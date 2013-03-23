@@ -63,12 +63,7 @@ class ADIF:
          logging.error("Unknown error occurred when reading the ADIF file.")
          raise
       
-      #if(format == ".adi"):
       records = self.parse_adi(text)
-      #elif(format == ".adx"):
-         #records = self.parse_adx(text)
-      #else:
-         #logging.error("Unknown file format.")
          
       if(records == []):
          logging.warning("No records found in the file. Empty file or wrong file type?")

@@ -77,11 +77,9 @@ class PyQSO(Gtk.Window):
          
       # Set up column names for each selected field
       field_names = self.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
-      data_types = self.logbook.SELECTED_FIELD_NAMES_TYPES.values()
-      for i in range(0, len(self.logbook.SELECTED_FIELD_NAMES_TYPES)):
+      for i in range(0, len(field_names)):
          renderer = Gtk.CellRendererText()
-         renderer.set_property("editable", True)
-         renderer.connect("edited", self.textcell_edited_callback, self.treeview, i+1)
+         renderer.set_property("editable", False)
          column = Gtk.TreeViewColumn(field_names[i], renderer, text=i+1)
          
          column.set_resizable(True)
@@ -106,7 +104,6 @@ class PyQSO(Gtk.Window):
       filter = Gtk.FileFilter()
       filter.set_name("All ADIF files")
       filter.add_pattern("*.adi")
-      filter.add_pattern("*.adx")
       dialog.add_filter(filter)
       
       response = dialog.run()
@@ -174,19 +171,6 @@ class PyQSO(Gtk.Window):
          self.logbook.delete_record(iter, index)
          
       dialog.destroy()
-      return
-      
-   def textcell_edited_callback(self, widget, path, text, treeview, column_index):
-      
-      #TODO: Validate user input!
-      
-      # First update the Record object. In this case, path is the row number.
-      column_name = treeview.get_column(column_index).get_title()
-      self.logbook.records[int(path)].set_field(column_name, text)
-      
-      # And then the GTK TreeView (i.e. the logbook)
-      self.logbook[path][column_index] = text
-      
       return
       
    def show_about(self, widget):
