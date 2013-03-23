@@ -189,26 +189,6 @@ class PyQSO(Gtk.Window):
       
       return
       
-   def booleancell_edited_callback(self, widget, path, text, treeview, column_index):
-
-      # Boolean combo boxes require special treatment:
-      # ADIF specification denotes True by the letter "Y" and False by the
-      # letter "N"...
-      if(text == "Yes"):
-         text_for_record = "Y"
-      elif(text == "No"):
-         text_for_record = "N"
-      else:
-         text_for_record = ""
-      column_name = treeview.get_column(column_index).get_title()
-      self.logbook.records[int(path)].set_field(column_name, text_for_record)
-   
-      # Update the logbook using the actual text from the combo box.
-      iter = self.logbook.get_iter(path)
-      self.logbook[path][column_index] = text
-      
-      return
-      
    def show_about(self, widget):
       about = Gtk.AboutDialog()
       about.set_program_name("PyQSO")
