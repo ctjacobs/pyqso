@@ -47,6 +47,63 @@ class Logbook(Gtk.ListStore):
       
       logging.debug("New Logbook instance created!")
       
+
+   def new_log(self, widget):
+      self.records = []
+      self.populate()
+      return
+
+   def open_log(self, widget):
+      dialog = Gtk.FileChooserDialog("Open File",
+                                    None,
+                                    Gtk.FileChooserAction.OPEN,
+                                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                    Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+      filter = Gtk.FileFilter()
+      filter.set_name("All ADIF files")
+      filter.add_pattern("*.adi")
+      dialog.add_filter(filter)
+      
+      response = dialog.run()
+      if(response == Gtk.ResponseType.OK):
+         path = dialog.get_filename()
+      else:
+         path = None
+      dialog.destroy()
+      
+      if(path is None):
+         logging.debug("No file path specified.")
+         return
+      
+      adif = ADIF()
+      self.records = adif.read(path)
+      self.populate()
+      
+      return
+      
+   def save_log(self, widget):
+      dialog = Gtk.FileChooserDialog("Save File",
+                              None,
+                              Gtk.FileChooserAction.SAVE,
+                              (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                              Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+                              
+      response = dialog.run()
+      if(response == Gtk.ResponseType.OK):
+         path = dialog.get_filename()
+      else:
+         path = None
+      dialog.destroy()
+      
+      if(path is None):
+         logging.debug("No file path specified.")
+         return
+         
+      adif = ADIF()
+      adif.write(self.records, path)
+      
+      return
+
    def add_record(self):
       # Adds a blank record to the end of the logbook,
       # to be completed by the user.

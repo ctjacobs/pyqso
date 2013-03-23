@@ -45,6 +45,9 @@ class PyQSO(Gtk.Window):
       vbox_outer = Gtk.VBox()
       self.add(vbox_outer)
       
+      # Create a new Logbook so we can add/remove/edit Record objects
+      self.logbook = Logbook()
+
       # Set up menu bar and populate it
       menu = Menu(self, vbox_outer)
 
@@ -53,8 +56,7 @@ class PyQSO(Gtk.Window):
       hbox = Gtk.HBox()
       vbox_outer.pack_start(hbox, True, True, 0)
       
-      # Create a new Logbook so we can add/remove/edit Record objects
-      self.logbook = Logbook()
+      # Render the logbook
       self.treeview = Gtk.TreeView(self.logbook)
       self.treeview.set_grid_lines(Gtk.TreeViewGridLines.BOTH)
 
@@ -70,7 +72,6 @@ class PyQSO(Gtk.Window):
       # The first column of the logbook will always be the unique record index.
       # Let's append this separately to the field names.
       renderer = Gtk.CellRendererText()
-      renderer.set_property("editable", False)
       column = Gtk.TreeViewColumn("INDEX", renderer, text=0)
       column.set_resizable(True)
       column.set_min_width(50)
@@ -80,9 +81,7 @@ class PyQSO(Gtk.Window):
       field_names = self.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
       for i in range(0, len(field_names)):
          renderer = Gtk.CellRendererText()
-         renderer.set_property("editable", False)
          column = Gtk.TreeViewColumn(field_names[i], renderer, text=i+1)
-         
          column.set_resizable(True)
          column.set_min_width(50)
          self.treeview.append_column(column)
@@ -91,61 +90,6 @@ class PyQSO(Gtk.Window):
       
       return
 
-   def new_log(self, widget):
-      self.logbook.records = []
-      self.logbook.populate()
-      return
-
-   def open_log(self, widget):
-      dialog = Gtk.FileChooserDialog("Open File",
-                                    None,
-                                    Gtk.FileChooserAction.OPEN,
-                                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                                    Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-      filter = Gtk.FileFilter()
-      filter.set_name("All ADIF files")
-      filter.add_pattern("*.adi")
-      dialog.add_filter(filter)
-      
-      response = dialog.run()
-      if(response == Gtk.ResponseType.OK):
-         path = dialog.get_filename()
-      else:
-         path = None
-      dialog.destroy()
-      
-      if(path is None):
-         logging.debug("No file path specified.")
-         return
-      
-      adif = ADIF()
-      self.logbook.records = adif.read(path)
-      self.logbook.populate()
-      
-      return
-      
-   def save_log(self, widget):
-      dialog = Gtk.FileChooserDialog("Save File",
-                              None,
-                              Gtk.FileChooserAction.SAVE,
-                              (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                              Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
-                              
-      response = dialog.run()
-      if(response == Gtk.ResponseType.OK):
-         path = dialog.get_filename()
-      else:
-         path = None
-      dialog.destroy()
-      
-      if(path is None):
-         logging.debug("No file path specified.")
-         return
-         
-      adif = ADIF()
-      adif.write(self.logbook.records, path)
-      
-      return
       
    def add_record_callback(self, widget):
       self.logbook.add_record()
@@ -232,3 +176,4 @@ if(__name__ == '__main__'):
 
    application = PyQSO() # Populate the main window and show it
    Gtk.main() # Start up the event loop!
+

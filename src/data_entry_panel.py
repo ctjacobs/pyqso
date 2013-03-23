@@ -21,40 +21,30 @@
 from gi.repository import Gtk, GObject
 import logging
 
+from adif import AVAILABLE_FIELD_NAMES_TYPES
+
 class DataEntryPanel(Gtk.VBox):
    
-   def __init__(self, parent, hbox):
+   def __init__(self, parent, hbox_parent):
       logging.debug("New DataEntryPanel instance created!")
       
       Gtk.VBox.__init__(self, spacing=2)
 
-      self.source_call = Gtk.Entry()
-      temp_hbox = Gtk.HBox(spacing=2)
-      temp_hbox.pack_start(Gtk.Label("Call: "), False, False, 2)
-      temp_hbox.pack_start(self.source_call, expand=True, fill=True, padding=2)
-      self.pack_start(temp_hbox, False, False, 0)
+      self.sources = {}
 
-      self.source_date = Gtk.Entry()
-      temp_hbox = Gtk.HBox(spacing=2)
-      temp_hbox.pack_start(Gtk.Label("Date: "), False, False, 2)
-      temp_hbox.pack_start(self.source_date, expand=True, fill=True, padding=2)
-      self.pack_start(temp_hbox, False, False, 0)
-
-      self.source_freq = Gtk.Entry()
-      temp_hbox = Gtk.HBox(spacing=6)
-      temp_hbox.pack_start(Gtk.Label("Freq.: "), False, False, 2)
-      temp_hbox.pack_start(self.source_freq, expand=True, fill=True, padding=2)
-      self.pack_start(temp_hbox, False, False, 0)
-
-      self.sources = {"CALL":self.source_call,
-                      "DATE":self.source_date,
-                      "FREQ":self.source_freq}
+      field_names = parent.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
+      for i in range(0, len(field_names)):
+         hbox_temp = Gtk.HBox(spacing=2)
+         hbox_temp.pack_start(Gtk.Label(field_names[i]), False, False, 0)
+         self.sources[field_names[i]] = Gtk.Entry()
+         hbox_temp.pack_start(self.sources[field_names[i]], True, True, 0)
+         self.pack_start(hbox_temp, False, False, 0)
 
       self.store = Gtk.Button("Store Data")
       self.store.connect("clicked", parent.edit_record_callback)
       self.pack_start(self.store, expand=False, fill=True, padding=2)
 
-      hbox.pack_start(self, False, False, 0)
+      hbox_parent.pack_start(self, False, False, 0)
 
       return
 
