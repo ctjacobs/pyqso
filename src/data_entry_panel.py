@@ -48,5 +48,19 @@ class DataEntryPanel(Gtk.VBox):
 
       return
 
+   def enable(self):
+      # Activates all text boxes and the "Store data" button
+      keys = self.sources.keys()
+      for i in range(0, len(keys)):
+         self.sources[keys[i]].set_property("editable", True)
+         self.sources[keys[i]].set_can_focus(True)
+      self.store.set_sensitive(True)
 
+   def disable(self):
+      # Deactivates all text boxes and the "Store data" button
+      keys = self.sources.keys()
+      for i in range(0, len(keys)):
+         self.sources[keys[i]].set_property("editable", False)
+         self.sources[keys[i]].set_can_focus(False)
+      self.store.set_sensitive(False)
 

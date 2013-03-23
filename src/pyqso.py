@@ -55,6 +55,7 @@ class PyQSO(Gtk.Window):
       vbox_outer.pack_start(hbox, True, True, 0)
       
       self.data_entry_panel = DataEntryPanel(self, hbox)
+      self.data_entry_panel.disable()
 
       # Render the logbook
       self.treeview = Gtk.TreeView(self.logbook)
