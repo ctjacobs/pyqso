@@ -26,15 +26,37 @@ class DataEntryPanel(Gtk.VBox):
    def __init__(self, parent, hbox):
       logging.debug("New DataEntryPanel instance created!")
       
-      Gtk.VBox.__init__(self, spacing=6)
+      Gtk.VBox.__init__(self, spacing=2)
 
-      self.edit_call = Gtk.Entry()
-      temp_hbox = Gtk.HBox(spacing=6)
-      temp_hbox.pack_start(Gtk.Label("Call: "), False, False, 0)
-      temp_hbox.pack_start(self.edit_call, False, False, 0)
+      self.source_call = Gtk.Entry()
+      temp_hbox = Gtk.HBox(spacing=2)
+      temp_hbox.pack_start(Gtk.Label("Call: "), False, False, 2)
+      temp_hbox.pack_start(self.source_call, expand=True, fill=True, padding=2)
       self.pack_start(temp_hbox, False, False, 0)
 
+      self.source_date = Gtk.Entry()
+      temp_hbox = Gtk.HBox(spacing=2)
+      temp_hbox.pack_start(Gtk.Label("Date: "), False, False, 2)
+      temp_hbox.pack_start(self.source_date, expand=True, fill=True, padding=2)
+      self.pack_start(temp_hbox, False, False, 0)
+
+      self.source_freq = Gtk.Entry()
+      temp_hbox = Gtk.HBox(spacing=6)
+      temp_hbox.pack_start(Gtk.Label("Freq.: "), False, False, 2)
+      temp_hbox.pack_start(self.source_freq, expand=True, fill=True, padding=2)
+      self.pack_start(temp_hbox, False, False, 0)
+
+      self.sources = {"CALL":self.source_call,
+                      "DATE":self.source_date,
+                      "FREQ":self.source_freq}
+
+      self.store = Gtk.Button("Store Data")
+      self.store.connect("clicked", parent.edit_record_callback)
+      self.pack_start(self.store, expand=False, fill=True, padding=2)
 
       hbox.pack_start(self, False, False, 0)
 
       return
+
+
+
