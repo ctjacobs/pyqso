@@ -38,8 +38,7 @@ class PyQSO(Gtk.Window):
       
       self.set_size_request(500, 300)
       self.set_position(Gtk.WindowPosition.CENTER)
-      # Kills the application if the close button is clicked
-      # on the main window itself. 
+      # Kills the application if the close button is clicked on the main window itself. 
       self.connect("delete-event", Gtk.main_quit)
       
       vbox_outer = Gtk.VBox()
@@ -51,17 +50,15 @@ class PyQSO(Gtk.Window):
       # Set up menu bar and populate it
       menu = Menu(self, vbox_outer)
 
-      # Under the menu, we want the data entry panel on the left and the logbook on the right,
-      # so we'll place these in an HBox.
+      # Under the menu, we want the data entry panel on the left and the logbook on the right.
       hbox = Gtk.HBox()
       vbox_outer.pack_start(hbox, True, True, 0)
       
+      self.data_entry_panel = DataEntryPanel(self, hbox)
+
       # Render the logbook
       self.treeview = Gtk.TreeView(self.logbook)
       self.treeview.set_grid_lines(Gtk.TreeViewGridLines.BOTH)
-
-      self.data_entry_panel = DataEntryPanel(self, hbox)
-
       # Allow the Logbook to be scrolled up/down
       sw = Gtk.ScrolledWindow()
       sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
@@ -89,7 +86,6 @@ class PyQSO(Gtk.Window):
       self.show_all()
       
       return
-
       
    def add_record_callback(self, widget):
       self.logbook.add_record()

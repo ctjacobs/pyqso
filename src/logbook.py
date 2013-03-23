@@ -28,15 +28,13 @@ class Logbook(Gtk.ListStore):
    
    def __init__(self):
             
-      self.SELECTED_FIELD_NAMES_TYPES = AVAILABLE_FIELD_NAMES_TYPES # FIXME: Allow the user to select the field names. By default, let's select them all.
+      # FIXME: Allow the user to select the field names. By default, let's select them all.
+      self.SELECTED_FIELD_NAMES_TYPES = AVAILABLE_FIELD_NAMES_TYPES 
       
-      # The ListStore constructor needs to know the data types of the
-      # columns, so let's make a list containing these now.
+      # The ListStore constructor needs to know the data types of the columns.
+      # The index is always an integer. We will assume the ADIF fields are strings.
       data_types = [int]
       for key in self.SELECTED_FIELD_NAMES_TYPES.keys():
-         # NOTE: we store all boolean field values as strings
-         # and use the combo boxes rather than the toggle buttons.
-         # The latter are are easier to modify accidentally.
          data_types.append(str)
       
       # Call the constructor of the super class (Gtk.ListStore)
