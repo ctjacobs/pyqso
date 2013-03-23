@@ -44,7 +44,7 @@ class PyQSO(Gtk.Window):
       vbox_outer = Gtk.VBox()
       self.add(vbox_outer)
       
-      # Create a new Logbook so we can add/remove/edit Record objects
+      # Create a Logbook so we can add/remove/edit Record objects
       self.logbook = Logbook()
 
       # Set up menu bar and populate it
@@ -90,6 +90,12 @@ class PyQSO(Gtk.Window):
       
    def add_record_callback(self, widget):
       self.logbook.add_record()
+      self.data_entry_panel.enable()
+      
+      # The current row is now the new Record's row.
+      selection = self.treeview.get_selection()
+      selection.select_path(self.logbook.get_number_of_records()-1)
+
       return
       
    def delete_record_callback(self, widget):
@@ -112,9 +118,13 @@ class PyQSO(Gtk.Window):
          self.logbook.delete_record(iter, index)
          
       dialog.destroy()
+
+      if(self.logbook.get_number_of_records() == 0):
+         self.data_entry_panel.disable()
+
       return
 
-   def edit_record_callback(self, widget):
+   def update_record_callback(self, widget):
       
       #TODO: Validate user input!
 

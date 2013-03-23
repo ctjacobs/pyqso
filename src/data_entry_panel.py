@@ -30,8 +30,8 @@ class DataEntryPanel(Gtk.VBox):
       
       Gtk.VBox.__init__(self, spacing=2)
 
+      # Create label:entry pairs and store them in a dictionary
       self.sources = {}
-
       field_names = parent.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
       for i in range(0, len(field_names)):
          hbox_temp = Gtk.HBox(spacing=2)
@@ -40,27 +40,27 @@ class DataEntryPanel(Gtk.VBox):
          hbox_temp.pack_start(self.sources[field_names[i]], True, True, 0)
          self.pack_start(hbox_temp, False, False, 0)
 
-      self.store = Gtk.Button("Store Data")
-      self.store.connect("clicked", parent.edit_record_callback)
-      self.pack_start(self.store, expand=False, fill=True, padding=2)
+      self.update = Gtk.Button("Update Record")
+      self.update.connect("clicked", parent.update_record_callback)
+      self.pack_start(self.update, expand=False, fill=True, padding=2)
 
       hbox_parent.pack_start(self, False, False, 0)
 
       return
 
    def enable(self):
-      # Activates all text boxes and the "Store data" button
+      # Activates all text boxes and the update button
       keys = self.sources.keys()
       for i in range(0, len(keys)):
          self.sources[keys[i]].set_property("editable", True)
          self.sources[keys[i]].set_can_focus(True)
-      self.store.set_sensitive(True)
+      self.update.set_sensitive(True)
 
    def disable(self):
-      # Deactivates all text boxes and the "Store data" button
+      # Deactivates all text boxes and the update button
       keys = self.sources.keys()
       for i in range(0, len(keys)):
          self.sources[keys[i]].set_property("editable", False)
          self.sources[keys[i]].set_can_focus(False)
-      self.store.set_sensitive(False)
+      self.update.set_sensitive(False)
 
