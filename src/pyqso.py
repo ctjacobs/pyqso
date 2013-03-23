@@ -26,6 +26,7 @@ import optparse
 from adif import *
 from logbook import *
 from menu import *
+from data_entry_panel import *
    
 # The PyQSO application class
 class PyQSO(Gtk.Window):
@@ -41,20 +42,25 @@ class PyQSO(Gtk.Window):
       # on the main window itself. 
       self.connect("delete-event", Gtk.main_quit)
       
-      # Vertically aligned packing layout
-      vbox = Gtk.VBox(spacing=6)
-      self.add(vbox)
+      vbox_outer = Gtk.VBox()
+      self.add(vbox_outer)
       
       # Set up menu bar and populate it
-      menu = Menu(self, vbox)
+      menu = Menu(self, vbox_outer)
 
-      # SCROLLED WINDOW to host the list box defined below.
+      # Under the menu, we want the data entry panel on the left and the logbook on the right,
+      # so we'll place these in an HBox.
+      hbox = Gtk.HBox()
+      vbox_outer.pack_start(hbox, True, True, 0)
+
+      data_entry_panel = DataEntryPanel(self, hbox)
+      
+      # Allow the Logbook to be scrolled up/down
       sw = Gtk.ScrolledWindow()
       sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
       sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-      vbox.pack_start(sw, True, True, 0)
-
-      # LIST BOX for the radio log entries
+      hbox.pack_start(sw, True, True, 0)
+      # Create a new Logbook so we can add/remove/edit Record objects
       self.logbook = Logbook()
       self.treeview = Gtk.TreeView(self.logbook)
       self.treeview.set_grid_lines(Gtk.TreeViewGridLines.BOTH)
@@ -73,31 +79,10 @@ class PyQSO(Gtk.Window):
       field_names = self.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
       data_types = self.logbook.SELECTED_FIELD_NAMES_TYPES.values()
       for i in range(0, len(self.logbook.SELECTED_FIELD_NAMES_TYPES)):
-         
-         if(data_types[i] == "S"):
-            renderer = Gtk.CellRendererText()
-            renderer.set_property("editable", True)
-            renderer.connect("edited", self.textcell_edited_callback, self.treeview, i+1)
-            column = Gtk.TreeViewColumn(field_names[i], renderer, text=i+1)
-            
-         elif(data_types[i] == "B"):
-            choices = Gtk.ListStore(str)
-            for item in ["", "Yes", "No"]:
-               choices.append([item])
-            
-            renderer = Gtk.CellRendererCombo()
-            renderer.set_property("editable", True)
-            renderer.set_property("model", choices)
-            renderer.set_property("text-column", 0)
-            renderer.connect("edited", self.booleancell_edited_callback, self.treeview, i+1)
-            column = Gtk.TreeViewColumn(field_names[i], renderer, text=i+1)
-            
-         else:
-            # Default to a text-based cell if the field name is unknown.
-            renderer = Gtk.CellRendererText()
-            renderer.set_property("editable", True)
-            renderer.connect("edited", self.textcell_edited_callback, self.treeview, i+1)
-            column = Gtk.TreeViewColumn(field_names[i], renderer, text=i+1)
+         renderer = Gtk.CellRendererText()
+         renderer.set_property("editable", True)
+         renderer.connect("edited", self.textcell_edited_callback, self.treeview, i+1)
+         column = Gtk.TreeViewColumn(field_names[i], renderer, text=i+1)
          
          column.set_resizable(True)
          column.set_min_width(50)

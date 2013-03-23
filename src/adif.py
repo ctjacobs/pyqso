@@ -26,13 +26,9 @@ from record import *
 
 # All the possible field names and their associated data types 
 # from the ADIF specification (version 3.0.2)
-AVAILABLE_FIELD_NAMES_TYPES = {"ADDRESS": "M", 
-                              "ADDRESS__INTL": "G", 
-                              "AGE": "N",
-                              "CALL": "S", 
+AVAILABLE_FIELD_NAMES_TYPES = {"CALL": "S", 
                               "FREQ": "N", 
-                              "DATE": "D",
-                              "QSO__RANDOM": "B"}
+                              "DATE": "D"}
 
 # A: AwardList
 # B: Boolean

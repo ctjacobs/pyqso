@@ -35,7 +35,7 @@ class Menu(Gtk.MenuBar):
       parent.add_accel_group(agrp)
       
       ###### FILE ######
-      mitem_file = Gtk.MenuItem("File")
+      mitem_file = Gtk.MenuItem("Log")
       self.append(mitem_file)  
       subm_file = Gtk.Menu()
       mitem_file.set_submenu(subm_file)
@@ -72,7 +72,7 @@ class Menu(Gtk.MenuBar):
       
       
       ###### LOG ######
-      mitem_log = Gtk.MenuItem("Log")
+      mitem_log = Gtk.MenuItem("Record")
       self.append(mitem_log)  
       subm_log = Gtk.Menu()
       mitem_log.set_submenu(subm_log)
