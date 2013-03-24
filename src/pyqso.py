@@ -27,7 +27,7 @@ from adif import *
 from logbook import *
 from menu import *
 from toolbar import *
-from data_entry_panel import *
+from record_dialog import *
    
 # The PyQSO application class
 class PyQSO(Gtk.Window):

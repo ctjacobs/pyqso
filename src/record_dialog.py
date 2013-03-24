@@ -28,7 +28,7 @@ class RecordDialog(Gtk.Dialog):
    def __init__(self, parent):
       logging.debug("New RecordDialog instance created!")
       
-      Gtk.Window.__init__(self, title="Update Record")
+      Gtk.Dialog.__init__(self, title="Update Record")
 
       # Create label:entry pairs and store them in a dictionary
       self.sources = {}
