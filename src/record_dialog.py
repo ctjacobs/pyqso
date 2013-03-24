@@ -65,11 +65,3 @@ class RecordDialog(Gtk.Dialog):
    def get_data(self, field_name):
       return self.sources[field_name].get_text()
 
-   def set_data(self, field_name, data):
-      if(data is None):
-         self.sources[field_name].set_text("")
-      else:
-         self.sources[field_name].set_text(data)
-      return
-
-
