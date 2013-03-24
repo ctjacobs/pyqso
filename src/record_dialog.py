@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# File: data_entry_panel.py
+# File: record_dialog.py
 
 #    Copyright (C) 2013 Christian Jacobs.
 
@@ -23,12 +23,12 @@ import logging
 
 from adif import AVAILABLE_FIELD_NAMES_TYPES
 
-class DataEntryPanel(Gtk.VBox):
+class RecordDialog(Gtk.Dialog):
    
-   def __init__(self, parent, hbox_parent):
-      logging.debug("New DataEntryPanel instance created!")
+   def __init__(self, parent):
+      logging.debug("New RecordDialog instance created!")
       
-      Gtk.VBox.__init__(self, spacing=2)
+      Gtk.Window.__init__(self, title="Update Record")
 
       # Create label:entry pairs and store them in a dictionary
       self.sources = {}
@@ -44,7 +44,7 @@ class DataEntryPanel(Gtk.VBox):
       self.update.connect("clicked", parent.update_record_callback)
       self.pack_start(self.update, expand=False, fill=True, padding=2)
 
-      hbox_parent.pack_start(self, False, False, 0)
+      #hbox_parent.pack_start(self, False, False, 0)
 
       return
 
@@ -58,19 +58,4 @@ class DataEntryPanel(Gtk.VBox):
          self.sources[field_name].set_text(data)
       return
 
-   def enable(self):
-      # Activates all Entry widgets and the update button
-      keys = self.sources.keys()
-      for i in range(0, len(keys)):
-         self.sources[keys[i]].set_property("editable", True)
-         self.sources[keys[i]].set_can_focus(True)
-      self.update.set_sensitive(True)
-
-   def disable(self):
-      # Deactivates all Entry widgets and the update button
-      keys = self.sources.keys()
-      for i in range(0, len(keys)):
-         self.sources[keys[i]].set_property("editable", False)
-         self.sources[keys[i]].set_can_focus(False)
-      self.update.set_sensitive(False)
 

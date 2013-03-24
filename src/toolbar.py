@@ -21,7 +21,6 @@
 from gi.repository import Gtk, GObject
 import logging
 
-
 class Toolbar(Gtk.HBox):
    
    def __init__(self, parent, vbox_parent):

@@ -26,6 +26,7 @@ import optparse
 from adif import *
 from logbook import *
 from menu import *
+from toolbar import *
 from data_entry_panel import *
    
 # The PyQSO application class
@@ -47,28 +48,21 @@ class PyQSO(Gtk.Window):
       # Create a Logbook so we can add/remove/edit Record objects
       self.logbook = Logbook()
 
-      # Set up menu bar and populate it
+      # Set up menu and tool bars
       menu = Menu(self, vbox_outer)
-
-      # Under the menu, we want the data entry panel on the left and the logbook on the right.
-      hbox = Gtk.HBox()
-      vbox_outer.pack_start(hbox, True, True, 0)
-      
-      self.data_entry_panel = DataEntryPanel(self, hbox)
-      self.data_entry_panel.disable()
+      toolbar = Toolbar(self, vbox_outer)
 
       # Render the logbook
       self.treeview = Gtk.TreeView(self.logbook)
       self.treeview.set_grid_lines(Gtk.TreeViewGridLines.BOTH)
       self.treeselection = self.treeview.get_selection()
       self.treeselection.set_mode(Gtk.SelectionMode.SINGLE)
-      self.treeselection.connect("changed", self.set_data_entry_panel_callback)
       # Allow the Logbook to be scrolled up/down
       sw = Gtk.ScrolledWindow()
       sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
       sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
       sw.add(self.treeview)
-      hbox.pack_start(sw, True, True, 0)
+      vbox_outer.pack_start(sw, True, True, 0)
 
       # The first column of the logbook will always be the unique record index.
       # Let's append this separately to the field names.
@@ -87,17 +81,18 @@ class PyQSO(Gtk.Window):
          column.set_min_width(50)
          self.treeview.append_column(column)
       
+      self.statusbar = Gtk.Statusbar()
+      context_id = self.statusbar.get_context_id("Status")
+      vbox_outer.pack_start(self.statusbar, False, False, 0)
+
       self.show_all()
       
       return
       
    def add_record_callback(self, widget):
       self.logbook.add_record()
-      self.data_entry_panel.enable()
-      
       # Select the new Record's row.
       self.treeselection.select_path(self.logbook.get_number_of_records()-1)
-
       return
       
    def delete_record_callback(self, widget):
@@ -119,9 +114,6 @@ class PyQSO(Gtk.Window):
          
       dialog.destroy()
 
-      if(self.logbook.get_number_of_records() == 0):
-         self.data_entry_panel.disable()
-
       return
 
    def update_record_callback(self, widget):
@@ -139,7 +131,7 @@ class PyQSO(Gtk.Window):
 
       field_names = self.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
       for column_index in range(0, len(field_names)):
-         data = self.data_entry_panel.get_data(field_names[column_index])
+         #data = self.data_entry_panel.get_data(field_names[column_index])
          # First update the Record object... 
          # (we add 1 onto the column_index here because we don't want to consider the index column)
          column_name = self.treeview.get_column(column_index+1).get_title()
@@ -147,25 +139,6 @@ class PyQSO(Gtk.Window):
          # ...and then the Logbook.
          self.logbook[row_index][column_index+1] = data
       
-      return
-
-   def set_data_entry_panel_callback(self, widget):
-      # Get the selected row in the logbook
-      (model, path) = self.treeselection.get_selected_rows()
-      try:
-         iter = model.get_iter(path[0])
-         index = model.get_value(iter,0)
-      except IndexError:
-         logging.debug("Could not find the selected row's index!")
-         return
-
-      if(index > self.logbook.get_number_of_records()-1):
-         index = self.logbook.get_number_of_records()-1
-
-      record = self.logbook.get_record(index)
-      field_names = self.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
-      for i in range(0, len(field_names)):
-         self.data_entry_panel.set_data(field_names[i], record.get_data(field_names[i]))
       return
 
    def show_about(self, widget):
