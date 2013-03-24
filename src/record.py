@@ -28,7 +28,7 @@ class Record:
       self.fields_and_data = fields_and_data
       logging.debug("New Record instance created!")
       
-   def get_field_data(self, field_name):
+   def get_data(self, field_name):
       try:
          data = self.fields_and_data[field_name]
       except KeyError:
@@ -37,7 +37,7 @@ class Record:
          data = None
       return data
       
-   def set_field(self, field_name, data):   
+   def set_data(self, field_name, data):   
       # NOTE: If the field_name already exists in the dictionary,
       # then any data stored there will be over-written.
       self.fields_and_data[field_name.upper()] = data

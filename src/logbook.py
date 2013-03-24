@@ -156,7 +156,7 @@ class Logbook(Gtk.ListStore):
          # First append the unique index given to the record.
          logbook_entry.append(i)
          for field in self.SELECTED_FIELD_NAMES_TYPES.keys():
-            logbook_entry.append(self.records[i].get_field_data(field))
+            logbook_entry.append(self.records[i].get_data(field))
          self.append(logbook_entry)
       
       return

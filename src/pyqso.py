@@ -143,7 +143,7 @@ class PyQSO(Gtk.Window):
          # First update the Record object... 
          # (we add 1 onto the column_index here because we don't want to consider the index column)
          column_name = self.treeview.get_column(column_index+1).get_title()
-         self.logbook.records[row_index].set_field(column_name, data)
+         self.logbook.records[row_index].set_data(column_name, data)
          # ...and then the Logbook.
          self.logbook[row_index][column_index+1] = data
       
@@ -162,7 +162,7 @@ class PyQSO(Gtk.Window):
       record = self.logbook.get_record(index)
       field_names = self.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
       for i in range(0, len(field_names)):
-         self.data_entry_panel.set_data(field_names[i], record.get_field_data(field_names[i]))
+         self.data_entry_panel.set_data(field_names[i], record.get_data(field_names[i]))
       return
 
    def show_about(self, widget):
