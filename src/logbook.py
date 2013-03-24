@@ -135,6 +135,9 @@ class Logbook(Gtk.ListStore):
 
    def get_number_of_records(self):
       return len(self.records)
+
+   def get_record(self, index):
+      return self.records[index]
       
    def check_consistency(self):
       # Make sure all the record indices are consecutive and 

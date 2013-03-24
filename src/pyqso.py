@@ -60,6 +60,9 @@ class PyQSO(Gtk.Window):
       # Render the logbook
       self.treeview = Gtk.TreeView(self.logbook)
       self.treeview.set_grid_lines(Gtk.TreeViewGridLines.BOTH)
+      self.treeselection = self.treeview.get_selection()
+      self.treeselection.set_mode(Gtk.SelectionMode.SINGLE)
+      self.treeselection.connect("changed", self.set_data_entry_panel_callback)
       # Allow the Logbook to be scrolled up/down
       sw = Gtk.ScrolledWindow()
       sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
@@ -92,24 +95,21 @@ class PyQSO(Gtk.Window):
       self.logbook.add_record()
       self.data_entry_panel.enable()
       
-      # The current row is now the new Record's row.
-      selection = self.treeview.get_selection()
-      selection.select_path(self.logbook.get_number_of_records()-1)
+      # Select the new Record's row.
+      self.treeselection.select_path(self.logbook.get_number_of_records()-1)
 
       return
       
    def delete_record_callback(self, widget):
-      # Get the selected row in the logbook and delete it.
-      selection = self.treeview.get_selection()
-      selection.set_mode(Gtk.SelectionMode.SINGLE)
-      (model, path) = selection.get_selected_rows()
+      # Get the selected row in the logbook
+      (model, path) = self.treeselection.get_selected_rows()
       try:
          iter = model.get_iter(path[0])
          index = model.get_value(iter,0)
       except IndexError:
          logging.debug("Trying to delete a record, but there are no records in the logbook!")
          return
-                          
+
       dialog = Gtk.MessageDialog(self, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                  Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
                                  "Are you sure you want to delete record %d?" % index)
@@ -128,15 +128,18 @@ class PyQSO(Gtk.Window):
       
       #TODO: Validate user input!
 
-      selection = self.treeview.get_selection()
-      selection.set_mode(Gtk.SelectionMode.SINGLE)
-      (model, path) = selection.get_selected_rows()
-      iter = model.get_iter(path[0])
-      row_index = model.get_value(iter,0)
+      # Get the selected row in the logbook
+      (model, path) = self.treeselection.get_selected_rows()
+      try:
+         iter = model.get_iter(path[0])
+         row_index = model.get_value(iter,0)
+      except IndexError:
+         logging.debug("Could not find the selected row's index!")
+         return
 
       field_names = self.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
       for column_index in range(0, len(field_names)):
-         data = self.data_entry_panel.sources[field_names[column_index]].get_text()
+         data = self.data_entry_panel.get_data(field_names[column_index])
          # First update the Record object... 
          # (we add 1 onto the column_index here because we don't want to consider the index column)
          column_name = self.treeview.get_column(column_index+1).get_title()
@@ -144,6 +147,22 @@ class PyQSO(Gtk.Window):
          # ...and then the Logbook.
          self.logbook[row_index][column_index+1] = data
       
+      return
+
+   def set_data_entry_panel_callback(self, widget):
+      # Get the selected row in the logbook
+      (model, path) = self.treeselection.get_selected_rows()
+      try:
+         iter = model.get_iter(path[0])
+         index = model.get_value(iter,0)
+      except IndexError:
+         logging.debug("Could not find the selected row's index!")
+         return
+
+      record = self.logbook.get_record(index)
+      field_names = self.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
+      for i in range(0, len(field_names)):
+         self.data_entry_panel.set_data(field_names[i], record.get_field_data(field_names[i]))
       return
 
    def show_about(self, widget):
