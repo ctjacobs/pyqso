@@ -59,7 +59,7 @@ class DataEntryPanel(Gtk.VBox):
       return
 
    def enable(self):
-      # Activates all text boxes and the update button
+      # Activates all Entry widgets and the update button
       keys = self.sources.keys()
       for i in range(0, len(keys)):
          self.sources[keys[i]].set_property("editable", True)
@@ -67,7 +67,7 @@ class DataEntryPanel(Gtk.VBox):
       self.update.set_sensitive(True)
 
    def disable(self):
-      # Deactivates all text boxes and the update button
+      # Deactivates all Entry widgets and the update button
       keys = self.sources.keys()
       for i in range(0, len(keys)):
          self.sources[keys[i]].set_property("editable", False)
