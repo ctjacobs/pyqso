@@ -20,7 +20,20 @@
 
 from gi.repository import Gtk, GObject
 import logging
+import httplib
 
 # Uses qrz.com to lookup details about a particular callsign.
 
+def init_session(username, password):
+   ''' Initiates a session with the qrz.com server. Hopefully this will return a session ID. '''
+   connection = httplib.HTTPSConnection('xmldata.qrz.com', port=443)
+   request = '/xml/current/?username=%s;password=%s;agent=pyqso' % (username, password)
+   connection.request('GET', request)
+   response = connection.getresponse()
+   data = response.read()
+
+   if(successful):
+      return session_id
+   else:
+      return None
 
