@@ -83,7 +83,13 @@ class Menu(Gtk.MenuBar):
       mitem_addrecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_log.append(mitem_addrecord)
       
-      mitem_deleterecord = Gtk.MenuItem("Delete Record...")
+      mitem_editrecord = Gtk.MenuItem("Edit Selected Record...")
+      mitem_editrecord.connect("activate", parent.edit_record_callback)
+      key, mod = Gtk.accelerator_parse("<Control>E")
+      mitem_editrecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
+      subm_log.append(mitem_editrecord)
+
+      mitem_deleterecord = Gtk.MenuItem("Delete Selected Record...")
       mitem_deleterecord.connect("activate", parent.delete_record_callback)
       key, mod = Gtk.accelerator_parse("Delete")
       mitem_deleterecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
