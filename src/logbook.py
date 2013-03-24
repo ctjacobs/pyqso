@@ -102,22 +102,19 @@ class Logbook(Gtk.ListStore):
       
       return
 
-   def add_record(self):
-      # Adds a blank record to the end of the logbook,
-      # to be completed by the user.
-      
-      fields_and_data_dictionary = {}
-      
+   def add_record(self, fields_and_data):
+      # Adds a record to the end of the logbook
+      # using data from the fields_and_data dictionary.
+
       logbook_entry = [len(self.records)] # Add the next available record index
       field_names = self.SELECTED_FIELD_NAMES_TYPES.keys()
       for i in range(0, len(field_names)):
-         # Initialise all field data to None.
-         fields_and_data_dictionary[field_names[i]] = None
-         logbook_entry.append(None)
-         
-      record = Record(fields_and_data_dictionary)
-      self.records.append(record)
+         logbook_entry.append(fields_and_data[field_names[i]])
       self.append(logbook_entry)
+
+      record = Record(fields_and_data)
+      self.records.append(record)
+
       # Hopefully this won't change anything as check_consistency
       # is also called in delete_record, but let's keep it
       # here as a sanity check.

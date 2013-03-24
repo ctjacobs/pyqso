@@ -91,11 +91,17 @@ class PyQSO(Gtk.Window):
       
    def add_record_callback(self, widget):
    
-      dialog = RecordDialog(self)
+      dialog = RecordDialog(self, index=None)
 
       response = dialog.run()
       if(response == Gtk.ResponseType.OK):
-         self.logbook.add_record()
+         fields_and_data = {}
+         field_names = self.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
+         for i in range(0, len(field_names)):
+            #TODO: Validate user input!
+            fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
+
+         self.logbook.add_record(fields_and_data)
          # Select the new Record's row.
          self.treeselection.select_path(self.logbook.get_number_of_records()-1)
 
@@ -124,9 +130,7 @@ class PyQSO(Gtk.Window):
 
       return
 
-   def update_record_callback(self, widget):
-      
-      #TODO: Validate user input!
+   def edit_record_callback(self, widget):
 
       # Get the selected row in the logbook
       (model, path) = self.treeselection.get_selected_rows()
@@ -137,16 +141,23 @@ class PyQSO(Gtk.Window):
          logging.debug("Could not find the selected row's index!")
          return
 
-      field_names = self.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
-      for column_index in range(0, len(field_names)):
-         #data = self.data_entry_panel.get_data(field_names[column_index])
-         # First update the Record object... 
-         # (we add 1 onto the column_index here because we don't want to consider the index column)
-         column_name = self.treeview.get_column(column_index+1).get_title()
-         self.logbook.records[row_index].set_data(column_name, data)
-         # ...and then the Logbook.
-         self.logbook[row_index][column_index+1] = data
+      dialog = RecordDialog(self, index=row_index)
+
+      response = dialog.run()
+      if(response == Gtk.ResponseType.OK):
+         fields_and_data = {}
+         field_names = self.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
+         for i in range(0, len(field_names)):
+            #TODO: Validate user input!
+            fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
+            # First update the Record object... 
+            self.logbook.records[row_index].set_data(field_names[i], fields_and_data[field_names[i]])
+            # ...and then the Logbook.
+            # (we add 1 onto the column_index here because we don't want to consider the index column)
+            self.logbook[row_index][i+1] = fields_and_data[field_names[i]]
       
+      dialog.destroy()
+
       return
 
    def show_about(self, widget):

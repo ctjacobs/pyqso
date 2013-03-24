@@ -25,7 +25,7 @@ from adif import AVAILABLE_FIELD_NAMES_TYPES
 
 class RecordDialog(Gtk.Dialog):
    
-   def __init__(self, parent):
+   def __init__(self, parent, index=None):
       logging.debug("New RecordDialog instance created!")
       
       Gtk.Dialog.__init__(self, title="Add/Edit Record", parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
@@ -40,9 +40,16 @@ class RecordDialog(Gtk.Dialog):
       field_names = parent.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
       vbox_inner = Gtk.VBox(spacing=2)
       for i in range(0, len(field_names)):
-         vbox_temp = Gtk.VBox(spacing=2)
-         vbox_temp.pack_start(Gtk.Label(field_names[i]), False, False, 0)
+         vbox_temp = Gtk.VBox(spacing=0)
+         label = Gtk.Label(field_names[i])
+         label.set_alignment(0, 0.5)
+         vbox_temp.pack_start(label, False, False, 0)
          self.sources[field_names[i]] = Gtk.Entry()
+
+         if(index is not None):
+            record = parent.logbook.get_record(index)
+            self.sources[field_names[i]].set_text(record.get_data(field_names[i]))
+
          vbox_temp.pack_start(self.sources[field_names[i]], True, True, 0)
          vbox_inner.pack_start(vbox_temp, False, False, 0)
       frame.add(vbox_inner)
