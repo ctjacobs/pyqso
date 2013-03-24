@@ -33,6 +33,7 @@ class Toolbar(Gtk.HBox):
       icon.set_from_stock(Gtk.STOCK_ADD, Gtk.IconSize.BUTTON)
       button = Gtk.Button()
       button.add(icon)
+      button.set_tooltip_text('Add record')
       button.connect("clicked", parent.add_record_callback)
       self.pack_start(button, False, False, 0)
 
@@ -41,14 +42,16 @@ class Toolbar(Gtk.HBox):
       icon.set_from_stock(Gtk.STOCK_EDIT, Gtk.IconSize.BUTTON)
       button = Gtk.Button()
       button.add(icon)
+      button.set_tooltip_text('Edit record')
       button.connect("clicked", parent.update_record_callback)
       self.pack_start(button, False, False, 0)
 
-      # Remove record
+      # Delete record
       icon = Gtk.Image()
       icon.set_from_stock(Gtk.STOCK_REMOVE, Gtk.IconSize.BUTTON)
       button = Gtk.Button()
       button.add(icon)
+      button.set_tooltip_text('Delete record')
       button.connect("clicked", parent.delete_record_callback)
       self.pack_start(button, False, False, 0)
 
