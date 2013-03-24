@@ -90,9 +90,17 @@ class PyQSO(Gtk.Window):
       return
       
    def add_record_callback(self, widget):
-      self.logbook.add_record()
-      # Select the new Record's row.
-      self.treeselection.select_path(self.logbook.get_number_of_records()-1)
+   
+      dialog = RecordDialog(self)
+
+      response = dialog.run()
+      if(response == Gtk.ResponseType.OK):
+         self.logbook.add_record()
+         # Select the new Record's row.
+         self.treeselection.select_path(self.logbook.get_number_of_records()-1)
+
+      dialog.destroy()
+
       return
       
    def delete_record_callback(self, widget):

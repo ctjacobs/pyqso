@@ -28,23 +28,26 @@ class RecordDialog(Gtk.Dialog):
    def __init__(self, parent):
       logging.debug("New RecordDialog instance created!")
       
-      Gtk.Dialog.__init__(self, title="Update Record")
+      Gtk.Dialog.__init__(self, title="Add/Edit Record", parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
+
+      frame = Gtk.Frame()
+      label = Gtk.Label("QSO Data")
+      frame.set_label_widget(label)
+      self.vbox.add(frame)
 
       # Create label:entry pairs and store them in a dictionary
       self.sources = {}
       field_names = parent.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
+      vbox_inner = Gtk.VBox(spacing=2)
       for i in range(0, len(field_names)):
-         hbox_temp = Gtk.HBox(spacing=2)
-         hbox_temp.pack_start(Gtk.Label(field_names[i]), False, False, 0)
+         vbox_temp = Gtk.VBox(spacing=2)
+         vbox_temp.pack_start(Gtk.Label(field_names[i]), False, False, 0)
          self.sources[field_names[i]] = Gtk.Entry()
-         hbox_temp.pack_start(self.sources[field_names[i]], True, True, 0)
-         self.pack_start(hbox_temp, False, False, 0)
+         vbox_temp.pack_start(self.sources[field_names[i]], True, True, 0)
+         vbox_inner.pack_start(vbox_temp, False, False, 0)
+      frame.add(vbox_inner)
 
-      self.update = Gtk.Button("Update Record")
-      self.update.connect("clicked", parent.update_record_callback)
-      self.pack_start(self.update, expand=False, fill=True, padding=2)
-
-      #hbox_parent.pack_start(self, False, False, 0)
+      self.show_all()
 
       return
 
