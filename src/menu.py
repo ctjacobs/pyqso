@@ -84,7 +84,7 @@ class Menu(Gtk.MenuBar):
       subm_log.append(mitem_addrecord)
       
       mitem_editrecord = Gtk.MenuItem("Edit Selected Record...")
-      mitem_editrecord.connect("activate", parent.edit_record_callback)
+      mitem_editrecord.connect("activate", parent.edit_record_callback, None, None)
       key, mod = Gtk.accelerator_parse("<Control>E")
       mitem_editrecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_log.append(mitem_editrecord)

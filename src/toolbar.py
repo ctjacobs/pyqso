@@ -43,7 +43,7 @@ class Toolbar(Gtk.HBox):
       button = Gtk.Button()
       button.add(icon)
       button.set_tooltip_text('Edit record')
-      button.connect("clicked", parent.edit_record_callback)
+      button.connect("clicked", parent.edit_record_callback, None, None)
       self.pack_start(button, False, False, 0)
 
       # Delete record

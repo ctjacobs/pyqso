@@ -55,6 +55,7 @@ class PyQSO(Gtk.Window):
       # Render the logbook
       self.treeview = Gtk.TreeView(self.logbook)
       self.treeview.set_grid_lines(Gtk.TreeViewGridLines.BOTH)
+      self.treeview.connect("row-activated", self.edit_record_callback)
       self.treeselection = self.treeview.get_selection()
       self.treeselection.set_mode(Gtk.SelectionMode.SINGLE)
       # Allow the Logbook to be scrolled up/down
@@ -130,7 +131,9 @@ class PyQSO(Gtk.Window):
 
       return
 
-   def edit_record_callback(self, widget):
+   def edit_record_callback(self, widget, path, view_column):
+      # Note: the path and view_column arguments need to be passed in
+      # since they associated with the row-activated signal.
 
       # Get the selected row in the logbook
       (model, path) = self.treeselection.get_selected_rows()

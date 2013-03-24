@@ -28,7 +28,11 @@ class RecordDialog(Gtk.Dialog):
    def __init__(self, parent, index=None):
       logging.debug("New RecordDialog instance created!")
       
-      Gtk.Dialog.__init__(self, title="Add/Edit Record", parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
+      if(index is not None):
+         title = "Edit Record %d" % index
+      else:
+         title = "Add Record"
+      Gtk.Dialog.__init__(self, title=title, parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
 
       frame = Gtk.Frame()
       label = Gtk.Label("QSO Data")
