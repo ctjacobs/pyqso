@@ -159,6 +159,9 @@ class PyQSO(Gtk.Window):
          logging.debug("Could not find the selected row's index!")
          return
 
+      if(index > self.logbook.get_number_of_records()-1):
+         index = self.logbook.get_number_of_records()-1
+
       record = self.logbook.get_record(index)
       field_names = self.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
       for i in range(0, len(field_names)):
