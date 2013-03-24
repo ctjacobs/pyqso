@@ -160,3 +160,4 @@ Generated on %s. Contains %d record(s).
 if(__name__ == '__main__'):
    a = ADIF() 
    a.test_read()
+
