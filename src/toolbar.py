@@ -34,7 +34,7 @@ class Toolbar(Gtk.HBox):
       button = Gtk.Button()
       button.add(icon)
       button.set_tooltip_text('Add record')
-      button.connect("clicked", parent.add_record_callback)
+      button.connect("clicked", parent.logbook.add_record_callback, parent)
       self.pack_start(button, False, False, 0)
 
       # Edit record
@@ -43,7 +43,7 @@ class Toolbar(Gtk.HBox):
       button = Gtk.Button()
       button.add(icon)
       button.set_tooltip_text('Edit record')
-      button.connect("clicked", parent.edit_record_callback, None, None)
+      button.connect("clicked", parent.logbook.edit_record_callback, None, None, parent)
       self.pack_start(button, False, False, 0)
 
       # Delete record
@@ -52,7 +52,7 @@ class Toolbar(Gtk.HBox):
       button = Gtk.Button()
       button.add(icon)
       button.set_tooltip_text('Delete record')
-      button.connect("clicked", parent.delete_record_callback)
+      button.connect("clicked", parent.logbook.delete_record_callback, parent)
       self.pack_start(button, False, False, 0)
 
       vbox_parent.pack_start(self, False, False, 0)

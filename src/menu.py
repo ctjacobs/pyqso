@@ -78,19 +78,19 @@ class Menu(Gtk.MenuBar):
       mitem_log.set_submenu(subm_log)
       
       mitem_addrecord = Gtk.MenuItem("Add Record...")
-      mitem_addrecord.connect("activate", parent.add_record_callback)
+      mitem_addrecord.connect("activate", parent.logbook.add_record_callback, parent)
       key, mod = Gtk.accelerator_parse("<Control>R")
       mitem_addrecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_log.append(mitem_addrecord)
       
       mitem_editrecord = Gtk.MenuItem("Edit Selected Record...")
-      mitem_editrecord.connect("activate", parent.edit_record_callback, None, None)
+      mitem_editrecord.connect("activate", parent.logbook.edit_record_callback, None, None, parent)
       key, mod = Gtk.accelerator_parse("<Control>E")
       mitem_editrecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_log.append(mitem_editrecord)
 
       mitem_deleterecord = Gtk.MenuItem("Delete Selected Record...")
-      mitem_deleterecord.connect("activate", parent.delete_record_callback)
+      mitem_deleterecord.connect("activate", parent.logbook.delete_record_callback, parent)
       key, mod = Gtk.accelerator_parse("Delete")
       mitem_deleterecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_log.append(mitem_deleterecord)
@@ -115,6 +115,4 @@ class Menu(Gtk.MenuBar):
       subm_help.append(mitem_about)
       
       return
-      
-      
       

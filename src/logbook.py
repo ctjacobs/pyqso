@@ -21,8 +21,9 @@
 from gi.repository import Gtk, GObject
 import logging
 
-from record import *
 from adif import *
+from record import *
+from record_dialog import *
 
 class Logbook(Gtk.ListStore):
    
@@ -106,32 +107,127 @@ class Logbook(Gtk.ListStore):
       
       return
 
-   def add_record(self, fields_and_data):
-      # Adds a record to the end of the logbook
-      # using data from the fields_and_data dictionary.
+   def add_record_callback(self, widget, parent):
 
-      logbook_entry = [len(self.records)] # Add the next available record index
-      field_names = self.SELECTED_FIELD_NAMES_ORDERED
-      for i in range(0, len(field_names)):
-         logbook_entry.append(fields_and_data[field_names[i]])
-      self.append(logbook_entry)
+      dialog = RecordDialog(parent, index=None)
+      all_valid = False # Are all the field entries valid?
 
-      record = Record(fields_and_data)
-      self.records.append(record)
+      while(not all_valid): 
+         # This while loop gives the user infinite attempts at giving valid data.
+         # The add/edit record window will stay open until the user gives valid data,
+         # or until the Cancel button is clicked.
+         all_valid = True
+         response = dialog.run() #FIXME: Is it ok to call .run() multiple times on the same RecordDialog object?
+         if(response == Gtk.ResponseType.OK):
+            fields_and_data = {}
+            field_names = self.SELECTED_FIELD_NAMES_ORDERED
+            for i in range(0, len(field_names)):
+               #TODO: Validate user input!
+               fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
+               if(not(dialog.is_valid(field_names[i], fields_and_data[field_names[i]]))):
+                  # Data is not valid - inform the user.
+                  message = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
+                                    "The data in field \"%s\" is not valid!" % field_names[i])
+                  message.run()
+                  message.destroy()
+                  all_valid = False
+                  break # Don't check the other data until the user has fixed the current one.
 
-      # Hopefully this won't change anything as check_consistency
-      # is also called in delete_record, but let's keep it
-      # here as a sanity check.
-      self.check_consistency() 
-      
+            if(all_valid):
+               # All data has been validated, so we can go ahead and add the new record.
+               logbook_entry = [len(self.records)] # Add the next available record index
+               field_names = self.SELECTED_FIELD_NAMES_ORDERED
+               for i in range(0, len(field_names)):
+                  logbook_entry.append(fields_and_data[field_names[i]])
+               self.append(logbook_entry)
+
+               record = Record(fields_and_data)
+               self.records.append(record)
+
+               # Hopefully this won't change anything as check_consistency
+               # is also called in delete_record, but let's keep it
+               # here as a sanity check.
+               self.check_consistency() 
+               # Select the new Record's row in the treeview.
+               parent.treeselection.select_path(self.get_number_of_records()-1)
+
+      dialog.destroy()
       return
       
-   def delete_record(self, iter, index):
-      # Deletes the record with index 'index' from self.records.
-      # 'iter' is needed to remove the record from the ListStore itself.
-      self.records.pop(index)
-      self.remove(iter)
-      self.check_consistency()
+   def delete_record_callback(self, widget, parent):
+      # Get the selected row in the logbook
+      (model, path) = parent.treeselection.get_selected_rows()
+      try:
+         iter = model.get_iter(path[0])
+         index = model.get_value(iter,0)
+      except IndexError:
+         logging.debug("Trying to delete a record, but there are no records in the logbook!")
+         return
+
+      dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                 Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
+                                 "Are you sure you want to delete record %d?" % index)
+      response = dialog.run()
+      if(response == Gtk.ResponseType.YES):
+         # Deletes the record with index 'index' from self.records.
+         # 'iter' is needed to remove the record from the ListStore itself.
+         self.records.pop(index)
+         self.remove(iter)
+         self.check_consistency()
+         
+      dialog.destroy()
+
+      return
+
+   def edit_record_callback(self, widget, path, view_column, parent):
+      # Note: the path and view_column arguments need to be passed in
+      # since they associated with the row-activated signal.
+
+      # Get the selected row in the logbook
+      (model, path) = parent.treeselection.get_selected_rows()
+      try:
+         iter = model.get_iter(path[0])
+         row_index = model.get_value(iter,0)
+      except IndexError:
+         logging.debug("Could not find the selected row's index!")
+         return
+
+      dialog = RecordDialog(parent, index=row_index)
+      all_valid = False # Are all the field entries valid?
+
+      while(not all_valid): 
+         # This while loop gives the user infinite attempts at giving valid data.
+         # The add/edit record window will stay open until the user gives valid data,
+         # or until the Cancel button is clicked.
+         all_valid = True
+         response = dialog.run() #FIXME: Is it ok to call .run() multiple times on the same RecordDialog object?
+         if(response == Gtk.ResponseType.OK):
+            fields_and_data = {}
+            field_names = self.SELECTED_FIELD_NAMES_ORDERED
+            for i in range(0, len(field_names)):
+               #TODO: Validate user input!
+               fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
+               if(not(dialog.is_valid(field_names[i], fields_and_data[field_names[i]]))):
+                  # Data is not valid - inform the user.
+                  message = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
+                                    "The data in field \"%s\" is not valid!" % field_names[i])
+                  message.run()
+                  message.destroy()
+                  all_valid = False
+                  break # Don't check the other data until the user has fixed the current one.
+
+            if(all_valid):
+               for i in range(0, len(field_names)):
+                  # All data has been validated, so we can go ahead and update the record.
+                  # First update the Record object... 
+                  self.records[row_index].set_data(field_names[i], fields_and_data[field_names[i]])
+                  # ...and then the Logbook.
+                  # (we add 1 onto the column_index here because we don't want to consider the index column)
+                  self[row_index][i+1] = fields_and_data[field_names[i]]
+
+      dialog.destroy()
       return
 
    def get_number_of_records(self):
