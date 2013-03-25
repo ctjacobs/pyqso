@@ -89,6 +89,7 @@ class RecordDialog(Gtk.Dialog):
       vbox_inner.pack_start(hbox_temp, False, False, 6)
 
       if(index is not None):
+         # The record already exists, so display its current data in the input boxes.
          record = parent.logbook.get_record(index)
          field_names = parent.logbook.SELECTED_FIELD_NAMES_ORDERED
          for i in range(0, len(field_names)):
@@ -102,6 +103,13 @@ class RecordDialog(Gtk.Dialog):
 
    def get_data(self, field_name):
       return self.sources[field_name].get_text()
+
+   def is_valid(self, field_name, data):
+      if(field_name == "FREQ"):
+         return True
+
+      else:
+         return True
 
    def lookup_callback(self, widget):
       # TODO: If a session doesn't already exist: Show a username and password dialog, and initiate a session.
