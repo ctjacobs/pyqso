@@ -22,6 +22,7 @@ from gi.repository import Gtk, GObject
 import logging
 
 from adif import AVAILABLE_FIELD_NAMES_TYPES
+from callsign_lookup import *
 
 class RecordDialog(Gtk.Dialog):
    
@@ -38,24 +39,61 @@ class RecordDialog(Gtk.Dialog):
       label = Gtk.Label("QSO Data")
       frame.set_label_widget(label)
       self.vbox.add(frame)
+      vbox_inner = Gtk.VBox(spacing=2)
 
       # Create label:entry pairs and store them in a dictionary
       self.sources = {}
-      field_names = parent.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
-      vbox_inner = Gtk.VBox(spacing=2)
-      for i in range(0, len(field_names)):
-         vbox_temp = Gtk.VBox(spacing=0)
-         label = Gtk.Label(field_names[i])
-         label.set_alignment(0, 0.5)
-         vbox_temp.pack_start(label, False, False, 0)
-         self.sources[field_names[i]] = Gtk.Entry()
 
-         if(index is not None):
-            record = parent.logbook.get_record(index)
+      # CALL
+      hbox_temp = Gtk.HBox(spacing=0)
+      label = Gtk.Label(parent.logbook.SELECTED_FIELD_NAMES_FRIENDLY["CALL"])
+      label.set_alignment(0, 0.5)
+      hbox_temp.pack_start(label, False, False, 6)
+      self.sources["CALL"] = Gtk.Entry()
+      hbox_temp.pack_start(self.sources["CALL"], True, True, 6)
+      lookup = Gtk.Button("Lookup") # Looks up the callsign on qrz.com for more details.
+      lookup.connect("clicked", self.lookup_callback)
+      hbox_temp.pack_start(lookup, True, True, 6)
+      vbox_inner.pack_start(hbox_temp, False, False, 6)
+
+      # DATE
+      hbox_temp = Gtk.HBox(spacing=0)
+      label = Gtk.Label(parent.logbook.SELECTED_FIELD_NAMES_FRIENDLY["DATE"])
+      label.set_alignment(0, 0.5)
+      hbox_temp.pack_start(label, False, False, 6)
+      self.sources["DATE"] = Gtk.Entry()
+      hbox_temp.pack_start(self.sources["DATE"], True, True, 6)
+
+      # TIME
+      label = Gtk.Label(parent.logbook.SELECTED_FIELD_NAMES_FRIENDLY["TIME"])
+      label.set_alignment(0, 0.5)
+      hbox_temp.pack_start(label, False, False, 6)
+      self.sources["TIME"] = Gtk.Entry()
+      hbox_temp.pack_start(self.sources["TIME"], True, True, 6)
+      vbox_inner.pack_start(hbox_temp, False, False, 6)
+
+      # FREQ
+      hbox_temp = Gtk.HBox(spacing=0)
+      label = Gtk.Label(parent.logbook.SELECTED_FIELD_NAMES_FRIENDLY["FREQ"])
+      label.set_alignment(0, 0.5)
+      hbox_temp.pack_start(label, False, False, 6)
+      self.sources["FREQ"] = Gtk.Entry()
+      hbox_temp.pack_start(self.sources["FREQ"], True, True, 6)
+
+      # MODE
+      label = Gtk.Label(parent.logbook.SELECTED_FIELD_NAMES_FRIENDLY["MODE"])
+      label.set_alignment(0, 0.5)
+      hbox_temp.pack_start(label, False, False, 6)
+      self.sources["MODE"] = Gtk.Entry()
+      hbox_temp.pack_start(self.sources["MODE"], True, True, 6)
+      vbox_inner.pack_start(hbox_temp, False, False, 6)
+
+      if(index is not None):
+         record = parent.logbook.get_record(index)
+         field_names = parent.logbook.SELECTED_FIELD_NAMES_ORDERED
+         for i in range(0, len(field_names)):
             self.sources[field_names[i]].set_text(record.get_data(field_names[i]))
 
-         vbox_temp.pack_start(self.sources[field_names[i]], True, True, 0)
-         vbox_inner.pack_start(vbox_temp, False, False, 0)
       frame.add(vbox_inner)
 
       self.show_all()
@@ -64,4 +102,7 @@ class RecordDialog(Gtk.Dialog):
 
    def get_data(self, field_name):
       return self.sources[field_name].get_text()
+
+   def lookup_callback(self, widget):
+      print "hello!"
 

@@ -68,16 +68,16 @@ class PyQSO(Gtk.Window):
       # The first column of the logbook will always be the unique record index.
       # Let's append this separately to the field names.
       renderer = Gtk.CellRendererText()
-      column = Gtk.TreeViewColumn("INDEX", renderer, text=0)
+      column = Gtk.TreeViewColumn("Index", renderer, text=0)
       column.set_resizable(True)
       column.set_min_width(50)
       self.treeview.append_column(column)
          
       # Set up column names for each selected field
-      field_names = self.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
+      field_names = self.logbook.SELECTED_FIELD_NAMES_ORDERED
       for i in range(0, len(field_names)):
          renderer = Gtk.CellRendererText()
-         column = Gtk.TreeViewColumn(field_names[i], renderer, text=i+1)
+         column = Gtk.TreeViewColumn(self.logbook.SELECTED_FIELD_NAMES_FRIENDLY[field_names[i]], renderer, text=i+1)
          column.set_resizable(True)
          column.set_min_width(50)
          self.treeview.append_column(column)
@@ -97,7 +97,7 @@ class PyQSO(Gtk.Window):
       response = dialog.run()
       if(response == Gtk.ResponseType.OK):
          fields_and_data = {}
-         field_names = self.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
+         field_names = self.logbook.SELECTED_FIELD_NAMES_ORDERED
          for i in range(0, len(field_names)):
             #TODO: Validate user input!
             fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
@@ -149,7 +149,7 @@ class PyQSO(Gtk.Window):
       response = dialog.run()
       if(response == Gtk.ResponseType.OK):
          fields_and_data = {}
-         field_names = self.logbook.SELECTED_FIELD_NAMES_TYPES.keys()
+         field_names = self.logbook.SELECTED_FIELD_NAMES_ORDERED
          for i in range(0, len(field_names)):
             #TODO: Validate user input!
             fields_and_data[field_names[i]] = dialog.get_data(field_names[i])

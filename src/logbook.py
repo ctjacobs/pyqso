@@ -29,13 +29,17 @@ class Logbook(Gtk.ListStore):
    def __init__(self):
             
       # FIXME: Allow the user to select the field names. By default, let's select them all.
-      self.SELECTED_FIELD_NAMES_TYPES = AVAILABLE_FIELD_NAMES_TYPES 
-      
+      self.SELECTED_FIELD_NAMES_TYPES = AVAILABLE_FIELD_NAMES_TYPES
+      self.SELECTED_FIELD_NAMES_ORDERED = ["CALL", "DATE", "TIME", "FREQ", "MODE"]
+      self.SELECTED_FIELD_NAMES_FRIENDLY = {"CALL":"Callsign",
+                                            "DATE":"Date",
+                                            "TIME":"Time",
+                                            "FREQ":"Frequency",
+                                            "MODE":"Mode"}
+
       # The ListStore constructor needs to know the data types of the columns.
       # The index is always an integer. We will assume the ADIF fields are strings.
-      data_types = [int]
-      for key in self.SELECTED_FIELD_NAMES_TYPES.keys():
-         data_types.append(str)
+      data_types = [int] + [str]*len(self.SELECTED_FIELD_NAMES_ORDERED)
       
       # Call the constructor of the super class (Gtk.ListStore)
       Gtk.ListStore.__init__(self, *data_types)
@@ -107,7 +111,7 @@ class Logbook(Gtk.ListStore):
       # using data from the fields_and_data dictionary.
 
       logbook_entry = [len(self.records)] # Add the next available record index
-      field_names = self.SELECTED_FIELD_NAMES_TYPES.keys()
+      field_names = self.SELECTED_FIELD_NAMES_ORDERED
       for i in range(0, len(field_names)):
          logbook_entry.append(fields_and_data[field_names[i]])
       self.append(logbook_entry)
@@ -152,7 +156,7 @@ class Logbook(Gtk.ListStore):
          logbook_entry = [] # Create a new logbook entry
          # First append the unique index given to the record.
          logbook_entry.append(i)
-         for field in self.SELECTED_FIELD_NAMES_TYPES.keys():
+         for field in self.SELECTED_FIELD_NAMES_ORDERED:
             logbook_entry.append(self.records[i].get_data(field))
          self.append(logbook_entry)
       
