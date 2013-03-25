@@ -186,7 +186,7 @@ class PyQSO(Gtk.Window):
                   break # Don't check the other data until the user has fixed the current one.
 
             if(all_valid):
-               # All data has been validated, so we can go ahead and add the new record.
+               # All data has been validated, so we can go ahead and update the record.
                # First update the Record object... 
                self.logbook.records[row_index].set_data(field_names[i], fields_and_data[field_names[i]])
                # ...and then the Logbook.
