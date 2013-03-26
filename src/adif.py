@@ -30,7 +30,10 @@ AVAILABLE_FIELD_NAMES_TYPES = {"CALL": "S",
                               "DATE": "D",
                               "TIME": "T",
                               "FREQ": "N",
-                              "MODE":"C"}
+                              "BAND": "E",
+                              "MODE": "E",
+                              "RST_SENT": "S",
+                              "RST_RCVD": "S"}
 
 # A: AwardList
 # B: Boolean

@@ -31,12 +31,15 @@ class Logbook(Gtk.ListStore):
             
       # FIXME: Allow the user to select the field names. By default, let's select them all.
       self.SELECTED_FIELD_NAMES_TYPES = AVAILABLE_FIELD_NAMES_TYPES
-      self.SELECTED_FIELD_NAMES_ORDERED = ["CALL", "DATE", "TIME", "FREQ", "MODE"]
+      self.SELECTED_FIELD_NAMES_ORDERED = ["CALL", "DATE", "TIME", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]
       self.SELECTED_FIELD_NAMES_FRIENDLY = {"CALL":"Callsign",
                                             "DATE":"Date",
                                             "TIME":"Time",
                                             "FREQ":"Frequency",
-                                            "MODE":"Mode"}
+                                            "BAND":"Band",
+                                            "MODE":"Mode",
+                                            "RST_SENT":"TX RST",
+                                            "RST_RCVD":"RX RST"}
 
       # The ListStore constructor needs to know the data types of the columns.
       # The index is always an integer. We will assume the ADIF fields are strings.
