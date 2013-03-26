@@ -88,7 +88,7 @@ class RecordDialog(Gtk.Dialog):
       self.sources["BAND"] = Gtk.ComboBoxText()
       for band in bands:
          self.sources["BAND"].append_text(band)
-      self.sources["BAND"].set_active(0)
+      self.sources["BAND"].set_active(0) # Set an empty string as the default option.
       hbox_temp.pack_start(self.sources["BAND"], True, True, 6)
       vbox_inner.pack_start(hbox_temp, False, False, 6)
 
@@ -101,7 +101,7 @@ class RecordDialog(Gtk.Dialog):
       self.sources["MODE"] = Gtk.ComboBoxText()
       for mode in modes:
          self.sources["MODE"].append_text(mode)
-      self.sources["MODE"].set_active(0)
+      self.sources["MODE"].set_active(0) # Set an empty string as the default option.
       hbox_temp.pack_start(self.sources["MODE"], True, True, 6)
       vbox_inner.pack_start(hbox_temp, False, False, 6)
 
