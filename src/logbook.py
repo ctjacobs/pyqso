@@ -105,7 +105,7 @@ class Logbook(Gtk.Notebook):
       adif = ADIF()
       adif.write(log.records, path)
 
-      #current.set_tab_label(path)
+      #current.set_tab_label(path) #FIXME: Need to change the tab's label once the log is saved.
       
       return
 
@@ -125,6 +125,9 @@ class Logbook(Gtk.Notebook):
    def render_log(self, log):
       # Render the Log
       current = self.get_number_of_logs()-1
+      #sorter = Gtk.TreeModelSort(model=log) #FIXME: Get sorted columns working!
+      #sorter.set_sort_column_id(1, Gtk.SortType.ASCENDING)
+      #self.treeview.append(Gtk.TreeView(sorter))
       self.treeview.append(Gtk.TreeView(log))
       self.treeview[current].set_grid_lines(Gtk.TreeViewGridLines.BOTH)
       self.treeview[current].connect("row-activated", self.edit_record_callback, self)
@@ -214,7 +217,7 @@ class Logbook(Gtk.Notebook):
          iter = model.get_iter(path[0])
          index = model.get_value(iter,0)
       except IndexError:
-         logging.debug("Trying to delete a record, but there are no records in the logbook!")
+         logging.debug("Trying to delete a record, but there are no records in the log!")
          return
 
       dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
