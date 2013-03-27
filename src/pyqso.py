@@ -46,41 +46,18 @@ class PyQSO(Gtk.Window):
       
       # Create a Logbook so we can add/remove/edit Record objects
       self.logbook = Logbook()
+      self.logbook.new_log() # Create a new log by default.
 
       # Set up menu and tool bars
-      menu = Menu(self, vbox_outer)
-      toolbar = Toolbar(self, vbox_outer)
-
-      # Render the logbook
-      self.treeview = Gtk.TreeView(self.logbook)
-      self.treeview.set_grid_lines(Gtk.TreeViewGridLines.BOTH)
-      self.treeview.connect("row-activated", self.logbook.edit_record_callback, self)
-      self.treeselection = self.treeview.get_selection()
-      self.treeselection.set_mode(Gtk.SelectionMode.SINGLE)
-      # Allow the Logbook to be scrolled up/down
-      sw = Gtk.ScrolledWindow()
-      sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
-      sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-      sw.add(self.treeview)
-      vbox_outer.pack_start(sw, True, True, 0)
-
-      # The first column of the logbook will always be the unique record index.
-      # Let's append this separately to the field names.
-      renderer = Gtk.CellRendererText()
-      column = Gtk.TreeViewColumn("Index", renderer, text=0)
-      column.set_resizable(True)
-      column.set_min_width(50)
-      self.treeview.append_column(column)
-         
-      # Set up column names for each selected field
-      field_names = self.logbook.SELECTED_FIELD_NAMES_ORDERED
-      for i in range(0, len(field_names)):
-         renderer = Gtk.CellRendererText()
-         column = Gtk.TreeViewColumn(self.logbook.SELECTED_FIELD_NAMES_FRIENDLY[field_names[i]], renderer, text=i+1)
-         column.set_resizable(True)
-         column.set_min_width(50)
-         self.treeview.append_column(column)
+      # These classes depend on the Logbook class,
+      # so pack the logbook after the menu and toolbar.
+      menu = Menu(self)
+      vbox_outer.pack_start(menu, False, False, 0)
+      toolbar = Toolbar(self)
+      vbox_outer.pack_start(toolbar, False, False, 0)
       
+      vbox_outer.pack_start(self.logbook, True, True, 0)
+
       self.statusbar = Gtk.Statusbar()
       context_id = self.statusbar.get_context_id("Status")
       vbox_outer.pack_start(self.statusbar, False, False, 0)

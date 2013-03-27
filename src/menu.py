@@ -23,13 +23,11 @@ import logging
 
 class Menu(Gtk.MenuBar):
    
-   def __init__(self, parent, vbox):
+   def __init__(self, parent):
       logging.debug("New Menu instance created!")
       
       # First let's call the constructor of the super class (Gtk.MenuBar)
       Gtk.MenuBar.__init__(self)
-
-      vbox.pack_start(self, False, False, 0)
       
       agrp = Gtk.AccelGroup()
       parent.add_accel_group(agrp)
@@ -60,6 +58,12 @@ class Menu(Gtk.MenuBar):
       key, mod = Gtk.accelerator_parse("<Control>S")
       mitem_save.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_file.append(mitem_save)
+
+      # Close the current log
+      mitem_close = Gtk.MenuItem("Close Log")
+      mitem_close.connect("activate", parent.logbook.close_log)
+      mitem_close.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
+      subm_file.append(mitem_close)
  
       subm_file.append(Gtk.SeparatorMenuItem())
         

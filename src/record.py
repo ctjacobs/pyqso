@@ -34,7 +34,7 @@ class Record:
       except KeyError:
          # If we can't find the field name, return None
          logging.warning("Field name %s not found in the record!" % field_name)
-         data = None
+         data = ""
       return data
       
    def set_data(self, field_name, data):   

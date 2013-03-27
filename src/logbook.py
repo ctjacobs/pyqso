@@ -22,44 +22,31 @@ from gi.repository import Gtk, GObject
 import logging
 
 from adif import *
-from record import *
-from record_dialog import *
+from log import *
 
-class Logbook(Gtk.ListStore):
+class Logbook(Gtk.Notebook):
+   ''' A Logbook object can store multiple Log objects. '''
    
    def __init__(self):
-            
-      # FIXME: Allow the user to select the field names. By default, let's select them all.
-      self.SELECTED_FIELD_NAMES_TYPES = AVAILABLE_FIELD_NAMES_TYPES
-      self.SELECTED_FIELD_NAMES_ORDERED = ["CALL", "DATE", "TIME", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]
-      self.SELECTED_FIELD_NAMES_FRIENDLY = {"CALL":"Callsign",
-                                            "DATE":"Date",
-                                            "TIME":"Time",
-                                            "FREQ":"Frequency",
-                                            "BAND":"Band",
-                                            "MODE":"Mode",
-                                            "RST_SENT":"TX RST",
-                                            "RST_RCVD":"RX RST"}
 
-      # The ListStore constructor needs to know the data types of the columns.
-      # The index is always an integer. We will assume the ADIF fields are strings.
-      data_types = [int] + [str]*len(self.SELECTED_FIELD_NAMES_ORDERED)
-      
-      # Call the constructor of the super class (Gtk.ListStore)
-      Gtk.ListStore.__init__(self, *data_types)
-      
-      # Begin with no records.
-      self.records = []
+      Gtk.Notebook.__init__(self)
+            
+      # A stack of Log objects
+      self.logs = []
+
+      # For rendering the logs. One treeview and one treeselection per Log.
+      self.treeview = []
+      self.treeselection = []
       
       logging.debug("New Logbook instance created!")
-      
-
-   def new_log(self, widget):
-      self.records = []
-      self.populate()
+     
+   def new_log(self, widget=None):
+      l = Log() # Empty log
+      self.logs.append(l)
+      self.render_log(l)
       return
 
-   def open_log(self, widget):
+   def open_log(self, widget=None):
       dialog = Gtk.FileChooserDialog("Open File",
                                     None,
                                     Gtk.FileChooserAction.OPEN,
@@ -82,12 +69,20 @@ class Logbook(Gtk.ListStore):
          return
       
       adif = ADIF()
-      self.records = adif.read(path)
-      self.populate()
+      records = adif.read(path)
+      
+      l = Log(records, path)
+      self.logs.append(l)
+      self.render_log(l)
       
       return
       
-   def save_log(self, widget):
+   def save_log(self, widget=None):
+      current = self.get_current_page() # Gets the index of the selected tab in the logbook
+      if(current == -1):
+         logging.debug("No log files to save!")
+         return
+
       dialog = Gtk.FileChooserDialog("Save File",
                               None,
                               Gtk.FileChooserAction.SAVE,
@@ -105,14 +100,72 @@ class Logbook(Gtk.ListStore):
          logging.debug("No file path specified.")
          return
          
+      log = self.logs[current]
+
       adif = ADIF()
-      adif.write(self.records, path)
+      adif.write(log.records, path)
+
+      #current.set_tab_label(path)
       
       return
 
+   def close_log(self, widget=None):
+      current = self.get_current_page() # Gets the index of the selected tab in the logbook
+      if(current == -1):
+         logging.debug("No log files to close!")
+         return
+      self.logs.pop(current)
+      # Remove the log from the renderers too
+      self.treeview.pop(current)
+      self.treeselection.pop(current)
+      # And finally remove the tab in the Logbook
+      self.remove_page(current)
+      return
+
+   def render_log(self, log):
+      # Render the Log
+      current = self.get_number_of_logs()-1
+      self.treeview.append(Gtk.TreeView(log))
+      self.treeview[current].set_grid_lines(Gtk.TreeViewGridLines.BOTH)
+      self.treeview[current].connect("row-activated", self.edit_record_callback, self)
+      self.treeselection.append(self.treeview[current].get_selection())
+      self.treeselection[current].set_mode(Gtk.SelectionMode.SINGLE)
+      # Allow the Log to be scrolled up/down
+      sw = Gtk.ScrolledWindow()
+      sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+      sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+      sw.add(self.treeview[current])
+      vbox = Gtk.VBox()
+      vbox.pack_start(sw, True, True, 0)
+      self.append_page(vbox, Gtk.Label(self.logs[current].name)) # Append the new log as a new tab
+
+      # The first column of the logbook will always be the unique record index.
+      # Let's append this separately to the field names.
+      renderer = Gtk.CellRendererText()
+      column = Gtk.TreeViewColumn("Index", renderer, text=0)
+      column.set_resizable(True)
+      column.set_min_width(50)
+      self.treeview[current].append_column(column)
+         
+      # Set up column names for each selected field
+      field_names = self.logs[current].SELECTED_FIELD_NAMES_ORDERED
+      for i in range(0, len(field_names)):
+         renderer = Gtk.CellRendererText()
+         column = Gtk.TreeViewColumn(self.logs[current].SELECTED_FIELD_NAMES_FRIENDLY[field_names[i]], renderer, text=i+1)
+         column.set_resizable(True)
+         column.set_min_width(50)
+         self.treeview[current].append_column(column)
+
+      self.show_all()
+
    def add_record_callback(self, widget, parent):
 
-      dialog = RecordDialog(parent, index=None)
+      current = self.get_current_page() # Gets the index of the selected tab in the logbook
+      if(current == -1):
+         logging.debug("Tried to add a record, but no log present!")
+         return
+      log = self.logs[current]
+      dialog = RecordDialog(root_window=parent, log=log, index=None)
       all_valid = False # Are all the field entries valid?
 
       while(not all_valid): 
@@ -123,7 +176,7 @@ class Logbook(Gtk.ListStore):
          response = dialog.run() #FIXME: Is it ok to call .run() multiple times on the same RecordDialog object?
          if(response == Gtk.ResponseType.OK):
             fields_and_data = {}
-            field_names = self.SELECTED_FIELD_NAMES_ORDERED
+            field_names = log.SELECTED_FIELD_NAMES_ORDERED
             for i in range(0, len(field_names)):
                #TODO: Validate user input!
                fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
@@ -139,28 +192,24 @@ class Logbook(Gtk.ListStore):
 
             if(all_valid):
                # All data has been validated, so we can go ahead and add the new record.
-               logbook_entry = [len(self.records)] # Add the next available record index
-               field_names = self.SELECTED_FIELD_NAMES_ORDERED
+               log_entry = [log.get_number_of_records()] # Add the next available record index
+               field_names = log.SELECTED_FIELD_NAMES_ORDERED
                for i in range(0, len(field_names)):
-                  logbook_entry.append(fields_and_data[field_names[i]])
-               self.append(logbook_entry)
-
-               record = Record(fields_and_data)
-               self.records.append(record)
-
-               # Hopefully this won't change anything as check_consistency
-               # is also called in delete_record, but let's keep it
-               # here as a sanity check.
-               self.check_consistency() 
+                  log_entry.append(fields_and_data[field_names[i]])
+               log.append(log_entry)
+               log.add_record(fields_and_data)
                # Select the new Record's row in the treeview.
-               parent.treeselection.select_path(self.get_number_of_records()-1)
+               self.treeselection[current].select_path(log.get_number_of_records()-1)
 
       dialog.destroy()
       return
       
    def delete_record_callback(self, widget, parent):
-      # Get the selected row in the logbook
-      (model, path) = parent.treeselection.get_selected_rows()
+      current = self.get_current_page() # Get the selected log
+      if(current == -1):
+         logging.debug("Tried to delete a record, but no log present!")
+         return
+      (model, path) = self.treeselection[current].get_selected_rows() # Get the selected row in the log
       try:
          iter = model.get_iter(path[0])
          index = model.get_value(iter,0)
@@ -173,11 +222,9 @@ class Logbook(Gtk.ListStore):
                                  "Are you sure you want to delete record %d?" % index)
       response = dialog.run()
       if(response == Gtk.ResponseType.YES):
-         # Deletes the record with index 'index' from self.records.
+         # Deletes the record with index 'index' from the Records list.
          # 'iter' is needed to remove the record from the ListStore itself.
-         self.records.pop(index)
-         self.remove(iter)
-         self.check_consistency()
+         self.logs[current].delete_record(index, iter)
          
       dialog.destroy()
 
@@ -187,8 +234,11 @@ class Logbook(Gtk.ListStore):
       # Note: the path and view_column arguments need to be passed in
       # since they associated with the row-activated signal.
 
-      # Get the selected row in the logbook
-      (model, path) = parent.treeselection.get_selected_rows()
+      current = self.get_current_page() # Get the selected log
+      if(current == -1):
+         logging.debug("Tried to edit a record, but no log present!")
+         return
+      (model, path) = self.treeselection[current].get_selected_rows() # Get the selected row in the log
       try:
          iter = model.get_iter(path[0])
          row_index = model.get_value(iter,0)
@@ -196,7 +246,7 @@ class Logbook(Gtk.ListStore):
          logging.debug("Could not find the selected row's index!")
          return
 
-      dialog = RecordDialog(parent, index=row_index)
+      dialog = RecordDialog(root_window=parent, log=self.logs[current], index=row_index)
       all_valid = False # Are all the field entries valid?
 
       while(not all_valid): 
@@ -207,7 +257,7 @@ class Logbook(Gtk.ListStore):
          response = dialog.run() #FIXME: Is it ok to call .run() multiple times on the same RecordDialog object?
          if(response == Gtk.ResponseType.OK):
             fields_and_data = {}
-            field_names = self.SELECTED_FIELD_NAMES_ORDERED
+            field_names = self.logs[current].SELECTED_FIELD_NAMES_ORDERED
             for i in range(0, len(field_names)):
                #TODO: Validate user input!
                fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
@@ -225,40 +275,16 @@ class Logbook(Gtk.ListStore):
                for i in range(0, len(field_names)):
                   # All data has been validated, so we can go ahead and update the record.
                   # First update the Record object... 
-                  self.records[row_index].set_data(field_names[i], fields_and_data[field_names[i]])
+                  log = self.logs[current]
+                  log.edit_record(row_index, field_names[i], fields_and_data[field_names[i]])
                   # ...and then the Logbook.
                   # (we add 1 onto the column_index here because we don't want to consider the index column)
-                  self[row_index][i+1] = fields_and_data[field_names[i]]
+                  log[row_index][i+1] = fields_and_data[field_names[i]]
 
       dialog.destroy()
       return
 
-   def get_number_of_records(self):
-      return len(self.records)
+   def get_number_of_logs(self):
+      return len(self.logs)
 
-   def get_record(self, index):
-      return self.records[index]
-      
-   def check_consistency(self):
-      # Make sure all the record indices are consecutive and 
-      # correctly ordered.
-      for i in range(0, len(self.records)):
-         if(self[i][0] != i):
-            self[i][0] = i
-      return
-         
-   def populate(self):
-      # Remove everything that is rendered already and start afresh
-      self.clear()
-      
-      for i in range(0, len(self.records)):
-         logbook_entry = [] # Create a new logbook entry
-         # First append the unique index given to the record.
-         logbook_entry.append(i)
-         for field in self.SELECTED_FIELD_NAMES_ORDERED:
-            logbook_entry.append(self.records[i].get_data(field))
-         self.append(logbook_entry)
-      
-      return
-      
       
