@@ -156,7 +156,7 @@ class RecordDialog(Gtk.Dialog):
       if(field_name == "FREQ"):
          # Allow a decimal point before and/or after any numbers,
          # but don't allow a decimal point on its own.
-         m = re.match("([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+)", data)
+         m = re.match("-?(([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+))", data)
          if(m is None):
             # Did not match anything.
             return False
