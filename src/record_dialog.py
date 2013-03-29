@@ -146,15 +146,24 @@ class RecordDialog(Gtk.Dialog):
          return self.sources[field_name].get_text()
 
    def is_valid(self, field_name, data):
+      
+      # Allow an empty string, in case the user doesn't want
+      # to fill in this field.
+      if(data == ""):
+         return True
+
+      # Validate the fields with respect to the ADIF specification.
       if(field_name == "FREQ"):
-         if(data != ""):
-            # Allow a decimal point before and/or after any numbers,
-            # but don't allow a decimal point on its own.
-            m = re.match("([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+)", data)
-            if(m is not None):
-               return (m.group(0) == data)
+         # Allow a decimal point before and/or after any numbers,
+         # but don't allow a decimal point on its own.
+         m = re.match("([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+)", data)
+         if(m is None):
+            # Did not match anything.
+            return False
          else:
-            return True
+            # Make sure we match the whole string,
+            # otherwise there may be an invalid character after the match. 
+            return (m.group(0) == data)
 
       else:
          return True
