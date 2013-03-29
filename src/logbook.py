@@ -20,6 +20,7 @@
 
 from gi.repository import Gtk, GObject
 import logging
+import MySQLdb
 
 from adif import *
 from log import *
