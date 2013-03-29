@@ -38,6 +38,11 @@ class PyQSO(Gtk.Window):
       
       self.set_size_request(500, 300)
       self.set_position(Gtk.WindowPosition.CENTER)
+      try:
+         self.set_icon_from_file("log.ico")
+      except Exception, error:
+         print error.message
+
       # Kills the application if the close button is clicked on the main window itself. 
       self.connect("delete-event", Gtk.main_quit)
       
