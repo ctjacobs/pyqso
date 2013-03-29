@@ -20,6 +20,7 @@
 
 from gi.repository import Gtk, GObject
 import logging
+import re
 
 from callsign_lookup import *
 
@@ -146,7 +147,14 @@ class RecordDialog(Gtk.Dialog):
 
    def is_valid(self, field_name, data):
       if(field_name == "FREQ"):
-         return True
+         if(data != ""):
+            # Allow a decimal point before and/or after any numbers,
+            # but don't allow a decimal point on its own.
+            m = re.match("([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+)", data)
+            if(m is not None):
+               return (m.group(0) == data)
+         else:
+            return True
 
       else:
          return True
