@@ -39,7 +39,7 @@ class PyQSO(Gtk.Window):
       self.set_size_request(500, 300)
       self.set_position(Gtk.WindowPosition.CENTER)
       try:
-         self.set_icon_from_file("../ico/log_64x64.png")
+         self.set_icon_from_file("../icons/log_64x64.png")
       except Exception, error:
          print error.message
 
