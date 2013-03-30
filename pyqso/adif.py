@@ -46,7 +46,9 @@ AVAILABLE_FIELD_NAMES_TYPES = {"CALL": "S",
 # G: Multi-line international string
 # L: Location
 DATA_TYPES = ["A", "B", "N", "S", "I", "D", "T", "M", "G", "L", "E"]
-   
+
+ADIF_VERSION = "3.0.2"
+
 class ADIF:
    
    def __init__(self):
@@ -128,14 +130,13 @@ class ADIF:
       # First write a header containing program version, number of records, etc.
       dt = datetime.now()
       
-      f.write('''Amateur radio log file. Conforms to ADIF specification version 3.0.2.
-Generated on %s. Contains %d record(s). 
+      f.write('''Amateur radio log file. Generated on %s. Contains %d record(s). 
       
-<adif_ver:5>3.0.2
+<adif_ver:5>%s
 <programid:5>PyQSO
 <programversion:8>0.1a.dev
 
-<eoh>\n''' % (dt, len(records)))
+<eoh>\n''' % (dt, len(records), ADIF_VERSION))
       
       # Then write each log to the file.
       for r in records:
