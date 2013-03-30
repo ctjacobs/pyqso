@@ -41,7 +41,7 @@ class PyQSO(Gtk.Window):
    def __init__(self):
          
       # Call the constructor of the super class (Gtk.Window)
-      Gtk.Window.__init__(self, title="PyQSO (development version)")
+      Gtk.Window.__init__(self, title="PyQSO 0.1a.dev")
       
       self.set_size_request(500, 300)
       self.set_position(Gtk.WindowPosition.CENTER)
@@ -83,7 +83,7 @@ class PyQSO(Gtk.Window):
    def show_about(self, widget):
       about = Gtk.AboutDialog()
       about.set_program_name("PyQSO")
-      about.set_version("Development version")
+      about.set_version("0.1a.dev")
       about.set_authors(["Christian Jacobs"])
       about.set_license('''This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

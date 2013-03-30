@@ -3,11 +3,13 @@
 from distutils.core import setup
 
 setup(name='PyQSO',
-      version='Development',
+      version='0.1a.dev',
       description='A Python-based QSO logging tool',
       author='Christian Jacobs',
       author_email='',
       url='https://launchpad.net/pyqso',
       packages=['pyqso'],
+      package_dir = {'pyqso': 'pyqso'},
+      scripts=["bin/pyqso"]
      )
 

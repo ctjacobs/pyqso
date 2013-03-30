@@ -133,7 +133,7 @@ Generated on %s. Contains %d record(s).
       
 <adif_ver:5>3.0.2
 <programid:5>PyQSO
-<programversion:11>Development
+<programversion:8>0.1a.dev
 
 <eoh>\n''' % (dt, len(records)))
       
