@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# File: setup.py
+# File: Makefile
 
 #    Copyright (C) 2012 Christian Jacobs.
 
@@ -18,15 +18,19 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from distutils.core import setup
+input: 	clean pyqso_setup documentation
 
-setup(name='PyQSO',
-      version='0.1a.dev',
-      description='A Python-based QSO logging tool',
-      author='Christian Jacobs',
-      url='https://launchpad.net/pyqso',
-      packages=['pyqso'],
-      package_dir = {'pyqso': 'pyqso'},
-      scripts=["bin/pyqso"]
-     )
+pyqso_setup:
+	@echo **********Setting up PyQSO
+	python setup.py install
 
+documentation:
+	cd doc
+	#latex manual.tex
+	cd ..
+
+clean:
+	@echo **********Cleaning build directory
+	rm -rf build
+	@echo **********Cleaning doc directory
+	cd doc; rm -rf *.log *.aux *.dvi *.pdf *.ps *.toc; cd ..; done
