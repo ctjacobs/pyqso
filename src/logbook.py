@@ -20,6 +20,7 @@
 
 from gi.repository import Gtk, GObject
 import logging
+from os.path import basename
 
 from adif import *
 from log import *
@@ -80,7 +81,7 @@ class Logbook(Gtk.Notebook):
       adif = ADIF()
       records = adif.read(path)
       
-      l = Log(records, path, path)
+      l = Log(records, path, basename(path))
       self.logs.append(l)
       self.render_log(l)
       
@@ -100,7 +101,7 @@ class Logbook(Gtk.Notebook):
          adif = ADIF()
          adif.write(log.records, log.path)
          if(log.modified):
-            log.name = log.path
+            log.name = basename(log.path)
             self.set_tab_label_text(self.get_nth_page(current), log.name)
             log.set_modified(False)
       return
@@ -136,7 +137,7 @@ class Logbook(Gtk.Notebook):
 
       if(log.modified):
          log.path = path
-         log.name = path
+         log.name = basename(log.path)
          self.set_tab_label_text(self.get_nth_page(current), log.name)
          log.set_modified(False)
       return
@@ -150,7 +151,7 @@ class Logbook(Gtk.Notebook):
       if(self.logs[current].modified):
          dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                  Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
-                                 "Log %d is not saved. Are you sure you want to close it?" % current)
+                                 "Log %s is not saved. Are you sure you want to close it?" % self.logs[current].name)
          response = dialog.run()
          dialog.destroy()
          if(response == Gtk.ResponseType.NO):

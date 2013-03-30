@@ -28,7 +28,7 @@ from record_dialog import *
 class Log(Gtk.ListStore):
    ''' A Log object can store multiple Record objects. '''
    
-   def __init__(self, records=None, name=None, path=None):
+   def __init__(self, records=None, path=None, name=None):
             
       # FIXME: Allow the user to select the field names. By default, let's select them all.
       self.SELECTED_FIELD_NAMES_TYPES = AVAILABLE_FIELD_NAMES_TYPES
