@@ -23,10 +23,10 @@ import logging
 import optparse
 
 # PyQSO modules
-from adif import *
-from logbook import *
-from menu import *
-from toolbar import *
+from pyqso.adif import *
+from pyqso.logbook import *
+from pyqso.menu import *
+from pyqso.toolbar import *
    
 # The PyQSO application class
 class PyQSO(Gtk.Window):
