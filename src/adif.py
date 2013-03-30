@@ -128,7 +128,7 @@ class ADIF:
       # First write a header containing program version, number of records, etc.
       dt = datetime.now()
       
-      f.write('''Amateur radio log file. Conforms to ADIF specification version 1.0.
+      f.write('''Amateur radio log file. Conforms to ADIF specification version 3.0.2.
 Generated on %s. Contains %d record(s). 
       
 <adif_ver:5>3.0.2
