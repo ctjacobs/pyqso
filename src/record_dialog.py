@@ -146,15 +146,15 @@ class RecordDialog(Gtk.Dialog):
       else:
          return self.sources[field_name].get_text()
 
-   def is_valid(self, log, field_name, data):
+   def is_valid(self, field_name, data, data_type):
+      ''' Validate the fields with respect to the ADIF specification '''
       
       # Allow an empty string, in case the user doesn't want
       # to fill in this field.
       if(data == ""):
          return True
 
-      # Validate the fields with respect to the ADIF specification.
-      if(log.SELECTED_FIELD_NAMES_TYPES[field_name] == "N"):
+      if(data_type == "N"):
          # Allow a decimal point before and/or after any numbers,
          # but don't allow a decimal point on its own.
          m = re.match("-?(([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+))", data)
@@ -166,7 +166,7 @@ class RecordDialog(Gtk.Dialog):
             # otherwise there may be an invalid character after the match. 
             return (m.group(0) == data)
       
-      elif(log.SELECTED_FIELD_NAMES_TYPES[field_name] == "B"):
+      elif(data_type == "B"):
          # Boolean
          m = re.match("(Y|N)", data)
          if(m is None):
@@ -174,7 +174,7 @@ class RecordDialog(Gtk.Dialog):
          else:
             return (m.group(0) == data)
 
-      elif(log.SELECTED_FIELD_NAMES_TYPES[field_name] == "D"):
+      elif(data_type == "D"):
          # Date
          pattern = re.compile("([0-9]){4}")
          m_year = pattern.match(data, 0)
@@ -199,7 +199,7 @@ class RecordDialog(Gtk.Dialog):
                   # otherwise there may be an invalid character after the match. 
                   return (len(data) == 8)
 
-      elif(log.SELECTED_FIELD_NAMES_TYPES[field_name] == "T"):
+      elif(data_type == "T"):
          # Time
          pattern = re.compile("([0-9]){2}")
          m_hour = pattern.match(data, 0)
@@ -226,7 +226,7 @@ class RecordDialog(Gtk.Dialog):
                   # otherwise there may be an invalid character after the match. 
                   return (len(data) == 6) # HHMMSS format
 
-      elif(log.SELECTED_FIELD_NAMES_TYPES[field_name] == "E"):
+      elif(data_type == "E"):
          # Enumeration.
          # We'll assume that this data is valid already,
          # since the user can only select from a pre-defined (valid) list.
