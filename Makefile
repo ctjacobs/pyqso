@@ -18,9 +18,9 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-input: 	clean pyqso_setup documentation
+input: 	clean install documentation
 
-pyqso_setup:
+install:
 	@echo **********Setting up PyQSO
 	python setup.py install
 
