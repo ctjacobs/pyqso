@@ -48,7 +48,7 @@ class Toolbar(Gtk.HBox):
 
       # Save log
       icon = Gtk.Image()
-      icon.set_from_stock(Gtk.STOCK_SAVE, Gtk.IconSize.BUTTON)
+      icon.set_from_stock(Gtk.STOCK_FLOPPY, Gtk.IconSize.BUTTON)
       button = Gtk.Button()
       button.add(icon)
       button.set_tooltip_text('Save log')
@@ -91,6 +91,17 @@ class Toolbar(Gtk.HBox):
       button.add(icon)
       button.set_tooltip_text('Delete record')
       button.connect("clicked", parent.logbook.delete_record_callback, parent)
+      self.pack_start(button, False, False, 0)
+
+      self.pack_start(Gtk.SeparatorMenuItem(), False, False, 0)
+
+      # Search log
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_FIND, Gtk.IconSize.BUTTON)
+      button = Gtk.Button()
+      button.add(icon)
+      button.set_tooltip_text('Search log')
+      button.connect("clicked", parent.logbook.search_log_callback)
       self.pack_start(button, False, False, 0)
 
       return

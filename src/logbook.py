@@ -287,6 +287,9 @@ class Logbook(Gtk.Notebook):
       dialog.destroy()
       return
 
+   def search_log_callback(self, widget):
+      print "Search feature has not yet been implemented."
+
    def get_number_of_logs(self):
       return len(self.logs)
 

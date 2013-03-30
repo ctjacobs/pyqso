@@ -297,5 +297,6 @@ class RecordDialog(Gtk.Dialog):
    def lookup_callback(self, widget):
       # TODO: If a session doesn't already exist: Show a username and password dialog, and initiate a session.
       # Get the callsign-related data from the qrz.com database.
+      print "Callsign lookup feature has not yet been implemented."
       return
 
