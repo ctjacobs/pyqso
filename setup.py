@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # File: setup.py
 
-#    Copyright (C) 2012 Christian Jacobs.
+#    Copyright (C) 2013 Christian Jacobs.
 
 #    This file is part of PyQSO.
 
