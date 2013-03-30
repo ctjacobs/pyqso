@@ -47,7 +47,7 @@ class Menu(Gtk.MenuBar):
       
       # Open (for opening and reading ADIF files)
       mitem_open = Gtk.MenuItem("Open Log File...")
-      mitem_open.connect("activate", parent.logbook.open_log)
+      mitem_open.connect("activate", parent.logbook.open_log, parent)
       key, mod = Gtk.accelerator_parse("<Control>O")
       mitem_open.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_file.append(mitem_open)
@@ -59,9 +59,17 @@ class Menu(Gtk.MenuBar):
       mitem_save.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_file.append(mitem_save)
 
+      # Save as (for writing ADIF files)
+      mitem_save = Gtk.MenuItem("Save Log File As...")
+      mitem_save.connect("activate", parent.logbook.save_log_as)
+      key, mod = Gtk.accelerator_parse("<Shift><Control>S")
+      mitem_save.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
+      subm_file.append(mitem_save)
+
       # Close the current log
       mitem_close = Gtk.MenuItem("Close Log")
-      mitem_close.connect("activate", parent.logbook.close_log)
+      mitem_close.connect("activate", parent.logbook.close_log, parent)
+      key, mod = Gtk.accelerator_parse("<Control>W")
       mitem_close.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_file.append(mitem_close)
  

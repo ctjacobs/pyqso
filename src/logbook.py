@@ -46,7 +46,7 @@ class Logbook(Gtk.Notebook):
       self.render_log(l)
       return
 
-   def open_log(self, widget=None):
+   def open_log(self, widget, parent):
       dialog = Gtk.FileChooserDialog("Open File",
                                     None,
                                     Gtk.FileChooserAction.OPEN,
@@ -67,11 +67,20 @@ class Logbook(Gtk.Notebook):
       if(path is None):
          logging.debug("No file path specified.")
          return
+
+      for log in self.logs:
+         if(log.path == path):
+            dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                 Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
+                                 "Log %s is already open." % path)
+            response = dialog.run()
+            dialog.destroy()
+            return
       
       adif = ADIF()
       records = adif.read(path)
       
-      l = Log(records, path)
+      l = Log(records, path, path)
       self.logs.append(l)
       self.render_log(l)
       
@@ -83,43 +92,77 @@ class Logbook(Gtk.Notebook):
          logging.debug("No log files to save!")
          return
 
+      log = self.logs[current]
+      if(log.path is None):
+         self.save_log_as()  
+      else:
+         # Log is already saved somewhere.
+         adif = ADIF()
+         adif.write(log.records, log.path)
+         if(log.modified):
+            log.name = log.path
+            self.set_tab_label_text(self.get_nth_page(current), log.name)
+            log.set_modified(False)
+      return
+
+   def save_log_as(self, widget=None):
+
+      current = self.get_current_page() # Gets the index of the selected tab in the logbook
+      if(current == -1):
+         logging.debug("No log files to save!")
+         return
+
+      log = self.logs[current]
+
       dialog = Gtk.FileChooserDialog("Save File",
                               None,
                               Gtk.FileChooserAction.SAVE,
                               (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                               Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
-                              
+                                 
       response = dialog.run()
       if(response == Gtk.ResponseType.OK):
          path = dialog.get_filename()
       else:
          path = None
       dialog.destroy()
-      
+         
       if(path is None):
          logging.debug("No file path specified.")
          return
-         
-      log = self.logs[current]
 
       adif = ADIF()
       adif.write(log.records, path)
 
-      #current.set_tab_label(path) #FIXME: Need to change the tab's label once the log is saved.
-      
+      if(log.modified):
+         log.path = path
+         log.name = path
+         self.set_tab_label_text(self.get_nth_page(current), log.name)
+         log.set_modified(False)
       return
 
-   def close_log(self, widget=None):
+   def close_log(self, widget, parent):
       current = self.get_current_page() # Gets the index of the selected tab in the logbook
       if(current == -1):
          logging.debug("No log files to close!")
          return
+
+      if(not self.logs[current].saved):
+         dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                 Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
+                                 "Log %d is not saved. Are you sure you want to close it?" % current)
+         response = dialog.run()
+         dialog.destroy()
+         if(response == Gtk.ResponseType.NO):
+            return
+
       self.logs.pop(current)
       # Remove the log from the renderers too
       self.treeview.pop(current)
       self.treeselection.pop(current)
       # And finally remove the tab in the Logbook
       self.remove_page(current)
+
       return
 
    def render_log(self, log):
@@ -205,6 +248,7 @@ class Logbook(Gtk.Notebook):
                self.treeselection[current].select_path(log.get_number_of_records()-1)
 
       dialog.destroy()
+      self.set_tab_label_text(self.get_nth_page(current), log.name)
       return
       
    def delete_record_callback(self, widget, parent):
@@ -230,7 +274,7 @@ class Logbook(Gtk.Notebook):
          self.logs[current].delete_record(index, iter)
          
       dialog.destroy()
-
+      self.set_tab_label_text(self.get_nth_page(current), self.logs[current].name)
       return
 
    def edit_record_callback(self, widget, path, view_column, parent):
@@ -285,6 +329,7 @@ class Logbook(Gtk.Notebook):
                   log[row_index][i+1] = fields_and_data[field_names[i]]
 
       dialog.destroy()
+      self.set_tab_label_text(self.get_nth_page(current), log.name)
       return
 
    def search_log_callback(self, widget):

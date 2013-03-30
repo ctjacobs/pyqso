@@ -28,7 +28,7 @@ from record_dialog import *
 class Log(Gtk.ListStore):
    ''' A Log object can store multiple Record objects. '''
    
-   def __init__(self, records=None, name="Untitled"):
+   def __init__(self, records=None, name=None, path=None):
             
       # FIXME: Allow the user to select the field names. By default, let's select them all.
       self.SELECTED_FIELD_NAMES_TYPES = AVAILABLE_FIELD_NAMES_TYPES
@@ -49,7 +49,14 @@ class Log(Gtk.ListStore):
       # Call the constructor of the super class (Gtk.ListStore)
       Gtk.ListStore.__init__(self, *data_types)
       
-      self.name = name
+      if(name is None):
+         self.name = "Untitled*"
+         self.path = None
+         self.modified = True
+      else:
+         self.name = name
+         self.path = path
+         self.modified = False
 
       if(records is None):
          # Begin with no records.
@@ -91,6 +98,7 @@ class Log(Gtk.ListStore):
       # is also called in delete_record, but let's keep it
       # here as a sanity check.
       self.check_consistency() 
+      self.set_modified(True)
       return
 
    def delete_record(self, index, iter):
@@ -98,10 +106,12 @@ class Log(Gtk.ListStore):
       self.records.pop(index)
       self.remove(iter)
       self.check_consistency()
+      self.set_modified(True)
       return
 
    def edit_record(self, index, field_name, data):
       self.records[index].set_data(field_name, data)
+      self.set_modified(True)
       return
 
    def get_record(self, index):
@@ -109,4 +119,15 @@ class Log(Gtk.ListStore):
 
    def get_number_of_records(self):
       return len(self.records)
+
+   def set_modified(self, modified):
+      if(modified and self.modified):
+         return # Already modified. Nothing to do here.
+      elif(modified and (not self.modified)):
+         self.modified = True
+         self.name = self.name + "*"
+         return
+      else:
+         self.modified = modified
+         return
 

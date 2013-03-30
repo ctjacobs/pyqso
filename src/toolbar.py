@@ -43,7 +43,7 @@ class Toolbar(Gtk.HBox):
       button = Gtk.Button()
       button.add(icon)
       button.set_tooltip_text('Open log')
-      button.connect("clicked", parent.logbook.open_log)
+      button.connect("clicked", parent.logbook.open_log, parent)
       self.pack_start(button, False, False, 0)
 
       # Save log
@@ -61,7 +61,7 @@ class Toolbar(Gtk.HBox):
       button = Gtk.Button()
       button.add(icon)
       button.set_tooltip_text('Close log')
-      button.connect("clicked", parent.logbook.close_log)
+      button.connect("clicked", parent.logbook.close_log, parent)
       self.pack_start(button, False, False, 0)
 
       self.pack_start(Gtk.SeparatorMenuItem(), False, False, 0)
