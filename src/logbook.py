@@ -147,7 +147,7 @@ class Logbook(Gtk.Notebook):
          logging.debug("No log files to close!")
          return
 
-      if(not self.logs[current].saved):
+      if(self.logs[current].modified):
          dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                  Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
                                  "Log %d is not saved. Are you sure you want to close it?" % current)
