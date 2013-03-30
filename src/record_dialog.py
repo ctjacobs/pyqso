@@ -21,6 +21,7 @@
 from gi.repository import Gtk, GObject
 import logging
 import re
+import calendar
 
 from callsign_lookup import *
 
@@ -145,7 +146,7 @@ class RecordDialog(Gtk.Dialog):
       else:
          return self.sources[field_name].get_text()
 
-   def is_valid(self, field_name, data):
+   def is_valid(self, log, field_name, data):
       
       # Allow an empty string, in case the user doesn't want
       # to fill in this field.
@@ -153,7 +154,7 @@ class RecordDialog(Gtk.Dialog):
          return True
 
       # Validate the fields with respect to the ADIF specification.
-      if(field_name == "FREQ"):
+      if(log.SELECTED_FIELD_NAMES_TYPES[field_name] == "N"):
          # Allow a decimal point before and/or after any numbers,
          # but don't allow a decimal point on its own.
          m = re.match("-?(([0-9]+\.?[0-9]*)|([0-9]*\.?[0-9]+))", data)
@@ -164,6 +165,72 @@ class RecordDialog(Gtk.Dialog):
             # Make sure we match the whole string,
             # otherwise there may be an invalid character after the match. 
             return (m.group(0) == data)
+      
+      elif(log.SELECTED_FIELD_NAMES_TYPES[field_name] == "B"):
+         # Boolean
+         m = re.match("(Y|N)", data)
+         if(m is None):
+            return False
+         else:
+            return (m.group(0) == data)
+
+      elif(log.SELECTED_FIELD_NAMES_TYPES[field_name] == "D"):
+         # Date
+         pattern = re.compile("([0-9]){4}")
+         m_year = pattern.match(data, 0)
+         if((m_year is None) or (int(m_year.group(0)) < 1930)):
+            # Did not match anything.
+            return False
+         else:
+            pattern = re.compile("([0-9]){2}")
+            m_month = pattern.match(data, 4)
+            if((m_month is None) or int(m_month.group(0)) > 12 or int(m_month.group(0)) < 1):
+               # Did not match anything.
+               return False
+            else:
+               pattern = re.compile("([0-9]){2}")
+               m_day = pattern.match(data, 6)
+               days_in_month = calendar.monthrange(int(m_year.group(0)), int(m_month.group(0)))
+               if((m_day is None) or int(m_day.group(0)) > days_in_month[1] or int(m_day.group(0)) < 1):
+                  # Did not match anything.
+                  return False
+               else:
+                  # Make sure we match the whole string,
+                  # otherwise there may be an invalid character after the match. 
+                  return (len(data) == 8)
+
+      elif(log.SELECTED_FIELD_NAMES_TYPES[field_name] == "T"):
+         # Time
+         pattern = re.compile("([0-9]){2}")
+         m_hour = pattern.match(data, 0)
+         if((m_hour is None) or (int(m_hour.group(0)) < 0) or (int(m_hour.group(0)) > 23)):
+            # Did not match anything.
+            return False
+         else:
+            pattern = re.compile("([0-9]){2}")
+            m_minutes = pattern.match(data, 2)
+            if((m_minutes is None) or int(m_minutes.group(0)) < 0 or int(m_minutes.group(0)) > 59):
+               # Did not match anything.
+               return False
+            else:
+               if(len(data) == 4):
+                  # HHMM format
+                  return True
+               pattern = re.compile("([0-9]){2}")
+               m_seconds = pattern.match(data, 4)
+               if((m_seconds is None) or int(m_seconds.group(0)) < 0 or int(m_seconds.group(0)) > 59):
+                  # Did not match anything.
+                  return False
+               else:
+                  # Make sure we match the whole string,
+                  # otherwise there may be an invalid character after the match. 
+                  return (len(data) == 6) # HHMMSS format
+
+      elif(log.SELECTED_FIELD_NAMES_TYPES[field_name] == "E"):
+         # Enumeration.
+         # We'll assume that this data is valid already,
+         # since the user can only select from a pre-defined (valid) list.
+         return True
 
       else:
          return True

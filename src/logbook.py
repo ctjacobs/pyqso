@@ -183,7 +183,7 @@ class Logbook(Gtk.Notebook):
             for i in range(0, len(field_names)):
                #TODO: Validate user input!
                fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
-               if(not(dialog.is_valid(field_names[i], fields_and_data[field_names[i]]))):
+               if(not(dialog.is_valid(log, field_names[i], fields_and_data[field_names[i]]))):
                   # Data is not valid - inform the user.
                   message = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                     Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
@@ -264,7 +264,7 @@ class Logbook(Gtk.Notebook):
             for i in range(0, len(field_names)):
                #TODO: Validate user input!
                fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
-               if(not(dialog.is_valid(field_names[i], fields_and_data[field_names[i]]))):
+               if(not(dialog.is_valid(self.logs[current], field_names[i], fields_and_data[field_names[i]]))):
                   # Data is not valid - inform the user.
                   message = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                     Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
