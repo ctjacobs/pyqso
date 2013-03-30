@@ -21,6 +21,14 @@
 from gi.repository import Gtk, GObject
 import logging
 import optparse
+import os
+import os.path
+import sys
+
+# This will help Python find the PyQSO modules
+# that need to be imported below.
+pyqso_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir)
+sys.path.insert(0, pyqso_path)
 
 # PyQSO modules
 from pyqso.adif import *
@@ -28,7 +36,6 @@ from pyqso.logbook import *
 from pyqso.menu import *
 from pyqso.toolbar import *
    
-# The PyQSO application class
 class PyQSO(Gtk.Window):
    
    def __init__(self):
@@ -38,10 +45,12 @@ class PyQSO(Gtk.Window):
       
       self.set_size_request(500, 300)
       self.set_position(Gtk.WindowPosition.CENTER)
-      try:
-         self.set_icon_from_file("../icons/log_64x64.png")
-      except Exception, error:
-         print error.message
+      possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
+      for icon_path in possible_icon_paths:
+         try:
+            self.set_icon_from_file(icon_path)
+         except Exception, error:
+            print error.message
 
       # Kills the application if the close button is clicked on the main window itself. 
       self.connect("delete-event", Gtk.main_quit)
