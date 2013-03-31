@@ -30,7 +30,7 @@ icon_files = []
 if(prefix is None):
    icon_files.append(("icons", ["icons/log_64x64.png"]))
 else:
-   icon_files.append((prefix + "/share/diamond/gui", ["icons/log_64x64.png"]))
+   icon_files.append((prefix + "/icons", ["icons/log_64x64.png"]))
 
 setup(name='PyQSO',
       version='0.1a.dev',
