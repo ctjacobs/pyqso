@@ -247,9 +247,9 @@ class Logbook(Gtk.Notebook):
                log.add_record(fields_and_data)
                # Select the new Record's row in the treeview.
                self.treeselection[current].select_path(log.get_number_of_records()-1)
+               self.set_tab_label_text(self.get_nth_page(current), log.name)
 
       dialog.destroy()
-      self.set_tab_label_text(self.get_nth_page(current), log.name)
       return
       
    def delete_record_callback(self, widget, parent):
@@ -286,6 +286,9 @@ class Logbook(Gtk.Notebook):
       if(current == -1):
          logging.debug("Tried to edit a record, but no log present!")
          return
+      
+      log = self.logs[current]
+
       (model, path) = self.treeselection[current].get_selected_rows() # Get the selected row in the log
       try:
          iter = model.get_iter(path[0])
@@ -323,14 +326,13 @@ class Logbook(Gtk.Notebook):
                for i in range(0, len(field_names)):
                   # All data has been validated, so we can go ahead and update the record.
                   # First update the Record object... 
-                  log = self.logs[current]
                   log.edit_record(row_index, field_names[i], fields_and_data[field_names[i]])
                   # ...and then the Logbook.
                   # (we add 1 onto the column_index here because we don't want to consider the index column)
                   log[row_index][i+1] = fields_and_data[field_names[i]]
+                  self.set_tab_label_text(self.get_nth_page(current), log.name)
 
       dialog.destroy()
-      self.set_tab_label_text(self.get_nth_page(current), log.name)
       return
 
    def search_log_callback(self, widget):
