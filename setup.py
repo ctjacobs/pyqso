@@ -19,6 +19,18 @@
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
 from distutils.core import setup
+import sys
+
+prefix = None
+for i, arg in enumerate(sys.argv):
+   if("--prefix" in arg):
+      prefix = arg.split('=')[1]
+
+icon_files = []
+if(prefix is None):
+   icon_files.append(("icons", ["icons/log_64x64.png"]))
+else:
+   icon_files.append((prefix + "/share/diamond/gui", ["icons/log_64x64.png"]))
 
 setup(name='PyQSO',
       version='0.1a.dev',
@@ -27,6 +39,7 @@ setup(name='PyQSO',
       url='https://launchpad.net/pyqso',
       packages=['pyqso'],
       package_dir = {'pyqso': 'pyqso'},
-      scripts=["bin/pyqso"]
+      scripts=["bin/pyqso"],
+      data_files = icon_files
      )
 
