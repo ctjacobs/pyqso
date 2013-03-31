@@ -174,7 +174,8 @@ class Logbook(Gtk.Notebook):
       #self.treeview.append(Gtk.TreeView(sorter))
       self.treeview.append(Gtk.TreeView(log))
       self.treeview[current].set_grid_lines(Gtk.TreeViewGridLines.BOTH)
-      self.treeview[current].connect("row-activated", self.edit_record_callback, self)
+      #FIXME: Ideally we want the parent window to be passed in to self.edit_record_callback.
+      self.treeview[current].connect("row-activated", self.edit_record_callback, None)
       self.treeselection.append(self.treeview[current].get_selection())
       self.treeselection[current].set_mode(Gtk.SelectionMode.SINGLE)
       # Allow the Log to be scrolled up/down
