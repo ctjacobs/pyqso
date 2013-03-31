@@ -147,11 +147,12 @@ class Logbook(Gtk.Notebook):
       if(current == -1):
          logging.debug("No log files to close!")
          return
+      log = self.logs[current]
 
-      if(self.logs[current].modified):
+      if(log.modified):
          dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                  Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
-                                 "Log %s is not saved. Are you sure you want to close it?" % self.logs[current].name)
+                                 "Log %s is not saved. Are you sure you want to close it?" % log.name[0:len(log.name)-1]) # Here we ignore the * at the end of the log's name.
          response = dialog.run()
          dialog.destroy()
          if(response == Gtk.ResponseType.NO):
