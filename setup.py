@@ -19,9 +19,7 @@
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
 from distutils.core import setup
-import sys
 
-icon_files = [("icons", ["icons/log_64x64.png"])]
 setup(name='PyQSO',
       version='0.1a.dev',
       description='A Python-based QSO logging tool',
@@ -30,6 +28,6 @@ setup(name='PyQSO',
       packages=['pyqso'],
       package_dir = {'pyqso': 'pyqso'},
       scripts=["bin/pyqso"],
-      data_files = icon_files
+      data_files=[("icons", ["icons/log_64x64.png"])]
      )
 
