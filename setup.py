@@ -21,17 +21,7 @@
 from distutils.core import setup
 import sys
 
-prefix = None
-for i, arg in enumerate(sys.argv):
-   if("--prefix" in arg):
-      prefix = arg.split('=')[1]
-
-icon_files = []
-if(prefix is None):
-   icon_files.append(("icons", ["icons/log_64x64.png"]))
-else:
-   icon_files.append((prefix + "/icons", ["icons/log_64x64.png"]))
-
+icon_files = [("icons", ["icons/log_64x64.png"])]
 setup(name='PyQSO',
       version='0.1a.dev',
       description='A Python-based QSO logging tool',
