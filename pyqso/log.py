@@ -19,6 +19,7 @@
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
 from gi.repository import Gtk, GObject
+from os.path import basename
 import logging
 import sqlite3 as sqlite
 
@@ -29,7 +30,7 @@ from record_dialog import *
 class Log(Gtk.ListStore):
    ''' A Log object can store multiple Record objects. '''
    
-   def __init__(self, connection, name=None, records=None, path=None):
+   def __init__(self, connection, path=None):
             
       # FIXME: Allow the user to select the field names. By default, let's select them all.
       self.SELECTED_FIELD_NAMES_TYPES = AVAILABLE_FIELD_NAMES_TYPES
@@ -50,20 +51,14 @@ class Log(Gtk.ListStore):
       # Call the constructor of the super class (Gtk.ListStore)
       Gtk.ListStore.__init__(self, *data_types)
       
-      if(name is None):
+      if(path is None):
          self.name = "Untitled*"
          self.path = None
          self.modified = True
       else:
-         self.name = name
+         self.name = basename(path)
          self.path = path
          self.modified = False
-
-      if(records is None):
-         # Begin with no records.
-         self.records = []
-      else:
-         self.records = records
 
       # Populate the ListStore with Record-containing rows
       self.populate()
@@ -75,7 +70,7 @@ class Log(Gtk.ListStore):
       self.clear()
       
       for i in range(0, len(self.records)):
-         log_entry = [] # Create a new log entry
+         log_entry = [] # Create a new record
          # First append the unique index given to the record.
          log_entry.append(i)
          for field in self.SELECTED_FIELD_NAMES_ORDERED:

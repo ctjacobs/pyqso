@@ -50,7 +50,7 @@ class Logbook(Gtk.Notebook):
          if(name is None):
             # Database will be created in RAM. Assuming the user saves the database to disk
             # before the database gets too large, this should be ok performance-wise.
-            connection = sqlite.connect(:memory:)
+            connection = sqlite.connect(":memory:")
          else:
             connection = sqlite.connect(name)
          return connection
@@ -66,15 +66,15 @@ class Logbook(Gtk.Notebook):
       try:
          connection.close()
          return True
-      except sqlite.Error as e
+      except sqlite.Error as e:
          logging.exception(e)
          return False
 
    def new_log(self, widget=None):
       connection = self._create_connection()
       if(connection):
-         self.connection.append()
-         l = Log() # Empty log
+         self.connections.append(connection)
+         l = Log(connection) # Empty log
          self.logs.append(l)
          self.render_log(l)
       return
@@ -123,6 +123,7 @@ class Logbook(Gtk.Notebook):
       # Finally, close the database connection.
       # Note: All uncommitted changes will be lost.
       self._destroy_connection(self.connections[current])
+      self.connections.pop(current)
 
       return
 
