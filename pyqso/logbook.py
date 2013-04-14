@@ -20,6 +20,7 @@
 
 from gi.repository import Gtk, GObject
 import logging
+import sqlite3 as sqlite
 from os.path import basename
 
 from adif import *
@@ -34,59 +35,51 @@ class Logbook(Gtk.Notebook):
             
       # A stack of Log objects
       self.logs = []
+      # All SQL database connections to the Logs
+      self.connections = []
 
       # For rendering the logs. One treeview and one treeselection per Log.
       self.treeview = []
       self.treeselection = []
       
       logging.debug("New Logbook instance created!")
-     
+      
+   def _create_connection(self, name=None):
+      connection = None
+      try:
+         if(name is None):
+            # Database will be created in RAM. Assuming the user saves the database to disk
+            # before the database gets too large, this should be ok performance-wise.
+            connection = sqlite.connect(:memory:)
+         else:
+            connection = sqlite.connect(name)
+         return connection
+      except sqlite.Error as e:
+         logging.exception(e)
+         if(connection):
+            # If a connection was created by something went wrong
+            # afterwards, let's free the resource.
+            connection.close()
+         return None
+      
+   def _destroy_connection(self, connection):
+      try:
+         connection.close()
+         return True
+      except sqlite.Error as e
+         logging.exception(e)
+         return False
+
    def new_log(self, widget=None):
-      l = Log() # Empty log
-      self.logs.append(l)
-      self.render_log(l)
+      connection = self._create_connection()
+      if(connection):
+         self.connection.append()
+         l = Log() # Empty log
+         self.logs.append(l)
+         self.render_log(l)
       return
 
-   def open_log(self, widget, parent):
-      dialog = Gtk.FileChooserDialog("Open File",
-                                    None,
-                                    Gtk.FileChooserAction.OPEN,
-                                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                                    Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-      filter = Gtk.FileFilter()
-      filter.set_name("All ADIF files")
-      filter.add_pattern("*.adi")
-      dialog.add_filter(filter)
-      
-      response = dialog.run()
-      if(response == Gtk.ResponseType.OK):
-         path = dialog.get_filename()
-      else:
-         path = None
-      dialog.destroy()
-      
-      if(path is None):
-         logging.debug("No file path specified.")
-         return
 
-      for log in self.logs:
-         if(log.path == path):
-            dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                                 Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
-                                 "Log %s is already open." % path)
-            response = dialog.run()
-            dialog.destroy()
-            return
-      
-      adif = ADIF()
-      records = adif.read(path)
-      
-      l = Log(records, path, basename(path))
-      self.logs.append(l)
-      self.render_log(l)
-      
-      return
-      
    def save_log(self, widget=None):
       current = self.get_current_page() # Gets the index of the selected tab in the logbook
       if(current == -1):
@@ -98,48 +91,10 @@ class Logbook(Gtk.Notebook):
          self.save_log_as()  
       else:
          # Log is already saved somewhere.
-         adif = ADIF()
-         adif.write(log.records, log.path)
          if(log.modified):
             log.name = basename(log.path)
             self.set_tab_label_text(self.get_nth_page(current), log.name)
             log.set_modified(False)
-      return
-
-   def save_log_as(self, widget=None):
-
-      current = self.get_current_page() # Gets the index of the selected tab in the logbook
-      if(current == -1):
-         logging.debug("No log files to save!")
-         return
-
-      log = self.logs[current]
-
-      dialog = Gtk.FileChooserDialog("Save File",
-                              None,
-                              Gtk.FileChooserAction.SAVE,
-                              (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                              Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
-                                 
-      response = dialog.run()
-      if(response == Gtk.ResponseType.OK):
-         path = dialog.get_filename()
-      else:
-         path = None
-      dialog.destroy()
-         
-      if(path is None):
-         logging.debug("No file path specified.")
-         return
-
-      adif = ADIF()
-      adif.write(log.records, path)
-
-      if(log.modified):
-         log.path = path
-         log.name = basename(log.path)
-         self.set_tab_label_text(self.get_nth_page(current), log.name)
-         log.set_modified(False)
       return
 
    def close_log(self, widget, parent):
@@ -164,6 +119,10 @@ class Logbook(Gtk.Notebook):
       self.treeselection.pop(current)
       # And finally remove the tab in the Logbook
       self.remove_page(current)
+
+      # Finally, close the database connection.
+      # Note: All uncommitted changes will be lost.
+      self._destroy_connection(self.connections[current])
 
       return
 
@@ -206,6 +165,83 @@ class Logbook(Gtk.Notebook):
          self.treeview[current].append_column(column)
 
       self.show_all()
+
+
+   def import_log(self, widget, parent):
+      dialog = Gtk.FileChooserDialog("Import ADIF Log File",
+                                    None,
+                                    Gtk.FileChooserAction.OPEN,
+                                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                    Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+      filter = Gtk.FileFilter()
+      filter.set_name("All ADIF files")
+      filter.add_pattern("*.adi")
+      dialog.add_filter(filter)
+      
+      response = dialog.run()
+      if(response == Gtk.ResponseType.OK):
+         path = dialog.get_filename()
+      else:
+         path = None
+      dialog.destroy()
+      
+      if(path is None):
+         logging.debug("No file path specified.")
+         return
+
+      for log in self.logs:
+         if(log.path == path):
+            dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                 Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
+                                 "Log %s is already open." % path)
+            response = dialog.run()
+            dialog.destroy()
+            return
+      
+      adif = ADIF()
+      records = adif.read(path)
+      
+      l = Log(records, path, basename(path))
+      self.logs.append(l)
+      self.render_log(l)
+      
+      return
+      
+   def export_log(self, widget=None):
+
+      current = self.get_current_page() # Gets the index of the selected tab in the logbook
+      if(current == -1):
+         logging.debug("No log files to export!")
+         return
+
+      log = self.logs[current]
+
+      dialog = Gtk.FileChooserDialog("Export Log to File",
+                              None,
+                              Gtk.FileChooserAction.SAVE,
+                              (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                              Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+                                 
+      response = dialog.run()
+      if(response == Gtk.ResponseType.OK):
+         path = dialog.get_filename()
+      else:
+         path = None
+      dialog.destroy()
+         
+      if(path is None):
+         logging.debug("No file path specified.")
+         return
+
+      adif = ADIF()
+      adif.write(log.records, path)
+
+      if(log.modified):
+         log.path = path
+         log.name = basename(log.path)
+         self.set_tab_label_text(self.get_nth_page(current), log.name)
+         log.set_modified(False)
+      return
 
    def add_record_callback(self, widget, parent):
 

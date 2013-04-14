@@ -20,6 +20,7 @@
 
 from gi.repository import Gtk, GObject
 import logging
+import sqlite3 as sqlite
 
 from adif import AVAILABLE_FIELD_NAMES_TYPES
 from record import *
@@ -28,7 +29,7 @@ from record_dialog import *
 class Log(Gtk.ListStore):
    ''' A Log object can store multiple Record objects. '''
    
-   def __init__(self, records=None, path=None, name=None):
+   def __init__(self, connection, name=None, records=None, path=None):
             
       # FIXME: Allow the user to select the field names. By default, let's select them all.
       self.SELECTED_FIELD_NAMES_TYPES = AVAILABLE_FIELD_NAMES_TYPES
@@ -68,14 +69,6 @@ class Log(Gtk.ListStore):
       self.populate()
       
       logging.debug("New Log instance created!")
-      
-   def check_consistency(self):
-      # Make sure all the record indices are consecutive and 
-      # correctly ordered.
-      for i in range(0, len(self.records)):
-         if(self[i][0] != i):
-            self[i][0] = i
-      return
                
    def populate(self):
       # Remove everything that is rendered already and start afresh
@@ -94,10 +87,6 @@ class Log(Gtk.ListStore):
    def add_record(self, fields_and_data):
       record = Record(fields_and_data)
       self.records.append(record)
-      # Hopefully this won't change anything as check_consistency
-      # is also called in delete_record, but let's keep it
-      # here as a sanity check.
-      self.check_consistency() 
       self.set_modified(True)
       return
 
@@ -105,7 +94,6 @@ class Log(Gtk.ListStore):
       # Get the selected row in the logbook
       self.records.pop(index)
       self.remove(iter)
-      self.check_consistency()
       self.set_modified(True)
       return
 
