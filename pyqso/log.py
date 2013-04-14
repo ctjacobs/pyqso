@@ -32,6 +32,9 @@ class Log(Gtk.ListStore):
    
    def __init__(self, connection, path=None):
             
+      # Call the constructor of the super class (Gtk.ListStore)
+      Gtk.ListStore.__init__(self, *data_types)
+
       # FIXME: Allow the user to select the field names. By default, let's select them all.
       self.SELECTED_FIELD_NAMES_TYPES = AVAILABLE_FIELD_NAMES_TYPES
       self.SELECTED_FIELD_NAMES_ORDERED = ["CALL", "DATE", "TIME", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]
@@ -45,22 +48,25 @@ class Log(Gtk.ListStore):
                                             "RST_RCVD":"RX RST"}
 
       # The ListStore constructor needs to know the data types of the columns.
-      # The index is always an integer. We will assume the ADIF fields are strings.
+      # The index is always an integer. We will assume the fields are strings.
       data_types = [int] + [str]*len(self.SELECTED_FIELD_NAMES_ORDERED)
       
-      # Call the constructor of the super class (Gtk.ListStore)
-      Gtk.ListStore.__init__(self, *data_types)
-      
+      self.connection = connection
+
       if(path is None):
          self.name = "Untitled*"
          self.path = None
          self.modified = True
+         # Set up a new log table in the database
+         c = self.connection.cursor()
+         c.execute('''CREATE TABLE log
+                   (id INTEGER PRIMARY KEY, ? text, ? text, ? text)''')
       else:
          self.name = basename(path)
          self.path = path
          self.modified = False
 
-      # Populate the ListStore with Record-containing rows
+      # Populate the ListStore with any existing records
       self.populate()
       
       logging.debug("New Log instance created!")
