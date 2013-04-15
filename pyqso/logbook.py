@@ -67,7 +67,10 @@ class Logbook(Gtk.Notebook):
          return True
 
    def new_log(self, widget=None):
-      l = Log(self.connection) # Empty log
+
+      
+
+      l = Log(self.connection, log_name) # Empty log
       self.logs.append(l)
       self.render_log(l)
       return

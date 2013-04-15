@@ -74,6 +74,8 @@ class PyQSO(Gtk.Window):
 
       self.statusbar = Gtk.Statusbar()
       context_id = self.statusbar.get_context_id("Status")
+      if(self.logbook.connection):
+         self.statusbar.push(context_id, "Connected to Logbook: %s" % logbook_path)
       vbox_outer.pack_start(self.statusbar, False, False, 0)
 
       self.show_all()
