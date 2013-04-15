@@ -30,10 +30,7 @@ from record_dialog import *
 class Log(Gtk.ListStore):
    ''' A Log object can store multiple Record objects. '''
    
-   def __init__(self, connection, path=None):
-            
-      # Call the constructor of the super class (Gtk.ListStore)
-      Gtk.ListStore.__init__(self, *data_types)
+   def __init__(self, connection, name):
 
       # FIXME: Allow the user to select the field names. By default, let's select them all.
       self.SELECTED_FIELD_NAMES_TYPES = AVAILABLE_FIELD_NAMES_TYPES
@@ -49,22 +46,25 @@ class Log(Gtk.ListStore):
 
       # The ListStore constructor needs to know the data types of the columns.
       # The index is always an integer. We will assume the fields are strings.
-      data_types = [int] + [str]*len(self.SELECTED_FIELD_NAMES_ORDERED)
-      
+      data_types = [int] + [str]*len(self.SELECTED_FIELD_NAMES_ORDERED)    
+      # Call the constructor of the super class (Gtk.ListStore)
+      Gtk.ListStore.__init__(self, *data_types)
+
       self.connection = connection
 
-      if(path is None):
-         self.name = "Untitled*"
-         self.path = None
-         self.modified = True
-         # Set up a new log table in the database
+      with self.connection:
+
+
+
+
+         # Set up the new log table in the database
          c = self.connection.cursor()
-         c.execute('''CREATE TABLE log
-                   (id INTEGER PRIMARY KEY, ? text, ? text, ? text)''')
-      else:
-         self.name = basename(path)
-         self.path = path
-         self.modified = False
+         query = "CREATE TABLE %s (id INTEGER PRIMARY KEY" % name
+         for field_name in self.SELECTED_FIELD_NAMES_ORDERED:
+            s = ", %s TEXT" % field_name.lower()
+            query = query + s
+         query = query + ")"
+         c.execute(query)
 
       # Populate the ListStore with any existing records
       self.populate()
@@ -74,40 +74,42 @@ class Log(Gtk.ListStore):
    def populate(self):
       # Remove everything that is rendered already and start afresh
       self.clear()
-      
-      for i in range(0, len(self.records)):
-         log_entry = [] # Create a new record
-         # First append the unique index given to the record.
-         log_entry.append(i)
-         for field in self.SELECTED_FIELD_NAMES_ORDERED:
-            log_entry.append(self.records[i].get_data(field))
-         self.append(log_entry)
-      
+      records = self.get_all_records()
+      if(len(records) > 0):
+         self.append(records)
       return
 
    def add_record(self, fields_and_data):
-      record = Record(fields_and_data)
-      self.records.append(record)
+
       self.set_modified(True)
       return
 
    def delete_record(self, index, iter):
       # Get the selected row in the logbook
-      self.records.pop(index)
+      #self.records.pop(index)
       self.remove(iter)
       self.set_modified(True)
       return
 
    def edit_record(self, index, field_name, data):
-      self.records[index].set_data(field_name, data)
+      #self.records[index].set_data(field_name, data)
       self.set_modified(True)
       return
 
-   def get_record(self, index):
-      return self.records[index]
+   def get_record_by_index(self, index):
+      c = self.connection.cursor()
+      c.execute("SELECT * FROM ? WHERE id=?", (TABLE_NAME, index))
+      return c.fetchone()
+
+   def get_all_records(self):
+      c = self.connection.cursor()
+      c.execute("SELECT * FROM %s" % TABLE_NAME)
+      return c.fetchall()
 
    def get_number_of_records(self):
-      return len(self.records)
+      c = self.connection.cursor()
+      c.execute("SELECT Count(*) FROM %s" % TABLE_NAME)
+      return c.fetchone()[0]
 
    def set_modified(self, modified):
       if(modified and self.modified):

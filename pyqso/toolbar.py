@@ -28,40 +28,22 @@ class Toolbar(Gtk.HBox):
       
       Gtk.HBox.__init__(self, spacing=2)
 
-      # New log
+      # New Log
       icon = Gtk.Image()
       icon.set_from_stock(Gtk.STOCK_NEW, Gtk.IconSize.BUTTON)
       button = Gtk.Button()
       button.add(icon)
-      button.set_tooltip_text('New log')
+      button.set_tooltip_text('New Log')
       button.connect("clicked", parent.logbook.new_log)
       self.pack_start(button, False, False, 0)
 
-      # Open log
+      # Delete Log
       icon = Gtk.Image()
-      icon.set_from_stock(Gtk.STOCK_OPEN, Gtk.IconSize.BUTTON)
+      icon.set_from_stock(Gtk.STOCK_DELETE, Gtk.IconSize.BUTTON)
       button = Gtk.Button()
       button.add(icon)
-      button.set_tooltip_text('Open log')
-      button.connect("clicked", parent.logbook.open_log, parent)
-      self.pack_start(button, False, False, 0)
-
-      # Save log
-      icon = Gtk.Image()
-      icon.set_from_stock(Gtk.STOCK_FLOPPY, Gtk.IconSize.BUTTON)
-      button = Gtk.Button()
-      button.add(icon)
-      button.set_tooltip_text('Save log')
-      button.connect("clicked", parent.logbook.save_log)
-      self.pack_start(button, False, False, 0)
-
-      # Close log
-      icon = Gtk.Image()
-      icon.set_from_stock(Gtk.STOCK_CLOSE, Gtk.IconSize.BUTTON)
-      button = Gtk.Button()
-      button.add(icon)
-      button.set_tooltip_text('Close log')
-      button.connect("clicked", parent.logbook.close_log, parent)
+      button.set_tooltip_text('Delete Log')
+      button.connect("clicked", parent.logbook.delete_log, parent)
       self.pack_start(button, False, False, 0)
 
       self.pack_start(Gtk.SeparatorMenuItem(), False, False, 0)
@@ -86,7 +68,7 @@ class Toolbar(Gtk.HBox):
 
       # Delete record
       icon = Gtk.Image()
-      icon.set_from_stock(Gtk.STOCK_REMOVE, Gtk.IconSize.BUTTON)
+      icon.set_from_stock(Gtk.STOCK_DELETE, Gtk.IconSize.BUTTON)
       button = Gtk.Button()
       button.add(icon)
       button.set_tooltip_text('Delete record')

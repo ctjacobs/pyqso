@@ -38,7 +38,7 @@ from pyqso.toolbar import *
    
 class PyQSO(Gtk.Window):
    
-   def __init__(self):
+   def __init__(self, logbook_path):
          
       # Call the constructor of the super class (Gtk.Window)
       Gtk.Window.__init__(self, title="PyQSO 0.1a.dev")
@@ -58,9 +58,9 @@ class PyQSO(Gtk.Window):
       vbox_outer = Gtk.VBox()
       self.add(vbox_outer)
       
-      # Create a Logbook so we can add/remove/edit Record objects
-      self.logbook = Logbook()
-      self.logbook.new_log() # Create a new log by default.
+      # Create a Logbook so we can add/remove/edit logs and records,
+      # once connected to the SQLite database.
+      self.logbook = Logbook(logbook_path)
 
       # Set up menu and tool bars
       # These classes depend on the Logbook class,
@@ -106,15 +106,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.''')
 if(__name__ == '__main__'):
    # Get any command line arguments
    parser = optparse.OptionParser()
-   parser.add_option('-l', '--log', action="store_true", default=False, help='Enable logging. All log messages will be written to pyqso.log.')
+   parser.add_option('-d', '--debug', action="store_true", default=False, help='Enable debugging. All debugging messages will be written to pyqso.debug.')
+   parser.add_option('-l', '--logbook', action="store", type="string", dest="logbook", default=os.environ["HOME"]+"/test.db", help='Path to the Logbook file.')
    (options, args) = parser.parse_args()
 
    # Set up debugging output
-   if(options.log):
-      logging.basicConfig(level=logging.DEBUG, filename="pyqso.log", 
+   if(options.debug):
+      logging.basicConfig(level=logging.DEBUG, filename="pyqso.debug", 
                         format="%(asctime)s %(levelname)s: %(message)s", 
                         datefmt="%Y-%m-%d %H:%M:%S")
 
-   application = PyQSO() # Populate the main window and show it
+   application = PyQSO(options.logbook) # Populate the main window and show it
    Gtk.main() # Start up the event loop!
 

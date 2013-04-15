@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-# File: menu.py
+# logbook: menu.py
 
 #    Copyright (C) 2012 Christian Jacobs.
 
-#    This file is part of PyQSO.
+#    This logbook is part of PyQSO.
 
 #    PyQSO is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -32,80 +32,59 @@ class Menu(Gtk.MenuBar):
       agrp = Gtk.AccelGroup()
       parent.add_accel_group(agrp)
       
-      ###### FILE ######
-      mitem_file = Gtk.MenuItem("Log")
-      self.append(mitem_file)  
-      subm_file = Gtk.Menu()
-      mitem_file.set_submenu(subm_file)
+      ###### LOGBOOK ######
+      mitem_logbook = Gtk.MenuItem("Logbook")
+      self.append(mitem_logbook)  
+      subm_logbook = Gtk.Menu()
+      mitem_logbook.set_submenu(subm_logbook)
     
-      # New ADIF log
+      # New log
       mitem_new = Gtk.MenuItem("New Log")
       mitem_new.connect("activate", parent.logbook.new_log)
       key, mod = Gtk.accelerator_parse("<Control>N")
       mitem_new.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
-      subm_file.append(mitem_new)
-      
-      # Open (for opening and reading ADIF files)
-      mitem_open = Gtk.MenuItem("Open Log File...")
-      mitem_open.connect("activate", parent.logbook.open_log, parent)
-      key, mod = Gtk.accelerator_parse("<Control>O")
-      mitem_open.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
-      subm_file.append(mitem_open)
-      
-      # Save (for writing ADIF files)
-      mitem_save = Gtk.MenuItem("Save Log File...")
-      mitem_save.connect("activate", parent.logbook.save_log)
-      key, mod = Gtk.accelerator_parse("<Control>S")
-      mitem_save.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
-      subm_file.append(mitem_save)
+      subm_logbook.append(mitem_new)
 
-      # Save as (for writing ADIF files)
-      mitem_save = Gtk.MenuItem("Save Log File As...")
-      mitem_save.connect("activate", parent.logbook.save_log_as)
-      key, mod = Gtk.accelerator_parse("<Shift><Control>S")
-      mitem_save.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
-      subm_file.append(mitem_save)
-
-      # Close the current log
-      mitem_close = Gtk.MenuItem("Close Log")
-      mitem_close.connect("activate", parent.logbook.close_log, parent)
-      key, mod = Gtk.accelerator_parse("<Control>W")
-      mitem_close.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
-      subm_file.append(mitem_close)
+      # Delete the current log
+      mitem_delete = Gtk.MenuItem("Delete Log")
+      mitem_delete.connect("activate", parent.logbook.delete_log, parent)
+      key, mod = Gtk.accelerator_parse("<Control>D")
+      mitem_delete.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
+      subm_logbook.append(mitem_delete)
  
-      subm_file.append(Gtk.SeparatorMenuItem())
+      subm_logbook.append(Gtk.SeparatorMenuItem())
         
       # Quit
       mitem_quit = Gtk.MenuItem("Quit")
       mitem_quit.connect("activate", Gtk.main_quit)
       key, mod = Gtk.accelerator_parse("<Control>Q")
       mitem_quit.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
-      subm_file.append(mitem_quit)
+      subm_logbook.append(mitem_quit)
       
       
-      ###### LOG ######
-      mitem_log = Gtk.MenuItem("Record")
-      self.append(mitem_log)  
-      subm_log = Gtk.Menu()
-      mitem_log.set_submenu(subm_log)
+      ###### RECORDS ######
+      mitem_records = Gtk.MenuItem("Records")
+      self.append(mitem_records)  
+      subm_records = Gtk.Menu()
+      mitem_records.set_submenu(subm_records)
       
       mitem_addrecord = Gtk.MenuItem("Add Record...")
       mitem_addrecord.connect("activate", parent.logbook.add_record_callback, parent)
       key, mod = Gtk.accelerator_parse("<Control>R")
       mitem_addrecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
-      subm_log.append(mitem_addrecord)
+      subm_records.append(mitem_addrecord)
       
       mitem_editrecord = Gtk.MenuItem("Edit Selected Record...")
       mitem_editrecord.connect("activate", parent.logbook.edit_record_callback, None, None, parent)
       key, mod = Gtk.accelerator_parse("<Control>E")
       mitem_editrecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
-      subm_log.append(mitem_editrecord)
+      subm_records.append(mitem_editrecord)
 
       mitem_deleterecord = Gtk.MenuItem("Delete Selected Record...")
       mitem_deleterecord.connect("activate", parent.logbook.delete_record_callback, parent)
       key, mod = Gtk.accelerator_parse("Delete")
       mitem_deleterecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
-      subm_log.append(mitem_deleterecord)
+      subm_records.append(mitem_deleterecord)
       
       
       ###### VIEW ######

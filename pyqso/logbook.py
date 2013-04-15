@@ -20,6 +20,7 @@
 
 from gi.repository import Gtk, GObject
 import logging
+import sys
 import sqlite3 as sqlite
 from os.path import basename
 
@@ -29,101 +30,67 @@ from log import *
 class Logbook(Gtk.Notebook):
    ''' A Logbook object can store multiple Log objects. '''
    
-   def __init__(self):
+   def __init__(self, path):
 
       Gtk.Notebook.__init__(self)
             
       # A stack of Log objects
       self.logs = []
-      # All SQL database connections to the Logs
-      self.connections = []
-
+      # SQL database connection to the Logbook's data source
+      self.connection = self._connect(path)
+      
       # For rendering the logs. One treeview and one treeselection per Log.
       self.treeview = []
       self.treeselection = []
-      
+
       logging.debug("New Logbook instance created!")
       
-   def _create_connection(self, name=None):
-      connection = None
+   def _connect(self, path):
       try:
-         if(name is None):
-            # Database will be created in RAM. Assuming the user saves the database to disk
-            # before the database gets too large, this should be ok performance-wise.
-            connection = sqlite.connect(":memory:")
-         else:
-            connection = sqlite.connect(name)
+         connection = sqlite.connect(path)
          return connection
       except sqlite.Error as e:
          logging.exception(e)
-         if(connection):
-            # If a connection was created by something went wrong
-            # afterwards, let's free the resource.
-            connection.close()
+         sys.exit(1) # PyQSO can't connect to the database. This error is fatal.
          return None
-      
-   def _destroy_connection(self, connection):
-      try:
-         connection.close()
+         
+   def _disconnect(self):
+      if(self.connection):
+         try:
+            self.connection.close()
+            return True
+         except sqlite.Error as e:
+            logging.exception(e)
+            return False
+      else:
+         logging.error("Already disconnected. Nothing to do here.")
          return True
-      except sqlite.Error as e:
-         logging.exception(e)
-         return False
 
    def new_log(self, widget=None):
-      connection = self._create_connection()
-      if(connection):
-         self.connections.append(connection)
-         l = Log(connection) # Empty log
-         self.logs.append(l)
-         self.render_log(l)
+      l = Log(self.connection) # Empty log
+      self.logs.append(l)
+      self.render_log(l)
       return
 
-
-   def save_log(self, widget=None):
+   def delete_log(self, widget, parent):
       current = self.get_current_page() # Gets the index of the selected tab in the logbook
       if(current == -1):
-         logging.debug("No log files to save!")
-         return
-
-      log = self.logs[current]
-      if(log.path is None):
-         self.save_log_as()  
-      else:
-         # Log is already saved somewhere.
-         if(log.modified):
-            log.name = basename(log.path)
-            self.set_tab_label_text(self.get_nth_page(current), log.name)
-            log.set_modified(False)
-      return
-
-   def close_log(self, widget, parent):
-      current = self.get_current_page() # Gets the index of the selected tab in the logbook
-      if(current == -1):
-         logging.debug("No log files to close!")
+         logging.debug("No logs to delete!")
          return
       log = self.logs[current]
 
-      if(log.modified):
-         dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                                 Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
-                                 "Log %s is not saved. Are you sure you want to close it?" % log.name[0:len(log.name)-1]) # Here we ignore the * at the end of the log's name.
-         response = dialog.run()
-         dialog.destroy()
-         if(response == Gtk.ResponseType.NO):
-            return
-
-      self.logs.pop(current)
-      # Remove the log from the renderers too
-      self.treeview.pop(current)
-      self.treeselection.pop(current)
-      # And finally remove the tab in the Logbook
-      self.remove_page(current)
-
-      # Finally, close the database connection.
-      # Note: All uncommitted changes will be lost.
-      self._destroy_connection(self.connections[current])
-      self.connections.pop(current)
+      dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                              Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
+                              "Are you sure you want to delete log %s?" % log.name)
+      response = dialog.run()
+      dialog.destroy()
+      if(response == Gtk.ResponseType.YES):
+         self.logs.pop(current)
+         # Remove the log from the renderers too
+         self.treeview.pop(current)
+         self.treeselection.pop(current)
+         # And finally remove the tab in the Logbook
+         self.remove_page(current)
 
       return
 
