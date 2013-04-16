@@ -47,7 +47,7 @@ class Menu(Gtk.MenuBar):
 
       # Delete the current log
       mitem_delete = Gtk.MenuItem("Delete Log")
-      mitem_delete.connect("activate", parent.logbook.delete_log, parent)
+      mitem_delete.connect("activate", parent.logbook.delete_log)
       key, mod = Gtk.accelerator_parse("<Control>D")
       mitem_delete.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_logbook.append(mitem_delete)
@@ -69,19 +69,19 @@ class Menu(Gtk.MenuBar):
       mitem_records.set_submenu(subm_records)
       
       mitem_addrecord = Gtk.MenuItem("Add Record...")
-      mitem_addrecord.connect("activate", parent.logbook.add_record_callback, parent)
+      mitem_addrecord.connect("activate", parent.logbook.add_record_callback)
       key, mod = Gtk.accelerator_parse("<Control>R")
       mitem_addrecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_records.append(mitem_addrecord)
       
       mitem_editrecord = Gtk.MenuItem("Edit Selected Record...")
-      mitem_editrecord.connect("activate", parent.logbook.edit_record_callback, None, None, parent)
+      mitem_editrecord.connect("activate", parent.logbook.edit_record_callback, None, None)
       key, mod = Gtk.accelerator_parse("<Control>E")
       mitem_editrecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_records.append(mitem_editrecord)
 
       mitem_deleterecord = Gtk.MenuItem("Delete Selected Record...")
-      mitem_deleterecord.connect("activate", parent.logbook.delete_record_callback, parent)
+      mitem_deleterecord.connect("activate", parent.logbook.delete_record_callback)
       key, mod = Gtk.accelerator_parse("Delete")
       mitem_deleterecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_records.append(mitem_deleterecord)

@@ -51,13 +51,9 @@ class Log(Gtk.ListStore):
       Gtk.ListStore.__init__(self, *data_types)
 
       self.connection = connection
-
+      self.name = name
       with self.connection:
-
-
-
-
-         # Set up the new log table in the database
+         # This is a new log/table, so create it in the database
          c = self.connection.cursor()
          query = "CREATE TABLE %s (id INTEGER PRIMARY KEY" % name
          for field_name in self.SELECTED_FIELD_NAMES_ORDERED:
@@ -81,44 +77,30 @@ class Log(Gtk.ListStore):
 
    def add_record(self, fields_and_data):
 
-      self.set_modified(True)
       return
 
    def delete_record(self, index, iter):
       # Get the selected row in the logbook
       #self.records.pop(index)
       self.remove(iter)
-      self.set_modified(True)
       return
 
    def edit_record(self, index, field_name, data):
       #self.records[index].set_data(field_name, data)
-      self.set_modified(True)
       return
 
    def get_record_by_index(self, index):
       c = self.connection.cursor()
-      c.execute("SELECT * FROM ? WHERE id=?", (TABLE_NAME, index))
+      c.execute("SELECT * FROM ? WHERE id=?", (self.name, index))
       return c.fetchone()
 
    def get_all_records(self):
       c = self.connection.cursor()
-      c.execute("SELECT * FROM %s" % TABLE_NAME)
+      c.execute("SELECT * FROM %s" % self.name)
       return c.fetchall()
 
    def get_number_of_records(self):
       c = self.connection.cursor()
-      c.execute("SELECT Count(*) FROM %s" % TABLE_NAME)
+      c.execute("SELECT Count(*) FROM %s" % self.name)
       return c.fetchone()[0]
-
-   def set_modified(self, modified):
-      if(modified and self.modified):
-         return # Already modified. Nothing to do here.
-      elif(modified and (not self.modified)):
-         self.modified = True
-         self.name = self.name + "*"
-         return
-      else:
-         self.modified = modified
-         return
 

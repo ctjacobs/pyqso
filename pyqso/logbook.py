@@ -26,14 +26,17 @@ from os.path import basename
 
 from adif import *
 from log import *
+from new_log_dialog import *
 
 class Logbook(Gtk.Notebook):
    ''' A Logbook object can store multiple Log objects. '''
    
-   def __init__(self, path):
+   def __init__(self, root_window, path):
 
       Gtk.Notebook.__init__(self)
-            
+
+      self.root_window = root_window            
+
       # A stack of Log objects
       self.logs = []
       # SQL database connection to the Logbook's data source
@@ -42,6 +45,14 @@ class Logbook(Gtk.Notebook):
       # For rendering the logs. One treeview and one treeselection per Log.
       self.treeview = []
       self.treeselection = []
+
+      self._create_new_log_tab()
+
+      # FIXME: This is an unfortunate work-around. If the area around the "+/New Log" button
+      # is clicked, PyQSO will change to an empty page. This signal is used to stop this from happening. 
+      self.connect("switch-page", self._on_switch_page)
+
+      self.show_all()
 
       logging.debug("New Logbook instance created!")
       
@@ -66,23 +77,76 @@ class Logbook(Gtk.Notebook):
          logging.error("Already disconnected. Nothing to do here.")
          return True
 
-   def new_log(self, widget=None):
+   def _create_new_log_tab(self):
+      # Create a blank page in the Notebook for the "+" (New Log) tab
+      blank_treeview = Gtk.TreeView([])
+      # Allow the Log to be scrolled up/down
+      sw = Gtk.ScrolledWindow()
+      sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+      sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+      sw.add(blank_treeview)
+      vbox = Gtk.VBox()
+      vbox.pack_start(sw, True, True, 0)
 
-      
+      # Add a "+" button to the tab
+      hbox = Gtk.HBox(False, 0)
+      icon = Gtk.Image.new_from_stock(Gtk.STOCK_ADD, Gtk.IconSize.MENU)
+      button = Gtk.Button()
+      button.set_relief(Gtk.ReliefStyle.NONE)
+      button.set_focus_on_click(False)
+      button.connect("clicked", self.new_log)
+      button.add(icon)
+      hbox.pack_start(button, False, False, 0)
+      hbox.show_all()
+      vbox.show_all()
 
-      l = Log(self.connection, log_name) # Empty log
-      self.logs.append(l)
-      self.render_log(l)
+      self.insert_page(vbox, hbox, 0)
+
       return
 
-   def delete_log(self, widget, parent):
-      current = self.get_current_page() # Gets the index of the selected tab in the logbook
+   def _on_switch_page(self, widget, label, new_page):
+      if(new_page == self.get_n_pages()-1): # The last (right-most) tab is the "New Log" tab.
+         self.stop_emission("switch-page")
+      return
+
+   def new_log(self, widget=None):
+
+      exists = True
+      dialog = NewLogDialog(self.root_window)
+      while(exists):
+         response = dialog.run()
+         if(response == Gtk.ResponseType.OK):
+            log_name = dialog.get_log_name()
+            if(not self.log_name_exists(log_name) and log_name != ""):
+               l = Log(self.connection, log_name) # Empty log
+               self.logs.append(l)
+               self.render_log(self.get_number_of_logs()-1)
+               exists = False
+            else:
+               logging.error("Log with name %s already exists." % log_name)
+               # Data is not valid - inform the user.
+               message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
+                                    "Log with name %s already exists. Please choose another name." % log_name)
+               message.run()
+               message.destroy()
+         else:
+            dialog.destroy()
+            return
+
+      dialog.destroy()
+
+      self.set_current_page(self.get_number_of_logs()-1)
+      return
+
+   def delete_log(self, widget):
+      current = self.get_current_page() - 1 # Gets the index of the selected tab in the logbook
       if(current == -1):
          logging.debug("No logs to delete!")
          return
       log = self.logs[current]
 
-      dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+      dialog = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                               Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
                               "Are you sure you want to delete log %s?" % log.name)
       response = dialog.run()
@@ -97,26 +161,38 @@ class Logbook(Gtk.Notebook):
 
       return
 
-   def render_log(self, log):
+   def render_log(self, index):
       # Render the Log
-      current = self.get_number_of_logs()-1
       #sorter = Gtk.TreeModelSort(model=log) #FIXME: Get sorted columns working!
       #sorter.set_sort_column_id(1, Gtk.SortType.ASCENDING)
       #self.treeview.append(Gtk.TreeView(sorter))
-      self.treeview.append(Gtk.TreeView(log))
-      self.treeview[current].set_grid_lines(Gtk.TreeViewGridLines.BOTH)
-      #FIXME: Ideally we want the parent window to be passed in to self.edit_record_callback.
-      self.treeview[current].connect("row-activated", self.edit_record_callback, None)
-      self.treeselection.append(self.treeview[current].get_selection())
-      self.treeselection[current].set_mode(Gtk.SelectionMode.SINGLE)
+      self.treeview.append(Gtk.TreeView(self.logs[index]))
+      self.treeview[index].set_grid_lines(Gtk.TreeViewGridLines.BOTH)
+      self.treeview[index].connect("row-activated", self.edit_record_callback, self.root_window)
+      self.treeselection.append(self.treeview[index].get_selection())
+      self.treeselection[index].set_mode(Gtk.SelectionMode.SINGLE)
       # Allow the Log to be scrolled up/down
       sw = Gtk.ScrolledWindow()
       sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
       sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-      sw.add(self.treeview[current])
+      sw.add(self.treeview[index])
       vbox = Gtk.VBox()
       vbox.pack_start(sw, True, True, 0)
-      self.append_page(vbox, Gtk.Label(self.logs[current].name)) # Append the new log as a new tab
+
+      # Add a close button to the tab
+      hbox = Gtk.HBox(False, 0)
+      label = Gtk.Label(self.logs[index].name)
+      hbox.pack_start(label, False, False, 0)
+      icon = Gtk.Image.new_from_stock(Gtk.STOCK_CLOSE, Gtk.IconSize.MENU)
+      button = Gtk.Button()
+      button.set_relief(Gtk.ReliefStyle.NONE)
+      button.set_focus_on_click(False)
+      button.connect("clicked", self.delete_log)
+      button.add(icon)
+      hbox.pack_start(button, False, False, 0)
+      hbox.show_all()
+
+      self.insert_page(vbox, hbox, index) # Append the new log as a new tab
 
       # The first column of the logbook will always be the unique record index.
       # Let's append this separately to the field names.
@@ -124,21 +200,21 @@ class Logbook(Gtk.Notebook):
       column = Gtk.TreeViewColumn("Index", renderer, text=0)
       column.set_resizable(True)
       column.set_min_width(50)
-      self.treeview[current].append_column(column)
+      self.treeview[index].append_column(column)
          
       # Set up column names for each selected field
-      field_names = self.logs[current].SELECTED_FIELD_NAMES_ORDERED
+      field_names = self.logs[index].SELECTED_FIELD_NAMES_ORDERED
       for i in range(0, len(field_names)):
          renderer = Gtk.CellRendererText()
-         column = Gtk.TreeViewColumn(self.logs[current].SELECTED_FIELD_NAMES_FRIENDLY[field_names[i]], renderer, text=i+1)
+         column = Gtk.TreeViewColumn(self.logs[index].SELECTED_FIELD_NAMES_FRIENDLY[field_names[i]], renderer, text=i+1)
          column.set_resizable(True)
          column.set_min_width(50)
-         self.treeview[current].append_column(column)
+         self.treeview[index].append_column(column)
 
       self.show_all()
 
 
-   def import_log(self, widget, parent):
+   def import_log(self, widget):
       dialog = Gtk.FileChooserDialog("Import ADIF Log File",
                                     None,
                                     Gtk.FileChooserAction.OPEN,
@@ -162,7 +238,7 @@ class Logbook(Gtk.Notebook):
 
       for log in self.logs:
          if(log.path == path):
-            dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+            dialog = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                  Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
                                  "Log %s is already open." % path)
             response = dialog.run()
@@ -214,14 +290,14 @@ class Logbook(Gtk.Notebook):
          log.set_modified(False)
       return
 
-   def add_record_callback(self, widget, parent):
+   def add_record_callback(self, widget):
 
-      current = self.get_current_page() # Gets the index of the selected tab in the logbook
+      current = self.get_current_page() - 1 # Gets the index of the selected tab in the logbook
       if(current == -1):
          logging.debug("Tried to add a record, but no log present!")
          return
       log = self.logs[current]
-      dialog = RecordDialog(root_window=parent, log=log, index=None)
+      dialog = RecordDialog(root_window=self.root_window, log=log, index=None)
       all_valid = False # Are all the field entries valid?
 
       while(not all_valid): 
@@ -238,7 +314,7 @@ class Logbook(Gtk.Notebook):
                fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
                if(not(dialog.is_valid(field_names[i], fields_and_data[field_names[i]], log.SELECTED_FIELD_NAMES_TYPES[field_names[i]]))):
                   # Data is not valid - inform the user.
-                  message = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                  message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                     Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
                                     "The data in field \"%s\" is not valid!" % field_names[i])
                   message.run()
@@ -261,8 +337,8 @@ class Logbook(Gtk.Notebook):
       dialog.destroy()
       return
       
-   def delete_record_callback(self, widget, parent):
-      current = self.get_current_page() # Get the selected log
+   def delete_record_callback(self, widget):
+      current = self.get_current_page() - 1 # Get the selected log
       if(current == -1):
          logging.debug("Tried to delete a record, but no log present!")
          return
@@ -274,7 +350,7 @@ class Logbook(Gtk.Notebook):
          logging.debug("Trying to delete a record, but there are no records in the log!")
          return
 
-      dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+      dialog = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                  Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
                                  "Are you sure you want to delete record %d?" % index)
       response = dialog.run()
@@ -287,11 +363,11 @@ class Logbook(Gtk.Notebook):
       self.set_tab_label_text(self.get_nth_page(current), self.logs[current].name)
       return
 
-   def edit_record_callback(self, widget, path, view_column, parent):
+   def edit_record_callback(self, widget, path, view_column):
       # Note: the path and view_column arguments need to be passed in
       # since they associated with the row-activated signal.
 
-      current = self.get_current_page() # Get the selected log
+      current = self.get_current_page() - 1 # Get the selected log
       if(current == -1):
          logging.debug("Tried to edit a record, but no log present!")
          return
@@ -306,7 +382,7 @@ class Logbook(Gtk.Notebook):
          logging.debug("Could not find the selected row's index!")
          return
 
-      dialog = RecordDialog(root_window=parent, log=self.logs[current], index=row_index)
+      dialog = RecordDialog(root_window=self.root_window, log=self.logs[current], index=row_index)
       all_valid = False # Are all the field entries valid?
 
       while(not all_valid): 
@@ -323,7 +399,7 @@ class Logbook(Gtk.Notebook):
                fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
                if(not(dialog.is_valid(field_names[i], fields_and_data[field_names[i]], self.logs[current].SELECTED_FIELD_NAMES_TYPES[field_names[i]]))):
                   # Data is not valid - inform the user.
-                  message = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                  message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                     Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
                                     "The data in field \"%s\" is not valid!" % field_names[i])
                   message.run()
@@ -350,4 +426,13 @@ class Logbook(Gtk.Notebook):
    def get_number_of_logs(self):
       return len(self.logs)
 
-      
+   def log_name_exists(self, table_name):
+      with self.connection:
+         c = self.connection.cursor()
+         c.execute("SELECT name FROM sqlite_master WHERE type='table'")
+         names = c.fetchall()
+      for name in names:
+         if(table_name in name):
+            return True
+      return False
+
