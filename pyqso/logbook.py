@@ -45,7 +45,7 @@ class Logbook(Gtk.Notebook):
       # For rendering the logs. One treeview and one treeselection per Log.
       self.treeview = []
       self.treeselection = []
-
+      self._create_summary_page()
       self._create_new_log_tab()
 
       # FIXME: This is an unfortunate work-around. If the area around the "+/New Log" button
@@ -100,7 +100,25 @@ class Logbook(Gtk.Notebook):
       hbox.show_all()
       vbox.show_all()
 
-      self.insert_page(vbox, hbox, 0)
+      self.insert_page(vbox, hbox, 1)
+      self.show_all()
+      self.set_current_page(0)
+      return
+
+   def _create_summary_page(self):
+      sw = Gtk.ScrolledWindow()
+      sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+      sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+      vbox = Gtk.VBox()
+      vbox.pack_start(sw, True, True, 0)
+
+      hbox = Gtk.HBox(False, 0)
+      label = Gtk.Label("Summary")
+      hbox.pack_start(label, False, False, 0)
+      hbox.show_all()
+
+      self.insert_page(vbox, hbox, 0) # Append the new log as a new tab
+      self.show_all()
 
       return
 
@@ -136,15 +154,18 @@ class Logbook(Gtk.Notebook):
 
       dialog.destroy()
 
-      self.set_current_page(self.get_number_of_logs()-1)
+      self.set_current_page(self.get_number_of_logs())
       return
 
-   def delete_log(self, widget):
-      current = self.get_current_page() - 1 # Gets the index of the selected tab in the logbook
-      if(current == -1):
+   def delete_log(self, widget, page_index=None):
+      if(page_index is None):
+         page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
+      log_index = page_index - 1
+
+      if(page_index == 0 or page_index == self.get_n_pages()-1): # Only the "New Log" tab is present (i.e. no actual logs in the logbook)
          logging.debug("No logs to delete!")
          return
-      log = self.logs[current]
+      log = self.logs[log_index]
 
       dialog = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                               Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
@@ -152,12 +173,12 @@ class Logbook(Gtk.Notebook):
       response = dialog.run()
       dialog.destroy()
       if(response == Gtk.ResponseType.YES):
-         self.logs.pop(current)
+         self.logs.pop(log_index)
          # Remove the log from the renderers too
-         self.treeview.pop(current)
-         self.treeselection.pop(current)
+         self.treeview.pop(log_index)
+         self.treeselection.pop(log_index)
          # And finally remove the tab in the Logbook
-         self.remove_page(current)
+         self.remove_page(page_index)
 
       return
 
@@ -168,7 +189,7 @@ class Logbook(Gtk.Notebook):
       #self.treeview.append(Gtk.TreeView(sorter))
       self.treeview.append(Gtk.TreeView(self.logs[index]))
       self.treeview[index].set_grid_lines(Gtk.TreeViewGridLines.BOTH)
-      self.treeview[index].connect("row-activated", self.edit_record_callback, self.root_window)
+      self.treeview[index].connect("row-activated", self.edit_record_callback)
       self.treeselection.append(self.treeview[index].get_selection())
       self.treeselection[index].set_mode(Gtk.SelectionMode.SINGLE)
       # Allow the Log to be scrolled up/down
@@ -187,12 +208,12 @@ class Logbook(Gtk.Notebook):
       button = Gtk.Button()
       button.set_relief(Gtk.ReliefStyle.NONE)
       button.set_focus_on_click(False)
-      button.connect("clicked", self.delete_log)
+      button.connect("clicked", self.delete_log, index+1)
       button.add(icon)
       hbox.pack_start(button, False, False, 0)
       hbox.show_all()
 
-      self.insert_page(vbox, hbox, index) # Append the new log as a new tab
+      self.insert_page(vbox, hbox, index+1) # Append the new log as a new tab
 
       # The first column of the logbook will always be the unique record index.
       # Let's append this separately to the field names.
@@ -212,6 +233,7 @@ class Logbook(Gtk.Notebook):
          self.treeview[index].append_column(column)
 
       self.show_all()
+      return
 
 
    def import_log(self, widget):
@@ -257,7 +279,7 @@ class Logbook(Gtk.Notebook):
    def export_log(self, widget=None):
 
       current = self.get_current_page() # Gets the index of the selected tab in the logbook
-      if(current == -1):
+      if(current == 0 or current == self.get_n_pages()-1):
          logging.debug("No log files to export!")
          return
 
@@ -292,11 +314,12 @@ class Logbook(Gtk.Notebook):
 
    def add_record_callback(self, widget):
 
-      current = self.get_current_page() - 1 # Gets the index of the selected tab in the logbook
-      if(current == -1):
+      page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
+      if(page_index == 0 or page_index == self.get_n_pages()-1):
          logging.debug("Tried to add a record, but no log present!")
          return
-      log = self.logs[current]
+      log_index = page_index - 1
+      log = self.logs[log_index]
       dialog = RecordDialog(root_window=self.root_window, log=log, index=None)
       all_valid = False # Are all the field entries valid?
 
@@ -331,18 +354,18 @@ class Logbook(Gtk.Notebook):
                log.append(log_entry)
                log.add_record(fields_and_data)
                # Select the new Record's row in the treeview.
-               self.treeselection[current].select_path(log.get_number_of_records()-1)
-               self.set_tab_label_text(self.get_nth_page(current), log.name)
+               self.treeselection[log_index].select_path(log.get_number_of_records())
 
       dialog.destroy()
       return
       
    def delete_record_callback(self, widget):
-      current = self.get_current_page() - 1 # Get the selected log
-      if(current == -1):
+      page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
+      if(page_index == 0 or page_index == self.get_n_pages()-1):
          logging.debug("Tried to delete a record, but no log present!")
          return
-      (model, path) = self.treeselection[current].get_selected_rows() # Get the selected row in the log
+      log_index = page_index - 1
+      (model, path) = self.treeselection[log_index].get_selected_rows() # Get the selected row in the log
       try:
          iter = model.get_iter(path[0])
          index = model.get_value(iter,0)
@@ -357,24 +380,24 @@ class Logbook(Gtk.Notebook):
       if(response == Gtk.ResponseType.YES):
          # Deletes the record with index 'index' from the Records list.
          # 'iter' is needed to remove the record from the ListStore itself.
-         self.logs[current].delete_record(index, iter)
+         self.logs[log_index].delete_record(index, iter)
          
       dialog.destroy()
-      self.set_tab_label_text(self.get_nth_page(current), self.logs[current].name)
       return
 
    def edit_record_callback(self, widget, path, view_column):
       # Note: the path and view_column arguments need to be passed in
       # since they associated with the row-activated signal.
 
-      current = self.get_current_page() - 1 # Get the selected log
-      if(current == -1):
+      page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
+      if(page_index == 0 or page_index == self.get_n_pages()-1):
          logging.debug("Tried to edit a record, but no log present!")
          return
+      log_index = page_index - 1
       
-      log = self.logs[current]
+      log = self.logs[log_index]
 
-      (model, path) = self.treeselection[current].get_selected_rows() # Get the selected row in the log
+      (model, path) = self.treeselection[log_index].get_selected_rows() # Get the selected row in the log
       try:
          iter = model.get_iter(path[0])
          row_index = model.get_value(iter,0)
@@ -382,7 +405,7 @@ class Logbook(Gtk.Notebook):
          logging.debug("Could not find the selected row's index!")
          return
 
-      dialog = RecordDialog(root_window=self.root_window, log=self.logs[current], index=row_index)
+      dialog = RecordDialog(root_window=self.root_window, log=self.logs[log_index], index=row_index)
       all_valid = False # Are all the field entries valid?
 
       while(not all_valid): 
@@ -393,11 +416,11 @@ class Logbook(Gtk.Notebook):
          response = dialog.run() #FIXME: Is it ok to call .run() multiple times on the same RecordDialog object?
          if(response == Gtk.ResponseType.OK):
             fields_and_data = {}
-            field_names = self.logs[current].SELECTED_FIELD_NAMES_ORDERED
+            field_names = self.logs[log_index].SELECTED_FIELD_NAMES_ORDERED
             for i in range(0, len(field_names)):
                #TODO: Validate user input!
                fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
-               if(not(dialog.is_valid(field_names[i], fields_and_data[field_names[i]], self.logs[current].SELECTED_FIELD_NAMES_TYPES[field_names[i]]))):
+               if(not(dialog.is_valid(field_names[i], fields_and_data[field_names[i]], self.logs[log_index].SELECTED_FIELD_NAMES_TYPES[field_names[i]]))):
                   # Data is not valid - inform the user.
                   message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                     Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
@@ -415,7 +438,6 @@ class Logbook(Gtk.Notebook):
                   # ...and then the Logbook.
                   # (we add 1 onto the column_index here because we don't want to consider the index column)
                   log[row_index][i+1] = fields_and_data[field_names[i]]
-                  self.set_tab_label_text(self.get_nth_page(current), log.name)
 
       dialog.destroy()
       return
