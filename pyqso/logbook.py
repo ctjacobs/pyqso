@@ -31,16 +31,56 @@ from new_log_dialog import *
 class Logbook(Gtk.Notebook):
    ''' A Logbook object can store multiple Log objects. '''
    
-   def __init__(self, root_window, path):
+   def __init__(self, root_window):
 
       Gtk.Notebook.__init__(self)
 
-      self.root_window = root_window            
+      self.root_window = root_window
+      self.connection = None
+
+      logging.debug("New Logbook instance created!")
+      
+   def db_connect(self, widget=None, path=None):
+      ''' Creates an SQL database connection to the Logbook's data source '''
+
+      if(path is None):
+         # If no path has been provided, get one from a "File Open" dialog.
+         dialog = Gtk.FileChooserDialog("Open SQLite Database File",
+                                    None,
+                                    Gtk.FileChooserAction.OPEN,
+                                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                    Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+         filter = Gtk.FileFilter()
+         filter.set_name("All SQLite Database files")
+         filter.add_pattern("*.db")
+         dialog.add_filter(filter)
+         
+         response = dialog.run()
+         if(response == Gtk.ResponseType.OK):
+            path = dialog.get_filename()
+         else:
+            path = None
+         dialog.destroy()
+         
+         if(path is None):
+            logging.debug("No file path specified.")
+            return
+         else:
+            self.path = path
+      else:
+         # Use existing user input
+         self.path = path
+
+      # Try setting up the SQL database connection
+      try:
+         self.db_disconnect()
+         self.connection = sqlite.connect(self.path)
+      except sqlite.Error as e:
+         logging.exception(e)
+         sys.exit(1) # PyQSO can't connect to the database. This error is fatal.
 
       # A stack of Log objects
       self.logs = []
-      # SQL database connection to the Logbook's data source
-      self.connection = self._connect(path)
       
       # For rendering the logs. One treeview and one treeselection per Log.
       self.treeview = []
@@ -52,30 +92,33 @@ class Logbook(Gtk.Notebook):
       # is clicked, PyQSO will change to an empty page. This signal is used to stop this from happening. 
       self.connect("switch-page", self._on_switch_page)
 
+      if(self.connection):
+         context_id = self.root_window.statusbar.get_context_id("Status")
+         self.root_window.statusbar.push(context_id, "Logbook: %s" % self.path)
+
       self.show_all()
 
-      logging.debug("New Logbook instance created!")
-      
-   def _connect(self, path):
-      try:
-         connection = sqlite.connect(path)
-         return connection
-      except sqlite.Error as e:
-         logging.exception(e)
-         sys.exit(1) # PyQSO can't connect to the database. This error is fatal.
-         return None
+      return
          
-   def _disconnect(self):
+   def db_disconnect(self, widget=None):
       if(self.connection):
          try:
             self.connection.close()
-            return True
+            self.connection = None
          except sqlite.Error as e:
             logging.exception(e)
-            return False
+
+         context_id = self.root_window.statusbar.get_context_id("Status")
+         self.root_window.statusbar.push(context_id, "Not connected to a Logbook.")
       else:
          logging.error("Already disconnected. Nothing to do here.")
-         return True
+
+      while(self.get_n_pages() > 0):
+         # Once a page is removed, the other pages get re-numbered,
+         # so a 'for' loop isn't the best option here.
+         self.remove_page(0)
+
+      return
 
    def _create_new_log_tab(self):
       # Create a blank page in the Notebook for the "+" (New Log) tab
@@ -106,15 +149,23 @@ class Logbook(Gtk.Notebook):
       return
 
    def _create_summary_page(self):
-      sw = Gtk.ScrolledWindow()
-      sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
-      sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+
       vbox = Gtk.VBox()
-      vbox.pack_start(sw, True, True, 0)
+      label = Gtk.Label("%s" % self.path)
+      #label.set_style()
+      vbox.pack_start(label, False, False, 0)
+      label = Gtk.Label("Total number of QSOs: ")
+      vbox.pack_start(label, False, False, 0)
+      label = Gtk.Label("Date created: ")
+      vbox.pack_start(label, False, False, 0)
+      label = Gtk.Label("Date modified: ")
+      vbox.pack_start(label, False, False, 0)
 
       hbox = Gtk.HBox(False, 0)
-      label = Gtk.Label("Summary")
+      label = Gtk.Label("Summary  ")
+      icon = Gtk.Image.new_from_stock(Gtk.STOCK_INDEX, Gtk.IconSize.MENU)
       hbox.pack_start(label, False, False, 0)
+      hbox.pack_start(icon, False, False, 0)
       hbox.show_all()
 
       self.insert_page(vbox, hbox, 0) # Append the new log as a new tab
@@ -208,7 +259,7 @@ class Logbook(Gtk.Notebook):
       button = Gtk.Button()
       button.set_relief(Gtk.ReliefStyle.NONE)
       button.set_focus_on_click(False)
-      button.connect("clicked", self.delete_log, index+1)
+      button.connect_after("clicked", self.delete_log, index+1)
       button.add(icon)
       hbox.pack_start(button, False, False, 0)
       hbox.show_all()

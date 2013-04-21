@@ -28,6 +28,26 @@ class Toolbar(Gtk.HBox):
       
       Gtk.HBox.__init__(self, spacing=2)
 
+      # Connect
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_CONNECT, Gtk.IconSize.BUTTON)
+      button = Gtk.Button()
+      button.add(icon)
+      button.set_tooltip_text('Connect to Logbook')
+      button.connect("clicked", parent.logbook.db_connect)
+      self.pack_start(button, False, False, 0)
+
+      # Disconnect
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_DISCONNECT, Gtk.IconSize.BUTTON)
+      button = Gtk.Button()
+      button.add(icon)
+      button.set_tooltip_text('Disconnect from Logbook')
+      button.connect("clicked", parent.logbook.db_disconnect)
+      self.pack_start(button, False, False, 0)
+
+      self.pack_start(Gtk.SeparatorMenuItem(), False, False, 0)
+
       # Add record
       icon = Gtk.Image()
       icon.set_from_stock(Gtk.STOCK_ADD, Gtk.IconSize.BUTTON)
