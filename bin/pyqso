@@ -57,27 +57,26 @@ class PyQSO(Gtk.Window):
       
       vbox_outer = Gtk.VBox()
       self.add(vbox_outer)
+
+      self.statusbar = Gtk.Statusbar()
+      context_id = self.statusbar.get_context_id("Status")
+      self.statusbar.push(context_id, "Not connected to a Logbook.")
       
       # Create a Logbook so we can add/remove/edit logs and records,
       # once connected to the SQLite database.
       self.logbook = Logbook(self)
       if(logbook_path is not None):
-         self.logbook.db_connect(logbook_path)
+         self.logbook.db_connect(path=logbook_path)
 
       # Set up menu and tool bars
       # These classes depend on the Logbook class,
       # so pack the logbook after the menu and toolbar.
       menu = Menu(self)
-      vbox_outer.pack_start(menu, False, False, 0)
       toolbar = Toolbar(self)
-      vbox_outer.pack_start(toolbar, False, False, 0)
-      
-      vbox_outer.pack_start(self.logbook, True, True, 0)
 
-      self.statusbar = Gtk.Statusbar()
-      if(self.logbook.connection is None):
-         context_id = self.statusbar.get_context_id("Status")
-         self.statusbar.push(context_id, "Not connected to a Logbook.")
+      vbox_outer.pack_start(menu, False, False, 0)
+      vbox_outer.pack_start(toolbar, False, False, 0)
+      vbox_outer.pack_start(self.logbook, True, True, 0)
       vbox_outer.pack_start(self.statusbar, False, False, 0)
 
       self.show_all()

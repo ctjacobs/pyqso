@@ -72,8 +72,10 @@ class Logbook(Gtk.Notebook):
          self.path = path
 
       # Try setting up the SQL database connection
-      try:
+      if(self.connection):
+         # Destroy any existing connections first.
          self.db_disconnect()
+      try:
          self.connection = sqlite.connect(self.path)
       except sqlite.Error as e:
          logging.exception(e)
@@ -139,6 +141,7 @@ class Logbook(Gtk.Notebook):
       button.set_focus_on_click(False)
       button.connect("clicked", self.new_log)
       button.add(icon)
+      button.set_tooltip_text('New Log')
       hbox.pack_start(button, False, False, 0)
       hbox.show_all()
       vbox.show_all()
@@ -151,15 +154,15 @@ class Logbook(Gtk.Notebook):
    def _create_summary_page(self):
 
       vbox = Gtk.VBox()
-      label = Gtk.Label("%s" % self.path)
-      #label.set_style()
-      vbox.pack_start(label, False, False, 0)
-      label = Gtk.Label("Total number of QSOs: ")
-      vbox.pack_start(label, False, False, 0)
-      label = Gtk.Label("Date created: ")
-      vbox.pack_start(label, False, False, 0)
-      label = Gtk.Label("Date modified: ")
-      vbox.pack_start(label, False, False, 0)
+      label = Gtk.Label(halign=Gtk.Align.START)
+      label.set_markup("   <span size=\"x-large\">%s</span>" % basename(self.path))
+      vbox.pack_start(label, False, False, 6)
+      label = Gtk.Label("   Total number of QSOs: ", halign=Gtk.Align.START)
+      vbox.pack_start(label, False, False, 2)
+      label = Gtk.Label("   Date created: ", halign=Gtk.Align.START)
+      vbox.pack_start(label, False, False, 2)
+      label = Gtk.Label("   Date modified: ", halign=Gtk.Align.START)
+      vbox.pack_start(label, False, False, 2)
 
       hbox = Gtk.HBox(False, 0)
       label = Gtk.Label("Summary  ")
@@ -179,7 +182,8 @@ class Logbook(Gtk.Notebook):
       return
 
    def new_log(self, widget=None):
-
+      if(self.connection is None):
+         return
       exists = True
       dialog = NewLogDialog(self.root_window)
       while(exists):
@@ -209,6 +213,8 @@ class Logbook(Gtk.Notebook):
       return
 
    def delete_log(self, widget, page_index=None):
+      if(self.connection is None):
+         return
       if(page_index is None):
          page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
       log_index = page_index - 1
