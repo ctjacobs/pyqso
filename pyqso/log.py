@@ -52,18 +52,6 @@ class Log(Gtk.ListStore):
 
       self.connection = connection
       self.name = name
-      with self.connection:
-         # This is a new log/table, so create it in the database
-         c = self.connection.cursor()
-         query = "CREATE TABLE %s (id INTEGER PRIMARY KEY" % name
-         for field_name in self.SELECTED_FIELD_NAMES_ORDERED:
-            s = ", %s TEXT" % field_name.lower()
-            query = query + s
-         query = query + ")"
-         c.execute(query)
-
-      # Populate the ListStore with any existing records
-      self.populate()
       
       logging.debug("New Log instance created!")
                

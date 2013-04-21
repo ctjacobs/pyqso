@@ -22,7 +22,8 @@ from gi.repository import Gtk, GObject
 import logging
 import sys
 import sqlite3 as sqlite
-from os.path import basename
+from os.path import basename, getctime, getmtime
+import datetime
 
 from adif import *
 from log import *
@@ -37,6 +38,7 @@ class Logbook(Gtk.Notebook):
 
       self.root_window = root_window
       self.connection = None
+      self.summary = {}
 
       logging.debug("New Logbook instance created!")
       
@@ -98,6 +100,8 @@ class Logbook(Gtk.Notebook):
          context_id = self.root_window.statusbar.get_context_id("Status")
          self.root_window.statusbar.push(context_id, "Logbook: %s" % self.path)
 
+      self.open_logs()
+
       self.show_all()
 
       return
@@ -154,15 +158,26 @@ class Logbook(Gtk.Notebook):
    def _create_summary_page(self):
 
       vbox = Gtk.VBox()
+
+      hbox = Gtk.HBox()
       label = Gtk.Label(halign=Gtk.Align.START)
-      label.set_markup("   <span size=\"x-large\">%s</span>" % basename(self.path))
-      vbox.pack_start(label, False, False, 6)
-      label = Gtk.Label("   Total number of QSOs: ", halign=Gtk.Align.START)
-      vbox.pack_start(label, False, False, 2)
-      label = Gtk.Label("   Date created: ", halign=Gtk.Align.START)
-      vbox.pack_start(label, False, False, 2)
-      label = Gtk.Label("   Date modified: ", halign=Gtk.Align.START)
-      vbox.pack_start(label, False, False, 2)
+      label.set_markup("<span size=\"x-large\">%s</span>" % basename(self.path))
+      hbox.pack_start(label, False, False, 6)
+      vbox.pack_start(hbox, False, False, 2)
+
+      hbox = Gtk.HBox()
+      label = Gtk.Label("Number of logs: ", halign=Gtk.Align.START)
+      hbox.pack_start(label, False, False, 6)
+      self.summary["NUMBER_OF_LOGS"] = Gtk.Label("0")
+      hbox.pack_start(self.summary["NUMBER_OF_LOGS"], False, False, 2)
+      vbox.pack_start(hbox, False, False, 2)
+
+      hbox = Gtk.HBox()
+      label = Gtk.Label("Date modified: ", halign=Gtk.Align.START)
+      hbox.pack_start(label, False, False, 6)
+      self.summary["DATE_MODIFIED"] = Gtk.Label("0")
+      hbox.pack_start(self.summary["DATE_MODIFIED"], False, False, 2)
+      vbox.pack_start(hbox, False, False, 2)
 
       hbox = Gtk.HBox(False, 0)
       label = Gtk.Label("Summary  ")
@@ -174,6 +189,11 @@ class Logbook(Gtk.Notebook):
       self.insert_page(vbox, hbox, 0) # Append the new log as a new tab
       self.show_all()
 
+      return
+
+   def _update_summary(self):
+      self.summary["NUMBER_OF_LOGS"].set_label(str(self.get_number_of_logs()))
+      self.summary["DATE_MODIFIED"].set_label(str(datetime.fromtimestamp(getmtime(self.path))))
       return
 
    def _on_switch_page(self, widget, label, new_page):
@@ -190,26 +210,52 @@ class Logbook(Gtk.Notebook):
          response = dialog.run()
          if(response == Gtk.ResponseType.OK):
             log_name = dialog.get_log_name()
-            if(not self.log_name_exists(log_name) and log_name != ""):
-               l = Log(self.connection, log_name) # Empty log
-               self.logs.append(l)
-               self.render_log(self.get_number_of_logs()-1)
+            try:
+               c = self.connection.cursor()
+               query = "CREATE TABLE %s (id INTEGER PRIMARY KEY" % log_name
+               for field_name in AVAILABLE_FIELD_NAMES_TYPES:
+                  s = ", %s TEXT" % field_name.lower()
+                  query = query + s
+               query = query + ")"
+               c.execute(query)
                exists = False
-            else:
-               logging.error("Log with name %s already exists." % log_name)
+            except sqlite.Error as e:
+               logging.exception(e)
                # Data is not valid - inform the user.
                message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                     Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
-                                    "Log with name %s already exists. Please choose another name." % log_name)
+                                    "Database error. Try another log name.")
                message.run()
                message.destroy()
+               exists = True
          else:
             dialog.destroy()
             return
 
       dialog.destroy()
 
+      l = Log(self.connection, log_name) # Empty log
+      l.populate()
+
+      self.logs.append(l)
+      self.render_log(self.get_number_of_logs()-1)
+      self._update_summary()
+
       self.set_current_page(self.get_number_of_logs())
+      return
+
+   def open_logs(self):
+      with self.connection:
+         c = self.connection.cursor()
+         c.execute("SELECT name FROM sqlite_master WHERE type='table'")
+         names = c.fetchall()
+      for name in names:
+         l = Log(self.connection, name[0])
+         l.populate()
+         self.logs.append(l)
+         self.render_log(self.get_number_of_logs()-1)       
+
+      self._update_summary()  
       return
 
    def delete_log(self, widget, page_index=None):
@@ -230,6 +276,11 @@ class Logbook(Gtk.Notebook):
       response = dialog.run()
       dialog.destroy()
       if(response == Gtk.ResponseType.YES):
+
+         with self.connection:
+            c = self.connection.cursor()
+            c.execute("DROP TABLE %s" % log.name)
+
          self.logs.pop(log_index)
          # Remove the log from the renderers too
          self.treeview.pop(log_index)
@@ -237,6 +288,7 @@ class Logbook(Gtk.Notebook):
          # And finally remove the tab in the Logbook
          self.remove_page(page_index)
 
+      self._update_summary()
       return
 
    def render_log(self, index):
@@ -265,7 +317,7 @@ class Logbook(Gtk.Notebook):
       button = Gtk.Button()
       button.set_relief(Gtk.ReliefStyle.NONE)
       button.set_focus_on_click(False)
-      button.connect_after("clicked", self.delete_log, index+1)
+      button.connect("clicked", self.delete_log, index+1)
       button.add(icon)
       hbox.pack_start(button, False, False, 0)
       hbox.show_all()
@@ -508,10 +560,9 @@ class Logbook(Gtk.Notebook):
    def log_name_exists(self, table_name):
       with self.connection:
          c = self.connection.cursor()
-         c.execute("SELECT name FROM sqlite_master WHERE type='table'")
-         names = c.fetchall()
-      for name in names:
-         if(table_name in name):
+         c.execute("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE name=?)", [table_name])
+         exists = c.fetchone()
+         if(exists[0] == 1):
             return True
       return False
 

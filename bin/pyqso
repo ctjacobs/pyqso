@@ -65,6 +65,7 @@ class PyQSO(Gtk.Window):
       # Create a Logbook so we can add/remove/edit logs and records,
       # once connected to the SQLite database.
       self.logbook = Logbook(self)
+      self.logbook.set_scrollable(True)
       if(logbook_path is not None):
          self.logbook.db_connect(path=logbook_path)
 
