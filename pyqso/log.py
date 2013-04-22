@@ -24,7 +24,6 @@ import logging
 import sqlite3 as sqlite
 
 from adif import AVAILABLE_FIELD_NAMES_TYPES
-from record import *
 from record_dialog import *
 
 class Log(Gtk.ListStore):

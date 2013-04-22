@@ -22,8 +22,6 @@ import re
 import logging
 from datetime import datetime
 
-from record import *
-
 # All the possible field names and their associated data types 
 # from the ADIF specification (version 3.0.2)
 AVAILABLE_FIELD_NAMES_TYPES = {"CALL": "S", 
