@@ -79,6 +79,7 @@ class Logbook(Gtk.Notebook):
          self.db_disconnect()
       try:
          self.connection = sqlite.connect(self.path)
+         self.connection.row_factory = sqlite.Row
       except sqlite.Error as e:
          logging.exception(e)
          sys.exit(1) # PyQSO can't connect to the database. This error is fatal.
@@ -212,8 +213,8 @@ class Logbook(Gtk.Notebook):
             log_name = dialog.get_log_name()
             try:
                c = self.connection.cursor()
-               query = "CREATE TABLE %s (id INTEGER PRIMARY KEY" % log_name
-               for field_name in AVAILABLE_FIELD_NAMES_TYPES:
+               query = "CREATE TABLE %s (id INTEGER PRIMARY KEY AUTOINCREMENT" % log_name
+               for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
                   s = ", %s TEXT" % field_name.lower()
                   query = query + s
                query = query + ")"
@@ -249,7 +250,10 @@ class Logbook(Gtk.Notebook):
          c = self.connection.cursor()
          c.execute("SELECT name FROM sqlite_master WHERE type='table'")
          names = c.fetchall()
+
       for name in names:
+         if(name[0][0:7] == "sqlite_"):
+            continue # Skip SQLite internal tables
          l = Log(self.connection, name[0])
          l.populate()
          self.logs.append(l)
@@ -276,7 +280,6 @@ class Logbook(Gtk.Notebook):
       response = dialog.run()
       dialog.destroy()
       if(response == Gtk.ResponseType.YES):
-
          with self.connection:
             c = self.connection.cursor()
             c.execute("DROP TABLE %s" % log.name)
@@ -456,12 +459,8 @@ class Logbook(Gtk.Notebook):
 
             if(all_valid):
                # All data has been validated, so we can go ahead and add the new record.
-               log_entry = [log.get_number_of_records()] # Add the next available record index
-               field_names = log.SELECTED_FIELD_NAMES_ORDERED
-               for i in range(0, len(field_names)):
-                  log_entry.append(fields_and_data[field_names[i]])
-               log.append(log_entry)
                log.add_record(fields_and_data)
+               self._update_summary()
                # Select the new Record's row in the treeview.
                self.treeselection[log_index].select_path(log.get_number_of_records())
 
@@ -490,6 +489,7 @@ class Logbook(Gtk.Notebook):
          # Deletes the record with index 'index' from the Records list.
          # 'iter' is needed to remove the record from the ListStore itself.
          self.logs[log_index].delete_record(index, iter)
+         self._update_summary()
          
       dialog.destroy()
       return
@@ -542,11 +542,12 @@ class Logbook(Gtk.Notebook):
             if(all_valid):
                for i in range(0, len(field_names)):
                   # All data has been validated, so we can go ahead and update the record.
-                  # First update the Record object... 
+                  # First update the record in the database... 
                   log.edit_record(row_index, field_names[i], fields_and_data[field_names[i]])
-                  # ...and then the Logbook.
+                  # ...and then in the ListStore
                   # (we add 1 onto the column_index here because we don't want to consider the index column)
-                  log[row_index][i+1] = fields_and_data[field_names[i]]
+                  log.set(iter, i+1, fields_and_data[field_names[i]])
+                  self._update_summary()
 
       dialog.destroy()
       return

@@ -35,6 +35,8 @@ AVAILABLE_FIELD_NAMES_TYPES = {"CALL": "S",
                               "RST_SENT": "S",
                               "RST_RCVD": "S"}
 
+AVAILABLE_FIELD_NAMES_ORDERED = ["CALL", "DATE", "TIME", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]
+
 # A: AwardList
 # B: Boolean
 # N: Number

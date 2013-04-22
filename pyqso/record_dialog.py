@@ -132,15 +132,15 @@ class RecordDialog(Gtk.Dialog):
 
       if(index is not None):
          # The record already exists, so display its current data in the input boxes.
-         record = log.get_record(index)
+         record = log.get_record_by_index(index)
          field_names = log.SELECTED_FIELD_NAMES_ORDERED
          for i in range(0, len(field_names)):
             if(field_names[i] == "BAND"):
-               self.sources[field_names[i]].set_active(bands.index(record.get_data(field_names[i])))
+               self.sources[field_names[i]].set_active(bands.index(record[field_names[i].lower()]))
             elif(field_names[i] == "MODE"):
-               self.sources[field_names[i]].set_active(modes.index(record.get_data(field_names[i])))
+               self.sources[field_names[i]].set_active(modes.index(record[field_names[i].lower()]))
             else:
-               self.sources[field_names[i]].set_text(record.get_data(field_names[i]))
+               self.sources[field_names[i]].set_text(record[field_names[i].lower()])
 
       frame.add(vbox_inner)
 

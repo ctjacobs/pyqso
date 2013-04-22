@@ -59,27 +59,53 @@ class Log(Gtk.ListStore):
       # Remove everything that is rendered already and start afresh
       self.clear()
       records = self.get_all_records()
-      if(len(records) > 0):
-         self.append(records)
+      for r in records:
+         self.append(r)
       return
 
    def add_record(self, fields_and_data):
+
+      log_entry = []
+      field_names = self.SELECTED_FIELD_NAMES_ORDERED
+      for i in range(0, len(field_names)):
+         log_entry.append(fields_and_data[field_names[i]])
+
+      with(self.connection):
+         c = self.connection.cursor()
+         query = "INSERT INTO %s VALUES (NULL" % self.name
+         for i in range(0, len(field_names)):
+            query = query + ",?"
+         query = query + ")"
+         c.execute(query, log_entry)
+         index = c.lastrowid
+
+      log_entry.insert(0, index) # Add the record's index.
+
+      self.append(log_entry)
 
       return
 
    def delete_record(self, index, iter):
       # Get the selected row in the logbook
-      #self.records.pop(index)
+      with(self.connection):
+         c = self.connection.cursor()
+         query = "DELETE FROM %s" % self.name
+         c.execute(query+" WHERE id=?", [index])
       self.remove(iter)
       return
 
    def edit_record(self, index, field_name, data):
-      #self.records[index].set_data(field_name, data)
+      with(self.connection):
+         c = self.connection.cursor()
+         query = "UPDATE %s SET %s" % (self.name, field_name)
+         query = query + "=? WHERE id=?"
+         c.execute(query, [data, index])
       return
 
    def get_record_by_index(self, index):
       c = self.connection.cursor()
-      c.execute("SELECT * FROM ? WHERE id=?", (self.name, index))
+      query = "SELECT * FROM %s WHERE id=?" % self.name
+      c.execute(query, [index])
       return c.fetchone()
 
    def get_all_records(self):
