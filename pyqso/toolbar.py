@@ -50,7 +50,7 @@ class Toolbar(Gtk.HBox):
       self.pack_start(button, False, False, 0)
       self.buttons["DISCONNECT"] = button
 
-      self.pack_start(Gtk.SeparatorMenuItem(), False, False, 0)
+      self.pack_start(Gtk.SeparatorToolItem(), False, False, 0)
 
       # Add record
       icon = Gtk.Image()
@@ -82,7 +82,7 @@ class Toolbar(Gtk.HBox):
       self.pack_start(button, False, False, 0)
       self.buttons["DELETE_RECORD"] = button
 
-      self.pack_start(Gtk.SeparatorMenuItem(), False, False, 0)
+      self.pack_start(Gtk.SeparatorToolItem(), False, False, 0)
 
       # Search log
       icon = Gtk.Image()

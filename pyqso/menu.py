@@ -56,24 +56,36 @@ class Menu(Gtk.MenuBar):
       subm_logbook.append(mitem_disconnect)
       self.items["DISCONNECT"] = mitem_disconnect
 
+      subm_logbook.append(Gtk.SeparatorMenuItem())
+
       # New log
       mitem_new = Gtk.MenuItem("New Log")
       mitem_new.connect("activate", parent.logbook.new_log)
-      key, mod = Gtk.accelerator_parse("<Control>N")
-      mitem_new.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_logbook.append(mitem_new)
       self.items["NEW_LOG"] = mitem_new
 
       # Delete the current log
       mitem_delete = Gtk.MenuItem("Delete Log")
       mitem_delete.connect("activate", parent.logbook.delete_log)
-      key, mod = Gtk.accelerator_parse("<Control>D")
-      mitem_delete.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_logbook.append(mitem_delete)
       self.items["DELETE_LOG"] = mitem_delete
+
+      subm_logbook.append(Gtk.SeparatorMenuItem())
+
+      # Import log
+      mitem_import = Gtk.MenuItem("Import Log")
+      mitem_import.connect("activate", parent.logbook.import_log)
+      subm_logbook.append(mitem_import)
+      self.items["IMPORT_LOG"] = mitem_import
+
+      # Export the current log
+      mitem_export = Gtk.MenuItem("Export Log")
+      mitem_export.connect("activate", parent.logbook.export_log)
+      subm_logbook.append(mitem_export)
+      self.items["EXPORT_LOG"] = mitem_export
  
       subm_logbook.append(Gtk.SeparatorMenuItem())
-        
+
       # Quit
       mitem_quit = Gtk.MenuItem("Quit")
       mitem_quit.connect("activate", Gtk.main_quit)
@@ -141,7 +153,7 @@ class Menu(Gtk.MenuBar):
       return
 
    def set_log_items_sensitive(self, sensitive):
-      for item_name in ["NEW_LOG", "DELETE_LOG"]:
+      for item_name in ["NEW_LOG", "DELETE_LOG", "IMPORT_LOG", "EXPORT_LOG"]:
          self.items[item_name].set_sensitive(sensitive)
       return
 

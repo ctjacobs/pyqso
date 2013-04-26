@@ -360,7 +360,7 @@ class Logbook(Gtk.Notebook):
       return
 
 
-   def import_log(self, widget):
+   def import_log(self, widget=None):
       dialog = Gtk.FileChooserDialog("Import ADIF Log File",
                                     None,
                                     Gtk.FileChooserAction.OPEN,
@@ -382,32 +382,49 @@ class Logbook(Gtk.Notebook):
          logging.debug("No file path specified.")
          return
 
-      for log in self.logs:
-         if(log.path == path):
-            dialog = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                                 Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
-                                 "Log %s is already open." % path)
-            response = dialog.run()
-            dialog.destroy()
-            return
+      log_name = basename(path)
+      try:
+         c = self.connection.cursor()
+         query = "CREATE TABLE %s (id INTEGER PRIMARY KEY AUTOINCREMENT" % log_name
+         for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
+            s = ", %s TEXT" % field_name.lower()
+            query = query + s
+         query = query + ")"
+         c.execute(query)
+      except sqlite.Error as e:
+         logging.exception(e)
+         # Data is not valid - inform the user.
+         message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
+                                    "Database error. Try another log name.")
+         message.run()
+         message.destroy()
+         return
       
       adif = ADIF()
       records = adif.read(path)
       
-      l = Log(records, path, basename(path))
+      l = Log(self.connection, log_name)
+      for record in records:
+         print record
+         l.add_record(record)
+      l.populate()
+
       self.logs.append(l)
-      self.render_log(l)
+      self.render_log(self.get_number_of_logs()-1)
+      self._update_summary()
       
       return
       
    def export_log(self, widget=None):
 
-      current = self.get_current_page() # Gets the index of the selected tab in the logbook
-      if(current == 0 or current == self.get_n_pages()-1):
-         logging.debug("No log files to export!")
+      page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
+      if(page_index == 0 or page_index == self.get_n_pages()-1):
+         logging.debug("Tried to add a record, but no log present!")
          return
+      log_index = page_index - 1
 
-      log = self.logs[current]
+      log = self.logs[log_index]
 
       dialog = Gtk.FileChooserDialog("Export Log to File",
                               None,
@@ -427,13 +444,8 @@ class Logbook(Gtk.Notebook):
          return
 
       adif = ADIF()
-      adif.write(log.records, path)
+      adif.write(log.get_all_records(), path)
 
-      if(log.modified):
-         log.path = path
-         log.name = basename(log.path)
-         self.set_tab_label_text(self.get_nth_page(current), log.name)
-         log.set_modified(False)
       return
 
    def add_record_callback(self, widget):

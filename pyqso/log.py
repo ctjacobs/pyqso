@@ -67,7 +67,10 @@ class Log(Gtk.ListStore):
       log_entry = []
       field_names = self.SELECTED_FIELD_NAMES_ORDERED
       for i in range(0, len(field_names)):
-         log_entry.append(fields_and_data[field_names[i]])
+         if(field_names[i] in fields_and_data.keys()):
+            log_entry.append(fields_and_data[field_names[i]])
+         else:
+            log_entry.append("NULL")
 
       with(self.connection):
          c = self.connection.cursor()

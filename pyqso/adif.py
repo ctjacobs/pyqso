@@ -117,7 +117,7 @@ class ADIF:
                # This will help us later when comparing the field names
                # against the available field names in the ADIF specification.
                fields_and_data_dictionary[fd[0].upper()] = fd[2][:int(fd[1])]
-            records.append(Record(fields_and_data_dictionary))    
+            records.append(fields_and_data_dictionary)
       
       assert n_eor == n_record
       
@@ -140,12 +140,9 @@ class ADIF:
       
       # Then write each log to the file.
       for r in records:
-         if(all([r.fields_and_data[key] is None for key in r.fields_and_data.keys()])):
-            # Check if all entries of record[i] are None - if so, don't add it.
-            continue
-         for key in r.fields_and_data.keys():
-            if( (r.fields_and_data[key] is not None) and (r.fields_and_data[key] != "") ):
-               f.write("<%s:%d>%s\n" % (key.lower(), len(r.fields_and_data[key]), r.fields_and_data[key]))
+         for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
+            if( (r[field_name] != "NULL") and (r[field_name] != "") ):
+               f.write("<%s:%d>%s\n" % (field_name.lower(), len(r[field_name]), r[field_name]))
          f.write("<eor>\n")
 
       f.close()
