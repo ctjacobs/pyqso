@@ -101,6 +101,8 @@ class Logbook(Gtk.Notebook):
          context_id = self.root_window.statusbar.get_context_id("Status")
          self.root_window.statusbar.push(context_id, "Logbook: %s" % self.path)
          self.root_window.toolbar.set_connect_button_sensitive(False)
+         self.root_window.menu.set_connect_item_sensitive(False)
+         self.root_window.menu.set_log_items_sensitive(True)
 
       self.open_logs()
 
@@ -119,6 +121,8 @@ class Logbook(Gtk.Notebook):
          context_id = self.root_window.statusbar.get_context_id("Status")
          self.root_window.statusbar.push(context_id, "Not connected to a Logbook.")
          self.root_window.toolbar.set_connect_button_sensitive(True)
+         self.root_window.menu.set_connect_item_sensitive(True)
+         self.root_window.menu.set_log_items_sensitive(False)
       else:
          logging.error("Already disconnected. Nothing to do here.")
 
@@ -204,8 +208,10 @@ class Logbook(Gtk.Notebook):
          self.stop_emission("switch-page")
       if(new_page == 0):
          self.root_window.toolbar.set_record_buttons_sensitive(False)
+         self.root_window.menu.set_record_items_sensitive(False)
       else:
          self.root_window.toolbar.set_record_buttons_sensitive(True)
+         self.root_window.menu.set_record_items_sensitive(True)
       return
 
    def new_log(self, widget=None):

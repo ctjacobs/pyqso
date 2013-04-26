@@ -31,6 +31,8 @@ class Menu(Gtk.MenuBar):
       
       agrp = Gtk.AccelGroup()
       parent.add_accel_group(agrp)
+
+      self.items = {}
       
       ###### LOGBOOK ######
       mitem_logbook = Gtk.MenuItem("Logbook")
@@ -38,12 +40,29 @@ class Menu(Gtk.MenuBar):
       subm_logbook = Gtk.Menu()
       mitem_logbook.set_submenu(subm_logbook)
     
+      # Connect
+      mitem_connect = Gtk.MenuItem("Connect to Logbook...")
+      mitem_connect.connect("activate", parent.logbook.db_connect)
+      key, mod = Gtk.accelerator_parse("<Control>O")
+      mitem_connect.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
+      subm_logbook.append(mitem_connect)
+      self.items["CONNECT"] = mitem_connect
+
+      # Disconnect
+      mitem_disconnect = Gtk.MenuItem("Disconnect from Logbook")
+      mitem_disconnect.connect("activate", parent.logbook.db_disconnect)
+      key, mod = Gtk.accelerator_parse("<Control>W")
+      mitem_disconnect.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
+      subm_logbook.append(mitem_disconnect)
+      self.items["DISCONNECT"] = mitem_disconnect
+
       # New log
       mitem_new = Gtk.MenuItem("New Log")
       mitem_new.connect("activate", parent.logbook.new_log)
       key, mod = Gtk.accelerator_parse("<Control>N")
       mitem_new.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_logbook.append(mitem_new)
+      self.items["NEW_LOG"] = mitem_new
 
       # Delete the current log
       mitem_delete = Gtk.MenuItem("Delete Log")
@@ -51,6 +70,7 @@ class Menu(Gtk.MenuBar):
       key, mod = Gtk.accelerator_parse("<Control>D")
       mitem_delete.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_logbook.append(mitem_delete)
+      self.items["DELETE_LOG"] = mitem_delete
  
       subm_logbook.append(Gtk.SeparatorMenuItem())
         
@@ -60,6 +80,7 @@ class Menu(Gtk.MenuBar):
       key, mod = Gtk.accelerator_parse("<Control>Q")
       mitem_quit.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_logbook.append(mitem_quit)
+      self.items["QUIT"] = mitem_quit
       
       
       ###### RECORDS ######
@@ -73,18 +94,21 @@ class Menu(Gtk.MenuBar):
       key, mod = Gtk.accelerator_parse("<Control>R")
       mitem_addrecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_records.append(mitem_addrecord)
+      self.items["ADD_RECORD"] = mitem_addrecord
       
       mitem_editrecord = Gtk.MenuItem("Edit Selected Record...")
       mitem_editrecord.connect("activate", parent.logbook.edit_record_callback, None, None)
       key, mod = Gtk.accelerator_parse("<Control>E")
       mitem_editrecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_records.append(mitem_editrecord)
+      self.items["EDIT_RECORD"] = mitem_editrecord
 
       mitem_deleterecord = Gtk.MenuItem("Delete Selected Record...")
       mitem_deleterecord.connect("activate", parent.logbook.delete_record_callback)
       key, mod = Gtk.accelerator_parse("Delete")
       mitem_deleterecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_records.append(mitem_deleterecord)
+      self.items["DELETE_RECORD"] = mitem_deleterecord
       
       
       ###### VIEW ######
@@ -104,6 +128,25 @@ class Menu(Gtk.MenuBar):
       mitem_about = Gtk.MenuItem("About PyQSO")
       mitem_about.connect("activate", parent.show_about)
       subm_help.append(mitem_about)
+
+      self.set_connect_item_sensitive(True)
+      self.set_log_items_sensitive(False)
+      self.set_record_items_sensitive(False)
       
       return
       
+   def set_connect_item_sensitive(self, sensitive):
+      self.items["CONNECT"].set_sensitive(sensitive)
+      self.items["DISCONNECT"].set_sensitive(not sensitive)
+      return
+
+   def set_log_items_sensitive(self, sensitive):
+      for item_name in ["NEW_LOG", "DELETE_LOG"]:
+         self.items[item_name].set_sensitive(sensitive)
+      return
+
+   def set_record_items_sensitive(self, sensitive):
+      for item_name in ["ADD_RECORD", "EDIT_RECORD", "DELETE_RECORD"]:
+         self.items[item_name].set_sensitive(sensitive)
+      return
+
