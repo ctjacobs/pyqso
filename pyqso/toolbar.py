@@ -28,6 +28,8 @@ class Toolbar(Gtk.HBox):
       
       Gtk.HBox.__init__(self, spacing=2)
 
+      self.buttons = {}
+
       # Connect
       icon = Gtk.Image()
       icon.set_from_stock(Gtk.STOCK_CONNECT, Gtk.IconSize.BUTTON)
@@ -36,6 +38,7 @@ class Toolbar(Gtk.HBox):
       button.set_tooltip_text('Connect to Logbook')
       button.connect("clicked", parent.logbook.db_connect)
       self.pack_start(button, False, False, 0)
+      self.buttons["CONNECT"] = button
 
       # Disconnect
       icon = Gtk.Image()
@@ -45,6 +48,7 @@ class Toolbar(Gtk.HBox):
       button.set_tooltip_text('Disconnect from Logbook')
       button.connect("clicked", parent.logbook.db_disconnect)
       self.pack_start(button, False, False, 0)
+      self.buttons["DISCONNECT"] = button
 
       self.pack_start(Gtk.SeparatorMenuItem(), False, False, 0)
 
@@ -56,6 +60,7 @@ class Toolbar(Gtk.HBox):
       button.set_tooltip_text('Add record')
       button.connect("clicked", parent.logbook.add_record_callback)
       self.pack_start(button, False, False, 0)
+      self.buttons["ADD_RECORD"] = button
 
       # Edit record
       icon = Gtk.Image()
@@ -65,6 +70,7 @@ class Toolbar(Gtk.HBox):
       button.set_tooltip_text('Edit record')
       button.connect("clicked", parent.logbook.edit_record_callback, None, None)
       self.pack_start(button, False, False, 0)
+      self.buttons["EDIT_RECORD"] = button
 
       # Delete record
       icon = Gtk.Image()
@@ -74,6 +80,7 @@ class Toolbar(Gtk.HBox):
       button.set_tooltip_text('Delete record')
       button.connect("clicked", parent.logbook.delete_record_callback)
       self.pack_start(button, False, False, 0)
+      self.buttons["DELETE_RECORD"] = button
 
       self.pack_start(Gtk.SeparatorMenuItem(), False, False, 0)
 
@@ -85,5 +92,21 @@ class Toolbar(Gtk.HBox):
       button.set_tooltip_text('Search log')
       button.connect("clicked", parent.logbook.search_log_callback)
       self.pack_start(button, False, False, 0)
+      self.buttons["SEARCH_LOG"] = button
+
+      self.set_record_buttons_sensitive(False)
+      self.set_connect_button_sensitive(True)
 
       return
+
+   def set_record_buttons_sensitive(self, sensitive):
+      for button_name in ["ADD_RECORD", "EDIT_RECORD", "DELETE_RECORD", "SEARCH_LOG"]:
+         self.buttons[button_name].set_sensitive(sensitive)
+      return
+
+   def set_connect_button_sensitive(self, sensitive):
+      self.buttons["CONNECT"].set_sensitive(sensitive)
+      self.buttons["DISCONNECT"].set_sensitive(not sensitive)
+      return
+
+

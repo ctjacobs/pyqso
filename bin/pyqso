@@ -72,11 +72,11 @@ class PyQSO(Gtk.Window):
       # Set up menu and tool bars
       # These classes depend on the Logbook class,
       # so pack the logbook after the menu and toolbar.
-      menu = Menu(self)
-      toolbar = Toolbar(self)
+      self.menu = Menu(self)
+      self.toolbar = Toolbar(self)
 
-      vbox_outer.pack_start(menu, False, False, 0)
-      vbox_outer.pack_start(toolbar, False, False, 0)
+      vbox_outer.pack_start(self.menu, False, False, 0)
+      vbox_outer.pack_start(self.toolbar, False, False, 0)
       vbox_outer.pack_start(self.logbook, True, True, 0)
       vbox_outer.pack_start(self.statusbar, False, False, 0)
 
