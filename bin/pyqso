@@ -18,7 +18,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, GObject
+from gi.repository import Gtk, GObject, Gdk, GdkPixbuf
 import logging
 import optparse
 import os
@@ -102,6 +102,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.''')
       about.set_comments("PyQSO: A Python-based contact logging tool for amateur radio operators")
+      possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
+      for icon_path in possible_icon_paths:
+         try:
+            about.set_logo(GdkPixbuf.Pixbuf.new_from_file_at_scale(icon_path, 64, 64, False))
+         except Exception, error:
+            print error.message
       about.run()
       about.destroy()
       return
