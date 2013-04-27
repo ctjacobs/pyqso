@@ -459,6 +459,8 @@ class Logbook(Gtk.Notebook):
       dialog = RecordDialog(root_window=self.root_window, log=log, index=None)
       all_valid = False # Are all the field entries valid?
 
+      adif = ADIF()
+
       while(not all_valid): 
          # This while loop gives the user infinite attempts at giving valid data.
          # The add/edit record window will stay open until the user gives valid data,
@@ -471,7 +473,7 @@ class Logbook(Gtk.Notebook):
             for i in range(0, len(field_names)):
                #TODO: Validate user input!
                fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
-               if(not(dialog.is_valid(field_names[i], fields_and_data[field_names[i]], log.SELECTED_FIELD_NAMES_TYPES[field_names[i]]))):
+               if(not(adif.is_valid(field_names[i], fields_and_data[field_names[i]], log.SELECTED_FIELD_NAMES_TYPES[field_names[i]]))):
                   # Data is not valid - inform the user.
                   message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                     Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
@@ -541,6 +543,8 @@ class Logbook(Gtk.Notebook):
       dialog = RecordDialog(root_window=self.root_window, log=self.logs[log_index], index=row_index)
       all_valid = False # Are all the field entries valid?
 
+      adif = ADIF()
+
       while(not all_valid): 
          # This while loop gives the user infinite attempts at giving valid data.
          # The add/edit record window will stay open until the user gives valid data,
@@ -553,7 +557,7 @@ class Logbook(Gtk.Notebook):
             for i in range(0, len(field_names)):
                #TODO: Validate user input!
                fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
-               if(not(dialog.is_valid(field_names[i], fields_and_data[field_names[i]], self.logs[log_index].SELECTED_FIELD_NAMES_TYPES[field_names[i]]))):
+               if(not(adif.is_valid(field_names[i], fields_and_data[field_names[i]], self.logs[log_index].SELECTED_FIELD_NAMES_TYPES[field_names[i]]))):
                   # Data is not valid - inform the user.
                   message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                     Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
