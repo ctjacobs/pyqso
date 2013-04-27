@@ -35,6 +35,7 @@ from pyqso.adif import *
 from pyqso.logbook import *
 from pyqso.menu import *
 from pyqso.toolbar import *
+from pyqso.dx_cluster import *
    
 class PyQSO(Gtk.Window):
    
@@ -112,6 +113,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.''')
       about.destroy()
       return
 
+   def dx_cluster_callback(self, widget=None):
+      dx = DXCluster()
+      
       
 if(__name__ == '__main__'):
    # Get any command line arguments

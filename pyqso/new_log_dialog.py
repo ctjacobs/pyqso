@@ -23,8 +23,6 @@ import logging
 import re
 import calendar
 
-from callsign_lookup import *
-
 class NewLogDialog(Gtk.Dialog):
    
    def __init__(self, root_window):

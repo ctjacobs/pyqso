@@ -128,6 +128,11 @@ class Menu(Gtk.MenuBar):
       self.append(mitem_view)  
       subm_view = Gtk.Menu()
       mitem_view.set_submenu(subm_view)
+
+      mitem_dxcluster = Gtk.MenuItem("DX Cluster")
+      mitem_dxcluster.connect("activate", parent.dx_cluster_callback)
+      subm_view.append(mitem_dxcluster)
+      self.items["DX_CLUSTER"] = mitem_dxcluster
       
             
       ###### HELP ######
