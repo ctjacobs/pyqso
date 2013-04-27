@@ -41,6 +41,8 @@ class DXCluster(Gtk.Window):
       self.set_size_request(600, 500)
       self.connect("delete-event", self.on_delete)
 
+      self.check_io_event = GObject.timeout_add(1000, self.on_telnet_io)
+
       possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
       for icon_path in possible_icon_paths:
          try:
@@ -139,8 +141,6 @@ class DXCluster(Gtk.Window):
          logging.exception("Could not create a connection to the Telnet server")
          self.connection = None
          return
-  
-      self.check_io_event = GObject.timeout_add(1000, self.on_telnet_io)
 
       self.set_connect_button_sensitive(False)
 
