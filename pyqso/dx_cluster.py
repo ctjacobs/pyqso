@@ -38,7 +38,8 @@ class DXCluster(Gtk.Window):
          
       # Call the constructor of the super class (Gtk.Window)
       Gtk.Window.__init__(self, title="DX Cluster")
-      self.set_size_request(300, 200)
+      self.set_size_request(600, 500)
+      self.connect("delete-event", self.on_delete)
 
       possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
       for icon_path in possible_icon_paths:
@@ -78,9 +79,9 @@ class DXCluster(Gtk.Window):
 
       self.command = Gtk.Entry()
       self.toolbar.pack_start(self.command, False, False, 0)
-      send = Gtk.Button("Send Command")
-      send.connect("clicked", self.telnet_send_command)
-      self.toolbar.pack_start(send, False, False, 0)
+      self.send = Gtk.Button("Send Command")
+      self.send.connect("clicked", self.telnet_send_command)
+      self.toolbar.pack_start(self.send, False, False, 0)
 
       vbox_inner.pack_start(self.toolbar, False, False, 6)
 
@@ -95,6 +96,8 @@ class DXCluster(Gtk.Window):
       vbox_inner.pack_start(sw, True, True, 6)
 
       self.add(vbox_inner)
+
+      self.set_connect_button_sensitive(True)
 
       self.show_all()
 
@@ -134,10 +137,13 @@ class DXCluster(Gtk.Window):
             self.connection.write(password + "\n")
       except:
          logging.exception("Could not create a connection to the Telnet server")
+         self.connection = None
          return
+  
+      self.check_io_event = GObject.timeout_add(1000, self.on_telnet_io)
 
-      GObject.timeout_add(1000, self.on_telnet_io)
-   
+      self.set_connect_button_sensitive(False)
+
       return
 
    def telnet_disconnect(self, widget=None):
@@ -145,19 +151,28 @@ class DXCluster(Gtk.Window):
          self.connection.close()
       self.buffer.set_text("")
       self.connection = None
+      self.set_connect_button_sensitive(True)
       return
 
    def telnet_send_command(self, widget=None):
       if(self.connection):
          self.connection.write(self.command.get_text() + "\n")
+         self.command.set_text("")
       return
 
    def on_telnet_io(self):
       if(self.connection):
          self.buffer.insert_at_cursor(self.connection.read_very_eager())
          self.renderer.scroll_to_mark(self.buffer.get_insert(), within_margin=0, use_align=False, xalign=0.5, yalign=0.5)
-         return True
-      else:
-         return False
+      return True
+   
+   def on_delete(self, widget, event):
+      self.telnet_disconnect()
+      GObject.source_remove(self.check_io_event)
 
+   def set_connect_button_sensitive(self, sensitive):
+      self.buttons["CONNECT"].set_sensitive(sensitive)
+      self.buttons["DISCONNECT"].set_sensitive(not sensitive)
+      self.send.set_sensitive(not sensitive)
+      return
 
