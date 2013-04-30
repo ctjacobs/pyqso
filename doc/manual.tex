@@ -22,6 +22,8 @@
 \usepackage{graphicx}
 \usepackage{float}
 
+\setlength{\parskip}{0.25cm}
+
 \begin{document}
 
 \begin{titlepage}
@@ -44,31 +46,39 @@ Many amateur radio operators choose to store all the contacts they ever make in 
 \section{Licensing}
 PyQSO is free software, released under the GNU General Public License. Please see the file called COPYING for more information.
 
-\section{Installation}
+\section{Installation and running}
 Assuming that your current working directory is PyQSO's base directory (the directory that the Makefile is in), you can install PyQSO via the terminal with the following command:
 
-  \texttt{make install}\\
-Note: you may need to use sudo for this. Once installed, the following command will run PyQSO:
+  \texttt{make install}
 
-  \texttt{pyqso}\\
-Alternatively, PyQSO can be run (without installing) with:
+\noindent Note: you may need to use sudo for this. Once installed, the following command will run PyQSO:
 
-  \texttt{python bin/pyqso}\\
-from PyQSO's base directory.
+  \texttt{pyqso}
+
+\noindent Alternatively, PyQSO can be run (without installing) with:
+
+  \texttt{python bin/pyqso}
+
+\noindent from PyQSO's base directory.
+
+
+
+\chapter{Getting started}
 
 \section{Command-line options}
 There are several options available when executing PyQSO from the command-line.
 
 \subsection{Load logbook file}
+In addition to being able to load a logbook through the GUI, users can also specify a logbook file to load at the command line with the \texttt{-l} or \texttt{--logbook} option. For example, to load a logbook file called \texttt{mylogbook.db}, use the following command:
+
+  \texttt{pyqso --logbook /path/to/mylogbook.db}
 
 \subsection{Debugging mode}
 Running PyQSO with the \texttt{-d} or \texttt{--debug} flag enables the debugging mode:
 
-  \texttt{pyqso --debug}\\
-All debugging-related messages are written to a file called pyqso.debug, located in the current working directory. If you encounter a bug in PyQSO, feel free to submit a bug report to the developers. If it is possible to replicate the bug, please re-run PyQSO with the debugging mode enabled and submit the pyqso.debug file along with your bug report.
+  \texttt{pyqso --debug}
 
-\chapter{Getting started}
-
+\noindent All debugging-related messages are written to a file called pyqso.debug, located in the current working directory. If you encounter a bug in PyQSO, feel free to submit a bug report to the developers. If it is possible to replicate the bug, please re-run PyQSO with the debugging mode enabled and submit the pyqso.debug file along with your bug report.
 
 \section{Adding a new contact}
 
