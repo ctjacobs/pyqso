@@ -370,10 +370,10 @@ class Logbook(Gtk.Notebook):
       log_index = self.get_current_page()-1
       column = self.treeview[log_index].get_column(column_index)
 
-      # If we are operating on the currently-sorted column, then check
-      # if we need to reverse the order of searching.
+      # If we are operating on the currently-sorted column...
       if(self.sorter[log_index].get_sort_column_id()[0] == column_index):
          order = column.get_sort_order()
+         # ...then check if we need to reverse the order of searching.
          if(order == Gtk.SortType.ASCENDING):
             self.sorter[log_index].set_sort_column_id(column_index, Gtk.SortType.DESCENDING)
             column.set_sort_order(Gtk.SortType.DESCENDING)
@@ -386,6 +386,10 @@ class Logbook(Gtk.Notebook):
          column.set_sort_order(Gtk.SortType.ASCENDING)
 
          # Show an arrow pointing in the direction of the sorting.
+         # (First we need to remove the arrow from the previously-sorted column.
+         # Since we don't know which one that was, just remove the arrow from all columns
+         # and start again. This only loops over a few dozen columns at most, so
+         # hopefully it won't take too much time.)
          for i in range(0, len(self.logs[log_index].SELECTED_FIELD_NAMES_ORDERED)):
             column = self.treeview[log_index].get_column(i)
             column.set_sort_indicator(False)
