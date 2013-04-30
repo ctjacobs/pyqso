@@ -90,6 +90,7 @@ class Logbook(Gtk.Notebook):
       # For rendering the logs. One treeview and one treeselection per Log.
       self.treeview = []
       self.treeselection = []
+      self.sorter = []
       self._create_summary_page()
       self._create_new_log_tab()
 
@@ -300,6 +301,7 @@ class Logbook(Gtk.Notebook):
          # Remove the log from the renderers too
          self.treeview.pop(log_index)
          self.treeselection.pop(log_index)
+         self.sorter.pop(log_index)
          # And finally remove the tab in the Logbook
          self.remove_page(page_index)
 
@@ -308,10 +310,9 @@ class Logbook(Gtk.Notebook):
 
    def render_log(self, index):
       # Render the Log
-      #sorter = Gtk.TreeModelSort(model=log) #FIXME: Get sorted columns working!
-      #sorter.set_sort_column_id(1, Gtk.SortType.ASCENDING)
-      #self.treeview.append(Gtk.TreeView(sorter))
-      self.treeview.append(Gtk.TreeView(self.logs[index]))
+      self.sorter.append(Gtk.TreeModelSort(model=self.logs[index]))
+      self.sorter[index].set_sort_column_id(0, Gtk.SortType.ASCENDING)
+      self.treeview.append(Gtk.TreeView(self.sorter[index]))
       self.treeview[index].set_grid_lines(Gtk.TreeViewGridLines.BOTH)
       self.treeview[index].connect("row-activated", self.edit_record_callback)
       self.treeselection.append(self.treeview[index].get_selection())
@@ -345,6 +346,10 @@ class Logbook(Gtk.Notebook):
       column = Gtk.TreeViewColumn("Index", renderer, text=0)
       column.set_resizable(True)
       column.set_min_width(50)
+      column.set_clickable(True)
+      column.set_sort_order(Gtk.SortType.ASCENDING)
+      column.set_sort_indicator(True)
+      column.connect("clicked", self.sort_log, 0)
       self.treeview[index].append_column(column)
          
       # Set up column names for each selected field
@@ -354,11 +359,39 @@ class Logbook(Gtk.Notebook):
          column = Gtk.TreeViewColumn(self.logs[index].SELECTED_FIELD_NAMES_FRIENDLY[field_names[i]], renderer, text=i+1)
          column.set_resizable(True)
          column.set_min_width(50)
+         column.set_clickable(True)
+         column.connect("clicked", self.sort_log, i+1)
          self.treeview[index].append_column(column)
 
       self.show_all()
       return
 
+   def sort_log(self, widget, column_index):
+      log_index = self.get_current_page()-1
+      column = self.treeview[log_index].get_column(column_index)
+
+      # If we are operating on the currently-sorted column, then check
+      # if we need to reverse the order of searching.
+      if(self.sorter[log_index].get_sort_column_id()[0] == column_index):
+         order = column.get_sort_order()
+         if(order == Gtk.SortType.ASCENDING):
+            self.sorter[log_index].set_sort_column_id(column_index, Gtk.SortType.DESCENDING)
+            column.set_sort_order(Gtk.SortType.DESCENDING)
+         else:
+            self.sorter[log_index].set_sort_column_id(column_index, Gtk.SortType.ASCENDING)
+            column.set_sort_order(Gtk.SortType.ASCENDING)
+      else:
+         # Otherwise, change to the new sorted column. Default to ASCENDING order.
+         self.sorter[log_index].set_sort_column_id(column_index, Gtk.SortType.ASCENDING)
+         column.set_sort_order(Gtk.SortType.ASCENDING)
+
+         # Show an arrow pointing in the direction of the sorting.
+         for i in range(0, len(self.logs[log_index].SELECTED_FIELD_NAMES_ORDERED)):
+            column = self.treeview[log_index].get_column(i)
+            column.set_sort_indicator(False)
+         column = self.treeview[log_index].get_column(column_index)
+         column.set_sort_indicator(True)
+      return
 
    def import_log(self, widget=None):
       dialog = Gtk.FileChooserDialog("Import ADIF Log File",
