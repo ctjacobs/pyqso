@@ -25,12 +25,11 @@ install:
 	python setup.py install
 
 manual:
-	cd doc
-	pdflatex manual.tex
-	cd ..
+	cd doc; pdflatex manual.tex; cd ..; done
 
 clean:
 	@echo **********Cleaning build directory
 	rm -rf build
 	@echo **********Cleaning doc directory
 	cd doc; rm -rf *.log *.aux *.dvi *.pdf *.ps *.toc; cd ..; done
+

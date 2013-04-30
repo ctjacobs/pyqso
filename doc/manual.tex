@@ -17,7 +17,7 @@
 %    You should have received a copy of the GNU General Public License
 %    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-\documentclass[11pt, a4paper]{book}
+\documentclass[11pt, a4paper]{report}
 \usepackage[margin=1.2in]{geometry}
 \usepackage{graphicx}
 \usepackage{float}
@@ -34,7 +34,48 @@
 
 \tableofcontents
 
+\chapter{Introduction}
+PyQSO is a contact logging tool for amateur radio operators. It is currently in the early stages of development.
+
+As the name suggests, PyQSO is written in Python. The graphical user interface (GUI) has been built using the GTK+ library through the PyGTK bindings. PyQSO also uses an SQLite embedded database to manage all the contacts an amateur radio operator makes.
+
+Many amateur radio operators choose to store all the contacts they ever make in a single \textit{logbook}, whereas others keep a separate logbook for each year, for example. Each logbook may be divided up to form multiple distinct \textit{logs}, perhaps one for casual repeater contacts and another for DX'ing. Finally, each log can contain multiple \textit{records}. PyQSO is based around this three-tier model, going from logbooks at the top to individual records at the bottom. From an implementation point-of-view, a database is analogous to a logbook, a table in the database is analogous to a log in the logbook, and the records in each table are analogous to the records in each log.
+
+\section{Licensing}
+PyQSO is free software, released under the GNU General Public License. Please see the file called COPYING for more information.
+
+\section{Installation}
+Assuming that your current working directory is PyQSO's base directory (the directory that the Makefile is in), you can install PyQSO via the terminal with the following command:
+
+  \texttt{make install}\\
+Note: you may need to use sudo for this. Once installed, the following command will run PyQSO:
+
+  \texttt{pyqso}\\
+Alternatively, PyQSO can be run (without installing) with:
+
+  \texttt{python bin/pyqso}\\
+from PyQSO's base directory.
+
+\section{Command-line options}
+There are several options available when executing PyQSO from the command-line.
+
+\subsection{Load logbook file}
+
+\subsection{Debugging mode}
+Running PyQSO with the \texttt{-d} or \texttt{--debug} flag enables the debugging mode:
+
+  \texttt{pyqso --debug}\\
+All debugging-related messages are written to a file called pyqso.debug, located in the current working directory. If you encounter a bug in PyQSO, feel free to submit a bug report to the developers. If it is possible to replicate the bug, please re-run PyQSO with the debugging mode enabled and submit the pyqso.debug file along with your bug report.
+
+\chapter{Getting started}
+
+
+\section{Adding a new contact}
+
+
+\chapter{DX cluster}
+
+
 
 \bibliographystyle{plainnat}
-
 \end{document}
