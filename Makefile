@@ -24,9 +24,9 @@ install:
 	@echo **********Setting up PyQSO
 	python setup.py install
 
-documentation:
+manual:
 	cd doc
-	#latex manual.tex
+	pdflatex manual.tex
 	cd ..
 
 clean:
