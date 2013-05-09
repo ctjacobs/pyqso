@@ -207,6 +207,8 @@ class Logbook(Gtk.Notebook):
    def _on_switch_page(self, widget, label, new_page):
       if(new_page == self.get_n_pages()-1): # The last (right-most) tab is the "New Log" tab.
          self.stop_emission("switch-page")
+         
+      # Disable the record buttons if a log page is not selected.
       if(new_page == 0):
          self.root_window.toolbar.set_record_buttons_sensitive(False)
          self.root_window.menu.set_record_items_sensitive(False)
@@ -275,17 +277,30 @@ class Logbook(Gtk.Notebook):
       self._update_summary()  
       return
 
-   def delete_log(self, widget, page_index=None):
+   def delete_log(self, widget, page=None):
       if(self.connection is None):
          return
-      if(page_index is None):
-         page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
-      log_index = page_index - 1
-
+         
+      if(page is None):
+         page = self.get_nth_page(self.get_current_page()) # Gets the Gtk.VBox of the selected tab in the logbook
+      
+      # If a page of the logbook (and therefore a Log object) gets deleted, 
+      # then the page_index may not correspond to the index of the log in the self.logs list.
+      # Therefore, we have to search for the tab with the same name as the log.
+      page_name = page.get_name()
+      for i in range(0, len(self.logs)):
+         if(self.logs[i].name == page_name):
+            log_index = i
+            break
+      log = self.logs[log_index]
+      
+      # We also need the page's index in order to remove it using remove_page below.   
+      # This may not be the same as what self.get_current_page() returns.  
+      page_index = self.page_num(page)
+            
       if(page_index == 0 or page_index == self.get_n_pages()-1): # Only the "New Log" tab is present (i.e. no actual logs in the logbook)
          logging.debug("No logs to delete!")
          return
-      log = self.logs[log_index]
 
       dialog = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                               Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
@@ -309,7 +324,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def render_log(self, index):
-      # Render the Log
+      # Render the Log in the Gtk.Notebook.
       self.sorter.append(Gtk.TreeModelSort(model=self.logs[index]))
       self.sorter[index].set_sort_column_id(0, Gtk.SortType.ASCENDING)
       self.treeview.append(Gtk.TreeView(self.sorter[index]))
@@ -323,6 +338,7 @@ class Logbook(Gtk.Notebook):
       sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
       sw.add(self.treeview[index])
       vbox = Gtk.VBox()
+      vbox.set_name(self.logs[index].name) # Set a name for the tab itself so we can match it up with the associated Log object later.
       vbox.pack_start(sw, True, True, 0)
 
       # Add a close button to the tab
@@ -333,7 +349,7 @@ class Logbook(Gtk.Notebook):
       button = Gtk.Button()
       button.set_relief(Gtk.ReliefStyle.NONE)
       button.set_focus_on_click(False)
-      button.connect("clicked", self.delete_log, index+1)
+      button.connect("clicked", self.delete_log, vbox)
       button.add(icon)
       hbox.pack_start(button, False, False, 0)
       hbox.show_all()
