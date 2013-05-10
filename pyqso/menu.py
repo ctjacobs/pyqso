@@ -65,10 +65,16 @@ class Menu(Gtk.MenuBar):
       self.items["NEW_LOG"] = mitem_new
 
       # Delete the current log
-      mitem_delete = Gtk.MenuItem("Delete Log")
+      mitem_delete = Gtk.MenuItem("Delete Selected Log")
       mitem_delete.connect("activate", parent.logbook.delete_log)
       subm_logbook.append(mitem_delete)
       self.items["DELETE_LOG"] = mitem_delete
+      
+      # Rename the current log
+      mitem_rename = Gtk.MenuItem("Rename Selected Log")
+      mitem_rename.connect("activate", parent.logbook.rename_log)
+      subm_logbook.append(mitem_rename)
+      self.items["RENAME_LOG"] = mitem_rename
 
       subm_logbook.append(Gtk.SeparatorMenuItem())
 
@@ -158,7 +164,7 @@ class Menu(Gtk.MenuBar):
       return
 
    def set_log_items_sensitive(self, sensitive):
-      for item_name in ["NEW_LOG", "DELETE_LOG", "IMPORT_LOG", "EXPORT_LOG"]:
+      for item_name in ["NEW_LOG", "DELETE_LOG", "RENAME_LOG", "IMPORT_LOG", "EXPORT_LOG"]:
          self.items[item_name].set_sensitive(sensitive)
       return
 

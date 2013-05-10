@@ -23,18 +23,24 @@ import logging
 import re
 import calendar
 
-class NewLogDialog(Gtk.Dialog):
+class LogNameDialog(Gtk.Dialog):
    
-   def __init__(self, root_window):
-      logging.debug("New NewLogDialog instance created!")
+   def __init__(self, root_window, name=None):
+      logging.debug("New LogNameDialog instance created!")
       
-      Gtk.Dialog.__init__(self, title="New Log", parent=root_window, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
+      if(name is None):
+         title = "New Log"
+      else:
+         title = "Rename Log"
+      Gtk.Dialog.__init__(self, title=title, parent=root_window, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
 
       hbox_temp = Gtk.HBox(spacing=0)
       label = Gtk.Label("Log Name:")
       label.set_alignment(0, 0.5)
       hbox_temp.pack_start(label, False, False, 6)
       self.entry = Gtk.Entry()
+      if(name is not None):
+         self.entry.set_text(name)
       hbox_temp.pack_start(self.entry, False, False, 6)
       self.vbox.pack_start(hbox_temp, False, False, 6)
       self.show_all()

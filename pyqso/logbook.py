@@ -27,7 +27,7 @@ import datetime
 
 from adif import *
 from log import *
-from new_log_dialog import *
+from log_name_dialog import *
 
 class Logbook(Gtk.Notebook):
    ''' A Logbook object can store multiple Log objects. '''
@@ -221,7 +221,7 @@ class Logbook(Gtk.Notebook):
       if(self.connection is None):
          return
       exists = True
-      dialog = NewLogDialog(self.root_window)
+      dialog = LogNameDialog(self.root_window)
       while(exists):
          response = dialog.run()
          if(response == Gtk.ResponseType.OK):
@@ -288,10 +288,7 @@ class Logbook(Gtk.Notebook):
       # then the page_index may not correspond to the index of the log in the self.logs list.
       # Therefore, we have to search for the tab with the same name as the log.
       page_name = page.get_name()
-      for i in range(0, len(self.logs)):
-         if(self.logs[i].name == page_name):
-            log_index = i
-            break
+      log_index = self.get_log_index_by_name(page_name)
       log = self.logs[log_index]
       
       # We also need the page's index in order to remove it using remove_page below.   
@@ -412,6 +409,67 @@ class Logbook(Gtk.Notebook):
          column = self.treeview[log_index].get_column(column_index)
          column.set_sort_indicator(True)
       return
+      
+   def rename_log(self, widget=None):
+      if(self.connection is None):
+         return
+      page_index = self.get_current_page()
+      page = self.get_nth_page(page_index) # Gets the Gtk.VBox of the selected tab in the logbook
+      old_log_name = page.get_name()
+      
+      log_index = self.get_log_index_by_name(old_log_name)
+      
+      exists = True
+      dialog = LogNameDialog(self.root_window, old_log_name)
+      while(exists):
+         response = dialog.run()
+         if(response == Gtk.ResponseType.OK):
+            new_log_name = dialog.get_log_name()
+            try:
+               c = self.connection.cursor()
+               query = "ALTER TABLE %s RENAME TO %s" % (old_log_name, new_log_name)
+               c.execute(query)
+               exists = False
+            except sqlite.Error as e:
+               logging.exception(e)
+               # Data is not valid - inform the user.
+               message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
+                                    "Database error. Try another log name.")
+               message.run()
+               message.destroy()
+               exists = True
+         else:
+            dialog.destroy()
+            return
+
+      dialog.destroy()
+      
+      # Remember to change the Log object's name...
+      self.logs[log_index].name = new_log_name
+      
+      # ...and the page's name
+      page.set_name(self.logs[log_index].name)
+
+      # ...and update the tab's label
+      hbox = Gtk.HBox(False, 0)
+      label = Gtk.Label(new_log_name)
+      hbox.pack_start(label, False, False, 0)
+      icon = Gtk.Image.new_from_stock(Gtk.STOCK_CLOSE, Gtk.IconSize.MENU)
+      button = Gtk.Button()
+      button.set_relief(Gtk.ReliefStyle.NONE)
+      button.set_focus_on_click(False)
+      button.connect("clicked", self.delete_log, page)
+      button.add(icon)
+      hbox.pack_start(button, False, False, 0)
+      hbox.show_all()
+      self.set_tab_label(page, hbox)
+      
+      # The number of logs will obviously stay the same, but
+      # we want to update the logbook's modification date.
+      self._update_summary()
+      
+      return
 
    def import_log(self, widget=None):
       dialog = Gtk.FileChooserDialog("Import ADIF Log File",
@@ -475,8 +533,8 @@ class Logbook(Gtk.Notebook):
       if(page_index == 0 or page_index == self.get_n_pages()-1):
          logging.debug("Tried to add a record, but no log present!")
          return
-      log_index = page_index - 1
-
+      page_name = self.get_nth_page(page_index).get_name()
+      log_index = self.get_log_index_by_name(page_name)
       log = self.logs[log_index]
 
       dialog = Gtk.FileChooserDialog("Export Log to File",
@@ -507,13 +565,14 @@ class Logbook(Gtk.Notebook):
       if(page_index == 0 or page_index == self.get_n_pages()-1):
          logging.debug("Tried to add a record, but no log present!")
          return
-      log_index = page_index - 1
+      page_name = self.get_nth_page(page_index).get_name()
+      log_index = self.get_log_index_by_name(page_name)
       log = self.logs[log_index]
+      
       dialog = RecordDialog(root_window=self.root_window, log=log, index=None)
       all_valid = False # Are all the field entries valid?
 
       adif = ADIF()
-
       while(not all_valid): 
          # This while loop gives the user infinite attempts at giving valid data.
          # The add/edit record window will stay open until the user gives valid data,
@@ -551,11 +610,13 @@ class Logbook(Gtk.Notebook):
       if(page_index == 0 or page_index == self.get_n_pages()-1):
          logging.debug("Tried to delete a record, but no log present!")
          return
-      log_index = page_index - 1
+      page_name = self.get_nth_page(page_index).get_name()
+      log_index = self.get_log_index_by_name(page_name)
       (model, path) = self.treeselection[log_index].get_selected_rows() # Get the selected row in the log
       try:
-         iter = model.get_iter(path[0])
-         index = model.get_value(iter,0)
+         sort_iter = model.get_iter(path[0])
+         child_iter = self.sorter[log_index].convert_iter_to_child_iter(sort_iter)
+         index = model.get_value(sort_iter,0)
       except IndexError:
          logging.debug("Trying to delete a record, but there are no records in the log!")
          return
@@ -567,7 +628,7 @@ class Logbook(Gtk.Notebook):
       if(response == Gtk.ResponseType.YES):
          # Deletes the record with index 'index' from the Records list.
          # 'iter' is needed to remove the record from the ListStore itself.
-         self.logs[log_index].delete_record(index, iter)
+         self.logs[log_index].delete_record(index, child_iter)
          self._update_summary()
          
       dialog.destroy()
@@ -581,14 +642,15 @@ class Logbook(Gtk.Notebook):
       if(page_index == 0 or page_index == self.get_n_pages()-1):
          logging.debug("Tried to edit a record, but no log present!")
          return
-      log_index = page_index - 1
-      
+      page_name = self.get_nth_page(page_index).get_name()
+      log_index = self.get_log_index_by_name(page_name)
       log = self.logs[log_index]
 
       (model, path) = self.treeselection[log_index].get_selected_rows() # Get the selected row in the log
       try:
-         iter = model.get_iter(path[0])
-         row_index = model.get_value(iter,0)
+         sort_iter = model.get_iter(path[0])
+         child_iter = self.sorter[log_index].convert_iter_to_child_iter(sort_iter)
+         row_index = model.get_value(sort_iter,0)
       except IndexError:
          logging.debug("Could not find the selected row's index!")
          return
@@ -597,7 +659,6 @@ class Logbook(Gtk.Notebook):
       all_valid = False # Are all the field entries valid?
 
       adif = ADIF()
-
       while(not all_valid): 
          # This while loop gives the user infinite attempts at giving valid data.
          # The add/edit record window will stay open until the user gives valid data,
@@ -627,8 +688,8 @@ class Logbook(Gtk.Notebook):
                   log.edit_record(row_index, field_names[i], fields_and_data[field_names[i]])
                   # ...and then in the ListStore
                   # (we add 1 onto the column_index here because we don't want to consider the index column)
-                  log.set(iter, i+1, fields_and_data[field_names[i]])
-                  self._update_summary()
+                  log.set(child_iter, i+1, fields_and_data[field_names[i]])
+               self._update_summary()
 
       dialog.destroy()
       return
@@ -647,4 +708,11 @@ class Logbook(Gtk.Notebook):
          if(exists[0] == 1):
             return True
       return False
+      
+   def get_log_index_by_name(self, name):
+      for i in range(0, len(self.logs)):
+         if(self.logs[i].name == name):
+            log_index = i
+            break
+      return log_index
 
