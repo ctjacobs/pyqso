@@ -20,6 +20,7 @@
 
 import re
 import logging
+import unittest
 from datetime import datetime
 
 # All the possible field names and their associated data types 
@@ -297,7 +298,9 @@ class ADIF:
          return True
       
    
-   def test_read(self):
+class TestADIF(unittest.TestCase):
+   def test_adif_read(self):
+      adif = ADIF()
       f = open("../ADIF.test_read.adi.test", 'w')
       f.write('''Some test ADI data.<eoh>
 
@@ -305,11 +308,10 @@ class ADIF:
 <qso_date:8:d>20130322<time_on:4>1955<eor>''')
       f.close()
     
-      records = self.read("../ADIF.test_read.adi.test")
+      records = adif.read("../ADIF.test_read.adi.test")
       
-      assert records == [{'band': '40M', 'time_on': '1955', 'call': 'TEST', 'mode': 'CW', 'qso_date': '20130322'}]
+      assert records == [{'BAND': '40M', 'TIME_ON': '1955', 'CALL': 'TEST', 'MODE': 'CW', 'QSO_DATE': '20130322'}]
               
 if(__name__ == '__main__'):
-   a = ADIF() 
-   a.test_read()
+   unittest.main()
 
