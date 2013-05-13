@@ -22,6 +22,7 @@ from gi.repository import Gtk, GObject
 from os.path import basename
 import logging
 import sqlite3 as sqlite
+import unittest
 
 from adif import AVAILABLE_FIELD_NAMES_TYPES
 from record_dialog import *
@@ -120,3 +121,35 @@ class Log(Gtk.ListStore):
       c.execute("SELECT Count(*) FROM %s" % self.name)
       return c.fetchone()[0]
 
+class TestLog(unittest.TestCase):
+
+   def test_log_add_record(self):
+      connection = sqlite.connect(":memory:")
+      connection.row_factory = sqlite.Row
+      
+      c = connection.cursor()
+      query = "CREATE TABLE test (id INTEGER PRIMARY KEY AUTOINCREMENT"
+      for field_name in ["CALL", "DATE", "TIME", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]:
+         s = ", %s TEXT" % field_name.lower()
+         query = query + s
+      query = query + ")"
+      c.execute(query)
+      
+      log = Log(connection, "test")
+      fields_and_data = {"CALL":"TEST123", "DATE":"123456789", "TIME":"123456789", "FREQ":"145.500", "BAND":"2m", "MODE":"FM", "RST_SENT":"59", "RST_RCVD":"59"}
+      log.add_record(fields_and_data)
+      c = connection.cursor()
+      c.execute("SELECT * FROM test")
+      records = c.fetchall()
+      
+      assert len(records) == 1
+      
+      for field_name in ["CALL", "DATE", "TIME", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]:
+         print fields_and_data[field_name], records[0][field_name]
+         assert fields_and_data[field_name] == records[0][field_name]
+      
+      connection.close()
+      
+              
+if(__name__ == '__main__'):
+   unittest.main()
