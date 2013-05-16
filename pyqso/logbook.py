@@ -493,29 +493,41 @@ class Logbook(Gtk.Notebook):
          logging.debug("No file path specified.")
          return
 
-      log_name = basename(path)
-      try:
-         c = self.connection.cursor()
-         query = "CREATE TABLE %s (id INTEGER PRIMARY KEY AUTOINCREMENT" % log_name
-         for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
-            s = ", %s TEXT" % field_name.lower()
-            query = query + s
-         query = query + ")"
-         c.execute(query)
-      except sqlite.Error as e:
-         logging.exception(e)
-         # Data is not valid - inform the user.
-         message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+      exists = True
+      dialog = LogNameDialog(self.root_window)
+      while(exists):
+         response = dialog.run()
+         if(response == Gtk.ResponseType.OK):
+            new_log_name = dialog.get_log_name()
+            try:
+               c = self.connection.cursor()
+               query = "CREATE TABLE %s (id INTEGER PRIMARY KEY AUTOINCREMENT" % new_log_name
+               for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
+                  s = ", %s TEXT" % field_name.lower()
+                  query = query + s
+               query = query + ")"
+               c.execute(query)
+               exists = False
+            except sqlite.Error as e:
+               logging.exception(e)
+               # Data is not valid - inform the user.
+               message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                     Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
                                     "Database error. Try another log name.")
-         message.run()
-         message.destroy()
-         return
+               message.run()
+               message.destroy()
+               exists = True
+         else:
+            dialog.destroy()
+            return
       
+      dialog.destroy()
+
       adif = ADIF()
       records = adif.read(path)
       
-      l = Log(self.connection, log_name)
+      l = Log(self.connection, new_log_name)
+      print "Importing records..."
       for record in records:
          print record
          l.add_record(record)
