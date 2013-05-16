@@ -71,7 +71,7 @@ class Log(Gtk.ListStore):
          if(field_names[i] in fields_and_data.keys()):
             log_entry.append(fields_and_data[field_names[i]])
          else:
-            log_entry.append("NULL")
+            log_entry.append("")
 
       with(self.connection):
          c = self.connection.cursor()
@@ -88,13 +88,15 @@ class Log(Gtk.ListStore):
 
       return
 
-   def delete_record(self, index, iter):
+   def delete_record(self, index, iter=None):
       # Get the selected row in the logbook
       with(self.connection):
          c = self.connection.cursor()
          query = "DELETE FROM %s" % self.name
          c.execute(query+" WHERE id=?", [index])
-      self.remove(iter)
+
+      if(iter is not None):
+         self.remove(iter)
       return
 
    def edit_record(self, index, field_name, data):
@@ -149,7 +151,67 @@ class TestLog(unittest.TestCase):
          assert fields_and_data[field_name] == records[0][field_name]
       
       connection.close()
+
+   def test_log_delete_record(self):
+      connection = sqlite.connect(":memory:")
+      connection.row_factory = sqlite.Row
       
+      c = connection.cursor()
+      query = "CREATE TABLE test (id INTEGER PRIMARY KEY AUTOINCREMENT"
+      for field_name in ["CALL", "DATE", "TIME", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]:
+         s = ", %s TEXT" % field_name.lower()
+         query = query + s
+      query = query + ")"
+      c.execute(query)
+      
+      log = Log(connection, "test")
+      query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
+      c.execute(query, ("TEST123", "123456789", "123456789", "145.500", "2m", "FM", "59", "59"))
+
+      c.execute("SELECT * FROM test")
+      records_before = c.fetchall()
+
+      log.delete_record(1)
+
+      c.execute("SELECT * FROM test")
+      records_after = c.fetchall()
+
+      assert(len(records_before) == 1)
+      assert(len(records_after) == 0)
+
+      connection.close()
+      
+   def test_log_edit_record(self):
+      connection = sqlite.connect(":memory:")
+      connection.row_factory = sqlite.Row
+      
+      c = connection.cursor()
+      query = "CREATE TABLE test (id INTEGER PRIMARY KEY AUTOINCREMENT"
+      for field_name in ["CALL", "DATE", "TIME", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]:
+         s = ", %s TEXT" % field_name.lower()
+         query = query + s
+      query = query + ")"
+      c.execute(query)
+      
+      log = Log(connection, "test")
+      query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
+      c.execute(query, ("TEST123", "123456789", "123456789", "145.500", "2m", "FM", "59", "59"))
+
+      c.execute("SELECT * FROM test")
+      record_before = c.fetchall()[0]
+
+      log.edit_record(1, "CALL", "TEST456")
+      log.edit_record(1, "FREQ", "145.450")
+
+      c.execute("SELECT * FROM test")
+      record_after = c.fetchall()[0]
+
+      assert(record_before["CALL"] == "TEST123")
+      assert(record_after["CALL"] == "TEST456")
+      assert(record_before["FREQ"] == "145.500")
+      assert(record_after["FREQ"] == "145.450")
+
+      connection.close()
               
 if(__name__ == '__main__'):
    unittest.main()
