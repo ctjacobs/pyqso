@@ -170,6 +170,7 @@ class Logbook(Gtk.Notebook):
 
       vbox = Gtk.VBox()
 
+      # Database name in large font at the top of the summary page
       hbox = Gtk.HBox()
       label = Gtk.Label(halign=Gtk.Align.START)
       label.set_markup("<span size=\"x-large\">%s</span>" % basename(self.path))
