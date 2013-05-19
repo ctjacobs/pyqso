@@ -91,6 +91,7 @@ class Logbook(Gtk.Notebook):
       self.treeview = []
       self.treeselection = []
       self.sorter = []
+      self.filter = []
       self._create_summary_page()
       self._create_new_log_tab()
 
@@ -320,10 +321,29 @@ class Logbook(Gtk.Notebook):
       self._update_summary()
       return
 
+   def filter_log(self, widget, callsign):
+      for i in range(0, len(self.filter)):
+         self.filter[i].refilter()
+      return
+
+   def filter_by_callsign(self, model, iter, data):
+      value = model.get_value(iter, 1)
+      callsign = self.root_window.toolbar.filter_source.get_text()
+      
+      if(callsign is None or callsign == ""):
+         # If there is nothing to filter with, then show all the records!
+         return True
+      else:
+         return callsign in value
+
    def render_log(self, index):
       # Render the Log in the Gtk.Notebook.
-      self.sorter.append(Gtk.TreeModelSort(model=self.logs[index]))
+      self.filter.append(self.logs[index].filter_new(root=None))
+      # Set the callsign column as the column we want to filter by
+      self.filter[index].set_visible_func(self.filter_by_callsign, data=None)
+      self.sorter.append(Gtk.TreeModelSort(model=self.filter[index]))
       self.sorter[index].set_sort_column_id(0, Gtk.SortType.ASCENDING)
+
       self.treeview.append(Gtk.TreeView(self.sorter[index]))
       self.treeview[index].set_grid_lines(Gtk.TreeViewGridLines.BOTH)
       self.treeview[index].connect("row-activated", self.edit_record_callback)
@@ -705,9 +725,6 @@ class Logbook(Gtk.Notebook):
 
       dialog.destroy()
       return
-
-   def search_log_callback(self, widget):
-      print "Search feature has not yet been implemented."
 
    def get_number_of_logs(self):
       return len(self.logs)

@@ -84,15 +84,12 @@ class Toolbar(Gtk.HBox):
 
       self.pack_start(Gtk.SeparatorToolItem(), False, False, 0)
 
-      # Search log
-      icon = Gtk.Image()
-      icon.set_from_stock(Gtk.STOCK_FIND, Gtk.IconSize.BUTTON)
-      button = Gtk.Button()
-      button.add(icon)
-      button.set_tooltip_text('Search log')
-      button.connect("clicked", parent.logbook.search_log_callback)
-      self.pack_start(button, False, False, 0)
-      self.buttons["SEARCH_LOG"] = button
+      # Filter log
+      label = Gtk.Label("Filter by callsign: ")
+      self.pack_start(label, False, False, 0)
+      self.filter_source = Gtk.Entry()
+      self.filter_source.connect_after("changed", parent.logbook.filter_log, self.filter_source.get_text())
+      self.pack_start(self.filter_source, False, False, 0)
 
       self.set_record_buttons_sensitive(False)
       self.set_connect_button_sensitive(True)
@@ -100,7 +97,7 @@ class Toolbar(Gtk.HBox):
       return
 
    def set_record_buttons_sensitive(self, sensitive):
-      for button_name in ["ADD_RECORD", "EDIT_RECORD", "DELETE_RECORD", "SEARCH_LOG"]:
+      for button_name in ["ADD_RECORD", "EDIT_RECORD", "DELETE_RECORD"]:
          self.buttons[button_name].set_sensitive(sensitive)
       return
 
