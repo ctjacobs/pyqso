@@ -317,6 +317,7 @@ class Logbook(Gtk.Notebook):
          self.treeview.pop(log_index)
          self.treeselection.pop(log_index)
          self.sorter.pop(log_index)
+         self.filter.pop(log_index)
          # And finally remove the tab in the Logbook
          self.remove_page(page_index)
 
