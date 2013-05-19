@@ -85,14 +85,17 @@ class Toolbar(Gtk.HBox):
       self.pack_start(Gtk.SeparatorToolItem(), False, False, 0)
 
       # Filter log
-      label = Gtk.Label("Filter by callsign: ")
+      label = Gtk.Label("Search callsign: ")
       self.pack_start(label, False, False, 0)
       self.filter_source = Gtk.Entry()
+      self.filter_source.set_width_chars(11)
       self.filter_source.connect_after("changed", parent.logbook.filter_log, self.filter_source.get_text())
       self.pack_start(self.filter_source, False, False, 0)
 
       self.set_record_buttons_sensitive(False)
       self.set_connect_button_sensitive(True)
+
+      self.filter_source.set_sensitive(False)
 
       return
 

@@ -105,6 +105,7 @@ class Logbook(Gtk.Notebook):
          self.root_window.toolbar.set_connect_button_sensitive(False)
          self.root_window.menu.set_connect_item_sensitive(False)
          self.root_window.menu.set_log_items_sensitive(True)
+         self.root_window.toolbar.filter_source.set_sensitive(True)
 
       self.open_logs()
 
@@ -125,6 +126,7 @@ class Logbook(Gtk.Notebook):
          self.root_window.toolbar.set_connect_button_sensitive(True)
          self.root_window.menu.set_connect_item_sensitive(True)
          self.root_window.menu.set_log_items_sensitive(False)
+         self.root_window.toolbar.filter_source.set_sensitive(False)
       else:
          logging.error("Already disconnected. Nothing to do here.")
 
