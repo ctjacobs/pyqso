@@ -52,7 +52,8 @@ class RecordDialog(Gtk.Dialog):
       label.set_alignment(0, 0.5)
       hbox_temp.pack_start(label, False, False, 6)
       self.sources["CALL"] = Gtk.Entry()
-      hbox_temp.pack_start(self.sources["CALL"], True, True, 6)
+      self.sources["CALL"].set_width_chars(15)
+      hbox_temp.pack_start(self.sources["CALL"], False, False, 6)
       lookup = Gtk.Button("Lookup") # Looks up the callsign on qrz.com for more details.
       lookup.connect("clicked", self.lookup_callback)
       hbox_temp.pack_start(lookup, True, True, 6)
@@ -65,7 +66,8 @@ class RecordDialog(Gtk.Dialog):
       label.set_alignment(0, 0.5)
       hbox_temp.pack_start(label, False, False, 6)
       self.sources["DATE"] = Gtk.Entry()
-      hbox_temp.pack_start(self.sources["DATE"], True, True, 6)
+      self.sources["DATE"].set_width_chars(15)
+      hbox_temp.pack_start(self.sources["DATE"], False, False, 6)
 
       # TIME
       label = Gtk.Label(log.SELECTED_FIELD_NAMES_FRIENDLY["TIME"], halign=Gtk.Align.START)
@@ -73,7 +75,8 @@ class RecordDialog(Gtk.Dialog):
       label.set_width_chars(11)
       hbox_temp.pack_start(label, False, False, 6)
       self.sources["TIME"] = Gtk.Entry()
-      hbox_temp.pack_start(self.sources["TIME"], True, True, 6)
+      self.sources["TIME"].set_width_chars(15)
+      hbox_temp.pack_start(self.sources["TIME"], False, False, 6)
       vbox_inner.pack_start(hbox_temp, False, False, 6)
 
       # FREQ
@@ -83,7 +86,8 @@ class RecordDialog(Gtk.Dialog):
       label.set_width_chars(11)
       hbox_temp.pack_start(label, False, False, 6)
       self.sources["FREQ"] = Gtk.Entry()
-      hbox_temp.pack_start(self.sources["FREQ"], True, True, 6)
+      self.sources["FREQ"].set_width_chars(15)
+      hbox_temp.pack_start(self.sources["FREQ"], False, False, 6)
 
       # BAND
       label = Gtk.Label(log.SELECTED_FIELD_NAMES_FRIENDLY["BAND"], halign=Gtk.Align.START)
@@ -95,7 +99,7 @@ class RecordDialog(Gtk.Dialog):
       for band in bands:
          self.sources["BAND"].append_text(band)
       self.sources["BAND"].set_active(0) # Set an empty string as the default option.
-      hbox_temp.pack_start(self.sources["BAND"], True, True, 6)
+      hbox_temp.pack_start(self.sources["BAND"], False, False, 6)
       vbox_inner.pack_start(hbox_temp, False, False, 6)
 
       # MODE
@@ -109,7 +113,7 @@ class RecordDialog(Gtk.Dialog):
       for mode in modes:
          self.sources["MODE"].append_text(mode)
       self.sources["MODE"].set_active(0) # Set an empty string as the default option.
-      hbox_temp.pack_start(self.sources["MODE"], True, True, 6)
+      hbox_temp.pack_start(self.sources["MODE"], False, False, 6)
       vbox_inner.pack_start(hbox_temp, False, False, 6)
 
       # RST_SENT
@@ -119,7 +123,8 @@ class RecordDialog(Gtk.Dialog):
       label.set_width_chars(11)
       hbox_temp.pack_start(label, False, False, 6)
       self.sources["RST_SENT"] = Gtk.Entry()
-      hbox_temp.pack_start(self.sources["RST_SENT"], True, True, 6)
+      self.sources["RST_SENT"].set_width_chars(15)
+      hbox_temp.pack_start(self.sources["RST_SENT"], False, False, 6)
 
       # RST_RCVD
       label = Gtk.Label(log.SELECTED_FIELD_NAMES_FRIENDLY["RST_RCVD"])
@@ -127,6 +132,7 @@ class RecordDialog(Gtk.Dialog):
       label.set_width_chars(11)
       hbox_temp.pack_start(label, False, False, 6)
       self.sources["RST_RCVD"] = Gtk.Entry()
+      self.sources["RST_RCVD"].set_width_chars(15)
       hbox_temp.pack_start(self.sources["RST_RCVD"], True, True, 6)
       vbox_inner.pack_start(hbox_temp, False, False, 6)
 
