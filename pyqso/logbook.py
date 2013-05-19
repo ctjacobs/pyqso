@@ -647,23 +647,25 @@ class Logbook(Gtk.Notebook):
          return
       page_name = self.get_nth_page(page_index).get_name()
       log_index = self.get_log_index_by_name(page_name)
-      (model, path) = self.treeselection[log_index].get_selected_rows() # Get the selected row in the log
+      (sort_model, path) = self.treeselection[log_index].get_selected_rows() # Get the selected row in the log
       try:
-         sort_iter = model.get_iter(path[0])
-         child_iter = self.sorter[log_index].convert_iter_to_child_iter(sort_iter)
-         index = model.get_value(sort_iter,0)
+         # Remember that the filter model is a child of the sort model.
+         filter_model = sort_model.get_model()
+         filter_iter = filter_model.get_iter(path[0])
+         child_iter = self.filter[log_index].convert_iter_to_child_iter(filter_iter)
+         row_index = filter_model.get_value(filter_iter,0)
       except IndexError:
          logging.debug("Trying to delete a record, but there are no records in the log!")
          return
 
       dialog = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                  Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
-                                 "Are you sure you want to delete record %d?" % index)
+                                 "Are you sure you want to delete record %d?" % row_index)
       response = dialog.run()
       if(response == Gtk.ResponseType.YES):
-         # Deletes the record with index 'index' from the Records list.
+         # Deletes the record with index 'row_index' from the Records list.
          # 'iter' is needed to remove the record from the ListStore itself.
-         self.logs[log_index].delete_record(index, child_iter)
+         self.logs[log_index].delete_record(row_index, child_iter)
          self._update_summary()
          
       dialog.destroy()
@@ -681,11 +683,13 @@ class Logbook(Gtk.Notebook):
       log_index = self.get_log_index_by_name(page_name)
       log = self.logs[log_index]
 
-      (model, path) = self.treeselection[log_index].get_selected_rows() # Get the selected row in the log
+      (sort_model, path) = self.treeselection[log_index].get_selected_rows() # Get the selected row in the log
       try:
-         sort_iter = model.get_iter(path[0])
-         child_iter = self.sorter[log_index].convert_iter_to_child_iter(sort_iter)
-         row_index = model.get_value(sort_iter,0)
+         # Remember that the filter model is a child of the sort model.
+         filter_model = sort_model.get_model()
+         filter_iter = filter_model.get_iter(path[0])
+         child_iter = self.filter[log_index].convert_iter_to_child_iter(filter_iter)
+         row_index = filter_model.get_value(filter_iter,0)
       except IndexError:
          logging.debug("Could not find the selected row's index!")
          return
