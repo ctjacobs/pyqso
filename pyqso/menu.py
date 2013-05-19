@@ -41,7 +41,10 @@ class Menu(Gtk.MenuBar):
       mitem_logbook.set_submenu(subm_logbook)
     
       # Connect
-      mitem_connect = Gtk.MenuItem("Connect to Logbook...")
+      mitem_connect = Gtk.ImageMenuItem("Connect to Logbook...")
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_CONNECT, Gtk.IconSize.MENU)
+      mitem_connect.set_image(icon)
       mitem_connect.connect("activate", parent.logbook.db_connect)
       key, mod = Gtk.accelerator_parse("<Control>O")
       mitem_connect.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
@@ -49,8 +52,11 @@ class Menu(Gtk.MenuBar):
       self.items["CONNECT"] = mitem_connect
 
       # Disconnect
-      mitem_disconnect = Gtk.MenuItem("Disconnect from Logbook")
+      mitem_disconnect = Gtk.ImageMenuItem("Disconnect from Logbook")
       mitem_disconnect.connect("activate", parent.logbook.db_disconnect)
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_DISCONNECT, Gtk.IconSize.MENU)
+      mitem_disconnect.set_image(icon)
       key, mod = Gtk.accelerator_parse("<Control>W")
       mitem_disconnect.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_logbook.append(mitem_disconnect)
@@ -59,19 +65,28 @@ class Menu(Gtk.MenuBar):
       subm_logbook.append(Gtk.SeparatorMenuItem())
 
       # New log
-      mitem_new = Gtk.MenuItem("New Log")
+      mitem_new = Gtk.ImageMenuItem("New Log")
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_ADD, Gtk.IconSize.MENU)
+      mitem_new.set_image(icon)
       mitem_new.connect("activate", parent.logbook.new_log)
       subm_logbook.append(mitem_new)
       self.items["NEW_LOG"] = mitem_new
 
       # Delete the current log
-      mitem_delete = Gtk.MenuItem("Delete Selected Log")
+      mitem_delete = Gtk.ImageMenuItem("Delete Selected Log")
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_CLOSE, Gtk.IconSize.MENU)
+      mitem_delete.set_image(icon)
       mitem_delete.connect("activate", parent.logbook.delete_log)
       subm_logbook.append(mitem_delete)
       self.items["DELETE_LOG"] = mitem_delete
       
       # Rename the current log
-      mitem_rename = Gtk.MenuItem("Rename Selected Log")
+      mitem_rename = Gtk.ImageMenuItem("Rename Selected Log")
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_EDIT, Gtk.IconSize.MENU)
+      mitem_rename.set_image(icon)
       mitem_rename.connect("activate", parent.logbook.rename_log)
       subm_logbook.append(mitem_rename)
       self.items["RENAME_LOG"] = mitem_rename
@@ -79,13 +94,19 @@ class Menu(Gtk.MenuBar):
       subm_logbook.append(Gtk.SeparatorMenuItem())
 
       # Import log
-      mitem_import = Gtk.MenuItem("Import Log")
+      mitem_import = Gtk.ImageMenuItem("Import Log")
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_GO_BACK, Gtk.IconSize.MENU)
+      mitem_import.set_image(icon)
       mitem_import.connect("activate", parent.logbook.import_log)
       subm_logbook.append(mitem_import)
       self.items["IMPORT_LOG"] = mitem_import
 
       # Export the current log
-      mitem_export = Gtk.MenuItem("Export Log")
+      mitem_export = Gtk.ImageMenuItem("Export Log")
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_GO_FORWARD, Gtk.IconSize.MENU)
+      mitem_export.set_image(icon)
       mitem_export.connect("activate", parent.logbook.export_log)
       subm_logbook.append(mitem_export)
       self.items["EXPORT_LOG"] = mitem_export
@@ -93,7 +114,10 @@ class Menu(Gtk.MenuBar):
       subm_logbook.append(Gtk.SeparatorMenuItem())
 
       # Quit
-      mitem_quit = Gtk.MenuItem("Quit")
+      mitem_quit = Gtk.ImageMenuItem("Quit")
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_QUIT, Gtk.IconSize.MENU)
+      mitem_quit.set_image(icon)
       mitem_quit.connect("activate", Gtk.main_quit)
       key, mod = Gtk.accelerator_parse("<Control>Q")
       mitem_quit.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
@@ -107,21 +131,30 @@ class Menu(Gtk.MenuBar):
       subm_records = Gtk.Menu()
       mitem_records.set_submenu(subm_records)
       
-      mitem_addrecord = Gtk.MenuItem("Add Record...")
+      mitem_addrecord = Gtk.ImageMenuItem("Add Record...")
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_ADD, Gtk.IconSize.MENU)
+      mitem_addrecord.set_image(icon)
       mitem_addrecord.connect("activate", parent.logbook.add_record_callback)
       key, mod = Gtk.accelerator_parse("<Control>R")
       mitem_addrecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_records.append(mitem_addrecord)
       self.items["ADD_RECORD"] = mitem_addrecord
       
-      mitem_editrecord = Gtk.MenuItem("Edit Selected Record...")
+      mitem_editrecord = Gtk.ImageMenuItem("Edit Selected Record...")
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_EDIT, Gtk.IconSize.MENU)
+      mitem_editrecord.set_image(icon)
       mitem_editrecord.connect("activate", parent.logbook.edit_record_callback, None, None)
       key, mod = Gtk.accelerator_parse("<Control>E")
       mitem_editrecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_records.append(mitem_editrecord)
       self.items["EDIT_RECORD"] = mitem_editrecord
 
-      mitem_deleterecord = Gtk.MenuItem("Delete Selected Record...")
+      mitem_deleterecord = Gtk.ImageMenuItem("Delete Selected Record...")
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_DELETE, Gtk.IconSize.MENU)
+      mitem_deleterecord.set_image(icon)
       mitem_deleterecord.connect("activate", parent.logbook.delete_record_callback)
       key, mod = Gtk.accelerator_parse("Delete")
       mitem_deleterecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
@@ -135,7 +168,10 @@ class Menu(Gtk.MenuBar):
       subm_view = Gtk.Menu()
       mitem_view.set_submenu(subm_view)
 
-      mitem_dxcluster = Gtk.MenuItem("DX Cluster")
+      mitem_dxcluster = Gtk.ImageMenuItem("DX Cluster")
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_NETWORK, Gtk.IconSize.MENU)
+      mitem_dxcluster.set_image(icon)
       mitem_dxcluster.connect("activate", parent.dx_cluster_callback)
       subm_view.append(mitem_dxcluster)
       self.items["DX_CLUSTER"] = mitem_dxcluster
@@ -148,7 +184,10 @@ class Menu(Gtk.MenuBar):
       mitem_help.set_submenu(subm_help)
       
       # About
-      mitem_about = Gtk.MenuItem("About PyQSO")
+      mitem_about = Gtk.ImageMenuItem("About PyQSO")
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_ABOUT, Gtk.IconSize.MENU)
+      mitem_about.set_image(icon)
       mitem_about.connect("activate", parent.show_about)
       subm_help.append(mitem_about)
 

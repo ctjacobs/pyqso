@@ -61,22 +61,22 @@ class RecordDialog(Gtk.Dialog):
 
       # DATE
       hbox_temp = Gtk.HBox(spacing=0)
-      label = Gtk.Label(log.SELECTED_FIELD_NAMES_FRIENDLY["DATE"], halign=Gtk.Align.START)
+      label = Gtk.Label(log.SELECTED_FIELD_NAMES_FRIENDLY["QSO_DATE"], halign=Gtk.Align.START)
       label.set_width_chars(11)
       label.set_alignment(0, 0.5)
       hbox_temp.pack_start(label, False, False, 6)
-      self.sources["DATE"] = Gtk.Entry()
-      self.sources["DATE"].set_width_chars(15)
-      hbox_temp.pack_start(self.sources["DATE"], False, False, 6)
+      self.sources["QSO_DATE"] = Gtk.Entry()
+      self.sources["QSO_DATE"].set_width_chars(15)
+      hbox_temp.pack_start(self.sources["QSO_DATE"], False, False, 6)
 
       # TIME
-      label = Gtk.Label(log.SELECTED_FIELD_NAMES_FRIENDLY["TIME"], halign=Gtk.Align.START)
+      label = Gtk.Label(log.SELECTED_FIELD_NAMES_FRIENDLY["TIME_ON"], halign=Gtk.Align.START)
       label.set_alignment(0, 0.5)
       label.set_width_chars(11)
       hbox_temp.pack_start(label, False, False, 6)
-      self.sources["TIME"] = Gtk.Entry()
-      self.sources["TIME"].set_width_chars(15)
-      hbox_temp.pack_start(self.sources["TIME"], False, False, 6)
+      self.sources["TIME_ON"] = Gtk.Entry()
+      self.sources["TIME_ON"].set_width_chars(15)
+      hbox_temp.pack_start(self.sources["TIME_ON"], False, False, 6)
       vbox_inner.pack_start(hbox_temp, False, False, 6)
 
       # FREQ

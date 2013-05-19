@@ -34,10 +34,10 @@ class Log(Gtk.ListStore):
 
       # FIXME: Allow the user to select the field names. By default, let's select them all.
       self.SELECTED_FIELD_NAMES_TYPES = AVAILABLE_FIELD_NAMES_TYPES
-      self.SELECTED_FIELD_NAMES_ORDERED = ["CALL", "DATE", "TIME", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]
+      self.SELECTED_FIELD_NAMES_ORDERED = ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]
       self.SELECTED_FIELD_NAMES_FRIENDLY = {"CALL":"Callsign",
-                                            "DATE":"Date",
-                                            "TIME":"Time",
+                                            "QSO_DATE":"Date",
+                                            "TIME_ON":"Time",
                                             "FREQ":"Frequency",
                                             "BAND":"Band",
                                             "MODE":"Mode",
@@ -131,14 +131,14 @@ class TestLog(unittest.TestCase):
       
       c = connection.cursor()
       query = "CREATE TABLE test (id INTEGER PRIMARY KEY AUTOINCREMENT"
-      for field_name in ["CALL", "DATE", "TIME", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]:
+      for field_name in ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]:
          s = ", %s TEXT" % field_name.lower()
          query = query + s
       query = query + ")"
       c.execute(query)
       
       log = Log(connection, "test")
-      fields_and_data = {"CALL":"TEST123", "DATE":"123456789", "TIME":"123456789", "FREQ":"145.500", "BAND":"2m", "MODE":"FM", "RST_SENT":"59", "RST_RCVD":"59"}
+      fields_and_data = {"CALL":"TEST123", "QSO_DATE":"123456789", "TIME_ON":"123456789", "FREQ":"145.500", "BAND":"2m", "MODE":"FM", "RST_SENT":"59", "RST_RCVD":"59"}
       log.add_record(fields_and_data)
       c = connection.cursor()
       c.execute("SELECT * FROM test")
@@ -146,7 +146,7 @@ class TestLog(unittest.TestCase):
       
       assert len(records) == 1
       
-      for field_name in ["CALL", "DATE", "TIME", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]:
+      for field_name in ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]:
          print fields_and_data[field_name], records[0][field_name]
          assert fields_and_data[field_name] == records[0][field_name]
       
@@ -158,7 +158,7 @@ class TestLog(unittest.TestCase):
       
       c = connection.cursor()
       query = "CREATE TABLE test (id INTEGER PRIMARY KEY AUTOINCREMENT"
-      for field_name in ["CALL", "DATE", "TIME", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]:
+      for field_name in ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]:
          s = ", %s TEXT" % field_name.lower()
          query = query + s
       query = query + ")"
@@ -187,7 +187,7 @@ class TestLog(unittest.TestCase):
       
       c = connection.cursor()
       query = "CREATE TABLE test (id INTEGER PRIMARY KEY AUTOINCREMENT"
-      for field_name in ["CALL", "DATE", "TIME", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]:
+      for field_name in ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]:
          s = ", %s TEXT" % field_name.lower()
          query = query + s
       query = query + ")"

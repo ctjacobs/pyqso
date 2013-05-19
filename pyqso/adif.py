@@ -22,19 +22,20 @@ import re
 import logging
 import unittest
 from datetime import datetime
+import calendar
 
 # All the possible field names and their associated data types 
 # from the ADIF specification (version 3.0.2)
 AVAILABLE_FIELD_NAMES_TYPES = {"CALL": "S", 
-                              "DATE": "D",
-                              "TIME": "T",
+                              "QSO_DATE": "D",
+                              "TIME_ON": "T",
                               "FREQ": "N",
                               "BAND": "E",
                               "MODE": "E",
                               "RST_SENT": "S",
                               "RST_RCVD": "S"}
 
-AVAILABLE_FIELD_NAMES_ORDERED = ["CALL", "DATE", "TIME", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]
+AVAILABLE_FIELD_NAMES_ORDERED = ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]
 
 # A: AwardList
 # B: Boolean
