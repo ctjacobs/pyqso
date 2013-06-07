@@ -172,7 +172,7 @@ class Menu(Gtk.MenuBar):
       icon = Gtk.Image()
       icon.set_from_stock(Gtk.STOCK_NETWORK, Gtk.IconSize.MENU)
       mitem_dxcluster.set_image(icon)
-      mitem_dxcluster.connect("activate", parent.dx_cluster_callback)
+      mitem_dxcluster.connect("activate", parent.dx_cluster.switch_visible_callback)
       subm_view.append(mitem_dxcluster)
       self.items["DX_CLUSTER"] = mitem_dxcluster
       

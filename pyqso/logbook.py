@@ -588,10 +588,12 @@ class Logbook(Gtk.Notebook):
          
       if(path is None):
          logging.debug("No file path specified.")
-         return
+      else:
+         #if(not path.endswith('.adi')):
+         #   path = path + ".adi"
 
-      adif = ADIF()
-      adif.write(log.get_all_records(), path)
+         adif = ADIF()
+         adif.write(log.get_all_records(), path)
 
       return
 

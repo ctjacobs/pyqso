@@ -68,6 +68,8 @@ class PyQSO(Gtk.Window):
       self.logbook = Logbook(self)
       self.logbook.set_scrollable(True)
 
+      self.dx_cluster = DXCluster(self)
+
       # Set up menu and tool bars
       # These classes depend on the Logbook class,
       # so pack the logbook after the menu and toolbar.
@@ -80,9 +82,13 @@ class PyQSO(Gtk.Window):
       vbox_outer.pack_start(self.menu, False, False, 0)
       vbox_outer.pack_start(self.toolbar, False, False, 0)
       vbox_outer.pack_start(self.logbook, True, True, 0)
+      vbox_outer.pack_start(self.dx_cluster, True, True, 0)
       vbox_outer.pack_start(self.statusbar, False, False, 0)
 
       self.show_all()
+
+      # Hide the DX cluster by default
+      self.dx_cluster.switch_visible_callback()
       
       return
 
@@ -112,11 +118,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.''')
             print error.message
       about.run()
       about.destroy()
-      return
-
-   def dx_cluster_callback(self, widget=None):
-      dx = DXCluster()
-      
+      return      
       
 if(__name__ == '__main__'):
    # Get any command line arguments

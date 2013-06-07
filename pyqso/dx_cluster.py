@@ -32,25 +32,18 @@ from pyqso.telnet_connection_dialog import *
 pyqso_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir)
 sys.path.insert(0, pyqso_path)
 
-class DXCluster(Gtk.Window):
+class DXCluster(Gtk.Frame):
    
-   def __init__(self):
+   def __init__(self, root_window):
          
-      # Call the constructor of the super class (Gtk.Window)
-      Gtk.Window.__init__(self, title="DX Cluster")
-      self.set_size_request(600, 500)
-      self.connect("delete-event", self.on_delete)
+      Gtk.Frame.__init__(self)
+      label = Gtk.Label("DX Cluster")
+      self.set_label_widget(label)
 
       self.check_io_event = GObject.timeout_add(1000, self.on_telnet_io)
 
-      possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
-      for icon_path in possible_icon_paths:
-         try:
-            self.set_icon_from_file(icon_path)
-         except Exception, error:
-            print error.message
-
       self.connection = None
+      self.root_window = root_window
 
       vbox_inner = Gtk.VBox(spacing=2)
 
@@ -90,6 +83,8 @@ class DXCluster(Gtk.Window):
       # A TextView object to display the output from the Telnet server.
       self.renderer = Gtk.TextView()
       self.renderer.set_editable(False)
+      self.renderer.set_cursor_visible(False)
+      self.renderer.set_overwrite(False)
       sw = Gtk.ScrolledWindow()
       sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
       sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
@@ -107,7 +102,7 @@ class DXCluster(Gtk.Window):
 
    def telnet_connect(self, widget=None):
 
-      dialog = TelnetConnectionDialog(self)
+      dialog = TelnetConnectionDialog(self.root_window)
       response = dialog.run()
       if(response == Gtk.ResponseType.OK):
          connection_info = dialog.get_connection_info()
@@ -174,5 +169,9 @@ class DXCluster(Gtk.Window):
       self.buttons["CONNECT"].set_sensitive(sensitive)
       self.buttons["DISCONNECT"].set_sensitive(not sensitive)
       self.send.set_sensitive(not sensitive)
+      return
+
+   def switch_visible_callback(self, widget=None):
+      self.set_visible(not self.get_visible())
       return
 
