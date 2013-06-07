@@ -84,7 +84,6 @@ class DXCluster(Gtk.Frame):
       self.renderer = Gtk.TextView()
       self.renderer.set_editable(False)
       self.renderer.set_cursor_visible(False)
-      self.renderer.set_overwrite(False)
       sw = Gtk.ScrolledWindow()
       sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
       sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
@@ -157,8 +156,22 @@ class DXCluster(Gtk.Frame):
 
    def on_telnet_io(self):
       if(self.connection):
-         self.buffer.insert_at_cursor(self.connection.read_very_eager())
-         self.renderer.scroll_to_mark(self.buffer.get_insert(), within_margin=0, use_align=False, xalign=0.5, yalign=0.5)
+         text = self.connection.read_very_eager()
+         text = text.replace(u"\u0007", "") # Remove the BEL Unicode character from the end of the line
+
+         # Allow auto-scrolling to the new text entry if the focus is already at
+         # the very end of the Gtk.TextView. Otherwise, don't auto-scroll
+         # in case the user is reading something further up.
+         # Note: This is based on the code from http://forums.gentoo.org/viewtopic-t-445598-view-next.html
+         end_iter = self.buffer.get_end_iter()
+         end_mark = self.buffer.create_mark(None, end_iter)
+         self.renderer.move_mark_onscreen(end_mark)
+         at_end = self.buffer.get_iter_at_mark(end_mark).equal(end_iter)
+         self.buffer.insert(end_iter, text)
+         if(at_end):
+            end_mark = self.buffer.create_mark(None, end_iter)
+            self.renderer.scroll_mark_onscreen(end_mark) 
+
       return True
    
    def on_delete(self, widget, event):
