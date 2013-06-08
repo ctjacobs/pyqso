@@ -287,12 +287,7 @@ class Logbook(Gtk.Notebook):
          
       if(page is None):
          page = self.get_nth_page(self.get_current_page()) # Gets the Gtk.VBox of the selected tab in the logbook
-      
-      # If a page of the logbook (and therefore a Log object) gets deleted, 
-      # then the page_index may not correspond to the index of the log in the self.logs list.
-      # Therefore, we have to search for the tab with the same name as the log.
-      page_name = page.get_name()
-      log_index = self.get_log_index_by_name(page_name)
+      log_index = self.get_log_index(name=page.get_name())
       log = self.logs[log_index]
       
       # We also need the page's index in order to remove it using remove_page below.   
@@ -404,7 +399,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def sort_log(self, widget, column_index):
-      log_index = self.get_current_page()-1
+      log_index = self.get_log_index()
       column = self.treeview[log_index].get_column(column_index)
 
       # If we are operating on the currently-sorted column...
@@ -441,7 +436,7 @@ class Logbook(Gtk.Notebook):
       page = self.get_nth_page(page_index) # Gets the Gtk.VBox of the selected tab in the logbook
       old_log_name = page.get_name()
       
-      log_index = self.get_log_index_by_name(old_log_name)
+      log_index = self.get_log_index(name=old_log_name)
       
       exists = True
       dialog = LogNameDialog(self.root_window, old_log_name)
@@ -565,12 +560,7 @@ class Logbook(Gtk.Notebook):
       
    def export_log(self, widget=None):
 
-      page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
-      if(page_index == 0 or page_index == self.get_n_pages()-1):
-         logging.debug("Tried to add a record, but no log present!")
-         return
-      page_name = self.get_nth_page(page_index).get_name()
-      log_index = self.get_log_index_by_name(page_name)
+      log_index = self.get_log_index()
       log = self.logs[log_index]
 
       dialog = Gtk.FileChooserDialog("Export Log to File",
@@ -598,13 +588,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def add_record_callback(self, widget):
-
-      page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
-      if(page_index == 0 or page_index == self.get_n_pages()-1):
-         logging.debug("Tried to add a record, but no log present!")
-         return
-      page_name = self.get_nth_page(page_index).get_name()
-      log_index = self.get_log_index_by_name(page_name)
+      log_index = self.get_log_index()
       log = self.logs[log_index]
       
       dialog = RecordDialog(root_window=self.root_window, log=log, index=None)
@@ -644,12 +628,7 @@ class Logbook(Gtk.Notebook):
       return
       
    def delete_record_callback(self, widget):
-      page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
-      if(page_index == 0 or page_index == self.get_n_pages()-1):
-         logging.debug("Tried to delete a record, but no log present!")
-         return
-      page_name = self.get_nth_page(page_index).get_name()
-      log_index = self.get_log_index_by_name(page_name)
+      log_index = self.get_log_index()
       (sort_model, path) = self.treeselection[log_index].get_selected_rows() # Get the selected row in the log
       try:
          # Remember that the filter model is a child of the sort model.
@@ -678,12 +657,7 @@ class Logbook(Gtk.Notebook):
       # Note: the path and view_column arguments need to be passed in
       # since they associated with the row-activated signal.
 
-      page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
-      if(page_index == 0 or page_index == self.get_n_pages()-1):
-         logging.debug("Tried to edit a record, but no log present!")
-         return
-      page_name = self.get_nth_page(page_index).get_name()
-      log_index = self.get_log_index_by_name(page_name)
+      log_index = self.get_log_index()
       log = self.logs[log_index]
 
       (sort_model, path) = self.treeselection[log_index].get_selected_rows() # Get the selected row in the log
@@ -747,8 +721,19 @@ class Logbook(Gtk.Notebook):
          if(exists[0] == 1):
             return True
       return False
-      
-   def get_log_index_by_name(self, name):
+
+   def get_log_index(self, name=None):
+      if(name is None):
+         # If no page name is supplied, then just use the currently selected page
+         page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
+         if(page_index == 0 or page_index == self.get_n_pages()-1):
+            # We either have the Summary page, or the "+" (add log) dummy page.
+            logging.debug("No log currently selected!")
+            return None
+         name = self.get_nth_page(page_index).get_name()
+      # If a page of the logbook (and therefore a Log object) gets deleted, 
+      # then the page_index may not correspond to the index of the log in the self.logs list.
+      # Therefore, we have to search for the tab with the same name as the log.
       for i in range(0, len(self.logs)):
          if(self.logs[i].name == name):
             log_index = i
