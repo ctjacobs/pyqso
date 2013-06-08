@@ -184,7 +184,7 @@ class DXCluster(Gtk.Frame):
       self.send.set_sensitive(not sensitive)
       return
 
-   def switch_visible_callback(self, widget=None):
+   def toggle_visible_callback(self, widget=None):
       self.set_visible(not self.get_visible())
       return
 
