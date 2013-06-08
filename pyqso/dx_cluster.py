@@ -78,7 +78,7 @@ class DXCluster(Gtk.Frame):
       self.send.connect("clicked", self.telnet_send_command)
       self.toolbar.pack_start(self.send, False, False, 0)
 
-      vbox_inner.pack_start(self.toolbar, False, False, 6)
+      vbox_inner.pack_start(self.toolbar, False, False, 0)
 
       # A TextView object to display the output from the Telnet server.
       self.renderer = Gtk.TextView()
@@ -89,7 +89,7 @@ class DXCluster(Gtk.Frame):
       sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
       sw.add(self.renderer)
       self.buffer = self.renderer.get_buffer()
-      vbox_inner.pack_start(sw, True, True, 6)
+      vbox_inner.pack_start(sw, True, True, 0)
 
       self.add(vbox_inner)
 
@@ -157,7 +157,7 @@ class DXCluster(Gtk.Frame):
    def on_telnet_io(self):
       if(self.connection):
          text = self.connection.read_very_eager()
-         text = text.replace(u"\u0007", "") # Remove the BEL Unicode character from the end of the line
+         #text = text.replace(u"\u0007", "") # Remove the BEL Unicode character from the end of the line
 
          # Allow auto-scrolling to the new text entry if the focus is already at
          # the very end of the Gtk.TextView. Otherwise, don't auto-scroll
