@@ -52,10 +52,6 @@ class Logbook(Gtk.Notebook):
                                     Gtk.FileChooserAction.OPEN,
                                     (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                     Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-         filter = Gtk.FileFilter()
-         filter.set_name("All SQLite Database files")
-         filter.add_pattern("*.db")
-         dialog.add_filter(filter)
          
          response = dialog.run()
          if(response == Gtk.ResponseType.OK):
