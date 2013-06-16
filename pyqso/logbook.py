@@ -564,7 +564,8 @@ class Logbook(Gtk.Notebook):
                               Gtk.FileChooserAction.SAVE,
                               (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                               Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
-                                 
+      dialog.set_do_overwrite_confirmation(True)
+            
       response = dialog.run()
       if(response == Gtk.ResponseType.OK):
          path = dialog.get_filename()
@@ -575,9 +576,6 @@ class Logbook(Gtk.Notebook):
       if(path is None):
          logging.debug("No file path specified.")
       else:
-         #if(not path.endswith('.adi')):
-         #   path = path + ".adi"
-
          adif = ADIF()
          adif.write(log.get_all_records(), path)
 

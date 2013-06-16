@@ -118,7 +118,22 @@ class ADIF:
                # Let's force all field names to be in upper case.
                # This will help us later when comparing the field names
                # against the available field names in the ADIF specification.
-               fields_and_data_dictionary[fd[0].upper()] = fd[2][:int(fd[1])]
+               field_name = fd[0].upper()
+               field_data = fd[2][:int(fd[1])]
+
+               # Combo boxes are used later on and these are case sensitive,
+               # so adjust the field data accordingly.
+               if(field_name == "BAND"):
+                  field_data = field_data.lower()
+               elif(field_name == "MODE"):
+                  field_data = field_data.upper()
+
+               if(field_name in AVAILABLE_FIELD_NAMES_ORDERED):
+                  field_data_type = AVAILABLE_FIELD_NAMES_TYPES[field_name]
+                  if(self.is_valid(field_name, field_data, field_data_type)):
+                     # Only add the field if it is a standard ADIF field and it holds valid data.
+                     fields_and_data_dictionary[field_name] = field_data
+
             records.append(fields_and_data_dictionary)
       
       assert n_eor == n_record
@@ -291,9 +306,14 @@ class ADIF:
 
       elif(data_type == "E" or data_type == "A"):
          # Enumeration, AwardList.
-         # We'll assume that this data is valid already,
-         # since the user can only select from a pre-defined (valid) list.
-         return True
+         if(field_name == "MODE"):
+            modes = ["", "AM", "AMTORFEC", "ASCI", "ATV", "CHIP64", "CHIP128", "CLO", "CONTESTI", "CW", "DSTAR", "DOMINO", "DOMINOF", "FAX", "FM", "FMHELL", "FSK31", "FSK441", "GTOR", "HELL", "HELL80", "HFSK", "ISCAT", "JT44", "JT4A", "JT4B", "JT4C", "JT4D", "JT4E", "JT4F", "JT4G", "JT65", "JT65A", "JT65B", "JT65C", "JT6M", "MFSK8", "MFSK16", "MT63", "OLIVIA", "PAC", "PAC2", "PAC3", "PAX", "PAX2", "PCW", "PKT", "PSK10", "PSK31", "PSK63", "PSK63F", "PSK125", "PSKAM10", "PSKAM31", "PSKAM50", "PSKFEC31", "PSKHELL", "Q15", "QPSK31", "QPSK63", "QPSK125", "ROS", "RTTY", "RTTYM", "SSB", "SSTV", "THRB", "THOR", "THRBX", "TOR", "V4", "VOI", "WINMOR", "WSPR"]
+            return (data in modes)
+         elif(field_name == "BAND"):
+            bands = ["", "2190m", "560m", "160m", "80m", "60m", "40m", "30m", "20m", "17m", "15m", "12m", "10m", "6m", "4m", "2m", "1.25m", "70cm", "33cm", "23cm", "13cm", "9cm", "6cm", "3cm", "1.25cm", "6mm", "4mm", "2.5mm", "2mm", "1mm"]
+            return (data in bands)
+         else:
+            return True
 
       else:
          return True

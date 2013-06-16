@@ -96,7 +96,7 @@ class Menu(Gtk.MenuBar):
       # Import log
       mitem_import = Gtk.ImageMenuItem("Import Log")
       icon = Gtk.Image()
-      icon.set_from_stock(Gtk.STOCK_GO_BACK, Gtk.IconSize.MENU)
+      icon.set_from_stock(Gtk.STOCK_GO_FORWARD, Gtk.IconSize.MENU)
       mitem_import.set_image(icon)
       mitem_import.connect("activate", parent.logbook.import_log)
       subm_logbook.append(mitem_import)
@@ -105,7 +105,7 @@ class Menu(Gtk.MenuBar):
       # Export the current log
       mitem_export = Gtk.ImageMenuItem("Export Log")
       icon = Gtk.Image()
-      icon.set_from_stock(Gtk.STOCK_GO_FORWARD, Gtk.IconSize.MENU)
+      icon.set_from_stock(Gtk.STOCK_GO_BACK, Gtk.IconSize.MENU)
       mitem_export.set_image(icon)
       mitem_export.connect("activate", parent.logbook.export_log)
       subm_logbook.append(mitem_export)
