@@ -20,9 +20,8 @@
 
 from gi.repository import Gtk, GObject
 import logging
-import re
-import calendar
 
+from adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED
 from callsign_lookup import *
 
 class RecordDialog(Gtk.Dialog):
@@ -47,7 +46,7 @@ class RecordDialog(Gtk.Dialog):
 
       # CALL
       hbox_temp = Gtk.HBox(spacing=0)
-      label = Gtk.Label(log.SELECTED_FIELD_NAMES_FRIENDLY["CALL"], halign=Gtk.Align.START)
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["CALL"], halign=Gtk.Align.START)
       label.set_width_chars(11)
       label.set_alignment(0, 0.5)
       hbox_temp.pack_start(label, False, False, 6)
@@ -61,7 +60,7 @@ class RecordDialog(Gtk.Dialog):
 
       # DATE
       hbox_temp = Gtk.HBox(spacing=0)
-      label = Gtk.Label(log.SELECTED_FIELD_NAMES_FRIENDLY["QSO_DATE"], halign=Gtk.Align.START)
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["QSO_DATE"], halign=Gtk.Align.START)
       label.set_width_chars(11)
       label.set_alignment(0, 0.5)
       hbox_temp.pack_start(label, False, False, 6)
@@ -70,7 +69,7 @@ class RecordDialog(Gtk.Dialog):
       hbox_temp.pack_start(self.sources["QSO_DATE"], False, False, 6)
 
       # TIME
-      label = Gtk.Label(log.SELECTED_FIELD_NAMES_FRIENDLY["TIME_ON"], halign=Gtk.Align.START)
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["TIME_ON"], halign=Gtk.Align.START)
       label.set_alignment(0, 0.5)
       label.set_width_chars(11)
       hbox_temp.pack_start(label, False, False, 6)
@@ -81,7 +80,7 @@ class RecordDialog(Gtk.Dialog):
 
       # FREQ
       hbox_temp = Gtk.HBox(spacing=0)
-      label = Gtk.Label(log.SELECTED_FIELD_NAMES_FRIENDLY["FREQ"], halign=Gtk.Align.START)
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["FREQ"], halign=Gtk.Align.START)
       label.set_alignment(0, 0.5)
       label.set_width_chars(11)
       hbox_temp.pack_start(label, False, False, 6)
@@ -90,7 +89,7 @@ class RecordDialog(Gtk.Dialog):
       hbox_temp.pack_start(self.sources["FREQ"], False, False, 6)
 
       # BAND
-      label = Gtk.Label(log.SELECTED_FIELD_NAMES_FRIENDLY["BAND"], halign=Gtk.Align.START)
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["BAND"], halign=Gtk.Align.START)
       label.set_alignment(0, 0.5)
       label.set_width_chars(11)
       hbox_temp.pack_start(label, False, False, 6)
@@ -104,7 +103,7 @@ class RecordDialog(Gtk.Dialog):
 
       # MODE
       hbox_temp = Gtk.HBox(spacing=0)
-      label = Gtk.Label(log.SELECTED_FIELD_NAMES_FRIENDLY["MODE"])
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["MODE"])
       label.set_alignment(0, 0.5)
       label.set_width_chars(11)
       hbox_temp.pack_start(label, False, False, 6)
@@ -118,7 +117,7 @@ class RecordDialog(Gtk.Dialog):
 
       # RST_SENT
       hbox_temp = Gtk.HBox(spacing=0)
-      label = Gtk.Label(log.SELECTED_FIELD_NAMES_FRIENDLY["RST_SENT"])
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["RST_SENT"])
       label.set_alignment(0, 0.5)
       label.set_width_chars(11)
       hbox_temp.pack_start(label, False, False, 6)
@@ -127,7 +126,7 @@ class RecordDialog(Gtk.Dialog):
       hbox_temp.pack_start(self.sources["RST_SENT"], False, False, 6)
 
       # RST_RCVD
-      label = Gtk.Label(log.SELECTED_FIELD_NAMES_FRIENDLY["RST_RCVD"])
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["RST_RCVD"])
       label.set_alignment(0, 0.5)
       label.set_width_chars(11)
       hbox_temp.pack_start(label, False, False, 6)
@@ -139,7 +138,7 @@ class RecordDialog(Gtk.Dialog):
       if(index is not None):
          # The record already exists, so display its current data in the input boxes.
          record = log.get_record_by_index(index)
-         field_names = log.SELECTED_FIELD_NAMES_ORDERED
+         field_names = AVAILABLE_FIELD_NAMES_ORDERED
          for i in range(0, len(field_names)):
             if(field_names[i] == "BAND"):
                self.sources[field_names[i]].set_active(bands.index(record[field_names[i].lower()]))

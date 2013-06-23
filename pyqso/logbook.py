@@ -381,10 +381,10 @@ class Logbook(Gtk.Notebook):
       self.treeview[index].append_column(column)
          
       # Set up column names for each selected field
-      field_names = self.logs[index].SELECTED_FIELD_NAMES_ORDERED
+      field_names = AVAILABLE_FIELD_NAMES_ORDERED
       for i in range(0, len(field_names)):
          renderer = Gtk.CellRendererText()
-         column = Gtk.TreeViewColumn(self.logs[index].SELECTED_FIELD_NAMES_FRIENDLY[field_names[i]], renderer, text=i+1)
+         column = Gtk.TreeViewColumn(AVAILABLE_FIELD_NAMES_FRIENDLY[field_names[i]], renderer, text=i+1)
          column.set_resizable(True)
          column.set_min_width(50)
          column.set_clickable(True)
@@ -418,7 +418,7 @@ class Logbook(Gtk.Notebook):
          # Since we don't know which one that was, just remove the arrow from all columns
          # and start again. This only loops over a few dozen columns at most, so
          # hopefully it won't take too much time.)
-         for i in range(0, len(self.logs[log_index].SELECTED_FIELD_NAMES_ORDERED)):
+         for i in range(0, len(AVAILABLE_FIELD_NAMES_ORDERED)):
             column = self.treeview[log_index].get_column(i)
             column.set_sort_indicator(False)
          column = self.treeview[log_index].get_column(column_index)
@@ -597,11 +597,11 @@ class Logbook(Gtk.Notebook):
          response = dialog.run() #FIXME: Is it ok to call .run() multiple times on the same RecordDialog object?
          if(response == Gtk.ResponseType.OK):
             fields_and_data = {}
-            field_names = log.SELECTED_FIELD_NAMES_ORDERED
+            field_names = AVAILABLE_FIELD_NAMES_ORDERED
             for i in range(0, len(field_names)):
                #TODO: Validate user input!
                fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
-               if(not(adif.is_valid(field_names[i], fields_and_data[field_names[i]], log.SELECTED_FIELD_NAMES_TYPES[field_names[i]]))):
+               if(not(adif.is_valid(field_names[i], fields_and_data[field_names[i]], AVAILABLE_FIELD_NAMES_TYPES[field_names[i]]))):
                   # Data is not valid - inform the user.
                   message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                     Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
@@ -677,11 +677,11 @@ class Logbook(Gtk.Notebook):
          response = dialog.run() #FIXME: Is it ok to call .run() multiple times on the same RecordDialog object?
          if(response == Gtk.ResponseType.OK):
             fields_and_data = {}
-            field_names = self.logs[log_index].SELECTED_FIELD_NAMES_ORDERED
+            field_names = AVAILABLE_FIELD_NAMES_ORDERED
             for i in range(0, len(field_names)):
                #TODO: Validate user input!
                fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
-               if(not(adif.is_valid(field_names[i], fields_and_data[field_names[i]], self.logs[log_index].SELECTED_FIELD_NAMES_TYPES[field_names[i]]))):
+               if(not(adif.is_valid(field_names[i], fields_and_data[field_names[i]], AVAILABLE_FIELD_NAMES_TYPES[field_names[i]]))):
                   # Data is not valid - inform the user.
                   message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                     Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
@@ -734,3 +734,7 @@ class Logbook(Gtk.Notebook):
             break
       return log_index
 
+   def visible_fields_callback(self, widget=None):
+      dialog = VisibleFieldsDialog(self.root_window)
+      dialog.run()
+      return

@@ -173,7 +173,7 @@ class Menu(Gtk.MenuBar):
       mitem_dxcluster.connect("activate", parent.dx_cluster.toggle_visible_callback)
       subm_view.append(mitem_dxcluster)
       self.items["DX_CLUSTER"] = mitem_dxcluster
-      
+
             
       ###### HELP ######
       mitem_help = Gtk.MenuItem("Help")

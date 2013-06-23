@@ -34,8 +34,18 @@ AVAILABLE_FIELD_NAMES_TYPES = {"CALL": "S",
                               "MODE": "E",
                               "RST_SENT": "S",
                               "RST_RCVD": "S"}
-
+# Note: The logbook uses the ADIF field names for the database column names.
+# This list is used to display the columns in a logical order.
 AVAILABLE_FIELD_NAMES_ORDERED = ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]
+# Define the more user-friendly versions of the field names.
+AVAILABLE_FIELD_NAMES_FRIENDLY = {"CALL":"Callsign",
+                                  "QSO_DATE":"Date",
+                                  "TIME_ON":"Time",
+                                  "FREQ":"Frequency",
+                                  "BAND":"Band",
+                                  "MODE":"Mode",
+                                  "RST_SENT":"TX RST",
+                                  "RST_RCVD":"RX RST"}
 
 # A: AwardList
 # B: Boolean

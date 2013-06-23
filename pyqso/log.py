@@ -24,7 +24,7 @@ import logging
 import sqlite3 as sqlite
 import unittest
 
-from adif import AVAILABLE_FIELD_NAMES_TYPES
+from adif import AVAILABLE_FIELD_NAMES_TYPES, AVAILABLE_FIELD_NAMES_ORDERED
 from record_dialog import *
 
 class Log(Gtk.ListStore):
@@ -32,21 +32,9 @@ class Log(Gtk.ListStore):
    
    def __init__(self, connection, name):
 
-      # FIXME: Allow the user to select the field names. By default, let's select them all.
-      self.SELECTED_FIELD_NAMES_TYPES = AVAILABLE_FIELD_NAMES_TYPES
-      self.SELECTED_FIELD_NAMES_ORDERED = ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]
-      self.SELECTED_FIELD_NAMES_FRIENDLY = {"CALL":"Callsign",
-                                            "QSO_DATE":"Date",
-                                            "TIME_ON":"Time",
-                                            "FREQ":"Frequency",
-                                            "BAND":"Band",
-                                            "MODE":"Mode",
-                                            "RST_SENT":"TX RST",
-                                            "RST_RCVD":"RX RST"}
-
       # The ListStore constructor needs to know the data types of the columns.
       # The index is always an integer. We will assume the fields are strings.
-      data_types = [int] + [str]*len(self.SELECTED_FIELD_NAMES_ORDERED)    
+      data_types = [int] + [str]*len(AVAILABLE_FIELD_NAMES_ORDERED)    
       # Call the constructor of the super class (Gtk.ListStore)
       Gtk.ListStore.__init__(self, *data_types)
 
@@ -66,7 +54,7 @@ class Log(Gtk.ListStore):
    def add_record(self, fields_and_data):
 
       log_entry = []
-      field_names = self.SELECTED_FIELD_NAMES_ORDERED
+      field_names = AVAILABLE_FIELD_NAMES_ORDERED
       for i in range(0, len(field_names)):
          if(field_names[i] in fields_and_data.keys()):
             log_entry.append(fields_and_data[field_names[i]])
