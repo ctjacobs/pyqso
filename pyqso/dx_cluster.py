@@ -27,25 +27,16 @@ import telnetlib
 
 from pyqso.telnet_connection_dialog import *
 
-# This will help Python find the PyQSO modules
-# that need to be imported below.
-pyqso_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir)
-sys.path.insert(0, pyqso_path)
-
-class DXCluster(Gtk.Frame):
+class DXCluster(Gtk.VBox):
    
    def __init__(self, root_window):
          
-      Gtk.Frame.__init__(self)
-      label = Gtk.Label("DX Cluster")
-      self.set_label_widget(label)
+      Gtk.VBox.__init__(self, spacing=2)
 
       self.check_io_event = GObject.timeout_add(1000, self.on_telnet_io)
 
       self.connection = None
       self.root_window = root_window
-
-      vbox_inner = Gtk.VBox(spacing=2)
 
       # Set up the toolbar
       self.toolbar = Gtk.HBox(spacing=2)
@@ -78,7 +69,7 @@ class DXCluster(Gtk.Frame):
       self.send.connect("clicked", self.telnet_send_command)
       self.toolbar.pack_start(self.send, False, False, 0)
 
-      vbox_inner.pack_start(self.toolbar, False, False, 0)
+      self.pack_start(self.toolbar, False, False, 0)
 
       # A TextView object to display the output from the Telnet server.
       self.renderer = Gtk.TextView()
@@ -89,9 +80,7 @@ class DXCluster(Gtk.Frame):
       sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
       sw.add(self.renderer)
       self.buffer = self.renderer.get_buffer()
-      vbox_inner.pack_start(sw, True, True, 0)
-
-      self.add(vbox_inner)
+      self.pack_start(sw, True, True, 0)
 
       self.set_connect_button_sensitive(True)
 
@@ -182,9 +171,5 @@ class DXCluster(Gtk.Frame):
       self.buttons["CONNECT"].set_sensitive(sensitive)
       self.buttons["DISCONNECT"].set_sensitive(not sensitive)
       self.send.set_sensitive(not sensitive)
-      return
-
-   def toggle_visible_callback(self, widget=None):
-      self.set_visible(not self.get_visible())
       return
 

@@ -35,7 +35,7 @@ from pyqso.adif import *
 from pyqso.logbook import *
 from pyqso.menu import *
 from pyqso.toolbar import *
-from pyqso.dx_cluster import *
+from pyqso.toolbox import *
    
 class PyQSO(Gtk.Window):
    
@@ -68,7 +68,7 @@ class PyQSO(Gtk.Window):
       self.logbook = Logbook(self)
       self.logbook.set_scrollable(True)
 
-      self.dx_cluster = DXCluster(self)
+      self.toolbox = Toolbox(self)
 
       # Set up menu and tool bars
       # These classes depend on the Logbook class,
@@ -82,13 +82,13 @@ class PyQSO(Gtk.Window):
       vbox_outer.pack_start(self.menu, False, False, 0)
       vbox_outer.pack_start(self.toolbar, False, False, 0)
       vbox_outer.pack_start(self.logbook, True, True, 0)
-      vbox_outer.pack_start(self.dx_cluster, True, True, 0)
+      vbox_outer.pack_start(self.toolbox, True, True, 0)
       vbox_outer.pack_start(self.statusbar, False, False, 0)
 
       self.show_all()
 
-      # Hide the DX cluster by default
-      self.dx_cluster.toggle_visible_callback()
+      # Hide the Toolbox by default
+      self.toolbox.toggle_visible_callback()
       
       return
 

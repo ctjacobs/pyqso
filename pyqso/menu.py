@@ -168,11 +168,11 @@ class Menu(Gtk.MenuBar):
       subm_view = Gtk.Menu()
       mitem_view.set_submenu(subm_view)
 
-      mitem_dxcluster = Gtk.CheckMenuItem("DX Cluster")
-      mitem_dxcluster.set_active(False)
-      mitem_dxcluster.connect("activate", parent.dx_cluster.toggle_visible_callback)
-      subm_view.append(mitem_dxcluster)
-      self.items["DX_CLUSTER"] = mitem_dxcluster
+      mitem_toolbox = Gtk.CheckMenuItem("Toolbox")
+      mitem_toolbox.set_active(False)
+      mitem_toolbox.connect("activate", parent.toolbox.toggle_visible_callback)
+      subm_view.append(mitem_toolbox)
+      self.items["TOOLBOX"] = mitem_toolbox
 
             
       ###### HELP ######
