@@ -43,7 +43,7 @@ class LogNameDialog(Gtk.Dialog):
          self.entry.set_text(name)
       hbox_temp.pack_start(self.entry, False, False, 6)
       self.vbox.pack_start(hbox_temp, False, False, 6)
-      self.show_all()
+
       return
 
    def get_log_name(self):

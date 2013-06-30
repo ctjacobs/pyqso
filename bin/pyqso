@@ -36,6 +36,7 @@ from pyqso.logbook import *
 from pyqso.menu import *
 from pyqso.toolbar import *
 from pyqso.toolbox import *
+from pyqso.preferences_dialog import *
    
 class PyQSO(Gtk.Window):
    
@@ -94,6 +95,8 @@ class PyQSO(Gtk.Window):
 
    def show_about(self, widget):
       about = Gtk.AboutDialog()
+      about.set_modal(True)
+      about.set_transient_for(parent=self)
       about.set_program_name("PyQSO")
       about.set_version("0.1a.dev")
       about.set_authors(["Christian Jacobs"])
@@ -119,7 +122,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.''')
       about.run()
       about.destroy()
       return      
-      
+
+   def show_preferences(self, widget):
+      preferences = PreferencesDialog(self)
+      response = preferences.run()
+      if(response == Gtk.ResponseType.OK):
+         preferences.commit()
+      preferences.destroy()
+      return
+
 if(__name__ == '__main__'):
    # Get any command line arguments
    parser = optparse.OptionParser()

@@ -174,6 +174,13 @@ class Menu(Gtk.MenuBar):
       subm_view.append(mitem_toolbox)
       self.items["TOOLBOX"] = mitem_toolbox
 
+      mitem_preferences = Gtk.ImageMenuItem("Preferences...")
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_PREFERENCES, Gtk.IconSize.MENU)
+      mitem_preferences.set_image(icon)
+      mitem_preferences.connect("activate", parent.show_preferences)
+      subm_view.append(mitem_preferences)
+      self.items["PREFERENCES"] = mitem_preferences
             
       ###### HELP ######
       mitem_help = Gtk.MenuItem("Help")
