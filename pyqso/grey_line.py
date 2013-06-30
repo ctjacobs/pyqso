@@ -38,7 +38,8 @@ class GreyLine(Gtk.VBox):
       # Draw the map of the world. This is based on the example from:
       # http://matplotlib.org/basemap/users/examples.html
       m = Basemap(projection='mill', lon_0=0, ax=sub, resolution='c', fix_aspect=False)
-      m.drawcoastlines()
+      m.drawcountries(linewidth=0.5)
+      m.drawcoastlines(linewidth=0.5)
       m.drawparallels(numpy.arange(-90,90,30), labels=[1,0,0,0])
       m.drawmeridians(numpy.arange(m.lonmin,m.lonmax+30,60), labels=[0,0,0,1])
 
