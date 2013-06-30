@@ -44,7 +44,12 @@ class PyQSO(Gtk.Window):
          
       # Call the constructor of the super class (Gtk.Window)
       Gtk.Window.__init__(self, title="PyQSO 0.1a.dev")
-      
+
+      # Get any application-specific preferences from the configuration file      
+      config = ConfigParser.ConfigParser()
+      have_config = (config.read(os.path.expanduser('~/.pyqso.cfg')) != [])
+      print have_config
+
       self.set_size_request(800, 600)
       self.set_position(Gtk.WindowPosition.CENTER)
       possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
