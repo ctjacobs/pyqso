@@ -21,9 +21,10 @@
 from gi.repository import Gtk, GObject
 import logging
 import numpy
+import matplotlib
+matplotlib.rcParams['font.size'] = 10.0
 from mpl_toolkits.basemap import Basemap
 from datetime import datetime
-from matplotlib.figure import Figure
 from backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
 
 class GreyLine(Gtk.VBox):
@@ -32,7 +33,7 @@ class GreyLine(Gtk.VBox):
          
       Gtk.VBox.__init__(self, spacing=2)
 
-      fig = Figure()
+      fig = matplotlib.figure.Figure()
       sub = fig.add_subplot(111)
 
       # Draw the map of the world. This is based on the example from:
@@ -40,8 +41,8 @@ class GreyLine(Gtk.VBox):
       m = Basemap(projection='mill', lon_0=0, ax=sub, resolution='c', fix_aspect=False)
       m.drawcountries(linewidth=0.5)
       m.drawcoastlines(linewidth=0.5)
-      m.drawparallels(numpy.arange(-90,90,30), labels=[1,0,0,0])
-      m.drawmeridians(numpy.arange(m.lonmin,m.lonmax+30,60), labels=[0,0,0,1])
+      m.drawparallels(numpy.arange(-90, 90, 30), labels=[1, 0, 0, 0])
+      m.drawmeridians(numpy.arange(m.lonmin, m.lonmax+30, 60), labels=[0, 0, 0, 1])
 
       m.drawmapboundary(fill_color='lightblue')
       m.fillcontinents(color='darkgreen', lake_color='lightblue')
