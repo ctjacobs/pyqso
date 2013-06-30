@@ -33,8 +33,17 @@ class GreyLine(Gtk.VBox):
          
       Gtk.VBox.__init__(self, spacing=2)
 
-      fig = matplotlib.figure.Figure()
-      sub = fig.add_subplot(111)
+      self.fig = matplotlib.figure.Figure()
+      self.canvas = FigureCanvas(self.fig) # For embedding in the Gtk application
+      self.pack_start(self.canvas, True, True, 0)
+
+      self.show_all()
+
+      return
+
+   def draw(self):
+      self.fig.clf()
+      sub = self.fig.add_subplot(111)
 
       # Draw the map of the world. This is based on the example from:
       # http://matplotlib.org/basemap/users/examples.html
@@ -43,15 +52,9 @@ class GreyLine(Gtk.VBox):
       m.drawcoastlines(linewidth=0.5)
       m.drawparallels(numpy.arange(-90, 90, 30), labels=[1, 0, 0, 0])
       m.drawmeridians(numpy.arange(m.lonmin, m.lonmax+30, 60), labels=[0, 0, 0, 1])
-
       m.drawmapboundary(fill_color='lightblue')
       m.fillcontinents(color='darkgreen', lake_color='lightblue')
       m.nightshade(datetime.utcnow()) # Add in the grey line using UTC time. Note that this requires NetCDF.
-
-      canvas = FigureCanvas(fig) # For embedding in the Gtk application
-      self.pack_start(canvas, True, True, 0)
-
-      self.show_all()
 
       return
 
