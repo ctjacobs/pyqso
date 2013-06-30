@@ -23,6 +23,7 @@ import logging
 
 import ConfigParser
 import os.path
+import sys
 
 class PreferencesDialog(Gtk.Dialog):
    
@@ -31,16 +32,12 @@ class PreferencesDialog(Gtk.Dialog):
 
       Gtk.Dialog.__init__(self, title="Preferences", parent=root_window, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
 
-      # Get any application-specific preferences from the configuration file
-      config = ConfigParser.ConfigParser()
-      have_config = (config.read(os.path.expanduser('~/.pyqso.cfg')) != [])
-
       self.preferences = Gtk.Notebook()
 
       self.general = GeneralPage()
       self.preferences.insert_page(self.general, Gtk.Label("General"), 0)
 
-      self.view = Gtk.VBox()
+      self.view = ViewPage()
       self.preferences.insert_page(self.view, Gtk.Label("View"), 1)
 
       self.vbox.pack_start(self.preferences, True, True, 2)
@@ -49,7 +46,26 @@ class PreferencesDialog(Gtk.Dialog):
       return
 
    def commit(self):
-      # Commit the changes to the preferences.
+      ''' Commits the user preferences to the configuration file. '''
+
+      general_data = self.general.get_data()
+      view_data = self.view.get_data()
+
+      config = ConfigParser.ConfigParser()
+
+      # General
+      config.add_section("general")
+      for key in general_data.keys():
+         config.set("general", key.lower(), general_data[key])
+
+      # View
+      config.add_section("view")
+      for key in view_data.keys():
+         config.set("view", key.lower(), view_data[key])
+      
+      with open(os.path.expanduser('~/.pyqso.ini'), 'w') as f:
+         config.write(f)
+
       return
 
 class GeneralPage(Gtk.VBox):
@@ -59,30 +75,49 @@ class GeneralPage(Gtk.VBox):
 
       Gtk.VBox.__init__(self, spacing=2)
 
+      # Remember that the have_config conditional in the PyQSO class may be out-of-date the next time the user opens up the preferences dialog
+      # because a configuration file may have been created after launching the application. Let's check to see if one exists again...
+      config = ConfigParser.ConfigParser()
+      have_config = (config.read(os.path.expanduser('~/.pyqso.ini')) != [])
+
       self.sources = {}
 
       frame = Gtk.Frame()
       frame.set_label("Startup")
       hbox = Gtk.HBox()
       self.sources["SHOW_TOOLBOX"] = Gtk.CheckButton("Show toolbox by default")
-      self.sources["SHOW_TOOLBOX"].set_active(False)
+      if(have_config):
+         self.sources["SHOW_TOOLBOX"].set_active(config.get("general", "show_toolbox") == "True")
+      else:
+         self.sources["SHOW_TOOLBOX"].set_active(False)
       hbox.pack_start(self.sources["SHOW_TOOLBOX"], False, False, 2)
       frame.add(hbox)
       self.pack_start(frame, True, True, 2)
 
       frame = Gtk.Frame()
-      frame.set_label("Callsign lookup (using qrz.com)")
+      frame.set_label("Login details (qrz.com)")
       inner_vbox = Gtk.VBox()
 
       hbox = Gtk.HBox()
-      hbox.pack_start(Gtk.Label("Username: "), False, False, 2)
+      label = Gtk.Label("Username: ")
+      label.set_width_chars(11)
+      label.set_alignment(0, 0.5)
+      hbox.pack_start(label, False, False, 2)
       self.sources["QRZ_USERNAME"] = Gtk.Entry()
+      if(have_config):
+         self.sources["QRZ_USERNAME"].set_text(config.get("general", "qrz_username"))
       hbox.pack_start(self.sources["QRZ_USERNAME"], False, False, 2)
       inner_vbox.pack_start(hbox, True, True, 2)
 
       hbox = Gtk.HBox()
-      hbox.pack_start(Gtk.Label("Password: "), False, False, 2)
+      label = Gtk.Label("Password: ")
+      label.set_width_chars(11)
+      label.set_alignment(0, 0.5)
+      hbox.pack_start(label, False, False, 2)
       self.sources["QRZ_PASSWORD"] = Gtk.Entry()
+      self.sources["QRZ_PASSWORD"].set_visibility(False) # Mask the password with the "*" character.
+      if(have_config):
+         self.sources["QRZ_PASSWORD"].set_text(config.get("general", "qrz_password"))
       hbox.pack_start(self.sources["QRZ_PASSWORD"], False, False, 2)
       inner_vbox.pack_start(hbox, True, True, 2)
 
@@ -91,6 +126,13 @@ class GeneralPage(Gtk.VBox):
 
       return
 
+   def get_data(self):
+      data = {}
+      data["SHOW_TOOLBOX"] = self.sources["SHOW_TOOLBOX"].get_active()
+      data["QRZ_USERNAME"] = self.sources["QRZ_USERNAME"].get_text()
+      data["QRZ_PASSWORD"] = self.sources["QRZ_PASSWORD"].get_text()
+      return data
+
 class ViewPage(Gtk.VBox):
    
    def __init__(self):
@@ -98,8 +140,14 @@ class ViewPage(Gtk.VBox):
 
       Gtk.VBox.__init__(self, spacing=2)
 
-      self.label = Gtk.Label("Hello")
+      self.sources = {}
+
+      self.label = Gtk.Label("Note: View-related changes will not take effect\nuntil PyQSO is restarted.")
       self.pack_start(self.label, True, True, 2)
 
       return
+
+   def get_data(self):
+      data = {}
+      return data
 

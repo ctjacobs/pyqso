@@ -65,6 +65,7 @@ class TelnetConnectionDialog(Gtk.Dialog):
       label.set_alignment(0, 0.5)
       hbox_temp.pack_start(label, False, False, 6)
       self.sources["PASSWORD"] = Gtk.Entry()
+      self.sources["PASSWORD"].set_visibility(False) # Mask the password with the "*" character.
       hbox_temp.pack_start(self.sources["PASSWORD"], True, True, 6)
       self.vbox.pack_start(hbox_temp, False, False, 6)
 

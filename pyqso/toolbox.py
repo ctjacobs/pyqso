@@ -40,8 +40,6 @@ class Toolbox(Gtk.Frame):
       self.tools.insert_page(self.grey_line, Gtk.Label("Grey Line"), 1)
 
       self.add(self.tools)
-      self.show_all()
-
       self.tools.connect("switch-page", self._on_switch_page)
 
       return
@@ -54,3 +52,4 @@ class Toolbox(Gtk.Frame):
       if(type(label) == GreyLine):
          label.draw() # Note that 'label' is actually a GreyLine object.
       return
+

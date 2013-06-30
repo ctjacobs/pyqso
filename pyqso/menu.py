@@ -20,6 +20,8 @@
 
 from gi.repository import Gtk, GObject
 import logging
+import ConfigParser
+import os.path
 
 class Menu(Gtk.MenuBar):
    
@@ -169,7 +171,12 @@ class Menu(Gtk.MenuBar):
       mitem_view.set_submenu(subm_view)
 
       mitem_toolbox = Gtk.CheckMenuItem("Toolbox")
-      mitem_toolbox.set_active(False)
+      config = ConfigParser.ConfigParser()
+      have_config = (config.read(os.path.expanduser('~/.pyqso.ini')) != [])
+      if(have_config):
+         mitem_toolbox.set_active(config.get("general", "show_toolbox") == "True")
+      else:
+         mitem_toolbox.set_active(False) # Don't show the toolbox by default
       mitem_toolbox.connect("activate", parent.toolbox.toggle_visible_callback)
       subm_view.append(mitem_toolbox)
       self.items["TOOLBOX"] = mitem_toolbox

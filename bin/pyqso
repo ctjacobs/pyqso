@@ -21,6 +21,7 @@
 from gi.repository import Gtk, GObject, Gdk, GdkPixbuf
 import logging
 import optparse
+import ConfigParser
 import os
 import os.path
 import sys
@@ -47,10 +48,11 @@ class PyQSO(Gtk.Window):
 
       # Get any application-specific preferences from the configuration file      
       config = ConfigParser.ConfigParser()
-      have_config = (config.read(os.path.expanduser('~/.pyqso.cfg')) != [])
-      print have_config
+      # Check that the configuration file actually exists (and is readable)
+      # otherwise, we will resort to the defaults.
+      have_config = (config.read(os.path.expanduser('~/.pyqso.ini')) != [])
 
-      self.set_size_request(800, 600)
+      self.set_size_request(800, 600) # Default to an 800 x 600 resolution.
       self.set_position(Gtk.WindowPosition.CENTER)
       possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
       for icon_path in possible_icon_paths:
@@ -93,9 +95,13 @@ class PyQSO(Gtk.Window):
 
       self.show_all()
 
-      # Hide the Toolbox by default
-      self.toolbox.toggle_visible_callback()
-      
+      if(have_config):
+         if(config.get("general", "show_toolbox") == "False"):
+            self.toolbox.toggle_visible_callback()
+      else:            
+            # Hide the Toolbox by default
+            self.toolbox.toggle_visible_callback()
+
       return
 
    def show_about(self, widget):
