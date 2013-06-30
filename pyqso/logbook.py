@@ -563,6 +563,10 @@ class Logbook(Gtk.Notebook):
       return
       
    def export_log(self, widget=None):
+      page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
+      if(page_index == 0): # If we are on the Summary page...
+         logging.debug("No log currently selected!")
+         return
 
       log_index = self.get_log_index()
       log = self.logs[log_index]
