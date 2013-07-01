@@ -20,10 +20,12 @@
 
 from gi.repository import Gtk, GObject
 import logging
-
 import ConfigParser
 import os.path
 import base64
+from math import ceil
+
+from pyqso.adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED
 
 class PreferencesDialog(Gtk.Dialog):
    
@@ -92,7 +94,7 @@ class GeneralPage(Gtk.VBox):
          self.sources["SHOW_TOOLBOX"].set_active(False)
       hbox.pack_start(self.sources["SHOW_TOOLBOX"], False, False, 2)
       frame.add(hbox)
-      self.pack_start(frame, True, True, 2)
+      self.pack_start(frame, False, False, 2)
 
       frame = Gtk.Frame()
       frame.set_label("Login details (qrz.com)")
@@ -100,18 +102,18 @@ class GeneralPage(Gtk.VBox):
 
       hbox = Gtk.HBox()
       label = Gtk.Label("Username: ")
-      label.set_width_chars(11)
+      label.set_width_chars(9)
       label.set_alignment(0, 0.5)
       hbox.pack_start(label, False, False, 2)
       self.sources["QRZ_USERNAME"] = Gtk.Entry()
       if(have_config):
          self.sources["QRZ_USERNAME"].set_text(config.get("general", "qrz_username"))
       hbox.pack_start(self.sources["QRZ_USERNAME"], False, False, 2)
-      inner_vbox.pack_start(hbox, True, True, 2)
+      inner_vbox.pack_start(hbox, False, False, 2)
 
       hbox = Gtk.HBox()
       label = Gtk.Label("Password: ")
-      label.set_width_chars(11)
+      label.set_width_chars(9)
       label.set_alignment(0, 0.5)
       hbox.pack_start(label, False, False, 2)
       self.sources["QRZ_PASSWORD"] = Gtk.Entry()
@@ -119,13 +121,13 @@ class GeneralPage(Gtk.VBox):
       if(have_config):
          self.sources["QRZ_PASSWORD"].set_text(base64.b64decode(config.get("general", "qrz_password")))
       hbox.pack_start(self.sources["QRZ_PASSWORD"], False, False, 2)
-      inner_vbox.pack_start(hbox, True, True, 2)
+      inner_vbox.pack_start(hbox, False, False, 2)
 
       label = Gtk.Label("Warning: Login details are currently stored as\nBase64-encoded plain text in the configuration file.")
-      inner_vbox.pack_start(label, True, True, 2)
+      inner_vbox.pack_start(label, False, False, 2)
 
       frame.add(inner_vbox)
-      self.pack_start(frame, True, True, 2)
+      self.pack_start(frame, False, False, 2)
 
       return
 
@@ -143,14 +145,38 @@ class ViewPage(Gtk.VBox):
 
       Gtk.VBox.__init__(self, spacing=2)
 
+      config = ConfigParser.ConfigParser()
+      have_config = (config.read(os.path.expanduser('~/.pyqso.ini')) != [])
+
       self.sources = {}
 
+      # Divide the list of available field names up into multiple columns (of maximum length 'max_buttons_per_column')
+      # so we don't make the Preferences dialog too long. 
+      hbox = Gtk.HBox(spacing=2)
+      max_buttons_per_column = 6
+      number_of_columns = int( len(AVAILABLE_FIELD_NAMES_ORDERED)/max_buttons_per_column ) + 1 # Number of check buttons per column
+      for i in range(0, number_of_columns):
+         vbox = Gtk.VBox(spacing=2)
+         for j in range(0, max_buttons_per_column):
+            if(i*max_buttons_per_column + j >= len(AVAILABLE_FIELD_NAMES_ORDERED)):
+               break
+            field_name = AVAILABLE_FIELD_NAMES_ORDERED[i*max_buttons_per_column + j]
+            button = Gtk.CheckButton(AVAILABLE_FIELD_NAMES_FRIENDLY[field_name ])
+            if(have_config):
+               button.set_active(config.get("view", field_name.lower()) == "True")
+            self.sources[field_name] = button
+            vbox.pack_start(button, False, False, 2)
+         hbox.pack_start(vbox, False, False, 2)
+      self.pack_start(hbox, False, False, 2)
+
       self.label = Gtk.Label("Note: View-related changes will not take effect\nuntil PyQSO is restarted.")
-      self.pack_start(self.label, True, True, 2)
+      self.pack_start(self.label, False, False, 2)
 
       return
 
    def get_data(self):
       data = {}
+      for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
+         data[field_name] = self.sources[field_name].get_active()
       return data
 

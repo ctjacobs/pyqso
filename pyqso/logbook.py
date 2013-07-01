@@ -22,8 +22,9 @@ from gi.repository import Gtk, GObject
 import logging
 import sys
 import sqlite3 as sqlite
-from os.path import basename, getctime, getmtime
+from os.path import basename, getctime, getmtime, expanduser
 import datetime
+import ConfigParser
 
 from adif import *
 from log import *
@@ -394,6 +395,11 @@ class Logbook(Gtk.Notebook):
          column.set_min_width(50)
          column.set_clickable(True)
          column.connect("clicked", self.sort_log, i+1)
+
+         config = ConfigParser.ConfigParser()
+         have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
+         if(have_config):
+            column.set_visible(config.get("view", AVAILABLE_FIELD_NAMES_ORDERED[i].lower()) == "True")
          self.treeview[index].append_column(column)
 
       self.show_all()
