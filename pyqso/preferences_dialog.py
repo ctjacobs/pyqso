@@ -23,7 +23,7 @@ import logging
 
 import ConfigParser
 import os.path
-import sys
+import base64
 
 class PreferencesDialog(Gtk.Dialog):
    
@@ -117,9 +117,12 @@ class GeneralPage(Gtk.VBox):
       self.sources["QRZ_PASSWORD"] = Gtk.Entry()
       self.sources["QRZ_PASSWORD"].set_visibility(False) # Mask the password with the "*" character.
       if(have_config):
-         self.sources["QRZ_PASSWORD"].set_text(config.get("general", "qrz_password"))
+         self.sources["QRZ_PASSWORD"].set_text(base64.b64decode(config.get("general", "qrz_password")))
       hbox.pack_start(self.sources["QRZ_PASSWORD"], False, False, 2)
       inner_vbox.pack_start(hbox, True, True, 2)
+
+      label = Gtk.Label("Warning: Login details are currently stored as\nBase64-encoded plain text in the configuration file.")
+      inner_vbox.pack_start(label, True, True, 2)
 
       frame.add(inner_vbox)
       self.pack_start(frame, True, True, 2)
@@ -130,7 +133,7 @@ class GeneralPage(Gtk.VBox):
       data = {}
       data["SHOW_TOOLBOX"] = self.sources["SHOW_TOOLBOX"].get_active()
       data["QRZ_USERNAME"] = self.sources["QRZ_USERNAME"].get_text()
-      data["QRZ_PASSWORD"] = self.sources["QRZ_PASSWORD"].get_text()
+      data["QRZ_PASSWORD"] = base64.b64encode(self.sources["QRZ_PASSWORD"].get_text())
       return data
 
 class ViewPage(Gtk.VBox):
