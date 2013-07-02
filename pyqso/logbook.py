@@ -449,7 +449,7 @@ class Logbook(Gtk.Notebook):
       log_index = self.get_log_index(name=old_log_name)
       
       exists = True
-      dialog = LogNameDialog(self.root_window, old_log_name)
+      dialog = LogNameDialog(self.root_window, title="Rename Log", name=old_log_name)
       while(exists):
          response = dialog.run()
          if(response == Gtk.ResponseType.OK):
@@ -522,30 +522,43 @@ class Logbook(Gtk.Notebook):
          logging.debug("No file path specified.")
          return
 
-      exists = True
-      dialog = LogNameDialog(self.root_window)
-      while(exists):
+      dialog = LogNameDialog(self.root_window, title="Import Log")
+      while(True):
          response = dialog.run()
          if(response == Gtk.ResponseType.OK):
-            new_log_name = dialog.get_log_name()
-            try:
-               c = self.connection.cursor()
-               query = "CREATE TABLE %s (id INTEGER PRIMARY KEY AUTOINCREMENT" % new_log_name
-               for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
-                  s = ", %s TEXT" % field_name.lower()
-                  query = query + s
-               query = query + ")"
-               c.execute(query)
-               exists = False
-            except sqlite.Error as e:
-               logging.exception(e)
-               # Data is not valid - inform the user.
-               message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
-                                    "Database error. Try another log name.")
-               message.run()
-               message.destroy()
+            log_name = dialog.get_log_name()
+            if(self.log_name_exists(log_name)):
+               # Import into existing log
                exists = True
+               l = self.logs[self.get_log_index(name=log_name)]
+               message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                 Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
+                                 "Are you sure you want to import into an existing log?")
+               response = message.run()
+               message.destroy()
+               if(response == Gtk.ResponseType.YES):
+                  break
+            else:
+               # Create a new log with the name the user supplies
+               exists = False
+               try:
+                  c = self.connection.cursor()
+                  query = "CREATE TABLE %s (id INTEGER PRIMARY KEY AUTOINCREMENT" % log_name
+                  for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
+                     s = ", %s TEXT" % field_name.lower()
+                     query = query + s
+                  query = query + ")"
+                  c.execute(query)
+                  l = Log(self.connection, log_name)
+                  break
+               except sqlite.Error as e:
+                  logging.exception(e)
+                  # Data is not valid - inform the user.
+                  message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                       Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
+                                       "Database error. Try another log name.")
+                  message.run()
+                  message.destroy()
          else:
             dialog.destroy()
             return
@@ -553,17 +566,16 @@ class Logbook(Gtk.Notebook):
       dialog.destroy()
 
       adif = ADIF()
-      records = adif.read(path)
-      
-      l = Log(self.connection, new_log_name)
+      records = adif.read(path)      
       print "Importing records..."
       for record in records:
          print record
          l.add_record(record)
       l.populate()
 
-      self.logs.append(l)
-      self.render_log(self.get_number_of_logs()-1)
+      if(not exists):
+         self.logs.append(l)
+         self.render_log(self.get_number_of_logs()-1)
       self._update_summary()
       
       return
