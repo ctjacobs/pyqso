@@ -79,13 +79,10 @@ class PyQSO(Gtk.Window):
       self.toolbox = Toolbox(self)
 
       # Set up menu and tool bars
-      # These classes depend on the Logbook class,
-      # so pack the logbook after the menu and toolbar.
+      # These classes depend on the Logbook and Toolbox class,
+      # so pack the logbook and toolbox after the menu and toolbar.
       self.menu = Menu(self)
       self.toolbar = Toolbar(self)
-
-      if(logbook_path is not None):
-         self.logbook.db_connect(path=logbook_path)
 
       vbox_outer.pack_start(self.menu, False, False, 0)
       vbox_outer.pack_start(self.toolbar, False, False, 0)
@@ -99,8 +96,11 @@ class PyQSO(Gtk.Window):
          if(config.get("general", "show_toolbox") == "False"):
             self.toolbox.toggle_visible_callback()
       else:            
-            # Hide the Toolbox by default
-            self.toolbox.toggle_visible_callback()
+         # Hide the Toolbox by default
+         self.toolbox.toggle_visible_callback()
+
+      if(logbook_path is not None):
+         self.logbook.db_connect(path=logbook_path)
 
       return
 

@@ -78,8 +78,14 @@ class Logbook(Gtk.Notebook):
          self.connection = sqlite.connect(self.path)
          self.connection.row_factory = sqlite.Row
       except sqlite.Error as e:
+         # PyQSO can't connect to the database.
          logging.exception(e)
-         sys.exit(1) # PyQSO can't connect to the database. This error is fatal.
+         message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
+                                    "PyQSO cannot connect to the database. Check file permissions?")
+         message.run()
+         message.destroy()
+         return
 
       # A stack of Log objects
       self.logs = []
@@ -766,7 +772,3 @@ class Logbook(Gtk.Notebook):
             break
       return log_index
 
-   def visible_fields_callback(self, widget=None):
-      dialog = VisibleFieldsDialog(self.root_window)
-      dialog.run()
-      return
