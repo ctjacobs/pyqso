@@ -282,13 +282,15 @@ class Logbook(Gtk.Notebook):
    def delete_log(self, widget, page=None):
       if(self.connection is None):
          return
-      page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
-      if(page_index == 0): # If we are on the Summary page...
-         logging.debug("No log currently selected!")
-         return
          
       if(page is None):
-         page = self.get_nth_page(self.get_current_page()) # Gets the Gtk.VBox of the selected tab in the logbook
+         page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
+         if(page_index == 0): # If we are on the Summary page...
+            logging.debug("No log currently selected!")
+            return
+         else:
+            page = self.get_nth_page(page_index) # Gets the Gtk.VBox of the selected tab in the logbook
+
       log_index = self.get_log_index(name=page.get_name())
       log = self.logs[log_index]
       
