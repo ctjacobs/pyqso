@@ -20,7 +20,6 @@
 
 from gi.repository import Gtk, GObject
 import logging
-import sys
 import sqlite3 as sqlite
 from os.path import basename, getctime, getmtime, expanduser
 import datetime
