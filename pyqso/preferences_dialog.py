@@ -164,6 +164,8 @@ class ViewPage(Gtk.VBox):
             button = Gtk.CheckButton(AVAILABLE_FIELD_NAMES_FRIENDLY[field_name ])
             if(have_config):
                button.set_active(config.get("view", field_name.lower()) == "True")
+            else:
+               button.set_active(True)
             self.sources[field_name] = button
             vbox.pack_start(button, False, False, 2)
          hbox.pack_start(vbox, False, False, 2)

@@ -40,7 +40,7 @@ class Toolbox(Gtk.Frame):
       self.tools.insert_page(self.grey_line, Gtk.Label("Grey Line"), 1)
 
       self.add(self.tools)
-      self.tools.connect("switch-page", self._on_switch_page)
+      self.tools.connect_after("switch-page", self._on_switch_page)
 
       return
 

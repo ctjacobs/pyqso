@@ -39,7 +39,11 @@ class RecordDialog(Gtk.Dialog):
       qso_frame = Gtk.Frame()
       qso_frame.set_label("QSO Information")
       self.vbox.add(qso_frame)
+
+      hbox_inner = Gtk.HBox(spacing=2)
+
       vbox_inner = Gtk.VBox(spacing=2)
+      hbox_inner.pack_start(vbox_inner, True, True, 2)
 
       # Create label:entry pairs and store them in a dictionary
       self.sources = {}
@@ -53,9 +57,13 @@ class RecordDialog(Gtk.Dialog):
       self.sources["CALL"] = Gtk.Entry()
       self.sources["CALL"].set_width_chars(15)
       hbox_temp.pack_start(self.sources["CALL"], False, False, 2)
-      lookup = Gtk.Button("Lookup on qrz.com") # Looks up the callsign on qrz.com for callsign and station information.
-      lookup.connect("clicked", self.lookup_callback)
-      hbox_temp.pack_start(lookup, True, True, 2)
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_INFO, Gtk.IconSize.MENU)
+      button = Gtk.Button()
+      button.add(icon)
+      button.connect("clicked", self.lookup_callback) # Looks up the callsign on qrz.com for callsign and station information.
+      button.set_tooltip_text("Lookup on qrz.com")
+      hbox_temp.pack_start(button, True, True, 2)
       vbox_inner.pack_start(hbox_temp, False, False, 2)
 
       # DATE
@@ -74,8 +82,10 @@ class RecordDialog(Gtk.Dialog):
       button.connect("clicked", self.calendar_callback)
       button.set_tooltip_text("Select date from calendar")
       hbox_temp.pack_start(button, True, True, 2)
+      vbox_inner.pack_start(hbox_temp, False, False, 2)
 
       # TIME
+      hbox_temp = Gtk.HBox(spacing=0)
       label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["TIME_ON"], halign=Gtk.Align.START)
       label.set_alignment(0, 0.5)
       label.set_width_chars(15)
@@ -94,8 +104,10 @@ class RecordDialog(Gtk.Dialog):
       self.sources["FREQ"] = Gtk.Entry()
       self.sources["FREQ"].set_width_chars(15)
       hbox_temp.pack_start(self.sources["FREQ"], False, False, 2)
+      vbox_inner.pack_start(hbox_temp, False, False, 2)
 
       # BAND
+      hbox_temp = Gtk.HBox(spacing=0)
       label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["BAND"], halign=Gtk.Align.START)
       label.set_alignment(0, 0.5)
       label.set_width_chars(15)
@@ -122,6 +134,11 @@ class RecordDialog(Gtk.Dialog):
       hbox_temp.pack_start(self.sources["MODE"], False, False, 2)
       vbox_inner.pack_start(hbox_temp, False, False, 2)
 
+
+      vbox_inner = Gtk.VBox(spacing=2)
+      hbox_inner.pack_start(Gtk.SeparatorToolItem(), False, False, 0)
+      hbox_inner.pack_start(vbox_inner, True, True, 2)
+
       # RST_SENT
       hbox_temp = Gtk.HBox(spacing=0)
       label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["RST_SENT"])
@@ -131,8 +148,10 @@ class RecordDialog(Gtk.Dialog):
       self.sources["RST_SENT"] = Gtk.Entry()
       self.sources["RST_SENT"].set_width_chars(15)
       hbox_temp.pack_start(self.sources["RST_SENT"], False, False, 2)
+      vbox_inner.pack_start(hbox_temp, False, False, 2)
 
       # RST_RCVD
+      hbox_temp = Gtk.HBox(spacing=0)
       label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["RST_RCVD"])
       label.set_alignment(0, 0.5)
       label.set_width_chars(15)
@@ -142,7 +161,7 @@ class RecordDialog(Gtk.Dialog):
       hbox_temp.pack_start(self.sources["RST_RCVD"], True, True, 2)
       vbox_inner.pack_start(hbox_temp, False, False, 2)
 
-      qso_frame.add(vbox_inner)
+      qso_frame.add(hbox_inner)
 
 
 
@@ -151,10 +170,12 @@ class RecordDialog(Gtk.Dialog):
       station_frame.set_label("Station Information")
       self.vbox.add(station_frame)
 
-      vbox_inner = Gtk.VBox(spacing=2)
-      station_frame.add(vbox_inner)
+      hbox_inner = Gtk.HBox(spacing=2)
 
-      # CALL
+      vbox_inner = Gtk.VBox(spacing=2)
+      hbox_inner.pack_start(vbox_inner, True, True, 2)
+
+      # NAME
       hbox_temp = Gtk.HBox(spacing=0)
       label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["NAME"], halign=Gtk.Align.START)
       label.set_width_chars(15)
@@ -165,7 +186,7 @@ class RecordDialog(Gtk.Dialog):
       hbox_temp.pack_start(self.sources["NAME"], False, False, 2)
       vbox_inner.pack_start(hbox_temp, False, False, 2)
 
-
+      station_frame.add(hbox_inner)
 
       if(index is not None):
          # The record already exists, so display its current data in the input boxes.
