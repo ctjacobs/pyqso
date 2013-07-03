@@ -29,6 +29,8 @@ from adif import *
 from log import *
 from log_name_dialog import *
 
+#import Hamlib
+
 class Logbook(Gtk.Notebook):
    ''' A Logbook object can store multiple Log objects. '''
    
