@@ -76,35 +76,38 @@ class Log(Gtk.ListStore):
 
    def add_record(self, fields_and_data):
 
-      log_entry = []
+      liststore_entry = []
       field_names = AVAILABLE_FIELD_NAMES_ORDERED
       for i in range(0, len(field_names)):
          if(field_names[i] in fields_and_data.keys()):
-            log_entry.append(fields_and_data[field_names[i]])
+            liststore_entry.append(fields_and_data[field_names[i]])
          else:
-            log_entry.append("")
+            liststore_entry.append("")
 
       with(self.connection):
          c = self.connection.cursor()
-         # What if the database columns are not necessarily in the same order as AVAILABLE_FIELD_NAMES_ORDERED? PyQSO handles this here.
-         c.execute("PRAGMA table_info(%s)" % self.name)
+         # What if the database columns are not necessarily in the same order as (or even exist in) AVAILABLE_FIELD_NAMES_ORDERED?
+         # PyQSO handles this here, but needs a separate list (called database_entry) to successfully perform the SQL query.
+         database_entry = []
+         c.execute("PRAGMA table_info(%s)" % self.name) # Get all the column names in the current database table.
          column_names = c.fetchall()
          query = "INSERT INTO %s VALUES (NULL" % self.name
          for t in column_names:
-            # t here is a tuple
+            # 't' here is a tuple
             column_name = str(t[1])
             if(column_name.upper() in AVAILABLE_FIELD_NAMES_ORDERED):
+               database_entry.append(fields_and_data[column_name.upper()])
                query = query + ",?"
             else:
                if(column_name != "id"): # Ignore the row index field. This is a special case since it's not in AVAILABLE_FIELD_NAMES_ORDERED.
                   query = query + ",NULL"
          query = query + ")"
-         c.execute(query, log_entry)
+         c.execute(query, database_entry)
          index = c.lastrowid
 
-      log_entry.insert(0, index) # Add the record's index.
+      liststore_entry.insert(0, index) # Add the record's index.
 
-      self.append(log_entry)
+      self.append(liststore_entry)
 
       return
 
