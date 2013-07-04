@@ -193,12 +193,15 @@ class RecordDialog(Gtk.Dialog):
          record = log.get_record_by_index(index)
          field_names = AVAILABLE_FIELD_NAMES_ORDERED
          for i in range(0, len(field_names)):
+            data = record[field_names[i].lower()]
+            if(data is None):
+               data = ""
             if(field_names[i] == "BAND"):
-               self.sources[field_names[i]].set_active(bands.index(record[field_names[i].lower()]))
+               self.sources[field_names[i]].set_active(bands.index(data))
             elif(field_names[i] == "MODE"):
-               self.sources[field_names[i]].set_active(modes.index(record[field_names[i].lower()]))
+               self.sources[field_names[i]].set_active(modes.index(data))
             else:
-               self.sources[field_names[i]].set_text(record[field_names[i].lower()])
+               self.sources[field_names[i]].set_text(data)
 
       self.show_all()
 

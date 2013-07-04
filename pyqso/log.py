@@ -43,8 +43,25 @@ class Log(Gtk.ListStore):
       
       logging.debug("New Log instance created!")
                
+   def enforce_table_consistency(self):
+      ''' Checks whether each field name in AVAILABLE_FIELD_NAMES_ORDERED is in the database. If not, PyQSO will add it
+      (with all entries being set to NULL initially). '''
+      with(self.connection):
+         c = self.connection.cursor()
+      for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
+         try:
+            # Tries to add a column, regardless of whether it already exists or not.
+            # If an error occurs, then PyQSO just continues onto the next field name without doing anything.
+            # FIXME: The error will (hopefully) be caused by the column name already existing. But in the case of a different error,
+            # a better solution should be implemented here.
+            c.execute('ALTER TABLE %s ADD COLUMN %s' % (self.name, field_name.lower()))
+         except:
+            pass # Column already exists, so don't do anything.
+      return
+
    def populate(self):
       # Remove everything that is rendered already and start afresh
+      self.enforce_table_consistency()
       self.clear()
       records = self.get_all_records()
       for r in records:
