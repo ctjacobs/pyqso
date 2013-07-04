@@ -42,9 +42,24 @@ class Log(Gtk.ListStore):
       self.name = name
       
       logging.debug("New Log instance created!")
-               
-   def enforce_table_consistency(self):
-      ''' Checks whether each field name in AVAILABLE_FIELD_NAMES_ORDERED is in the database. If not, PyQSO will add it
+
+   def populate(self):
+      ''' Removes everything in the Gtk.ListStore that is rendered already (via the TreeView), and starts afresh '''
+      self.add_missing_db_columns()
+      self.clear()
+      records = self.get_all_records()
+      for r in records:
+         liststore_entry = [r["id"]]
+         for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
+            # Note: r may contain column names that are not in AVAILABLE_FIELD_NAMES_ORDERED, 
+            # so we need to loop over and only select those that are, since the ListStore will
+            # expect a specific number of columns.
+            liststore_entry.append(r[field_name])
+         self.append(liststore_entry)
+      return
+
+   def add_missing_db_columns(self):
+      ''' Checks whether each field name in AVAILABLE_FIELD_NAMES_ORDERED is in the database table. If not, PyQSO will add it
       (with all entries being set to NULL initially). '''
       with(self.connection):
          c = self.connection.cursor()
@@ -57,21 +72,6 @@ class Log(Gtk.ListStore):
             c.execute('ALTER TABLE %s ADD COLUMN %s' % (self.name, field_name.lower()))
          except:
             pass # Column already exists, so don't do anything.
-      return
-
-   def populate(self):
-      # Remove everything that is rendered already and start afresh
-      self.enforce_table_consistency()
-      self.clear()
-      records = self.get_all_records()
-      for r in records:
-         liststore_entry = [r["id"]]
-         for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
-            # Note: r may contain column names that are not in AVAILABLE_FIELD_NAMES_ORDERED, 
-            # so we need to loop over and only select those that are, since the ListStore will
-            # expect a specific number of columns.
-            liststore_entry.append(r[field_name])
-         self.append(liststore_entry)
       return
 
    def add_record(self, fields_and_data):
