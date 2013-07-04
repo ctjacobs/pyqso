@@ -65,7 +65,13 @@ class Log(Gtk.ListStore):
       self.clear()
       records = self.get_all_records()
       for r in records:
-         self.append(r)
+         liststore_entry = [r["id"]]
+         for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
+            # Note: r may contain column names that are not in AVAILABLE_FIELD_NAMES_ORDERED, 
+            # so we need to loop over and only select those that are, since the ListStore will
+            # expect a specific number of columns.
+            liststore_entry.append(r[field_name])
+         self.append(liststore_entry)
       return
 
    def add_record(self, fields_and_data):
@@ -80,9 +86,18 @@ class Log(Gtk.ListStore):
 
       with(self.connection):
          c = self.connection.cursor()
+         # What if the database columns are not necessarily in the same order as AVAILABLE_FIELD_NAMES_ORDERED? PyQSO handles this here.
+         c.execute("PRAGMA table_info(%s)" % self.name)
+         column_names = c.fetchall()
          query = "INSERT INTO %s VALUES (NULL" % self.name
-         for i in range(0, len(field_names)):
-            query = query + ",?"
+         for t in column_names:
+            # t here is a tuple
+            column_name = str(t[1])
+            if(column_name.upper() in AVAILABLE_FIELD_NAMES_ORDERED):
+               query = query + ",?"
+            else:
+               if(column_name != "id"): # Ignore the row index field. This is a special case since it's not in AVAILABLE_FIELD_NAMES_ORDERED.
+                  query = query + ",NULL"
          query = query + ")"
          c.execute(query, log_entry)
          index = c.lastrowid
