@@ -115,6 +115,17 @@ class Menu(Gtk.MenuBar):
  
       subm_logbook.append(Gtk.SeparatorMenuItem())
 
+      # Print log
+      mitem_print = Gtk.ImageMenuItem("Print Log")
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_PRINT, Gtk.IconSize.MENU)
+      mitem_print.set_image(icon)
+      mitem_print.connect("activate", parent.logbook.print_log)
+      subm_logbook.append(mitem_print)
+      self.items["PRINT_LOG"] = mitem_print
+
+      subm_logbook.append(Gtk.SeparatorMenuItem())
+
       # Quit
       mitem_quit = Gtk.ImageMenuItem("Quit")
       icon = Gtk.Image()
@@ -189,6 +200,7 @@ class Menu(Gtk.MenuBar):
       subm_view.append(mitem_preferences)
       self.items["PREFERENCES"] = mitem_preferences
             
+
       ###### HELP ######
       mitem_help = Gtk.MenuItem("Help")
       self.append(mitem_help)  
@@ -215,7 +227,7 @@ class Menu(Gtk.MenuBar):
       return
 
    def set_log_items_sensitive(self, sensitive):
-      for item_name in ["NEW_LOG", "DELETE_LOG", "RENAME_LOG", "IMPORT_LOG", "EXPORT_LOG"]:
+      for item_name in ["NEW_LOG", "DELETE_LOG", "RENAME_LOG", "IMPORT_LOG", "EXPORT_LOG", "PRINT_LOG"]:
          self.items[item_name].set_sensitive(sensitive)
       return
 

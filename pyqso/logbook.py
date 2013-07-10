@@ -18,7 +18,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, GObject
+from gi.repository import Gtk, GObject, Pango, PangoCairo
 import logging
 import sqlite3 as sqlite
 from os.path import basename, getctime, getmtime, expanduser
@@ -619,6 +619,68 @@ class Logbook(Gtk.Notebook):
          adif.write(log.get_all_records(), path)
 
       return
+
+   def print_log(self, widget=None):
+      page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
+      if(page_index == 0): # If we are on the Summary page...
+         logging.debug("No log currently selected!")
+         return
+      log_index = self.get_log_index()
+      log = self.logs[log_index]
+
+      self.text_to_print = "Callsign\tDate\tTime\tFrequency\tMode\n"
+      records = log.get_all_records()
+      for r in records:
+         self.text_to_print += str(r["CALL"]) + "\t" + str(r["QSO_DATE"]) + "\t" + str(r["TIME_ON"]) + "\t" + str(r["FREQ"]) + "\t" + str(r["MODE"]) + "\n"
+
+      action = Gtk.PrintOperationAction.PRINT_DIALOG
+      operation = Gtk.PrintOperation()
+      operation.set_default_page_setup(Gtk.PageSetup())
+      operation.set_unit(Gtk.Unit.MM)
+
+      operation.connect("begin_print", self.begin_print)
+      operation.connect("draw_page", self.draw_page)
+      result = operation.run(action, None)
+      return
+    
+   def begin_print(self, operation, context):
+      width = context.get_width()
+      height = context.get_height()
+      layout = context.create_pango_layout()
+      layout.set_font_description(Pango.FontDescription("normal 10"))
+      layout.set_width(int(width*Pango.SCALE))
+      layout.set_text(self.text_to_print, -1)
+
+      number_of_pages = 0
+      page_height = 0
+      for line in range(0, layout.get_line_count()):
+         layout_line = layout.get_line(line)
+         ink_rectangle, logical_rectangle = layout_line.get_extents()
+         x_bearing, y_bearing, logical_rectangle_width, logical_rectangle_height = logical_rectangle.x, logical_rectangle.y, logical_rectangle.width, logical_rectangle.height
+         self.line_height = logical_rectangle.height/1024.0 + 3
+         page_height += self.line_height
+         if(page_height + self.line_height > height):
+            number_of_pages += 1
+            page_height = self.line_height
+      operation.set_n_pages(number_of_pages + 1)
+      self.text_to_print = self.text_to_print.split("\n")
+
+   def draw_page(self, operation, context, page_number):
+      cr = context.get_cairo_context()
+      cr.set_source_rgb(0, 0, 0)
+      layout = context.create_pango_layout()
+ 
+      current_line_number = 0
+      for line in self.text_to_print:
+         layout.set_text(line, -1)  
+         cr.move_to(5, current_line_number*self.line_height)
+         PangoCairo.update_layout(cr, layout)
+         PangoCairo.show_layout(cr, layout)
+         current_line_number = current_line_number + 1
+         if(current_line_number*self.line_height > context.get_height()):
+            for j in range(0, current_line_number):
+               self.text_to_print.pop(0) # Remove what has been printed already before draw_page is called again
+            break
 
    def add_record_callback(self, widget):
       log_index = self.get_log_index()
