@@ -664,6 +664,7 @@ class Logbook(Gtk.Notebook):
             page_height = self.line_height
       operation.set_n_pages(number_of_pages + 1)
       self.text_to_print = self.text_to_print.split("\n")
+      return
 
    def draw_page(self, operation, context, page_number):
       cr = context.get_cairo_context()
@@ -681,6 +682,7 @@ class Logbook(Gtk.Notebook):
             for j in range(0, current_line_number):
                self.text_to_print.pop(0) # Remove what has been printed already before draw_page is called again
             break
+      return
 
    def add_record_callback(self, widget):
       log_index = self.get_log_index()

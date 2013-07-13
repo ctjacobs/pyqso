@@ -20,7 +20,9 @@
 
 from gi.repository import Gtk, GObject
 import logging
+import ConfigParser
 from datetime import datetime
+from os.path import expanduser
 
 from adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED
 from callsign_lookup import *
@@ -232,14 +234,39 @@ class RecordDialog(Gtk.Dialog):
       else:
          return self.sources[field_name].get_text()
 
-   def lookup_callback(self, widget):
+   def lookup_callback(self, widget=None):
       # TODO: If a session doesn't already exist: Show a username and password dialog, and initiate a session.
       # Get the callsign-related data from the qrz.com database.
-      print "Callsign lookup feature has not yet been implemented."
+      callsign_lookup = CallsignLookup(root_window = self)
+
+      config = ConfigParser.ConfigParser()
+      have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
+      if(have_config):
+         username = config.get("general", "qrz_username")
+         password = config.get("general", "qrz_password")
+         if(username == "" or password == ""):
+            details_given = False
+         else:
+            details_given = True
+      else:
+         details_given = False
+      if(not details_given):
+         message = Gtk.MessageDialog(self, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
+                                    "To perform a callsign lookup, please specify your qrz.com username and password in the Preferences.")
+         message.run()
+         message.destroy()
+         return
+
+      callsign_lookup.connect("test", "test")
+      if(callsign_lookup.session_key is not None):
+         fields_and_data = callsign_lookup.lookup(self.sources["CALL"].get_text())
+         for field_name in fields_and_data.keys():
+            self.sources[field_name].set_text(fields_and_data[field_name])
       return
 
    def calendar_callback(self, widget):
-      calendar = CalendarDialog(self)
+      calendar = CalendarDialog(root_window = self)
       response = calendar.run()
       if(response == Gtk.ResponseType.OK):
          date = calendar.get_date()
