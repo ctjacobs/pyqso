@@ -210,7 +210,7 @@ class RecordDialog(Gtk.Dialog):
          (hour, minute) = (dt.hour, dt.minute)
          # If necessary, add on leading zeros so the YYYYMMDD and HHMM format is followed.
          if(month < 10):
-            month = "0" + str(month+1) # Note: the months start from an index of 0.
+            month = "0" + str(month) # Note: Unlike the calendar widget, the months start from an index of 1 here.
          if(day < 10):
             day = "0" + str(day)
          if(hour < 10):
@@ -263,7 +263,7 @@ class CalendarDialog(Gtk.Dialog):
       (year, month, day) = self.calendar.get_date()
       # If necessary, add on leading zeros so the YYYYMMDD format is followed.
       if(month < 10):
-         month = "0" + str(month+1) # Note: the months start from an index of 0.
+         month = "0" + str(month+1) # Note: the months start from an index of 0 when retrieved from the calendar widget.
       if(day < 10):
          day = "0" + str(day)
       date = str(year) + str(month) + str(day)
