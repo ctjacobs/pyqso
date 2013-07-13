@@ -20,6 +20,7 @@
 
 from gi.repository import Gtk, GObject
 import logging
+from datetime import datetime
 
 from adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED
 from callsign_lookup import *
@@ -202,6 +203,24 @@ class RecordDialog(Gtk.Dialog):
                self.sources[field_names[i]].set_active(modes.index(data))
             else:
                self.sources[field_names[i]].set_text(data)
+      else:
+         # Automatically fill in the current date and time
+         dt = datetime.now()
+         (year, month, day) = (dt.year, dt.month, dt.day)
+         (hour, minute) = (dt.hour, dt.minute)
+         # If necessary, add on leading zeros so the YYYYMMDD and HHMM format is followed.
+         if(month < 10):
+            month = "0" + str(month+1) # Note: the months start from an index of 0.
+         if(day < 10):
+            day = "0" + str(day)
+         if(hour < 10):
+            hour = "0" + str(hour)
+         if(minute < 10):
+            minute = "0" + str(minute)
+         date = str(year) + str(month) + str(day)
+         time = str(hour) + str(minute)
+         self.sources["QSO_DATE"].set_text(date)
+         self.sources["TIME_ON"].set_text(time)
 
       self.show_all()
 

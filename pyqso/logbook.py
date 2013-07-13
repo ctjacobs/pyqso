@@ -628,10 +628,10 @@ class Logbook(Gtk.Notebook):
       log_index = self.get_log_index()
       log = self.logs[log_index]
 
-      self.text_to_print = "Callsign\tDate\tTime\tFrequency\tMode\n"
+      self.text_to_print = "Callsign\t---\tDate\t---\tTime\t---\tFrequency\t---\tMode\n"
       records = log.get_all_records()
       for r in records:
-         self.text_to_print += str(r["CALL"]) + "\t" + str(r["QSO_DATE"]) + "\t" + str(r["TIME_ON"]) + "\t" + str(r["FREQ"]) + "\t" + str(r["MODE"]) + "\n"
+         self.text_to_print += str(r["CALL"]) + "\t---\t" + str(r["QSO_DATE"]) + "\t---\t" + str(r["TIME_ON"]) + "\t---\t" + str(r["FREQ"]) + "\t---\t" + str(r["MODE"]) + "\n"
 
       action = Gtk.PrintOperationAction.PRINT_DIALOG
       operation = Gtk.PrintOperation()

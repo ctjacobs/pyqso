@@ -1,7 +1,5 @@
-- Log printing
 - Backwards compatibility (e.g. if the number of columns changes then copy over the contents of the database into a new database with the additional/removed columns)
 - Lookup via qrz.com
 - Hamlib support
 - Additional field names, particularly for the "station information" frame.
 - Finish manual
-
