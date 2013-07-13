@@ -235,8 +235,7 @@ class RecordDialog(Gtk.Dialog):
          return self.sources[field_name].get_text()
 
    def lookup_callback(self, widget=None):
-      # TODO: If a session doesn't already exist: Show a username and password dialog, and initiate a session.
-      # Get the callsign-related data from the qrz.com database.
+      ''' Gets the callsign-related data from the qrz.com database. '''
       callsign_lookup = CallsignLookup(root_window = self)
 
       config = ConfigParser.ConfigParser()
