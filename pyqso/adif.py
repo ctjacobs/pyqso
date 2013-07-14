@@ -24,8 +24,7 @@ import unittest
 from datetime import datetime
 import calendar
 
-# All the possible field names and their associated data types 
-# from the ADIF specification (version 3.0.2)
+# ADIF field names and their associated data types available in PyQSO.
 AVAILABLE_FIELD_NAMES_TYPES = {"CALL": "S", 
                               "QSO_DATE": "D",
                               "TIME_ON": "T",
@@ -61,7 +60,7 @@ AVAILABLE_FIELD_NAMES_FRIENDLY = {"CALL":"Callsign",
 # L: Location
 DATA_TYPES = ["A", "B", "N", "S", "I", "D", "T", "M", "G", "L", "E"]
 
-ADIF_VERSION = "3.0.2"
+ADIF_VERSION = "1.0"
 
 class ADIF:
    
