@@ -23,6 +23,7 @@ import logging
 
 from pyqso.dx_cluster import *
 from pyqso.grey_line import *
+from pyqso.awards import *
 
 class Toolbox(Gtk.Frame):
    
@@ -38,6 +39,8 @@ class Toolbox(Gtk.Frame):
       self.tools.insert_page(self.dx_cluster, Gtk.Label("DX Cluster"), 0)
       self.grey_line = GreyLine(self.root_window)
       self.tools.insert_page(self.grey_line, Gtk.Label("Grey Line"), 1)
+      self.awards = Awards(self.root_window)
+      self.tools.insert_page(self.awards, Gtk.Label("Awards"), 2)
 
       self.add(self.tools)
       self.tools.connect_after("switch-page", self._on_switch_page)
