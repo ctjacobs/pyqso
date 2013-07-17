@@ -35,7 +35,7 @@ class CallsignLookup():
 
    def connect(self, username, password):
       ''' Initiates a session with the qrz.com server. Hopefully this will return a session key. '''
-      self.connection = httplib.HTTPSConnection('xmldata.qrz.com', port=443)
+      self.connection = httplib.HTTPConnection('xmldata.qrz.com')
       request = '/xml/current/?username=%s;password=%s;agent=pyqso' % (username, password)
       self.connection.request('GET', request)
       response = self.connection.getresponse()
@@ -60,7 +60,7 @@ class CallsignLookup():
    def lookup(self, callsign):
       fields_and_data = {"NAME":""}
       if(self.session_key):
-         request = 'xml/current/?s=%s;callsign=%s' % (self.session_key, callsign)
+         request = '/xml/current/?s=%s;callsign=%s' % (self.session_key, callsign)
          self.connection.request('GET', request)
          response = self.connection.getresponse()
 

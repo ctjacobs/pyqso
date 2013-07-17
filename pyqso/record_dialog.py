@@ -23,6 +23,7 @@ import logging
 import ConfigParser
 from datetime import datetime
 from os.path import expanduser
+import base64
 
 from adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED
 from callsign_lookup import *
@@ -242,7 +243,7 @@ class RecordDialog(Gtk.Dialog):
       have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
       if(have_config):
          username = config.get("general", "qrz_username")
-         password = config.get("general", "qrz_password")
+         password = base64.b64decode(config.get("general", "qrz_password"))
          if(username == "" or password == ""):
             details_given = False
          else:
@@ -257,7 +258,7 @@ class RecordDialog(Gtk.Dialog):
          message.destroy()
          return
 
-      callsign_lookup.connect("test", "test")
+      callsign_lookup.connect(username, password)
       if(callsign_lookup.session_key is not None):
          fields_and_data = callsign_lookup.lookup(self.sources["CALL"].get_text())
          for field_name in fields_and_data.keys():

@@ -20,7 +20,6 @@
 
 from gi.repository import Gtk, GObject
 import logging
-import numpy
 
 class Awards(Gtk.VBox):
    
