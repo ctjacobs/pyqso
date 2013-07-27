@@ -24,6 +24,10 @@ import ConfigParser
 from datetime import datetime
 from os.path import expanduser
 import base64
+try:
+   import Hamlib
+except:
+   logging.error("Could not import the Hamlib module!")
 
 from adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED
 from callsign_lookup import *
@@ -224,6 +228,25 @@ class RecordDialog(Gtk.Dialog):
          time = str(hour) + str(minute)
          self.sources["QSO_DATE"].set_text(date)
          self.sources["TIME_ON"].set_text(time)
+
+         config = ConfigParser.ConfigParser()
+         have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
+         if(have_config):
+            autofill = (config.get("hamlib", "autofill") == "True")
+            rig_model = config.get("hamlib", "rig_model")
+            rig_pathname = config.get("hamlib", "rig_pathname")
+            if(autofill):
+               # Use Hamlib (if available) to get the frequency
+               try:
+                  Hamlib.rig_set_debug(Hamlib.RIG_DEBUG_NONE)
+                  rig = Hamlib.Rig(Hamlib.__dict__[rig_model]) # Look up the model's numerical index in Hamlib's symbol dictionary
+                  rig.set_conf("rig_pathname", rig_pathname)
+                  rig.open()
+                  frequency = "%.6f" % (rig.get_freq()/1.0e6) # Converting to MHz here
+                  self.sources["FREQ"].set_text(frequency)
+                  rig.close()
+               except:
+                  logging.error("Could not obtain Frequency data via Hamlib!")
 
       self.show_all()
 

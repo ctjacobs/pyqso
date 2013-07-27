@@ -24,6 +24,10 @@ import ConfigParser
 import os.path
 import base64
 from math import ceil
+try:
+   import Hamlib
+except:
+   logging.error("Could not import the Hamlib module!")
 
 from pyqso.adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED
 
@@ -42,6 +46,9 @@ class PreferencesDialog(Gtk.Dialog):
       self.view = ViewPage()
       self.preferences.insert_page(self.view, Gtk.Label("View"), 1)
 
+      self.hamlib = HamlibPage()
+      self.preferences.insert_page(self.hamlib, Gtk.Label("Hamlib"), 2)
+
       self.vbox.pack_start(self.preferences, True, True, 2)
       self.show_all()
 
@@ -52,6 +59,7 @@ class PreferencesDialog(Gtk.Dialog):
 
       general_data = self.general.get_data()
       view_data = self.view.get_data()
+      hamlib_data = self.hamlib.get_data()
 
       config = ConfigParser.ConfigParser()
 
@@ -64,6 +72,11 @@ class PreferencesDialog(Gtk.Dialog):
       config.add_section("view")
       for key in view_data.keys():
          config.set("view", key.lower(), view_data[key])
+
+      # Hamlib
+      config.add_section("hamlib")
+      for key in hamlib_data.keys():
+         config.set("hamlib", key.lower(), hamlib_data[key])
       
       with open(os.path.expanduser('~/.pyqso.ini'), 'w') as f:
          config.write(f)
@@ -180,5 +193,79 @@ class ViewPage(Gtk.VBox):
       data = {}
       for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
          data[field_name] = self.sources[field_name].get_active()
+      return data
+
+class HamlibPage(Gtk.VBox):
+   
+   def __init__(self):
+      logging.debug("New HamlibPage instance created!")
+
+      Gtk.VBox.__init__(self, spacing=2)
+
+      config = ConfigParser.ConfigParser()
+      have_config = (config.read(os.path.expanduser('~/.pyqso.ini')) != [])
+
+      self.sources = {}
+
+      frame = Gtk.Frame()
+      frame.set_label("Hamlib support")
+
+      vbox_inner = Gtk.VBox(spacing=2)
+
+      self.sources["AUTOFILL"] = Gtk.CheckButton("Auto-fill Frequency field")
+      if(have_config):
+         self.sources["AUTOFILL"].set_active(config.get("hamlib", "autofill") == "True")
+      else:
+         self.sources["AUTOFILL"].set_active(False)
+      vbox_inner.pack_start(self.sources["AUTOFILL"], False, False, 2)
+
+      hbox_temp = Gtk.HBox(spacing=0)
+      label = Gtk.Label("Model: ")
+      label.set_alignment(0, 0.5)
+      label.set_width_chars(17)
+      hbox_temp.pack_start(label, False, False, 2)
+
+      # Rig model
+      models = []
+      try:
+         for item in dir(Hamlib):
+            if(item.startswith("RIG_MODEL_")):
+               models.append(item)
+      except:
+         logging.error("Could not obtain rig models list via Hamlib!")
+         models.append("RIG_MODEL_NONE")
+
+      self.sources["RIG_MODEL"] = Gtk.ComboBoxText()
+      for model in models:
+         self.sources["RIG_MODEL"].append_text(model)
+      if(have_config):
+         self.sources["RIG_MODEL"].set_active(models.index(config.get("hamlib", "rig_model")))
+      else:
+         self.sources["RIG_MODEL"].set_active(models.index("RIG_MODEL_NONE")) # Set to RIG_MODEL_NONE as the default option.
+      hbox_temp.pack_start(self.sources["RIG_MODEL"], True, True, 2)
+      vbox_inner.pack_start(hbox_temp, False, False, 2)
+
+      # Path to rig
+      hbox_temp = Gtk.HBox()
+      label = Gtk.Label("Path to radio device: ")
+      label.set_width_chars(17)
+      label.set_alignment(0, 0.5)
+      hbox_temp.pack_start(label, False, False, 2)
+      self.sources["RIG_PATHNAME"] = Gtk.Entry()
+      if(have_config):
+         self.sources["RIG_PATHNAME"].set_text(config.get("hamlib", "rig_pathname"))
+      hbox_temp.pack_start(self.sources["RIG_PATHNAME"], True, True, 2)
+      vbox_inner.pack_start(hbox_temp, False, False, 2)
+
+      frame.add(vbox_inner)
+      self.pack_start(frame, True, True, 2)
+
+      return
+
+   def get_data(self):
+      data = {}
+      data["AUTOFILL"] = self.sources["AUTOFILL"].get_active()
+      data["RIG_PATHNAME"] = self.sources["RIG_PATHNAME"].get_text()
+      data["RIG_MODEL"] = self.sources["RIG_MODEL"].get_active_text()
       return data
 
