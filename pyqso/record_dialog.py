@@ -166,11 +166,53 @@ class RecordDialog(Gtk.Dialog):
       hbox_temp.pack_start(label, False, False, 2)
       self.sources["RST_RCVD"] = Gtk.Entry()
       self.sources["RST_RCVD"].set_width_chars(15)
-      hbox_temp.pack_start(self.sources["RST_RCVD"], True, True, 2)
+      hbox_temp.pack_start(self.sources["RST_RCVD"], False, False, 2)
       vbox_inner.pack_start(hbox_temp, False, False, 2)
 
-      qso_frame.add(hbox_inner)
+      # QSL_SENT
+      hbox_temp = Gtk.HBox(spacing=0)
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["QSL_SENT"])
+      label.set_alignment(0, 0.5)
+      label.set_width_chars(15)
+      hbox_temp.pack_start(label, False, False, 2)
+      qsl_options = ["", "Y", "N", "R", "I"]
+      self.sources["QSL_SENT"] = Gtk.ComboBoxText()
+      for option in qsl_options:
+         self.sources["QSL_SENT"].append_text(option)
+      self.sources["QSL_SENT"].set_active(0) # Set an empty string as the default option.
+      hbox_temp.pack_start(self.sources["QSL_SENT"], False, False, 2)
+      vbox_inner.pack_start(hbox_temp, False, False, 2)
 
+      # QSL_RCVD
+      hbox_temp = Gtk.HBox(spacing=0)
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["QSL_RCVD"])
+      label.set_alignment(0, 0.5)
+      label.set_width_chars(15)
+      hbox_temp.pack_start(label, False, False, 2)
+      qsl_options = ["", "Y", "N", "R", "I"]
+      self.sources["QSL_RCVD"] = Gtk.ComboBoxText()
+      for option in qsl_options:
+         self.sources["QSL_RCVD"].append_text(option)
+      self.sources["QSL_RCVD"].set_active(0) # Set an empty string as the default option.
+      hbox_temp.pack_start(self.sources["QSL_RCVD"], False, False, 2)
+      vbox_inner.pack_start(hbox_temp, False, False, 2)
+
+      # NOTES
+      hbox_temp = Gtk.HBox(spacing=0)
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["NOTES"])
+      label.set_alignment(0, 0.5)
+      label.set_width_chars(15)
+      hbox_temp.pack_start(label, False, False, 2)
+      self.textview = Gtk.TextView()
+      sw = Gtk.ScrolledWindow()
+      sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
+      sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+      sw.add(self.textview)
+      self.sources["NOTES"] = self.textview.get_buffer()
+      hbox_temp.pack_start(sw, True, True, 2)
+      vbox_inner.pack_start(hbox_temp, True, True, 2)
+
+      qso_frame.add(hbox_inner)
 
 
       ## STATION INFORMATION FRAME
@@ -208,6 +250,12 @@ class RecordDialog(Gtk.Dialog):
                self.sources[field_names[i]].set_active(bands.index(data))
             elif(field_names[i] == "MODE"):
                self.sources[field_names[i]].set_active(modes.index(data))
+            elif(field_names[i] == "QSL_SENT" or field_names[i] == "QSL_RCVD"):
+               self.sources[field_names[i]].set_active(qsl_options.index(data))
+            elif(field_names[i] == "NOTES"):
+               # Remember to put the new line escape characters back in when displaying the data in a Gtk.TextView
+               text = data.replace("\\n", "\n") 
+               self.sources[field_names[i]].set_text(text)
             else:
                self.sources[field_names[i]].set_text(data)
       else:
@@ -253,8 +301,15 @@ class RecordDialog(Gtk.Dialog):
       return
 
    def get_data(self, field_name):
-      if(field_name == "BAND" or field_name == "MODE"):
+      if(field_name == "BAND" or field_name == "MODE" or field_name == "QSL_SENT" or field_name == "QSL_RCVD"):
          return self.sources[field_name].get_active_text()
+      elif(field_name == "NOTES"):
+         (start, end) = self.sources[field_name].get_bounds()
+         text = self.sources[field_name].get_text(start, end, True)
+         # Replace the escape characters with a slightly different new line marker.
+         # If we don't do this, the rows in the Gtk.TreeView expand based on the number of new lines.
+         text = text.replace("\n", "\\n")
+         return text
       else:
          return self.sources[field_name].get_text()
 

@@ -33,10 +33,13 @@ AVAILABLE_FIELD_NAMES_TYPES = {"CALL": "S",
                               "MODE": "E",
                               "RST_SENT": "S",
                               "RST_RCVD": "S",
+                              "QSL_SENT": "S",
+                              "QSL_RCVD": "S",
+                              "NOTES": "M",
                               "NAME": "S"}
 # Note: The logbook uses the ADIF field names for the database column names.
 # This list is used to display the columns in a logical order.
-AVAILABLE_FIELD_NAMES_ORDERED = ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD", "NAME"]
+AVAILABLE_FIELD_NAMES_ORDERED = ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD", "QSL_SENT", "QSL_RCVD", "NOTES", "NAME"]
 # Define the more user-friendly versions of the field names.
 AVAILABLE_FIELD_NAMES_FRIENDLY = {"CALL":"Callsign",
                                   "QSO_DATE":"Date",
@@ -46,6 +49,9 @@ AVAILABLE_FIELD_NAMES_FRIENDLY = {"CALL":"Callsign",
                                   "MODE":"Mode",
                                   "RST_SENT":"TX RST",
                                   "RST_RCVD":"RX RST",
+                                  "QSL_SENT":"QSL Sent",
+                                  "QSL_RCVD":"QSL Received",
+                                  "NOTES":"Notes",
                                   "NAME":"Name"}
 
 # A: AwardList
@@ -284,11 +290,12 @@ class ADIF:
 
       elif(data_type == "M"):
          # MultilineString
-         m = re.match(r"(.+(\r\n)*.*)", data)
-         if(m is None):
-            return False
-         else:
-            return (m.group(0) == data)
+         #m = re.match(r"(.+(\r\n)*.*)", data)
+         #if(m is None):
+         #   return False
+         #else:
+         #   return (m.group(0) == data)
+         return True
 
       elif(data_type == "L"):
          # Location
