@@ -1,4 +1,5 @@
-- Backwards compatibility (e.g. if the number of columns changes then copy over the contents of the database into a new database with the additional/removed columns)
-- Additional field names, particularly for the "station information" frame.
 - Finish manual
 - Awards
+- Add a module for creating custom warning-/error-related dialogs.
+- More error handling
+

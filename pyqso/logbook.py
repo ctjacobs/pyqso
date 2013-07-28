@@ -344,7 +344,8 @@ class Logbook(Gtk.Notebook):
          # If there is nothing to filter with, then show all the records!
          return True
       else:
-         return callsign in value
+         # We need this to be case insensitive
+         return callsign.upper() in value or callsign.lower() in value
 
    def render_log(self, index):
       # Render the Log in the Gtk.Notebook.

@@ -58,7 +58,7 @@ class CallsignLookup():
       return
 
    def lookup(self, callsign):
-      fields_and_data = {"NAME":""}
+      fields_and_data = {"NAME":"", "ADDRESS":"", "STATE":"", "COUNTRY":"", "DXCC":"", "CQZ":"", "ITUZ":"", "IOTA":""}
       if(self.session_key):
          request = '/xml/current/?s=%s;callsign=%s' % (self.session_key, callsign)
          self.connection.request('GET', request)
@@ -75,6 +75,37 @@ class CallsignLookup():
                fields_and_data["NAME"] = callsign_fname_node[0].firstChild.nodeValue
             if(len(callsign_name_node) > 0): # Add the surname, if present
                fields_and_data["NAME"] = fields_and_data["NAME"] + " " + callsign_name_node[0].firstChild.nodeValue
+
+            callsign_addr1_node = callsign_node.getElementsByTagName('addr1')
+            callsign_addr2_node = callsign_node.getElementsByTagName('addr2')
+            if(len(callsign_addr1_node) > 0):
+               fields_and_data["ADDRESS"] = callsign_addr1_node[0].firstChild.nodeValue
+            if(len(callsign_addr2_node) > 0): # Add the second line of the address, if present
+               fields_and_data["ADDRESS"] = fields_and_data["ADDRESS"] + ", " + callsign_addr2_node[0].firstChild.nodeValue
+
+            callsign_state_node = callsign_node.getElementsByTagName('state')
+            if(len(callsign_state_node) > 0):
+               fields_and_data["STATE"] = callsign_state_node[0].firstChild.nodeValue
+
+            callsign_country_node = callsign_node.getElementsByTagName('country')
+            if(len(callsign_country_node) > 0):
+               fields_and_data["COUNTRY"] = callsign_country_node[0].firstChild.nodeValue
+
+            callsign_ccode_node = callsign_node.getElementsByTagName('ccode')
+            if(len(callsign_ccode_node) > 0):
+               fields_and_data["DXCC"] = callsign_ccode_node[0].firstChild.nodeValue
+
+            callsign_cqzone_node = callsign_node.getElementsByTagName('cqzone')
+            if(len(callsign_cqzone_node) > 0):
+               fields_and_data["CQZ"] = callsign_cqzone_node[0].firstChild.nodeValue
+
+            callsign_ituzone_node = callsign_node.getElementsByTagName('ituzone')
+            if(len(callsign_ituzone_node) > 0):
+               fields_and_data["ITUZ"] = callsign_ituzone_node[0].firstChild.nodeValue
+
+            callsign_iota_node = callsign_node.getElementsByTagName('iota')
+            if(len(callsign_iota_node) > 0):
+               fields_and_data["IOTA"] = callsign_iota_node[0].firstChild.nodeValue
          else:
             # If there is no Callsign element, then print out the error message in the Session element
             session_node = xml_data.getElementsByTagName('Session')

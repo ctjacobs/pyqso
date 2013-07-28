@@ -31,15 +31,25 @@ AVAILABLE_FIELD_NAMES_TYPES = {"CALL": "S",
                               "FREQ": "N",
                               "BAND": "E",
                               "MODE": "E",
+                              "TX_PWR": "N",
                               "RST_SENT": "S",
                               "RST_RCVD": "S",
                               "QSL_SENT": "S",
                               "QSL_RCVD": "S",
                               "NOTES": "M",
-                              "NAME": "S"}
+                              "NAME": "S",
+                              "ADDRESS": "S",
+                              "STATE": "S",
+                              "COUNTRY": "S",
+                              "DXCC": "N",
+                              "CQZ": "N",
+                              "ITUZ": "N",
+                              "IOTA": "C"}
 # Note: The logbook uses the ADIF field names for the database column names.
 # This list is used to display the columns in a logical order.
-AVAILABLE_FIELD_NAMES_ORDERED = ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD", "QSL_SENT", "QSL_RCVD", "NOTES", "NAME"]
+AVAILABLE_FIELD_NAMES_ORDERED = ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "TX_PWR", 
+                                 "RST_SENT", "RST_RCVD", "QSL_SENT", "QSL_RCVD", "NOTES", "NAME",
+                                 "ADDRESS", "STATE", "COUNTRY", "DXCC", "CQZ", "ITUZ", "IOTA"]
 # Define the more user-friendly versions of the field names.
 AVAILABLE_FIELD_NAMES_FRIENDLY = {"CALL":"Callsign",
                                   "QSO_DATE":"Date",
@@ -47,12 +57,20 @@ AVAILABLE_FIELD_NAMES_FRIENDLY = {"CALL":"Callsign",
                                   "FREQ":"Frequency (MHz)",
                                   "BAND":"Band",
                                   "MODE":"Mode",
+                                  "TX_PWR":"TX Power (W)",
                                   "RST_SENT":"TX RST",
                                   "RST_RCVD":"RX RST",
                                   "QSL_SENT":"QSL Sent",
                                   "QSL_RCVD":"QSL Received",
                                   "NOTES":"Notes",
-                                  "NAME":"Name"}
+                                  "NAME":"Name",
+                                  "ADDRESS":"Address",
+                                  "STATE":"State",
+                                  "COUNTRY":"Country",
+                                  "DXCC":"DXCC",
+                                  "CQZ":"CQ Zone",
+                                  "ITUZ":"ITU Zone",
+                                  "IOTA":"IOTA Designator"}
 
 # A: AwardList
 # B: Boolean

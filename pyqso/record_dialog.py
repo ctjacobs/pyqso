@@ -142,6 +142,16 @@ class RecordDialog(Gtk.Dialog):
       hbox_temp.pack_start(self.sources["MODE"], False, False, 2)
       vbox_inner.pack_start(hbox_temp, False, False, 2)
 
+      # POWER
+      hbox_temp = Gtk.HBox(spacing=0)
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["TX_PWR"], halign=Gtk.Align.START)
+      label.set_alignment(0, 0.5)
+      label.set_width_chars(15)
+      hbox_temp.pack_start(label, False, False, 2)
+      self.sources["TX_PWR"] = Gtk.Entry()
+      self.sources["TX_PWR"].set_width_chars(15)
+      hbox_temp.pack_start(self.sources["TX_PWR"], False, False, 2)
+      vbox_inner.pack_start(hbox_temp, False, False, 2)
 
       vbox_inner = Gtk.VBox(spacing=2)
       hbox_inner.pack_start(Gtk.SeparatorToolItem(), False, False, 0)
@@ -234,6 +244,87 @@ class RecordDialog(Gtk.Dialog):
       self.sources["NAME"] = Gtk.Entry()
       self.sources["NAME"].set_width_chars(15)
       hbox_temp.pack_start(self.sources["NAME"], False, False, 2)
+      vbox_inner.pack_start(hbox_temp, False, False, 2)
+
+      # ADDRESS
+      hbox_temp = Gtk.HBox(spacing=0)
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["ADDRESS"], halign=Gtk.Align.START)
+      label.set_width_chars(15)
+      label.set_alignment(0, 0.5)
+      hbox_temp.pack_start(label, False, False, 2)
+      self.sources["ADDRESS"] = Gtk.Entry()
+      self.sources["ADDRESS"].set_width_chars(15)
+      hbox_temp.pack_start(self.sources["ADDRESS"], False, False, 2)
+      vbox_inner.pack_start(hbox_temp, False, False, 2)
+
+      # STATE
+      hbox_temp = Gtk.HBox(spacing=0)
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["STATE"], halign=Gtk.Align.START)
+      label.set_width_chars(15)
+      label.set_alignment(0, 0.5)
+      hbox_temp.pack_start(label, False, False, 2)
+      self.sources["STATE"] = Gtk.Entry()
+      self.sources["STATE"].set_width_chars(15)
+      hbox_temp.pack_start(self.sources["STATE"], False, False, 2)
+      vbox_inner.pack_start(hbox_temp, False, False, 2)
+
+      # COUNTRY
+      hbox_temp = Gtk.HBox(spacing=0)
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["COUNTRY"], halign=Gtk.Align.START)
+      label.set_width_chars(15)
+      label.set_alignment(0, 0.5)
+      hbox_temp.pack_start(label, False, False, 2)
+      self.sources["COUNTRY"] = Gtk.Entry()
+      self.sources["COUNTRY"].set_width_chars(15)
+      hbox_temp.pack_start(self.sources["COUNTRY"], False, False, 2)
+      vbox_inner.pack_start(hbox_temp, False, False, 2)
+
+      vbox_inner = Gtk.VBox(spacing=2)
+      hbox_inner.pack_start(Gtk.SeparatorToolItem(), False, False, 0)
+      hbox_inner.pack_start(vbox_inner, True, True, 2)
+
+      # DXCC
+      hbox_temp = Gtk.HBox(spacing=0)
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["DXCC"], halign=Gtk.Align.START)
+      label.set_width_chars(15)
+      label.set_alignment(0, 0.5)
+      hbox_temp.pack_start(label, False, False, 2)
+      self.sources["DXCC"] = Gtk.Entry()
+      self.sources["DXCC"].set_width_chars(15)
+      hbox_temp.pack_start(self.sources["DXCC"], False, False, 2)
+      vbox_inner.pack_start(hbox_temp, False, False, 2)
+
+      # CQZ
+      hbox_temp = Gtk.HBox(spacing=0)
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["CQZ"], halign=Gtk.Align.START)
+      label.set_width_chars(15)
+      label.set_alignment(0, 0.5)
+      hbox_temp.pack_start(label, False, False, 2)
+      self.sources["CQZ"] = Gtk.Entry()
+      self.sources["CQZ"].set_width_chars(15)
+      hbox_temp.pack_start(self.sources["CQZ"], False, False, 2)
+      vbox_inner.pack_start(hbox_temp, False, False, 2)
+
+      # ITUZ
+      hbox_temp = Gtk.HBox(spacing=0)
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["ITUZ"], halign=Gtk.Align.START)
+      label.set_width_chars(15)
+      label.set_alignment(0, 0.5)
+      hbox_temp.pack_start(label, False, False, 2)
+      self.sources["ITUZ"] = Gtk.Entry()
+      self.sources["ITUZ"].set_width_chars(15)
+      hbox_temp.pack_start(self.sources["ITUZ"], False, False, 2)
+      vbox_inner.pack_start(hbox_temp, False, False, 2)
+
+      # IOTA
+      hbox_temp = Gtk.HBox(spacing=0)
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["IOTA"], halign=Gtk.Align.START)
+      label.set_width_chars(15)
+      label.set_alignment(0, 0.5)
+      hbox_temp.pack_start(label, False, False, 2)
+      self.sources["IOTA"] = Gtk.Entry()
+      self.sources["IOTA"].set_width_chars(15)
+      hbox_temp.pack_start(self.sources["IOTA"], False, False, 2)
       vbox_inner.pack_start(hbox_temp, False, False, 2)
 
       station_frame.add(hbox_inner)
