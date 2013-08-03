@@ -31,17 +31,18 @@ except:
 
 from adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED
 from callsign_lookup import *
+from auxiliary_dialogs import *
 
 class RecordDialog(Gtk.Dialog):
    
-   def __init__(self, root_window, log, index=None):
+   def __init__(self, parent, log, index=None):
       logging.debug("New RecordDialog instance created!")
       
       if(index is not None):
          title = "Edit Record %d" % index
       else:
          title = "Add Record"
-      Gtk.Dialog.__init__(self, title=title, parent=root_window, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
+      Gtk.Dialog.__init__(self, title=title, parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
 
       ## QSO DATA FRAME
       qso_frame = Gtk.Frame()
@@ -406,7 +407,7 @@ class RecordDialog(Gtk.Dialog):
 
    def lookup_callback(self, widget=None):
       ''' Gets the callsign-related data from the qrz.com database. '''
-      callsign_lookup = CallsignLookup(root_window = self)
+      callsign_lookup = CallsignLookup(parent = self)
 
       config = ConfigParser.ConfigParser()
       have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
@@ -420,11 +421,7 @@ class RecordDialog(Gtk.Dialog):
       else:
          details_given = False
       if(not details_given):
-         message = Gtk.MessageDialog(self, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
-                                    "To perform a callsign lookup, please specify your qrz.com username and password in the Preferences.")
-         message.run()
-         message.destroy()
+         error(parent=self, message="To perform a callsign lookup, please specify your qrz.com username and password in the Preferences.")
          return
 
       callsign_lookup.connect(username, password)
@@ -435,7 +432,7 @@ class RecordDialog(Gtk.Dialog):
       return
 
    def calendar_callback(self, widget):
-      calendar = CalendarDialog(root_window = self)
+      calendar = CalendarDialog(parent = self)
       response = calendar.run()
       if(response == Gtk.ResponseType.OK):
          date = calendar.get_date()
@@ -446,9 +443,9 @@ class RecordDialog(Gtk.Dialog):
 class CalendarDialog(Gtk.Dialog):
    ''' A simple dialog containing a Gtk.Calendar widget. Using this ensures the date is in the correct YYYYMMDD format required by ADIF. ''' 
    
-   def __init__(self, root_window):
+   def __init__(self, parent):
       logging.debug("New CalendarDialog instance created!")
-      Gtk.Dialog.__init__(self, title="Select Date", parent=root_window, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
+      Gtk.Dialog.__init__(self, title="Select Date", parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
       self.calendar = Gtk.Calendar()
       self.vbox.add(self.calendar)
       self.show_all()

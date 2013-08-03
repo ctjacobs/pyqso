@@ -27,19 +27,19 @@ from pyqso.awards import *
 
 class Toolbox(Gtk.Frame):
    
-   def __init__(self, root_window):
+   def __init__(self, parent):
          
       Gtk.Frame.__init__(self)
       self.set_label("Toolbox")
-      self.root_window = root_window
+      self.parent = parent
 
       self.tools = Gtk.Notebook()
 
-      self.dx_cluster = DXCluster(self.root_window)
+      self.dx_cluster = DXCluster(self.parent)
       self.tools.insert_page(self.dx_cluster, Gtk.Label("DX Cluster"), 0)
-      self.grey_line = GreyLine(self.root_window)
+      self.grey_line = GreyLine(self.parent)
       self.tools.insert_page(self.grey_line, Gtk.Label("Grey Line"), 1)
-      self.awards = Awards(self.root_window)
+      self.awards = Awards(self.parent)
       self.tools.insert_page(self.awards, Gtk.Label("Awards"), 2)
 
       self.add(self.tools)

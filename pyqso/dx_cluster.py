@@ -29,14 +29,14 @@ from pyqso.telnet_connection_dialog import *
 
 class DXCluster(Gtk.VBox):
    
-   def __init__(self, root_window):
+   def __init__(self, parent):
          
       Gtk.VBox.__init__(self, spacing=2)
 
       self.check_io_event = GObject.timeout_add(1000, self.on_telnet_io)
 
       self.connection = None
-      self.root_window = root_window
+      self.parent = parent
 
       # Set up the toolbar
       self.toolbar = Gtk.HBox(spacing=2)
@@ -90,7 +90,7 @@ class DXCluster(Gtk.VBox):
 
    def telnet_connect(self, widget=None):
 
-      dialog = TelnetConnectionDialog(self.root_window)
+      dialog = TelnetConnectionDialog(self.parent)
       response = dialog.run()
       if(response == Gtk.ResponseType.OK):
          connection_info = dialog.get_connection_info()

@@ -23,12 +23,14 @@ import logging
 import httplib
 from xml.dom import minidom
 
+from auxiliary_dialogs import *
+
 class CallsignLookup():
    ''' Uses qrz.com to lookup details about a particular callsign. '''
 
-   def __init__(self, root_window):
+   def __init__(self, parent):
       logging.debug("New CallsignLookup instance created!")
-      self.root_window = root_window
+      self.parent = parent
       self.connection = None
       self.session_key = None
       return
@@ -50,11 +52,7 @@ class CallsignLookup():
       session_error_node = session_node.getElementsByTagName('Error')
       if(len(session_error_node) > 0):
          session_error = session_error_node[0].firstChild.nodeValue
-         message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
-                                    session_error)
-         message.run()
-         message.destroy()
+         error(parent=self.parent, message=session_error)
       return
 
    def lookup(self, callsign):
@@ -113,11 +111,7 @@ class CallsignLookup():
                session_error_node = session_node.getElementsByTagName('Error')
                if(len(session_error_node) > 0):
                   session_error = session_error_node[0].firstChild.nodeValue
-                  message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
-                                    session_error)
-                  message.run()
-                  message.destroy()
+                  error(parent=self.parent, message=session_error)
             # Return empty strings for the field data
 
       return fields_and_data

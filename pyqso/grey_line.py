@@ -29,7 +29,7 @@ from backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
 
 class GreyLine(Gtk.VBox):
    
-   def __init__(self, root_window):
+   def __init__(self, parent):
          
       Gtk.VBox.__init__(self, spacing=2)
 
@@ -37,7 +37,7 @@ class GreyLine(Gtk.VBox):
       self.canvas = FigureCanvas(self.fig) # For embedding in the Gtk application
       self.pack_start(self.canvas, True, True, 0)
 
-      self.root_window = root_window
+      self.parent = parent
       self.refresh_event = GObject.timeout_add(1800000, self.draw) # Re-draw the grey line automatically after 30 minutes (if the grey line tool is visible).
 
       self.show_all()
@@ -45,7 +45,7 @@ class GreyLine(Gtk.VBox):
       return
 
    def draw(self):
-      if(self.root_window.toolbox.tools.get_current_page() != 1 or not self.root_window.toolbox.get_visible()):
+      if(self.parent.toolbox.tools.get_current_page() != 1 or not self.parent.toolbox.get_visible()):
          # Don't re-draw if the grey line is not visible.
          return True # We need to return True in case this is method was called by a timer event.
       else:

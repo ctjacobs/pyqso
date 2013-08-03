@@ -25,14 +25,14 @@ import calendar
 
 class LogNameDialog(Gtk.Dialog):
    
-   def __init__(self, root_window, title=None, name=None):
+   def __init__(self, parent, title=None, name=None):
       logging.debug("New LogNameDialog instance created!")
       
       if(title is None):
          title = "New Log"
       else:
          title = title
-      Gtk.Dialog.__init__(self, title=title, parent=root_window, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
+      Gtk.Dialog.__init__(self, title=title, parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
 
       hbox_temp = Gtk.HBox(spacing=0)
       label = Gtk.Label("Log Name:")

@@ -28,17 +28,18 @@ import ConfigParser
 from adif import *
 from log import *
 from log_name_dialog import *
+from auxiliary_dialogs import *
 
 #import Hamlib
 
 class Logbook(Gtk.Notebook):
    ''' A Logbook object can store multiple Log objects. '''
    
-   def __init__(self, root_window):
+   def __init__(self, parent):
 
       Gtk.Notebook.__init__(self)
 
-      self.root_window = root_window
+      self.parent = parent
       self.connection = None
       self.summary = {}
 
@@ -81,11 +82,7 @@ class Logbook(Gtk.Notebook):
       except sqlite.Error as e:
          # PyQSO can't connect to the database.
          logging.exception(e)
-         message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
-                                    "PyQSO cannot connect to the database. Check file permissions?")
-         message.run()
-         message.destroy()
+         error(parent=self.parent, message="PyQSO cannot connect to the database. Check file permissions?")
          return
 
       # A stack of Log objects
@@ -104,12 +101,12 @@ class Logbook(Gtk.Notebook):
       self.connect("switch-page", self._on_switch_page)
 
       if(self.connection):
-         context_id = self.root_window.statusbar.get_context_id("Status")
-         self.root_window.statusbar.push(context_id, "Logbook: %s" % self.path)
-         self.root_window.toolbar.set_connect_button_sensitive(False)
-         self.root_window.menu.set_connect_item_sensitive(False)
-         self.root_window.menu.set_log_items_sensitive(True)
-         self.root_window.toolbar.filter_source.set_sensitive(True)
+         context_id = self.parent.statusbar.get_context_id("Status")
+         self.parent.statusbar.push(context_id, "Logbook: %s" % self.path)
+         self.parent.toolbar.set_connect_button_sensitive(False)
+         self.parent.menu.set_connect_item_sensitive(False)
+         self.parent.menu.set_log_items_sensitive(True)
+         self.parent.toolbar.filter_source.set_sensitive(True)
 
       self.open_logs()
 
@@ -125,12 +122,12 @@ class Logbook(Gtk.Notebook):
          except sqlite.Error as e:
             logging.exception(e)
 
-         context_id = self.root_window.statusbar.get_context_id("Status")
-         self.root_window.statusbar.push(context_id, "Not connected to a Logbook.")
-         self.root_window.toolbar.set_connect_button_sensitive(True)
-         self.root_window.menu.set_connect_item_sensitive(True)
-         self.root_window.menu.set_log_items_sensitive(False)
-         self.root_window.toolbar.filter_source.set_sensitive(False)
+         context_id = self.parent.statusbar.get_context_id("Status")
+         self.parent.statusbar.push(context_id, "Not connected to a Logbook.")
+         self.parent.toolbar.set_connect_button_sensitive(True)
+         self.parent.menu.set_connect_item_sensitive(True)
+         self.parent.menu.set_log_items_sensitive(False)
+         self.parent.toolbar.filter_source.set_sensitive(False)
       else:
          logging.error("Already disconnected. Nothing to do here.")
 
@@ -219,18 +216,18 @@ class Logbook(Gtk.Notebook):
          
       # Disable the record buttons if a log page is not selected.
       if(new_page == 0):
-         self.root_window.toolbar.set_record_buttons_sensitive(False)
-         self.root_window.menu.set_record_items_sensitive(False)
+         self.parent.toolbar.set_record_buttons_sensitive(False)
+         self.parent.menu.set_record_items_sensitive(False)
       else:
-         self.root_window.toolbar.set_record_buttons_sensitive(True)
-         self.root_window.menu.set_record_items_sensitive(True)
+         self.parent.toolbar.set_record_buttons_sensitive(True)
+         self.parent.menu.set_record_items_sensitive(True)
       return
 
    def new_log(self, widget=None):
       if(self.connection is None):
          return
       exists = True
-      dialog = LogNameDialog(self.root_window)
+      dialog = LogNameDialog(self.parent)
       while(exists):
          response = dialog.run()
          if(response == Gtk.ResponseType.OK):
@@ -247,11 +244,7 @@ class Logbook(Gtk.Notebook):
             except sqlite.Error as e:
                logging.exception(e)
                # Data is not valid - inform the user.
-               message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
-                                    "Database error. Try another log name.")
-               message.run()
-               message.destroy()
+               error(parent=self.parent, message="Database error. Try another log name.")
                exists = True
          else:
             dialog.destroy()
@@ -309,11 +302,7 @@ class Logbook(Gtk.Notebook):
          logging.debug("No logs to delete!")
          return
 
-      dialog = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                              Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
-                              "Are you sure you want to delete log %s?" % log.name)
-      response = dialog.run()
-      dialog.destroy()
+      response = question(parent=self.parent, message="Are you sure you want to delete log %s?" % log.name)
       if(response == Gtk.ResponseType.YES):
          with self.connection:
             c = self.connection.cursor()
@@ -338,7 +327,7 @@ class Logbook(Gtk.Notebook):
 
    def filter_by_callsign(self, model, iter, data):
       value = model.get_value(iter, 1)
-      callsign = self.root_window.toolbar.filter_source.get_text()
+      callsign = self.parent.toolbar.filter_source.get_text()
       
       if(callsign is None or callsign == ""):
          # If there is nothing to filter with, then show all the records!
@@ -459,7 +448,7 @@ class Logbook(Gtk.Notebook):
       log_index = self.get_log_index(name=old_log_name)
       
       exists = True
-      dialog = LogNameDialog(self.root_window, title="Rename Log", name=old_log_name)
+      dialog = LogNameDialog(self.parent, title="Rename Log", name=old_log_name)
       while(exists):
          response = dialog.run()
          if(response == Gtk.ResponseType.OK):
@@ -472,11 +461,7 @@ class Logbook(Gtk.Notebook):
             except sqlite.Error as e:
                logging.exception(e)
                # Data is not valid - inform the user.
-               message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
-                                    "Database error. Try another log name.")
-               message.run()
-               message.destroy()
+               error(parent=self.parent, message="Database error. Try another log name.")
                exists = True
          else:
             dialog.destroy()
@@ -532,7 +517,7 @@ class Logbook(Gtk.Notebook):
          logging.debug("No file path specified.")
          return
 
-      dialog = LogNameDialog(self.root_window, title="Import Log")
+      dialog = LogNameDialog(self.parent, title="Import Log")
       while(True):
          response = dialog.run()
          if(response == Gtk.ResponseType.OK):
@@ -541,11 +526,7 @@ class Logbook(Gtk.Notebook):
                # Import into existing log
                exists = True
                l = self.logs[self.get_log_index(name=log_name)]
-               message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                                 Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
-                                 "Are you sure you want to import into an existing log?")
-               response = message.run()
-               message.destroy()
+               response = question(parent=self.parent, message="Are you sure you want to import into an existing log?")
                if(response == Gtk.ResponseType.YES):
                   break
             else:
@@ -564,11 +545,7 @@ class Logbook(Gtk.Notebook):
                except sqlite.Error as e:
                   logging.exception(e)
                   # Data is not valid - inform the user.
-                  message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                                       Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
-                                       "Database error. Try another log name.")
-                  message.run()
-                  message.destroy()
+                  error(parent=self.parent, message="Database error. Try another log name.")
          else:
             dialog.destroy()
             return
@@ -689,7 +666,7 @@ class Logbook(Gtk.Notebook):
       log_index = self.get_log_index()
       log = self.logs[log_index]
       
-      dialog = RecordDialog(root_window=self.root_window, log=log, index=None)
+      dialog = RecordDialog(parent=self.parent, log=log, index=None)
       all_valid = False # Are all the field entries valid?
 
       adif = ADIF()
@@ -707,11 +684,7 @@ class Logbook(Gtk.Notebook):
                fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
                if(not(adif.is_valid(field_names[i], fields_and_data[field_names[i]], AVAILABLE_FIELD_NAMES_TYPES[field_names[i]]))):
                   # Data is not valid - inform the user.
-                  message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
-                                    "The data in field \"%s\" is not valid!" % field_names[i])
-                  message.run()
-                  message.destroy()
+                  error(parent=self.parent, message="The data in field \"%s\" is not valid!" % field_names[i])
                   all_valid = False
                   break # Don't check the other data until the user has fixed the current one.
 
@@ -741,17 +714,12 @@ class Logbook(Gtk.Notebook):
          logging.debug("Trying to delete a record, but there are no records in the log!")
          return
 
-      dialog = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                                 Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
-                                 "Are you sure you want to delete record %d?" % row_index)
-      response = dialog.run()
+      response = question(parent=self.parent, message = "Are you sure you want to delete record %d?" % row_index)
       if(response == Gtk.ResponseType.YES):
          # Deletes the record with index 'row_index' from the Records list.
          # 'iter' is needed to remove the record from the ListStore itself.
          log.delete_record(row_index, child_iter)
          self._update_summary()
-         
-      dialog.destroy()
       return
 
    def edit_record_callback(self, widget, path, view_column):
@@ -774,7 +742,7 @@ class Logbook(Gtk.Notebook):
          logging.debug("Could not find the selected row's index!")
          return
 
-      dialog = RecordDialog(root_window=self.root_window, log=self.logs[log_index], index=row_index)
+      dialog = RecordDialog(parent=self.parent, log=self.logs[log_index], index=row_index)
       all_valid = False # Are all the field entries valid?
 
       adif = ADIF()
@@ -792,11 +760,7 @@ class Logbook(Gtk.Notebook):
                fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
                if(not(adif.is_valid(field_names[i], fields_and_data[field_names[i]], AVAILABLE_FIELD_NAMES_TYPES[field_names[i]]))):
                   # Data is not valid - inform the user.
-                  message = Gtk.MessageDialog(self.root_window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, 
-                                    "The data in field \"%s\" is not valid!" % field_names[i])
-                  message.run()
-                  message.destroy()
+                  error(parent=self.parent, message="The data in field \"%s\" is not valid!" % field_names[i])
                   all_valid = False
                   break # Don't check the other data until the user has fixed the current one.
 

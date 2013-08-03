@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-# File: awards.py
+#!/usr/bin/env python 
+# File: auxiliary_dialogs.py
 
 #    Copyright (C) 2013 Christian Jacobs.
 
@@ -19,19 +19,20 @@
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
 from gi.repository import Gtk, GObject
-import logging
 
-class Awards(Gtk.VBox):
+def error(parent, message):
+   ''' Displays an error message. '''
+   dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                               Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, message)
+   dialog.run()
+   dialog.destroy()
+   return
    
-   def __init__(self, parent):
-         
-      Gtk.VBox.__init__(self, spacing=2)
-
-      self.parent = parent
-      self.show_all()
-
-      return
-
-   def count(self):
-      return
-
+def question(parent, message):
+   ''' Asks the user a question. The dialog comes with 'Yes' and 'No' response buttons. '''
+   dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                              Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
+                              message)
+   response = dialog.run()
+   dialog.destroy()
+   return response

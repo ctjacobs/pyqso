@@ -25,10 +25,10 @@ import calendar
 
 class TelnetConnectionDialog(Gtk.Dialog):
    
-   def __init__(self, root_window):
+   def __init__(self, parent):
       logging.debug("New TelnetConnectionDialog instance created!")
       
-      Gtk.Dialog.__init__(self, title="New Telnet Connection", parent=root_window, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
+      Gtk.Dialog.__init__(self, title="New Telnet Connection", parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
 
       self.sources = {}
 
