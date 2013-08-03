@@ -618,7 +618,7 @@ class Logbook(Gtk.Notebook):
 
       operation.connect("begin_print", self.begin_print)
       operation.connect("draw_page", self.draw_page)
-      result = operation.run(action, None)
+      result = operation.run(action, parent=self.parent)
       return
     
    def begin_print(self, operation, context):
