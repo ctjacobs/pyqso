@@ -727,13 +727,16 @@ class Logbook(Gtk.Notebook):
       
    def delete_record_callback(self, widget):
       log_index = self.get_log_index()
+      log = self.logs[log_index]
       (sort_model, path) = self.treeselection[log_index].get_selected_rows() # Get the selected row in the log
       try:
-         # Remember that the filter model is a child of the sort model.
+         sort_iter = sort_model.get_iter(path[0])
+         # Remember that the filter model is a child of the sort model...
          filter_model = sort_model.get_model()
-         filter_iter = filter_model.get_iter(path[0])
+         filter_iter = self.sorter[log_index].convert_iter_to_child_iter(sort_iter)
+         # ...and the ListStore model (i.e. the log) is a child of the filter model.
          child_iter = self.filter[log_index].convert_iter_to_child_iter(filter_iter)
-         row_index = filter_model.get_value(filter_iter,0)
+         row_index = log.get_value(child_iter,0)
       except IndexError:
          logging.debug("Trying to delete a record, but there are no records in the log!")
          return
@@ -745,7 +748,7 @@ class Logbook(Gtk.Notebook):
       if(response == Gtk.ResponseType.YES):
          # Deletes the record with index 'row_index' from the Records list.
          # 'iter' is needed to remove the record from the ListStore itself.
-         self.logs[log_index].delete_record(row_index, child_iter)
+         log.delete_record(row_index, child_iter)
          self._update_summary()
          
       dialog.destroy()
@@ -760,11 +763,13 @@ class Logbook(Gtk.Notebook):
 
       (sort_model, path) = self.treeselection[log_index].get_selected_rows() # Get the selected row in the log
       try:
-         # Remember that the filter model is a child of the sort model.
+         sort_iter = sort_model.get_iter(path[0])
+         # Remember that the filter model is a child of the sort model...
          filter_model = sort_model.get_model()
-         filter_iter = filter_model.get_iter(path[0])
+         filter_iter = self.sorter[log_index].convert_iter_to_child_iter(sort_iter)
+         # ...and the ListStore model (i.e. the log) is a child of the filter model.
          child_iter = self.filter[log_index].convert_iter_to_child_iter(filter_iter)
-         row_index = filter_model.get_value(filter_iter,0)
+         row_index = log.get_value(child_iter,0)
       except IndexError:
          logging.debug("Could not find the selected row's index!")
          return
