@@ -21,6 +21,11 @@
 \usepackage[margin=1.2in]{geometry}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=false,
+  pdfborder={0 0 0},
+  }
 
 \setlength{\parskip}{0.25cm}
 
@@ -39,7 +44,7 @@
 \chapter{Introduction}
 PyQSO is a contact logging tool for amateur radio operators. It is currently in the early stages of development.
 
-As the name suggests, PyQSO is written in Python. The graphical user interface (GUI) has been built using the GTK+ library through the PyGTK bindings. PyQSO also uses an SQLite embedded database to manage all the contacts an amateur radio operator makes.
+As the name suggests, PyQSO is written primarily in the Python programming language. The graphical user interface (GUI) has been built using the GTK+ library through the PyGTK bindings. PyQSO also uses an SQLite embedded database to manage all the contacts an amateur radio operator makes.
 
 Many amateur radio operators choose to store all the contacts they ever make in a single \textit{logbook}, whereas others keep a separate logbook for each year, for example. Each logbook may be divided up to form multiple distinct \textit{logs}, perhaps one for casual repeater contacts and another for DX'ing. Finally, each log can contain multiple \textit{records}. PyQSO is based around this three-tier model, going from logbooks at the top to individual records at the bottom. From an implementation point-of-view, a database is analogous to a logbook, a table in the database is analogous to a log in the logbook, and the records in each table are analogous to the records in each log.
 
@@ -80,12 +85,40 @@ Running PyQSO with the \texttt{-d} or \texttt{--debug} flag enables the debuggin
 
 \noindent All debugging-related messages are written to a file called pyqso.debug, located in the current working directory.
 
-\section{Adding a new contact}
+\section{Log management}
+\subsection{New log}
+\subsection{Renaming a log}
+\subsection{Deleting a log}
+\subsection{Printing a log}
+Due to restrictions on the page width, only a selection of field names will be printed: callsign, date, time, frequency, and mode.
 
+\section{Record management}
 
-\chapter{DX cluster}
+\subsection{New record (QSO)}
+\subsubsection{Callsign lookup}
+PyQSO can also resolve callsign-related information (e.g. the operator's name, address, and ITU Zone) by querying the qrz.com database.
 
+Note that users must first supply their qrz.com account information in the preferences dialog window.
 
+\chapter{Toolbox}
+
+\section{DX cluster}
+A DX cluster is essentially a server through which radio operators can report and receive updates about QSOs that are in progress across the bands.
+
+PyQSO is able to connect to a DX cluster that operates using the Telnet protocol to provide a text-based alert service. As a result of the many different Telnet-based software products that DX clusters run, PyQSO currently outputs the raw data received from the DX cluster rather than trying to parse it in some way.
+
+\section{Grey line}
+
+\section{Awards}
+
+\chapter{Preferences}
+\section{View}
+Not all the available fields have to be displayed in the logbook. Users can choose to hide a subset of them by unchecking them in the View tab. 
+
+PyQSO must be restarted in order for any changes to take effect.
+
+\section{Hamlib support}
+PyQSO features rudimentary support for the Hamlib library. The name and path of the radio device connected to the user's computer can be specified in the Hamlib tab of the preferences dialog. Upon adding a new record to the log, PyQSO will use Hamlib to retrieve the current frequency that the radio device is set to and automatically fill in the Frequency field. 
 
 \bibliographystyle{plainnat}
 \end{document}
