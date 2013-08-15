@@ -768,20 +768,35 @@ class Logbook(Gtk.Notebook):
                   # Data is not valid - inform the user.
                   error(parent=self.parent, message="The data in field \"%s\" is not valid!" % field_names[i])
                   all_valid = False
-                  break # Don't check the other data until the user has fixed the current one.
+                  break # Don't check the other fields until the user has fixed the current field's data.
 
             if(all_valid):
+               # All data has been validated, so we can go ahead and update the record.
+               record = log.get_record_by_index(row_index)           
                for i in range(0, len(field_names)):
-                  # All data has been validated, so we can go ahead and update the record.
-                  # First update the record in the database... 
-                  log.edit_record(row_index, field_names[i], fields_and_data[field_names[i]])
-                  # ...and then in the ListStore
-                  # (we add 1 onto the column_index here because we don't want to consider the index column)
-                  log.set(child_iter, i+1, fields_and_data[field_names[i]])
+                  # Check whether the data has actually changed. Database updates can be expensive.
+                  if(record[field_names[i].lower()] != fields_and_data[field_names[i]]):
+                     # First update the record in the database... 
+                     log.edit_record(row_index, field_names[i], fields_and_data[field_names[i]])
+                     # ...and then in the ListStore
+                     # (we add 1 onto the column_index here because we don't want to consider the index column)
+                     log.set(child_iter, i+1, fields_and_data[field_names[i]])
                self._update_summary()
                self.parent.toolbox.awards.count()
 
       dialog.destroy()
+      return
+
+   def remove_duplicates_callback(self, widget=None):
+      logging.debug("Removing duplicate records...")
+      logging.error("Duplicates cannot be removed yet.")
+
+      log_index = self.get_log_index()
+      log = self.logs[log_index]
+
+      removed = 0
+
+      logging.debug("Removed %d duplicate records." % removed)
       return
 
    def get_number_of_logs(self):

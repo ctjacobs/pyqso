@@ -72,6 +72,8 @@ class Menu(Gtk.MenuBar):
       icon.set_from_stock(Gtk.STOCK_ADD, Gtk.IconSize.MENU)
       mitem_new.set_image(icon)
       mitem_new.connect("activate", parent.logbook.new_log)
+      key, mod = Gtk.accelerator_parse("<Control>N")
+      mitem_new.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_logbook.append(mitem_new)
       self.items["NEW_LOG"] = mitem_new
 
@@ -121,6 +123,8 @@ class Menu(Gtk.MenuBar):
       icon.set_from_stock(Gtk.STOCK_PRINT, Gtk.IconSize.MENU)
       mitem_print.set_image(icon)
       mitem_print.connect("activate", parent.logbook.print_log)
+      key, mod = Gtk.accelerator_parse("<Control>P")
+      mitem_print.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_logbook.append(mitem_print)
       self.items["PRINT_LOG"] = mitem_print
 
@@ -173,6 +177,14 @@ class Menu(Gtk.MenuBar):
       mitem_deleterecord.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_records.append(mitem_deleterecord)
       self.items["DELETE_RECORD"] = mitem_deleterecord
+
+      mitem_removeduplicates = Gtk.ImageMenuItem("Remove Duplicate Records")
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_FIND_AND_REPLACE, Gtk.IconSize.MENU)
+      mitem_removeduplicates.set_image(icon)
+      mitem_removeduplicates.connect("activate", parent.logbook.remove_duplicates_callback)
+      subm_records.append(mitem_removeduplicates)
+      self.items["REMOVE_DUPLICATES"] = mitem_removeduplicates
       
       
       ###### VIEW ######
@@ -232,7 +244,7 @@ class Menu(Gtk.MenuBar):
       return
 
    def set_record_items_sensitive(self, sensitive):
-      for item_name in ["ADD_RECORD", "EDIT_RECORD", "DELETE_RECORD"]:
+      for item_name in ["ADD_RECORD", "EDIT_RECORD", "DELETE_RECORD", "REMOVE_DUPLICATES"]:
          self.items[item_name].set_sensitive(sensitive)
       return
 
