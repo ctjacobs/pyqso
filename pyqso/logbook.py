@@ -42,6 +42,7 @@ class Logbook(Gtk.Notebook):
       self.parent = parent
       self.connection = None
       self.summary = {}
+      self.logs = []
 
       logging.debug("New Logbook instance created!")
       
@@ -277,6 +278,7 @@ class Logbook(Gtk.Notebook):
          self.render_log(self.get_number_of_logs()-1)       
 
       self._update_summary()  
+      self.parent.toolbox.awards.count()
       return
 
    def delete_log(self, widget, page=None):
@@ -318,6 +320,7 @@ class Logbook(Gtk.Notebook):
          self.remove_page(page_index)
 
       self._update_summary()
+      self.parent.toolbox.awards.count()
       return
 
    def filter_log(self, widget, callsign):
@@ -564,6 +567,7 @@ class Logbook(Gtk.Notebook):
          self.logs.append(l)
          self.render_log(self.get_number_of_logs()-1)
       self._update_summary()
+      self.parent.toolbox.awards.count()
       
       return
       
@@ -692,6 +696,7 @@ class Logbook(Gtk.Notebook):
                # All data has been validated, so we can go ahead and add the new record.
                log.add_record(fields_and_data)
                self._update_summary()
+               self.parent.toolbox.awards.count()
                # Select the new Record's row in the treeview.
                self.treeselection[log_index].select_path(log.get_number_of_records())
 
@@ -720,6 +725,7 @@ class Logbook(Gtk.Notebook):
          # 'iter' is needed to remove the record from the ListStore itself.
          log.delete_record(row_index, child_iter)
          self._update_summary()
+         self.parent.toolbox.awards.count()
       return
 
    def edit_record_callback(self, widget, path, view_column):
@@ -773,6 +779,7 @@ class Logbook(Gtk.Notebook):
                   # (we add 1 onto the column_index here because we don't want to consider the index column)
                   log.set(child_iter, i+1, fields_and_data[field_names[i]])
                self._update_summary()
+               self.parent.toolbox.awards.count()
 
       dialog.destroy()
       return
