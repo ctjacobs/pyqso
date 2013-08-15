@@ -78,7 +78,7 @@ class Awards(Gtk.VBox):
          records = log.get_all_records()
          for r in records:
             if(r["BAND"] != "" and r["MODE"] != ""):
-               band = self.bands.index(r["BAND"])
+               band = self.bands.index(r["BAND"].lower())
                # Phone modes
                if(r["MODE"].upper() in ["FM", "AM", "SSB", "SSTV"]):
                   count[0][band] += 1
