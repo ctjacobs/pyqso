@@ -789,14 +789,35 @@ class Logbook(Gtk.Notebook):
 
    def remove_duplicates_callback(self, widget=None):
       logging.debug("Removing duplicate records...")
-      logging.error("Duplicates cannot be removed yet.")
 
       log_index = self.get_log_index()
       log = self.logs[log_index]
 
-      removed = 0
+      duplicates = []
+      # Find the duplicates in the log, based on the CALL, QSO_DATE, TIME_ON, FREQ and MODE fields.
+      with self.connection:
+         c = self.connection.cursor()
+         c.execute(
+'''SELECT rowid FROM repeater_contacts WHERE rowid NOT IN
+(
+SELECT MIN(rowid) FROM repeater_contacts GROUP BY call, qso_date, time_on, freq, mode
+)''')
+         result = c.fetchall()
+         for rowid in result:
+            duplicates.append(rowid[0]) # Get the integers from inside the tuples.
 
-      logging.debug("Removed %d duplicate records." % removed)
+      removed = 0 # Count the number of records that are removed. Hopefully this will be the same as len(duplicates).
+      path = Gtk.TreePath(0) # Start with the first row in the log.
+      iter = log.get_iter(path)
+      while iter is not None:
+         row_index = log.get_value(iter, 0) # Get the index.
+         if(row_index in duplicates): # Is this a duplicate row? If so, delete it.
+            log.delete_record(row_index, iter)
+            removed += 1
+         iter = log.iter_next(iter) # Move on to the next row, until iter_next returns None.
+
+      info(self.parent, "Found %d duplicate(s). Successfully removed %d duplicate(s)." % (len(duplicates), removed))
+      assert(len(duplicates) == removed)
       return
 
    def get_number_of_logs(self):

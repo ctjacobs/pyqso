@@ -27,6 +27,14 @@ def error(parent, message):
    dialog.run()
    dialog.destroy()
    return
+
+def info(parent, message):
+   ''' Displays some information. '''
+   dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                               Gtk.MessageType.INFO, Gtk.ButtonsType.OK, message)
+   dialog.run()
+   dialog.destroy()
+   return
    
 def question(parent, message):
    ''' Asks the user a question. The dialog comes with 'Yes' and 'No' response buttons. '''
