@@ -26,7 +26,7 @@ from xml.dom import minidom
 from auxiliary_dialogs import *
 
 class CallsignLookup():
-   ''' Uses qrz.com to lookup details about a particular callsign. '''
+   """ Uses qrz.com to lookup details about a particular callsign. """
 
    def __init__(self, parent):
       logging.debug("New CallsignLookup instance created!")
@@ -36,7 +36,7 @@ class CallsignLookup():
       return
 
    def connect(self, username, password):
-      ''' Initiates a session with the qrz.com server. Hopefully this will return a session key. '''
+      """ Initiates a session with the qrz.com server. Hopefully this will return a session key. """
       self.connection = httplib.HTTPConnection('xmldata.qrz.com')
       request = '/xml/current/?username=%s;password=%s;agent=pyqso' % (username, password)
       self.connection.request('GET', request)
@@ -56,8 +56,8 @@ class CallsignLookup():
       return
 
    def lookup(self, callsign):
-      ''' Parses the XML tree that is returned from the qrz.com XML server to obtain the NAME, ADDRESS, STATE, COUNTRY, DXCC, CQZ, ITUZ, and IOTA field data (if present),
-      and returns the data in the dictionary called fields_and_data. '''
+      """ Parses the XML tree that is returned from the qrz.com XML server to obtain the NAME, ADDRESS, STATE, COUNTRY, DXCC, CQZ, ITUZ, and IOTA field data (if present),
+      and returns the data in the dictionary called fields_and_data. """
       fields_and_data = {"NAME":"", "ADDRESS":"", "STATE":"", "COUNTRY":"", "DXCC":"", "CQZ":"", "ITUZ":"", "IOTA":""}
       if(self.session_key):
          request = '/xml/current/?s=%s;callsign=%s' % (self.session_key, callsign)

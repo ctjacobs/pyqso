@@ -26,7 +26,7 @@ from pyqso.grey_line import *
 from pyqso.awards import *
 
 class Toolbox(Gtk.Frame):
-   ''' Contains a Gtk.Notebook full of amateur radio-related tools. '''   
+   """ Contains a Gtk.Notebook full of amateur radio-related tools. """   
 
    def __init__(self, parent):
          
@@ -49,12 +49,12 @@ class Toolbox(Gtk.Frame):
       return
 
    def toggle_visible_callback(self, widget=None):
-      ''' Show/hide the toolbox. '''
+      """ Show/hide the toolbox. """
       self.set_visible(not self.get_visible())
       return
 
    def _on_switch_page(self, widget, label, new_page):
-      ''' Re-draw the Grey Line if the user switches to the grey line tab. '''
+      """ Re-draw the Grey Line if the user switches to the grey line tab. """
       if(type(label) == GreyLine):
          label.draw() # Note that 'label' is actually a GreyLine object.
       return

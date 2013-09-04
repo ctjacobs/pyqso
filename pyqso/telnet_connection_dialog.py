@@ -24,8 +24,8 @@ import re
 import calendar
 
 class TelnetConnectionDialog(Gtk.Dialog):
-   ''' A simple dialog through which users can specify host and login information for a Telnet server. 
-   This can be used to connect to DX clusters. '''
+   """ A simple dialog through which users can specify host and login information for a Telnet server. 
+   This can be used to connect to DX clusters. """
    
    def __init__(self, parent):
       logging.debug("New TelnetConnectionDialog instance created!")
@@ -75,7 +75,7 @@ class TelnetConnectionDialog(Gtk.Dialog):
       return
 
    def get_connection_info(self):
-      ''' Returns the host and login information stored in the Gtk.Entry boxes. '''
+      """ Returns the host and login information stored in the Gtk.Entry boxes. """
       return self.sources
 
 

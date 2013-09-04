@@ -21,7 +21,7 @@
 from gi.repository import Gtk, GObject
 
 def error(parent, message):
-   ''' Displays an error message. '''
+   """ Displays an error message. """
    dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, message)
    dialog.run()
@@ -29,7 +29,7 @@ def error(parent, message):
    return
 
 def info(parent, message):
-   ''' Displays some information. '''
+   """ Displays some information. """
    dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                Gtk.MessageType.INFO, Gtk.ButtonsType.OK, message)
    dialog.run()
@@ -37,7 +37,7 @@ def info(parent, message):
    return
    
 def question(parent, message):
-   ''' Asks the user a question. The dialog comes with 'Yes' and 'No' response buttons. '''
+   """ Asks the user a question. The dialog comes with 'Yes' and 'No' response buttons. """
    dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                               Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
                               message)

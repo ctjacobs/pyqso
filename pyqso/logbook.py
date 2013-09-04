@@ -33,7 +33,7 @@ from auxiliary_dialogs import *
 #import Hamlib
 
 class Logbook(Gtk.Notebook):
-   ''' A Logbook object can store multiple Log objects. '''
+   """ A Logbook object can store multiple Log objects. """
    
    def __init__(self, parent):
 
@@ -47,7 +47,7 @@ class Logbook(Gtk.Notebook):
       logging.debug("New Logbook instance created!")
       
    def db_connect(self, widget=None, path=None):
-      ''' Creates an SQL database connection to the Logbook's data source '''
+      """ Creates an SQL database connection to the Logbook's data source """
 
       if(path is None):
          # If no path has been provided, get one from a "File Open" dialog.
@@ -140,7 +140,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def _create_new_log_tab(self):
-      ''' Creates a blank page in the Gtk.Notebook for the "+" (New Log) tab. '''
+      """ Creates a blank page in the Gtk.Notebook for the "+" (New Log) tab. """
       blank_treeview = Gtk.TreeView([])
       # Allow the Log to be scrolled up/down
       sw = Gtk.ScrolledWindow()
@@ -169,7 +169,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def _create_summary_page(self):
-      ''' Creates a summary page containing the number of logs in the logbook, and the logbook's modification date. '''
+      """ Creates a summary page containing the number of logs in the logbook, and the logbook's modification date. """
       vbox = Gtk.VBox()
 
       # Database name in large font at the top of the summary page
@@ -206,7 +206,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def _update_summary(self):
-      ''' Updates the information presented on the summary page. '''
+      """ Updates the information presented on the summary page. """
       self.summary["NUMBER_OF_LOGS"].set_label(str(self.get_number_of_logs()))
       t = datetime.fromtimestamp(getmtime(self.path)).strftime("%d %B %Y @ %H:%M")
       self.summary["DATE_MODIFIED"].set_label(str(t))
@@ -789,7 +789,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def remove_duplicates_callback(self, widget=None):
-      ''' Removes duplicate records in a log. Detecting duplicate records is done based on the CALL, QSO_DATE, TIME_ON, FREQ, and MODE fields. '''
+      """ Removes duplicate records in a log. Detecting duplicate records is done based on the CALL, QSO_DATE, TIME_ON, FREQ, and MODE fields. """
       logging.debug("Removing duplicate records...")
 
       log_index = self.get_log_index()
@@ -800,10 +800,10 @@ class Logbook(Gtk.Notebook):
       with self.connection:
          c = self.connection.cursor()
          c.execute(
-'''SELECT rowid FROM repeater_contacts WHERE rowid NOT IN
+"""SELECT rowid FROM repeater_contacts WHERE rowid NOT IN
 (
 SELECT MIN(rowid) FROM repeater_contacts GROUP BY call, qso_date, time_on, freq, mode
-)''')
+)""")
          result = c.fetchall()
          for rowid in result:
             duplicates.append(rowid[0]) # Get the integers from inside the tuples.
@@ -823,11 +823,11 @@ SELECT MIN(rowid) FROM repeater_contacts GROUP BY call, qso_date, time_on, freq,
       return
 
    def get_number_of_logs(self):
-      ''' Returns the total number of logs in the logbook. '''
+      """ Returns the total number of logs in the logbook. """
       return len(self.logs)
 
    def log_name_exists(self, table_name):
-      ''' Returns True if the log name already exists in the logbook, and False otherwise. '''
+      """ Returns True if the log name already exists in the logbook, and False otherwise. """
       with self.connection:
          c = self.connection.cursor()
          c.execute("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE name=?)", [table_name])

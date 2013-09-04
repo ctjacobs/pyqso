@@ -28,7 +28,7 @@ from adif import AVAILABLE_FIELD_NAMES_TYPES, AVAILABLE_FIELD_NAMES_ORDERED
 from record_dialog import *
 
 class Log(Gtk.ListStore):
-   ''' A Log object can store multiple Record objects. '''
+   """ A Log object can store multiple Record objects. """
    
    def __init__(self, connection, name):
 
@@ -44,7 +44,7 @@ class Log(Gtk.ListStore):
       logging.debug("New Log instance created!")
 
    def populate(self):
-      ''' Removes everything in the Gtk.ListStore that is rendered already (via the TreeView), and starts afresh '''
+      """ Removes everything in the Gtk.ListStore that is rendered already (via the TreeView), and starts afresh """
       self.add_missing_db_columns()
       self.clear()
       records = self.get_all_records()
@@ -59,8 +59,8 @@ class Log(Gtk.ListStore):
       return
 
    def add_missing_db_columns(self):
-      ''' Checks whether each field name in AVAILABLE_FIELD_NAMES_ORDERED is in the database table. If not, PyQSO will add it
-      (with all entries being set to NULL initially). '''
+      """ Checks whether each field name in AVAILABLE_FIELD_NAMES_ORDERED is in the database table. If not, PyQSO will add it
+      (with all entries being set to NULL initially). """
       with(self.connection):
          c = self.connection.cursor()
       for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
@@ -75,7 +75,7 @@ class Log(Gtk.ListStore):
       return
 
    def add_record(self, fields_and_data):
-      ''' Adds a record comprising data given in the 'fields_and_data' argument to the log. '''
+      """ Adds a record comprising data given in the 'fields_and_data' argument to the log. """
       liststore_entry = []
       field_names = AVAILABLE_FIELD_NAMES_ORDERED
       for i in range(0, len(field_names)):
@@ -112,7 +112,7 @@ class Log(Gtk.ListStore):
       return
 
    def delete_record(self, index, iter=None):
-      ''' Deletes a record with a specific index in the log. If 'iter' is not None, the corresponding record is also deleted from the Gtk.ListStore data structure. '''
+      """ Deletes a record with a specific index in the log. If 'iter' is not None, the corresponding record is also deleted from the Gtk.ListStore data structure. """
       # Get the selected row in the logbook
       with(self.connection):
          c = self.connection.cursor()
@@ -124,7 +124,7 @@ class Log(Gtk.ListStore):
       return
 
    def edit_record(self, index, field_name, data):
-      ''' Edits a specified record by replacing the data in the field 'field_name' with the data given in the argument called 'data'. '''
+      """ Edits a specified record by replacing the data in the field 'field_name' with the data given in the argument called 'data'. """
       with(self.connection):
          c = self.connection.cursor()
          query = "UPDATE %s SET %s" % (self.name, field_name)
@@ -133,20 +133,20 @@ class Log(Gtk.ListStore):
       return
 
    def get_record_by_index(self, index):
-      ''' Returns a record with a given index in the log. The record is represented by a dictionary of field-value pairs. '''
+      """ Returns a record with a given index in the log. The record is represented by a dictionary of field-value pairs. """
       c = self.connection.cursor()
       query = "SELECT * FROM %s WHERE id=?" % self.name
       c.execute(query, [index])
       return c.fetchone()
 
    def get_all_records(self):
-      ''' Returns a list of all the records in the log. Each record is represented by a dictionary. '''
+      """ Returns a list of all the records in the log. Each record is represented by a dictionary. """
       c = self.connection.cursor()
       c.execute("SELECT * FROM %s" % self.name)
       return c.fetchall()
 
    def get_number_of_records(self):
-      ''' Returns the total number of records in the log. '''
+      """ Returns the total number of records in the log. """
       c = self.connection.cursor()
       c.execute("SELECT Count(*) FROM %s" % self.name)
       return c.fetchone()[0]

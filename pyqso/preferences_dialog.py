@@ -55,7 +55,7 @@ class PreferencesDialog(Gtk.Dialog):
       return
 
    def commit(self):
-      ''' Commits the user preferences to the configuration file. '''
+      """ Commits the user preferences to the configuration file. """
 
       general_data = self.general.get_data()
       view_data = self.view.get_data()
