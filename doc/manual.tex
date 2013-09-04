@@ -87,6 +87,8 @@ Running PyQSO with the \texttt{-d} or \texttt{--debug} flag enables the debuggin
 
 \section{Window layout}
 
+
+
 \section{Creating a new logbook}
 Logbooks are SQL databases, and as such they must be accessed with a database connection.
 
@@ -95,9 +97,18 @@ To create a connection, click \texttt{Connect to Logbook...} in the \texttt{Logb
   \item Find and select an existing logbook database file (with the \texttt{.db} file extension), and click \texttt{Open} to create the database connection; or
   \item Create a new database by entering a (non-existing) file name and clicking \texttt{Open}. The logbook database file (and a connection to it) will then be created automatically.
 \end{itemize}
-Once the database connection has been established, the database file name will appear in the status bar. All logs in the logbook will be opened automatically.
+Once the database connection has been established, the database file name will appear in the status bar. All logs in the logbook will be opened automatically, and the user will be presented with a `Summary' page showing how many logs are in the logbook, and when the logbook was last modified.
+
+\begin{center}
+  \includegraphics[width=1\columnwidth]{images/summary.png}
+\end{center}
 
 \chapter{Log management}
+Each log will look something like this:
+\begin{center}
+  \includegraphics[width=1\columnwidth]{images/log_with_awards.png}
+\end{center}
+
 \section{New log}
 To create a new log, click \texttt{New Log} in the \texttt{Logbook} menu and enter the desired name of the log (e.g. repeater\_contacts, dx, mobile\_log). This name must be unique. Alternatively, use the shortcut key combination \texttt{Ctrl + N}.
 
@@ -136,6 +147,12 @@ PyQSO can also resolve callsign-related information (e.g. the operator's name, a
 
 Note that users must first supply their qrz.com account information in the preferences dialog window.
 
+\section{Edit record}
+An existing record can be modified by double-clicking on it. This will bring up the same dialog window 
+
+\begin{center}
+  \includegraphics[width=1\columnwidth]{images/edit_record.png}
+\end{center}
 
 \chapter{Toolbox}
 
@@ -146,6 +163,10 @@ A DX cluster is essentially a server through which radio operators can report an
 
 \section{Grey line}
 The grey line tool can be used to check which parts of the world are in darkness. The position of the grey line is automatically updated every 30 minutes.
+
+\begin{center}
+  \includegraphics[width=1\columnwidth]{images/grey_line.png}
+\end{center}
 
 \section{Awards}
 The awards data is updated each time a record is added, deleted, or modified. 
@@ -165,6 +186,10 @@ PyQSO must be restarted in order for any changes to take effect.
 
 \section{Hamlib support}
 PyQSO features rudimentary support for the Hamlib library. The name and path of the radio device connected to the user's computer can be specified in the Hamlib tab of the preferences dialog. Upon adding a new record to the log, PyQSO will use Hamlib to retrieve the current frequency that the radio device is set to and automatically fill in the Frequency field. 
+
+\begin{center}
+  \includegraphics[width=1\columnwidth]{images/preferences_hamlib.png}
+\end{center}
 
 \bibliographystyle{plainnat}
 \end{document}
