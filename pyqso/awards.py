@@ -22,8 +22,10 @@ from gi.repository import Gtk, GObject
 import logging
 
 class Awards(Gtk.VBox):
+   ''' A tool for tracking progress towards an award. Currently this only supports the DXCC award. '''
    
    def __init__(self, parent):
+      ''' Sets up a table for progress tracking purposes. '''
       #TODO: This only considers the DXCC award for now.
       logging.debug("New Awards instance created!")
          
@@ -66,6 +68,7 @@ class Awards(Gtk.VBox):
       return
 
    def count(self):
+      ''' Updates the table for progress tracking. '''
       logging.debug("Counting the band/mode combinations for the awards table.")
       # Wipe everything and start again
       self.awards.clear()

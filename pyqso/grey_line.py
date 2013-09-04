@@ -28,8 +28,10 @@ from datetime import datetime
 from backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
 
 class GreyLine(Gtk.VBox):
+   ''' A tool for visualising the grey line. '''
    
    def __init__(self, parent):
+      ''' Sets up the drawing canvas and the timer which will re-plot the grey line every 30 minutes. '''
          
       Gtk.VBox.__init__(self, spacing=2)
 
@@ -45,6 +47,7 @@ class GreyLine(Gtk.VBox):
       return
 
    def draw(self):
+      ''' Draws the world map and the grey line on top of it. This method always returns True to satisfy the GObject timer. '''
       if(self.parent.toolbox.tools.get_current_page() != 1 or not self.parent.toolbox.get_visible()):
          # Don't re-draw if the grey line is not visible.
          return True # We need to return True in case this is method was called by a timer event.

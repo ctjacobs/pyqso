@@ -87,15 +87,19 @@ DATA_TYPES = ["A", "B", "N", "S", "I", "D", "T", "M", "G", "L", "E"]
 ADIF_VERSION = "1.0"
 
 class ADIF:
+   ''' The ADIF class supplies methods for reading, parsing, and writing log files in the Amateur Data Interchange Format (ADIF). '''
    
    def __init__(self):
       # Class for I/O of files using the Amateur Data Interchange Format (ADIF).
       logging.debug("New ADIF instance created!")
       
    def read(self, path):
-      
+      ''' Reads an ADIF file with a specified path (given in the 'path' argument), and then parses it.
+      The output is a list of dictionaries (one dictionary per QSO), with each dictionary containing field-value pairs,
+      e.g. {FREQ:145.500, BAND:2M, MODE:FM}. '''
       logging.debug("Reading in ADIF file with path: %s." % path)
-      
+
+      text = ""      
       try:
          f = open(path, 'r')
          text = f.read()
@@ -106,7 +110,7 @@ class ADIF:
       except:
          logging.error("Unknown error occurred when reading the ADIF file.")
          raise
-      
+
       records = self.parse_adi(text)
          
       if(records == []):
@@ -115,6 +119,9 @@ class ADIF:
       return records
       
    def parse_adi(self, text):
+      ''' Parses some raw text (defined in the 'text' argument) for ADIF field data.
+      Outputs a list of dictionaries (one dictionary per QSO). Each dictionary contains the field-value pairs,
+      e.g. {FREQ:145.500, BAND:2M, MODE:FM}. '''
       records = []
 
       # Separate the text at the <eor> or <eoh> markers.
@@ -177,31 +184,44 @@ class ADIF:
 
       
    def write(self, records, path):
-      f = open(path, 'w') # Open file for writing
-      
-      # First write a header containing program version, number of records, etc.
-      dt = datetime.now()
-      
-      f.write('''Amateur radio log file. Generated on %s. Contains %d record(s). 
-      
-<adif_ver:5>%s
-<programid:5>PyQSO
-<programversion:8>0.1a.dev
+      ''' Writes an ADIF file containing all the QSOs in the 'records' list. The desired path is specified in the 'path' argument. 
+      This method returns None. '''
+      try:
+         f = open(path, 'w') # Open file for writing
+         
+         # First write a header containing program version, number of records, etc.
+         dt = datetime.now()
+         
+         f.write('''Amateur radio log file. Generated on %s. Contains %d record(s). 
+         
+   <adif_ver:5>%s
+   <programid:5>PyQSO
+   <programversion:8>0.1a.dev
 
-<eoh>\n''' % (dt, len(records), ADIF_VERSION))
-      
-      # Then write each log to the file.
-      for r in records:
-         for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
-            if( (r[field_name] != "NULL") and (r[field_name] != "") ):
-               f.write("<%s:%d>%s\n" % (field_name.lower(), len(r[field_name]), r[field_name]))
-         f.write("<eor>\n")
+   <eoh>\n''' % (dt, len(records), ADIF_VERSION))
+         
+         # Then write each log to the file.
+         for r in records:
+            for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
+               if( (r[field_name] != "NULL") and (r[field_name] != "") ):
+                  f.write("<%s:%d>%s\n" % (field_name.lower(), len(r[field_name]), r[field_name]))
+            f.write("<eor>\n")
 
-      f.close()
+         f.close()
+
+      except IOError as e:
+         logging.error("I/O error %d: %s" % (e.errno, e.strerror))
+         raise
+      except:
+         logging.error("Unknown error occurred when writing the ADIF file.")
+         raise
+         
+      return
 
 
    def is_valid(self, field_name, data, data_type):
-      ''' Validate the fields with respect to the ADIF specification '''
+      ''' Validates the data in a field (with name 'field_name') with respect to the ADIF specification. 
+      This method returns either True or False to indicate whether the data is valid or not. '''
       
       # Allow an empty string, in case the user doesn't want
       # to fill in this field.

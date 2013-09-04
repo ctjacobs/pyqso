@@ -34,8 +34,13 @@ from callsign_lookup import *
 from auxiliary_dialogs import *
 
 class RecordDialog(Gtk.Dialog):
+   ''' A dialog through which users can enter information about a QSO/record. '''
    
    def __init__(self, parent, log, index=None):
+      ''' Sets up the layout of the record dialog.
+      If a record index is specified in the 'index' argument, then the dialog turns into 'edit record mode' and fills the data sources with the existing data in the log.
+      If the 'index' argument is None, then the dialog starts off with nothing in the data sources (e.g. the Gtk.Entry boxes). '''
+
       logging.debug("New RecordDialog instance created!")
       
       if(index is not None):
@@ -393,6 +398,7 @@ class RecordDialog(Gtk.Dialog):
       return
 
    def get_data(self, field_name):
+      ''' Returns the data for a specified field (with name 'field_name') from the Gtk.Entry/Gtk.ComboBoxText/etc boxes in the record dialog. '''
       if(field_name == "BAND" or field_name == "MODE" or field_name == "QSL_SENT" or field_name == "QSL_RCVD"):
          return self.sources[field_name].get_active_text()
       elif(field_name == "NOTES"):
@@ -406,7 +412,7 @@ class RecordDialog(Gtk.Dialog):
          return self.sources[field_name].get_text()
 
    def lookup_callback(self, widget=None):
-      ''' Gets the callsign-related data from the qrz.com database. '''
+      ''' Gets the callsign-related data from the qrz.com database and stores it in the relevant Gtk.Entry boxes, but returns None. '''
       callsign_lookup = CallsignLookup(parent = self)
 
       config = ConfigParser.ConfigParser()
@@ -432,6 +438,7 @@ class RecordDialog(Gtk.Dialog):
       return
 
    def calendar_callback(self, widget):
+      ''' Opens up a calendar widget for easy QSO_DATE selection. Returns None after the user destroys the dialog. '''
       calendar = CalendarDialog(parent = self)
       response = calendar.run()
       if(response == Gtk.ResponseType.OK):

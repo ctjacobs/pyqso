@@ -140,7 +140,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def _create_new_log_tab(self):
-      # Create a blank page in the Notebook for the "+" (New Log) tab
+      ''' Creates a blank page in the Gtk.Notebook for the "+" (New Log) tab. '''
       blank_treeview = Gtk.TreeView([])
       # Allow the Log to be scrolled up/down
       sw = Gtk.ScrolledWindow()
@@ -169,7 +169,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def _create_summary_page(self):
-
+      ''' Creates a summary page containing the number of logs in the logbook, and the logbook's modification date. '''
       vbox = Gtk.VBox()
 
       # Database name in large font at the top of the summary page
@@ -206,6 +206,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def _update_summary(self):
+      ''' Updates the information presented on the summary page. '''
       self.summary["NUMBER_OF_LOGS"].set_label(str(self.get_number_of_logs()))
       t = datetime.fromtimestamp(getmtime(self.path)).strftime("%d %B %Y @ %H:%M")
       self.summary["DATE_MODIFIED"].set_label(str(t))
@@ -788,6 +789,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def remove_duplicates_callback(self, widget=None):
+      ''' Removes duplicate records in a log. Detecting duplicate records is done based on the CALL, QSO_DATE, TIME_ON, FREQ, and MODE fields. '''
       logging.debug("Removing duplicate records...")
 
       log_index = self.get_log_index()
@@ -821,9 +823,11 @@ SELECT MIN(rowid) FROM repeater_contacts GROUP BY call, qso_date, time_on, freq,
       return
 
    def get_number_of_logs(self):
+      ''' Returns the total number of logs in the logbook. '''
       return len(self.logs)
 
    def log_name_exists(self, table_name):
+      ''' Returns True if the log name already exists in the logbook, and False otherwise. '''
       with self.connection:
          c = self.connection.cursor()
          c.execute("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE name=?)", [table_name])

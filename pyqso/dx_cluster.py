@@ -28,8 +28,10 @@ import telnetlib
 from pyqso.telnet_connection_dialog import *
 
 class DXCluster(Gtk.VBox):
+   ''' A tool for connecting to a DX cluster (specifically Telnet-based DX clusters). '''
    
    def __init__(self, parent):
+      ''' Also sets up a timer so that PyQSO can retrieve new data from the Telnet server every few seconds. '''
          
       Gtk.VBox.__init__(self, spacing=2)
 
@@ -89,7 +91,7 @@ class DXCluster(Gtk.VBox):
       return
 
    def telnet_connect(self, widget=None):
-
+      ''' Connects to a user-specified Telnet server, with the host and login details specified in the Gtk.Entry boxes in the TelnetConnectionDialog. '''
       dialog = TelnetConnectionDialog(self.parent)
       response = dialog.run()
       if(response == Gtk.ResponseType.OK):
@@ -130,6 +132,7 @@ class DXCluster(Gtk.VBox):
       return
 
    def telnet_disconnect(self, widget=None):
+      ''' Disconnects from a Telnet server. '''
       if(self.connection):
          self.connection.close()
       self.buffer.set_text("")
@@ -138,12 +141,14 @@ class DXCluster(Gtk.VBox):
       return
 
    def telnet_send_command(self, widget=None):
+      ''' Sends the user-specified command in the Gtk.Entry box to the Telnet server (if PyQSO is connected to one). '''
       if(self.connection):
          self.connection.write(self.command.get_text() + "\n")
          self.command.set_text("")
       return
 
    def on_telnet_io(self):
+      ''' Retrieves any new data from the Telnet server and prints it out in the Gtk.TextView widget. Always returns True to satisfy the GObject timer. '''
       if(self.connection):
          text = self.connection.read_very_eager()
          #text = text.replace(u"\u0007", "") # Remove the BEL Unicode character from the end of the line
@@ -164,10 +169,12 @@ class DXCluster(Gtk.VBox):
       return True
    
    def on_delete(self, widget, event):
+      ''' Removes the I/O timer and ends the connection with the Telnet server. '''
       self.telnet_disconnect()
       GObject.source_remove(self.check_io_event)
 
    def set_connect_button_sensitive(self, sensitive):
+      ''' Enables/disables the relevant buttons for connecting/disconnecting from a DX cluster, so that users cannot click the connect button if PyQSO is already connected. '''
       self.buttons["CONNECT"].set_sensitive(sensitive)
       self.buttons["DISCONNECT"].set_sensitive(not sensitive)
       self.send.set_sensitive(not sensitive)

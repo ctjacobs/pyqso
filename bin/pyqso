@@ -40,8 +40,10 @@ from pyqso.toolbox import *
 from pyqso.preferences_dialog import *
    
 class PyQSO(Gtk.Window):
+   ''' The PyQSO application class. '''
    
    def __init__(self, logbook_path):
+      ''' Sets up the main (root) window, starts the event loop, and connects to a logbook (if specified by the user in the command line). '''
          
       # Call the constructor of the super class (Gtk.Window)
       Gtk.Window.__init__(self, title="PyQSO 0.1a.dev")
@@ -105,6 +107,7 @@ class PyQSO(Gtk.Window):
       return
 
    def show_about(self, widget):
+      ''' Shows the About dialog, which includes license information. This method returns None after the user destroys the dialog. '''
       about = Gtk.AboutDialog()
       about.set_modal(True)
       about.set_transient_for(parent=self)
@@ -135,6 +138,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.''')
       return      
 
    def show_preferences(self, widget):
+      ''' Shows the Preferences dialog. Any changes made by the user after clicking the 'Ok' button are saved in the .cfg file. This method returns None after the user destroys the dialog. '''
       preferences = PreferencesDialog(self)
       response = preferences.run()
       if(response == Gtk.ResponseType.OK):

@@ -56,6 +56,8 @@ class CallsignLookup():
       return
 
    def lookup(self, callsign):
+      ''' Parses the XML tree that is returned from the qrz.com XML server to obtain the NAME, ADDRESS, STATE, COUNTRY, DXCC, CQZ, ITUZ, and IOTA field data (if present),
+      and returns the data in the dictionary called fields_and_data. '''
       fields_and_data = {"NAME":"", "ADDRESS":"", "STATE":"", "COUNTRY":"", "DXCC":"", "CQZ":"", "ITUZ":"", "IOTA":""}
       if(self.session_key):
          request = '/xml/current/?s=%s;callsign=%s' % (self.session_key, callsign)
