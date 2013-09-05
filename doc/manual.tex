@@ -159,7 +159,15 @@ An existing record can be modified by double-clicking on it. This will bring up 
 \section{DX cluster}
 A DX cluster is essentially a server through which radio operators can report and receive updates about QSOs that are in progress across the bands. PyQSO is able to connect to a DX cluster that operates using the Telnet protocol to provide a text-based alert service. As a result of the many different Telnet-based software products that DX clusters run, PyQSO currently outputs the raw data received from the DX cluster rather than trying to parse it in some way.
 
+%\begin{center}
+%  \includegraphics[width=1\columnwidth]{images/dx_cluster.png}
+%\end{center}
 
+If no port is specified, PyQSO will use the default value of 23.
+
+\begin{center}
+  \includegraphics[width=0.5\columnwidth]{images/telnet_connection_dialog.png}
+\end{center}
 
 \section{Grey line}
 The grey line tool can be used to check which parts of the world are in darkness. The position of the grey line is automatically updated every 30 minutes.
