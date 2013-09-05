@@ -366,13 +366,6 @@ class Logbook(Gtk.Notebook):
       hbox = Gtk.HBox(False, 0)
       label = Gtk.Label(self.logs[index].name)
       hbox.pack_start(label, False, False, 0)
-      icon = Gtk.Image.new_from_stock(Gtk.STOCK_CLOSE, Gtk.IconSize.MENU)
-      button = Gtk.Button()
-      button.set_relief(Gtk.ReliefStyle.NONE)
-      button.set_focus_on_click(False)
-      button.connect("clicked", self.delete_log, vbox)
-      button.add(icon)
-      hbox.pack_start(button, False, False, 0)
       hbox.show_all()
 
       self.insert_page(vbox, hbox, index+1) # Append the new log as a new tab
