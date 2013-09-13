@@ -41,15 +41,20 @@
 
 \tableofcontents
 
-\chapter{Introduction}
+\chapter{Introduction}\label{chap:introduction}
 PyQSO is a contact logging tool for amateur radio operators. It is currently in the early stages of development.
 
 As the name suggests, PyQSO is written primarily in the Python programming language. The graphical user interface (GUI) has been built using the GTK+ library through the PyGTK bindings. PyQSO also uses an SQLite embedded database to manage all the contacts an amateur radio operator makes.
 
 Many amateur radio operators choose to store all the contacts they ever make in a single \textit{logbook}, whereas others keep a separate logbook for each year, for example. Each logbook may be divided up to form multiple distinct \textit{logs}, perhaps one for casual repeater contacts and another for DX'ing. Finally, each log can contain multiple \textit{records}. PyQSO is based around this three-tier model, going from logbooks at the top to individual records at the bottom. From an implementation point-of-view, a database is analogous to a logbook, a table in the database is analogous to a log in the logbook, and the records in each table are analogous to the records in each log.
 
+The structure of this manual is as follows. Chapter \ref{chap:getting_started} is concerned with the installation, running, and overall layout of PyQSO. It also describes how to create a  new logbook and open an existing one. Chapter \ref{chap:log_management} explains how to create a log in the logbook, as well as the basic operations that users can perform with existing logs, such as printing, importing from/exporting to ADIF format, and sorting. Chapter \ref{chap:record_management} deals with the bottom layer of the three-tier model -- the creation, deletion, and modification of QSO records in a log. Chapter \ref{chap:toolbox} introduces the PyQSO toolbox which contains three tools that are useful to amateur radio operators: a DX cluster, grey line plotter, and an awards progress tracker. Finally, Chapter \ref{chap:preferences} explains how users can set up Hamlib support and show/hide various fields in a log, along with several other user preferences that can be set via the Preferences dialog window.
+
 \section{Licensing}
 PyQSO is free software, released under the GNU General Public License. Please see the file called COPYING for more information.
+
+
+\chapter{Getting started}\label{chap:getting_started}
 
 \section{Installation and running}
 Assuming that your current working directory is PyQSO's base directory (the directory that the Makefile is in), you can install PyQSO via the terminal with the following command:
@@ -66,44 +71,39 @@ Assuming that your current working directory is PyQSO's base directory (the dire
 
 \noindent from PyQSO's base directory.
 
-
-
-\chapter{Getting started}
-
-\section{Command-line options}
+\subsection{Command-line options}
 There are several options available when executing PyQSO from the command-line.
 
-\subsection{Load logbook file}
+\subsubsection{Load logbook file}
 In addition to being able to load a logbook through the GUI, users can also specify a logbook file to load at the command line with the \texttt{-l} or \texttt{--logbook} option. For example, to load a logbook file called \texttt{mylogbook.db}, use the following command:
 
   \texttt{pyqso --logbook /path/to/mylogbook.db}
 
-\subsection{Debugging mode}
+\subsubsection{Debugging mode}
 Running PyQSO with the \texttt{-d} or \texttt{--debug} flag enables the debugging mode:
 
   \texttt{pyqso --debug}
 
 \noindent All debugging-related messages are written to a file called pyqso.debug, located in the current working directory.
 
+
 \section{Window layout}
 
 
 
 \section{Creating a new logbook}
-Logbooks are SQL databases, and as such they must be accessed with a database connection.
-
-To create a connection, click \texttt{Connect to Logbook...} in the \texttt{Logbook} menu, and either:
+Logbooks are SQL databases, and as such they must be accessed with a database connection. To create a connection, click \texttt{Connect to Logbook...} in the \texttt{Logbook} menu, and either:
 \begin{itemize}
   \item Find and select an existing logbook database file (with the \texttt{.db} file extension), and click \texttt{Open} to create the database connection; or
   \item Create a new database by entering a (non-existing) file name and clicking \texttt{Open}. The logbook database file (and a connection to it) will then be created automatically.
 \end{itemize}
-Once the database connection has been established, the database file name will appear in the status bar. All logs in the logbook will be opened automatically, and the user will be presented with a `Summary' page showing how many logs are in the logbook, and when the logbook was last modified.
+Once the database connection has been established, the database file name will appear in the status bar. All logs in the logbook will be opened automatically, and you will be presented with a `Summary' page showing how many logs are in the logbook, and when the logbook was last modified.
 
 \begin{center}
   \includegraphics[width=1\columnwidth]{images/summary.png}
 \end{center}
 
-\chapter{Log management}
+\chapter{Log management}\label{chap:log_management}
 Each log will look something like this:
 \begin{center}
   \includegraphics[width=1\columnwidth]{images/log_with_awards.png}
@@ -113,7 +113,10 @@ Each log will look something like this:
 To create a new log, click \texttt{New Log} in the \texttt{Logbook} menu and enter the desired name of the log (e.g. repeater\_contacts, dx, mobile\_log). This name must be unique. Alternatively, use the shortcut key combination \texttt{Ctrl + N}.
 
 \section{Renaming a log}
+To rename the currently selected log, click \texttt{Rename Selected Log} in the \texttt{Logbook} menu. Remember that the log's new name cannot be the same as another log in the logbook.
+
 \section{Deleting a log}
+To delete the currently selected log, click \texttt{Delete Selected Log} in the \texttt{Logbook} menu. As with all database operations in PyQSO, this is permanent and cannot be undone.
 
 \section{Importing and exporting a log}
 While PyQSO stores logbooks in SQL format, it is possible to export individual logs in the well-known ADIF format. View the log you wish to export, and click \texttt{Export Log} in the \texttt{Logbook} menu.
@@ -126,12 +129,12 @@ Note that all data must conform to the ADIF standard, otherwise it will be ignor
 Due to restrictions on the page width, only a selection of field names will be printed: callsign, date, time, frequency, and mode.
 
 \section{Filtering by callsign}
-Entering an expression such as \texttt{xyz} into the ``Filter by callsign'' box will instantly filter out any callsigns beginning with that expression.
+Entering an expression such as \texttt{xyz} into the \texttt{Search callsign} box will instantly filter out any callsigns beginning with that expression.
 
 \section{Sorting by field}
 To sort a log by a particular field name, left-click the column header that contains that field name. By default, it is the \texttt{Index} field that is sorted in ascending order.
 
-\chapter{Record management}
+\chapter{Record management}\label{chap:record_management}
 
 \section{New record (QSO)}
 A new QSO can be added by either:
@@ -140,7 +143,7 @@ A new QSO can be added by either:
   \item Pressing \texttt{Ctrl + R}.
   \item Clicking \texttt{Add Record...} in the \texttt{Records} menu.
 \end{itemize}
-A dialog window will appear where you can enter the details of the QSO. Note that the current date and time are filled in automatically.
+A dialog window will appear where you can enter the details of the QSO. Note that the current date and time are filled in automatically. Once you have finished entering the QSO details, click \texttt{OK} to save the changes.
 
 \subsection{Callsign lookup}
 PyQSO can also resolve callsign-related information (e.g. the operator's name, address, and ITU Zone) by querying the qrz.com database.
@@ -148,13 +151,13 @@ PyQSO can also resolve callsign-related information (e.g. the operator's name, a
 Note that users must first supply their qrz.com account information in the preferences dialog window.
 
 \section{Edit record}
-An existing record can be modified by double-clicking on it. This will bring up the same dialog window 
+An existing record can be modified by double-clicking on it. This will bring up the same dialog window
 
 \begin{center}
   \includegraphics[width=1\columnwidth]{images/edit_record.png}
 \end{center}
 
-\chapter{Toolbox}
+\chapter{Toolbox}\label{chap:toolbox}
 
 \section{DX cluster}
 A DX cluster is essentially a server through which radio operators can report and receive updates about QSOs that are in progress across the bands. PyQSO is able to connect to a DX cluster that operates using the Telnet protocol to provide a text-based alert service. As a result of the many different Telnet-based software products that DX clusters run, PyQSO currently outputs the raw data received from the DX cluster rather than trying to parse it in some way.
@@ -181,19 +184,21 @@ The awards data is updated each time a record is added, deleted, or modified.
 
 Currently only the DXCC award is supported, but additional awards will be added if there is user demand for them.
 
-\chapter{Preferences}
+\chapter{Preferences}\label{chap:preferences}
 PyQSO user preferences are stored in a configuration file located at \texttt{\textasciitilde/.pyqso.cfg}, where \texttt{\textasciitilde} denotes the user's home directory.
 
 \section{General}
+Under the \texttt{General} tab, you can choose to show the toolbox (see Chapter \ref{chap:toolbox}) when PyQSO is started.
 
+Users can also enter their login details to access the qrz.com database. Note that these details are currently stored in plain text (unencrypted) format.
 
 \section{View}
-Not all the available fields have to be displayed in the logbook. Users can choose to hide a subset of them by unchecking them in the View tab. 
+Not all the available fields have to be displayed in the logbook. Users can choose to hide a subset of them by unchecking them in the \texttt{View} tab. 
 
 PyQSO must be restarted in order for any changes to take effect.
 
 \section{Hamlib support}
-PyQSO features rudimentary support for the Hamlib library. The name and path of the radio device connected to the user's computer can be specified in the Hamlib tab of the preferences dialog. Upon adding a new record to the log, PyQSO will use Hamlib to retrieve the current frequency that the radio device is set to and automatically fill in the Frequency field. 
+PyQSO features rudimentary support for the Hamlib library. The name and path of the radio device connected to the user's computer can be specified in the \texttt{Hamlib} tab of the preferences dialog. Upon adding a new record to the log, PyQSO will use Hamlib to retrieve the current frequency that the radio device is set to and automatically fill in the Frequency field. 
 
 \begin{center}
   \includegraphics[width=1\columnwidth]{images/preferences_hamlib.png}
