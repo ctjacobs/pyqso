@@ -21,15 +21,20 @@
 input: 	clean install documentation
 
 install:
-	@echo **********Setting up PyQSO
+	@echo **********Installing PyQSO
 	python setup.py install
 
 manual:
-	cd doc; pdflatex manual.tex; cd ..; done
+	@echo **********Compiling the user manual
+	cd doc; pdflatex manual.tex; cd ..
+
+unittest:
+	@echo **********Running the unit tests
+	cd pyqso; for file in *.py ; do (python $$file); done; cd ..
 
 clean:
 	@echo **********Cleaning build directory
 	rm -rf build
 	@echo **********Cleaning doc directory
-	cd doc; rm -rf *.log *.aux *.dvi *.pdf *.ps *.toc; cd ..; done
+	cd doc; rm -rf *.log *.aux *.dvi *.pdf *.ps *.toc; cd ..
 

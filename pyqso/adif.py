@@ -380,13 +380,17 @@ class TestADIF(unittest.TestCase):
       f = open("ADIF.test_read.adi", 'w')
       f.write("""Some test ADI data.<eoh>
 
-<call:4>TEST<band:3>40M<mode:2>CW
+<call:4>TEST<band:3>40m<mode:2>CW
 <qso_date:8:d>20130322<time_on:4>1955<eor>""")
       f.close()
     
       records = adif.read("ADIF.test_read.adi")
-      
-      assert records == [{'BAND': '40M', 'TIME_ON': '1955', 'CALL': 'TEST', 'MODE': 'CW', 'QSO_DATE': '20130322'}]
+      expected_records = [{'TIME_ON': '1955', 'BAND': '40m', 'CALL': 'TEST', 'MODE': 'CW', 'QSO_DATE': '20130322'}]
+      print "Imported records: ", records
+      print "Expected records: ", expected_records
+      assert(len(records) == 1)
+      assert(len(records[0].keys()) == len(expected_records[0].keys()))
+      assert(records == expected_records)
               
 if(__name__ == '__main__'):
    unittest.main()
