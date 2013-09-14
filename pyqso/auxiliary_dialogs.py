@@ -19,9 +19,11 @@
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
 from gi.repository import Gtk, GObject
+import logging
 
 def error(parent, message):
    """ Displays an error message. """
+   logging.error(message)
    dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, message)
    dialog.run()
@@ -30,6 +32,7 @@ def error(parent, message):
 
 def info(parent, message):
    """ Displays some information. """
+   logging.debug(message)
    dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                Gtk.MessageType.INFO, Gtk.ButtonsType.OK, message)
    dialog.run()

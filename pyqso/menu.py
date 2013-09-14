@@ -42,27 +42,27 @@ class Menu(Gtk.MenuBar):
       subm_logbook = Gtk.Menu()
       mitem_logbook.set_submenu(subm_logbook)
     
-      # Connect
-      mitem_connect = Gtk.ImageMenuItem("Connect to Logbook...")
+      # Create/open logbook
+      mitem_connect = Gtk.ImageMenuItem("Create/Open Logbook...")
       icon = Gtk.Image()
-      icon.set_from_stock(Gtk.STOCK_CONNECT, Gtk.IconSize.MENU)
+      icon.set_from_stock(Gtk.STOCK_OPEN, Gtk.IconSize.MENU)
       mitem_connect.set_image(icon)
-      mitem_connect.connect("activate", parent.logbook.db_connect)
+      mitem_connect.connect("activate", parent.logbook.open)
       key, mod = Gtk.accelerator_parse("<Control>O")
       mitem_connect.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_logbook.append(mitem_connect)
-      self.items["CONNECT"] = mitem_connect
+      self.items["OPEN_LOGBOOK"] = mitem_connect
 
-      # Disconnect
-      mitem_disconnect = Gtk.ImageMenuItem("Disconnect from Logbook")
-      mitem_disconnect.connect("activate", parent.logbook.db_disconnect)
+      # Close logbook
+      mitem_disconnect = Gtk.ImageMenuItem("Close Logbook")
+      mitem_disconnect.connect("activate", parent.logbook.close)
       icon = Gtk.Image()
-      icon.set_from_stock(Gtk.STOCK_DISCONNECT, Gtk.IconSize.MENU)
+      icon.set_from_stock(Gtk.STOCK_CLOSE, Gtk.IconSize.MENU)
       mitem_disconnect.set_image(icon)
       key, mod = Gtk.accelerator_parse("<Control>W")
       mitem_disconnect.add_accelerator("activate", agrp, key, mod, Gtk.AccelFlags.VISIBLE)
       subm_logbook.append(mitem_disconnect)
-      self.items["DISCONNECT"] = mitem_disconnect
+      self.items["CLOSE_LOGBOOK"] = mitem_disconnect
 
       subm_logbook.append(Gtk.SeparatorMenuItem())
 
@@ -80,7 +80,7 @@ class Menu(Gtk.MenuBar):
       # Delete the current log
       mitem_delete = Gtk.ImageMenuItem("Delete Selected Log")
       icon = Gtk.Image()
-      icon.set_from_stock(Gtk.STOCK_CLOSE, Gtk.IconSize.MENU)
+      icon.set_from_stock(Gtk.STOCK_DELETE, Gtk.IconSize.MENU)
       mitem_delete.set_image(icon)
       mitem_delete.connect("activate", parent.logbook.delete_log)
       subm_logbook.append(mitem_delete)
@@ -227,15 +227,15 @@ class Menu(Gtk.MenuBar):
       mitem_about.connect("activate", parent.show_about)
       subm_help.append(mitem_about)
 
-      self.set_connect_item_sensitive(True)
+      self.set_logbook_item_sensitive(True)
       self.set_log_items_sensitive(False)
       self.set_record_items_sensitive(False)
       
       return
       
-   def set_connect_item_sensitive(self, sensitive):
-      self.items["CONNECT"].set_sensitive(sensitive)
-      self.items["DISCONNECT"].set_sensitive(not sensitive)
+   def set_logbook_item_sensitive(self, sensitive):
+      self.items["OPEN_LOGBOOK"].set_sensitive(sensitive)
+      self.items["CLOSE_LOGBOOK"].set_sensitive(not sensitive)
       return
 
    def set_log_items_sensitive(self, sensitive):

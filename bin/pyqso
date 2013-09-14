@@ -40,10 +40,10 @@ from pyqso.toolbox import *
 from pyqso.preferences_dialog import *
    
 class PyQSO(Gtk.Window):
-   ''' The PyQSO application class. '''
+   """ The PyQSO application class. """
    
    def __init__(self, logbook_path):
-      ''' Sets up the main (root) window, starts the event loop, and connects to a logbook (if specified by the user in the command line). '''
+      """ Set up the main (root) window, start the event loop, and open a logbook (if the logbook's path is specified by the user in the command line). """
          
       # Call the constructor of the super class (Gtk.Window)
       Gtk.Window.__init__(self, title="PyQSO 0.1a.dev")
@@ -52,7 +52,7 @@ class PyQSO(Gtk.Window):
       config = ConfigParser.ConfigParser()
       # Check that the configuration file actually exists (and is readable)
       # otherwise, we will resort to the defaults.
-      have_config = (config.read(os.path.expanduser('~/.pyqso.ini')) != [])
+      have_config = (config.read(os.path.expanduser("~/.pyqso.ini")) != [])
 
       self.set_size_request(800, 600) # Default to an 800 x 600 resolution.
       self.set_position(Gtk.WindowPosition.CENTER)
@@ -102,19 +102,19 @@ class PyQSO(Gtk.Window):
          self.toolbox.toggle_visible_callback()
 
       if(logbook_path is not None):
-         self.logbook.db_connect(path=logbook_path)
+         self.logbook.open(widget=None, path=logbook_path)
 
       return
 
    def show_about(self, widget):
-      ''' Shows the About dialog, which includes license information. This method returns None after the user destroys the dialog. '''
+      """ Show the About dialog, which includes license information. This method returns None after the user destroys the dialog. """
       about = Gtk.AboutDialog()
       about.set_modal(True)
       about.set_transient_for(parent=self)
       about.set_program_name("PyQSO")
       about.set_version("0.1a.dev")
       about.set_authors(["Christian Jacobs"])
-      about.set_license('''This program is free software: you can redistribute it and/or modify
+      about.set_license("""This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
@@ -125,7 +125,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.''')
+along with this program.  If not, see <http://www.gnu.org/licenses/>.""")
       about.set_comments("PyQSO: A Python-based contact logging tool for amateur radio operators")
       possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
       for icon_path in possible_icon_paths:
@@ -138,7 +138,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.''')
       return      
 
    def show_preferences(self, widget):
-      ''' Shows the Preferences dialog. Any changes made by the user after clicking the 'Ok' button are saved in the .cfg file. This method returns None after the user destroys the dialog. '''
+      """ Show the Preferences dialog. Any changes made by the user after clicking the 'Ok' button are saved in the .cfg file. This method returns None after the user destroys the dialog. """
       preferences = PreferencesDialog(self)
       response = preferences.run()
       if(response == Gtk.ResponseType.OK):
@@ -146,11 +146,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.''')
       preferences.destroy()
       return
 
-if(__name__ == '__main__'):
+if(__name__ == "__main__"):
    # Get any command line arguments
    parser = optparse.OptionParser()
-   parser.add_option('-d', '--debug', action="store_true", default=False, help='Enable debugging. All debugging messages will be written to pyqso.debug.')
-   parser.add_option('-l', '--logbook', action="store", type="string", dest="logbook", default=None, help='Path to the Logbook file.')
+   parser.add_option("-d", "--debug", action="store_true", default=False, help="Enable debugging. All debugging messages will be written to pyqso.debug.")
+   parser.add_option("-l", "--logbook", action="store", type="string", dest="logbook", default=None, help="Path to the Logbook file.")
    (options, args) = parser.parse_args()
 
    # Set up debugging output

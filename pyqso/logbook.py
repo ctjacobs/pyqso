@@ -43,12 +43,93 @@ class Logbook(Gtk.Notebook):
       self.connection = None
       self.summary = {}
       self.logs = []
-
       logging.debug("New Logbook instance created!")
-      
-   def db_connect(self, widget=None, path=None):
-      """ Creates an SQL database connection to the Logbook's data source """
+      return
+   
+   def open(self, widget=None, path=None):
+      """ Open a logbook, and render all the logs within it. 
+      An optional 'path' argument can be specified if the database file location is known.
+      Otherwise, a file selection dialog will appear. """
 
+      connected = self.db_connect(path)
+      if(connected):
+         # If the connection setup was successful, then open all the logs in the database
+
+         logging.debug("Trying to retrieve all the logs in the logbook...")
+         self.logs = [] # A fresh stack of Log objects
+         try:
+            c = self.connection.cursor()
+            c.execute("SELECT name FROM sqlite_master WHERE type='table'")
+            names = c.fetchall()
+
+            for name in names:
+               if(name[0][0:7] == "sqlite_"):
+                  continue # Skip SQLite internal tables
+               l = Log(self.connection, name[0])
+               l.populate()
+               self.logs.append(l)
+         except:
+            logging.exception("Oops! Something went wrong when trying to retrieve the logs from the logbook.")
+            return
+
+         logging.debug("All logs retrieved successfully. Now attempting to render them all in the Gtk.Notebook...")
+         # For rendering the logs. One treeview and one treeselection per Log.
+         self.treeview = []
+         self.treeselection = []
+         self.sorter = []
+         self.filter = []
+         self._create_summary_page()
+         self._create_dummy_page()
+
+         # FIXME: This is an unfortunate work-around. If the area around the "+/New Log" button
+         # is clicked, PyQSO will change to an empty page. This signal is used to stop this from happening. 
+         self.connect("switch-page", self._on_switch_page)
+
+         for i in range(len(self.logs)):
+            self._render_log(i) 
+         self._update_summary()  
+         self.parent.toolbox.awards.count()  
+
+         context_id = self.parent.statusbar.get_context_id("Status")
+         self.parent.statusbar.push(context_id, "Logbook: %s" % self.path)
+         self.parent.toolbar.set_logbook_button_sensitive(False)
+         self.parent.menu.set_logbook_item_sensitive(False)
+         self.parent.menu.set_log_items_sensitive(True)
+         self.parent.toolbar.filter_source.set_sensitive(True)
+
+         self.show_all()
+         logging.debug("All logs rendered successfully.")
+      else:
+         logging.debug("No logs were opened.")
+
+      return
+
+   def close(self, widget=None):
+      """ Close the logbook that is currently open """
+
+      disconnected = self.db_disconnect()
+      if(disconnected):
+         logging.debug("Closing all logs in the logbook...")
+         context_id = self.parent.statusbar.get_context_id("Status")
+         self.parent.statusbar.push(context_id, "Not connected to a Logbook.")
+         self.parent.toolbar.set_logbook_button_sensitive(True)
+         self.parent.menu.set_logbook_item_sensitive(True)
+         self.parent.menu.set_log_items_sensitive(False)
+         self.parent.toolbar.filter_source.set_sensitive(False)
+
+         while(self.get_n_pages() > 0):
+            # Once a page is removed, the other pages get re-numbered,
+            # so a 'for' loop isn't the best option here.
+            self.remove_page(0)
+         logging.debug("All logs now closed.")
+      else:
+         logging.debug("Unable to disconnect from the database. No logs were closed.")
+      return
+
+   def db_connect(self, path=None):
+      """ Create an SQL database connection to the Logbook's data source """
+
+      logging.debug("Attempting to connect to the logbook database...")
       if(path is None):
          # If no path has been provided, get one from a "File Open" dialog.
          dialog = Gtk.FileChooserDialog("Open SQLite Database File",
@@ -60,13 +141,11 @@ class Logbook(Gtk.Notebook):
          response = dialog.run()
          if(response == Gtk.ResponseType.OK):
             path = dialog.get_filename()
-         else:
-            path = None
          dialog.destroy()
          
-         if(path is None):
+         if(path is None): # If the Cancel button has been clicked, path will still be None
             logging.debug("No file path specified.")
-            return
+            return False
          else:
             self.path = path
       else:
@@ -74,73 +153,34 @@ class Logbook(Gtk.Notebook):
          self.path = path
 
       # Try setting up the SQL database connection
-      if(self.connection):
-         # Destroy any existing connections first.
-         self.db_disconnect()
       try:
+         self.db_disconnect() # Destroy any existing connections first.
          self.connection = sqlite.connect(self.path)
          self.connection.row_factory = sqlite.Row
       except sqlite.Error as e:
          # PyQSO can't connect to the database.
          logging.exception(e)
          error(parent=self.parent, message="PyQSO cannot connect to the database. Check file permissions?")
-         return
+         return False
 
-      # A stack of Log objects
-      self.logs = []
-      
-      # For rendering the logs. One treeview and one treeselection per Log.
-      self.treeview = []
-      self.treeselection = []
-      self.sorter = []
-      self.filter = []
-      self._create_summary_page()
-      self._create_new_log_tab()
-
-      # FIXME: This is an unfortunate work-around. If the area around the "+/New Log" button
-      # is clicked, PyQSO will change to an empty page. This signal is used to stop this from happening. 
-      self.connect("switch-page", self._on_switch_page)
-
-      if(self.connection):
-         context_id = self.parent.statusbar.get_context_id("Status")
-         self.parent.statusbar.push(context_id, "Logbook: %s" % self.path)
-         self.parent.toolbar.set_connect_button_sensitive(False)
-         self.parent.menu.set_connect_item_sensitive(False)
-         self.parent.menu.set_log_items_sensitive(True)
-         self.parent.toolbar.filter_source.set_sensitive(True)
-
-      self.open_logs()
-
-      self.show_all()
-
-      return
+      logging.debug("Database connection created successfully!")
+      return True
          
-   def db_disconnect(self, widget=None):
+   def db_disconnect(self):
+      """ Destroy the connection to the Logbook's data source """
+      logging.debug("Attempting to disconnect from the logbook database...")
       if(self.connection):
          try:
             self.connection.close()
-            self.connection = None
          except sqlite.Error as e:
             logging.exception(e)
-
-         context_id = self.parent.statusbar.get_context_id("Status")
-         self.parent.statusbar.push(context_id, "Not connected to a Logbook.")
-         self.parent.toolbar.set_connect_button_sensitive(True)
-         self.parent.menu.set_connect_item_sensitive(True)
-         self.parent.menu.set_log_items_sensitive(False)
-         self.parent.toolbar.filter_source.set_sensitive(False)
+            return False
       else:
-         logging.error("Already disconnected. Nothing to do here.")
+         logging.debug("Already disconnected. Nothing to do here.")
+      return True
 
-      while(self.get_n_pages() > 0):
-         # Once a page is removed, the other pages get re-numbered,
-         # so a 'for' loop isn't the best option here.
-         self.remove_page(0)
-
-      return
-
-   def _create_new_log_tab(self):
-      """ Creates a blank page in the Gtk.Notebook for the "+" (New Log) tab. """
+   def _create_dummy_page(self):
+      """ Create a blank page in the Gtk.Notebook for the "+" (New Log) tab. """
       blank_treeview = Gtk.TreeView([])
       # Allow the Log to be scrolled up/down
       sw = Gtk.ScrolledWindow()
@@ -169,7 +209,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def _create_summary_page(self):
-      """ Creates a summary page containing the number of logs in the logbook, and the logbook's modification date. """
+      """ Create a summary page containing the number of logs in the logbook, and the logbook's modification date. """
       vbox = Gtk.VBox()
 
       # Database name in large font at the top of the summary page
@@ -206,7 +246,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def _update_summary(self):
-      """ Updates the information presented on the summary page. """
+      """ Update the information presented on the summary page. """
       self.summary["NUMBER_OF_LOGS"].set_label(str(self.get_number_of_logs()))
       t = datetime.fromtimestamp(getmtime(self.path)).strftime("%d %B %Y @ %H:%M")
       self.summary["DATE_MODIFIED"].set_label(str(t))
@@ -226,6 +266,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def new_log(self, widget=None):
+      """ Create a new log in the logbook. """
       if(self.connection is None):
          return
       exists = True
@@ -258,28 +299,10 @@ class Logbook(Gtk.Notebook):
       l.populate()
 
       self.logs.append(l)
-      self.render_log(self.get_number_of_logs()-1)
+      self._render_log(self.get_number_of_logs()-1)
       self._update_summary()
 
       self.set_current_page(self.get_number_of_logs())
-      return
-
-   def open_logs(self):
-      with self.connection:
-         c = self.connection.cursor()
-         c.execute("SELECT name FROM sqlite_master WHERE type='table'")
-         names = c.fetchall()
-
-      for name in names:
-         if(name[0][0:7] == "sqlite_"):
-            continue # Skip SQLite internal tables
-         l = Log(self.connection, name[0])
-         l.populate()
-         self.logs.append(l)
-         self.render_log(self.get_number_of_logs()-1)       
-
-      self._update_summary()  
-      self.parent.toolbox.awards.count()
       return
 
    def delete_log(self, widget, page=None):
@@ -294,7 +317,7 @@ class Logbook(Gtk.Notebook):
          else:
             page = self.get_nth_page(page_index) # Gets the Gtk.VBox of the selected tab in the logbook
 
-      log_index = self.get_log_index(name=page.get_name())
+      log_index = self._get_log_index(name=page.get_name())
       log = self.logs[log_index]
       
       # We also need the page's index in order to remove it using remove_page below.   
@@ -329,7 +352,7 @@ class Logbook(Gtk.Notebook):
          self.filter[i].refilter()
       return
 
-   def filter_by_callsign(self, model, iter, data):
+   def _filter_by_callsign(self, model, iter, data):
       value = model.get_value(iter, 1)
       callsign = self.parent.toolbar.filter_source.get_text()
       
@@ -340,11 +363,11 @@ class Logbook(Gtk.Notebook):
          # We need this to be case insensitive
          return callsign.upper() in value or callsign.lower() in value
 
-   def render_log(self, index):
+   def _render_log(self, index):
       # Render the Log in the Gtk.Notebook.
       self.filter.append(self.logs[index].filter_new(root=None))
       # Set the callsign column as the column we want to filter by
-      self.filter[index].set_visible_func(self.filter_by_callsign, data=None)
+      self.filter[index].set_visible_func(self._filter_by_callsign, data=None)
       self.sorter.append(Gtk.TreeModelSort(model=self.filter[index]))
       self.sorter[index].set_sort_column_id(0, Gtk.SortType.ASCENDING)
 
@@ -402,7 +425,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def sort_log(self, widget, column_index):
-      log_index = self.get_log_index()
+      log_index = self._get_log_index()
       column = self.treeview[log_index].get_column(column_index)
 
       # If we are operating on the currently-sorted column...
@@ -442,7 +465,7 @@ class Logbook(Gtk.Notebook):
       page = self.get_nth_page(page_index) # Gets the Gtk.VBox of the selected tab in the logbook
       old_log_name = page.get_name()
       
-      log_index = self.get_log_index(name=old_log_name)
+      log_index = self._get_log_index(name=old_log_name)
       
       exists = True
       dialog = LogNameDialog(self.parent, title="Rename Log", name=old_log_name)
@@ -522,7 +545,7 @@ class Logbook(Gtk.Notebook):
             if(self.log_name_exists(log_name)):
                # Import into existing log
                exists = True
-               l = self.logs[self.get_log_index(name=log_name)]
+               l = self.logs[self._get_log_index(name=log_name)]
                response = question(parent=self.parent, message="Are you sure you want to import into an existing log?")
                if(response == Gtk.ResponseType.YES):
                   break
@@ -559,7 +582,7 @@ class Logbook(Gtk.Notebook):
 
       if(not exists):
          self.logs.append(l)
-         self.render_log(self.get_number_of_logs()-1)
+         self._render_log(self.get_number_of_logs()-1)
       self._update_summary()
       self.parent.toolbox.awards.count()
       
@@ -571,7 +594,7 @@ class Logbook(Gtk.Notebook):
          logging.debug("No log currently selected!")
          return
 
-      log_index = self.get_log_index()
+      log_index = self._get_log_index()
       log = self.logs[log_index]
 
       dialog = Gtk.FileChooserDialog("Export Log to File",
@@ -601,7 +624,7 @@ class Logbook(Gtk.Notebook):
       if(page_index == 0): # If we are on the Summary page...
          logging.debug("No log currently selected!")
          return
-      log_index = self.get_log_index()
+      log_index = self._get_log_index()
       log = self.logs[log_index]
 
       self.text_to_print = "Callsign\t---\tDate\t---\tTime\t---\tFrequency\t---\tMode\n"
@@ -614,12 +637,12 @@ class Logbook(Gtk.Notebook):
       operation.set_default_page_setup(Gtk.PageSetup())
       operation.set_unit(Gtk.Unit.MM)
 
-      operation.connect("begin_print", self.begin_print)
-      operation.connect("draw_page", self.draw_page)
+      operation.connect("begin_print", self._begin_print)
+      operation.connect("draw_page", self._draw_page)
       result = operation.run(action, parent=self.parent)
       return
     
-   def begin_print(self, operation, context):
+   def _begin_print(self, operation, context):
       width = context.get_width()
       height = context.get_height()
       layout = context.create_pango_layout()
@@ -642,7 +665,7 @@ class Logbook(Gtk.Notebook):
       self.text_to_print = self.text_to_print.split("\n")
       return
 
-   def draw_page(self, operation, context, page_number):
+   def _draw_page(self, operation, context, page_number):
       cr = context.get_cairo_context()
       cr.set_source_rgb(0, 0, 0)
       layout = context.create_pango_layout()
@@ -661,7 +684,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def add_record_callback(self, widget):
-      log_index = self.get_log_index()
+      log_index = self._get_log_index()
       log = self.logs[log_index]
       
       dialog = RecordDialog(parent=self.parent, log=log, index=None)
@@ -698,7 +721,7 @@ class Logbook(Gtk.Notebook):
       return
       
    def delete_record_callback(self, widget):
-      log_index = self.get_log_index()
+      log_index = self._get_log_index()
       log = self.logs[log_index]
       (sort_model, path) = self.treeselection[log_index].get_selected_rows() # Get the selected row in the log
       try:
@@ -726,7 +749,7 @@ class Logbook(Gtk.Notebook):
       # Note: the path and view_column arguments need to be passed in
       # since they associated with the row-activated signal.
 
-      log_index = self.get_log_index()
+      log_index = self._get_log_index()
       log = self.logs[log_index]
 
       (sort_model, path) = self.treeselection[log_index].get_selected_rows() # Get the selected row in the log
@@ -782,10 +805,11 @@ class Logbook(Gtk.Notebook):
       return
 
    def remove_duplicates_callback(self, widget=None):
-      """ Removes duplicate records in a log. Detecting duplicate records is done based on the CALL, QSO_DATE, TIME_ON, FREQ, and MODE fields. """
+      """ Remove duplicate records in a log. 
+      Detecting duplicate records is done based on the CALL, QSO_DATE, TIME_ON, FREQ, and MODE fields. """
       logging.debug("Removing duplicate records...")
 
-      log_index = self.get_log_index()
+      log_index = self._get_log_index()
       log = self.logs[log_index]
 
       duplicates = []
@@ -829,7 +853,7 @@ SELECT MIN(rowid) FROM repeater_contacts GROUP BY call, qso_date, time_on, freq,
             return True
       return False
 
-   def get_log_index(self, name=None):
+   def _get_log_index(self, name=None):
       if(name is None):
          # If no page name is supplied, then just use the currently selected page
          page_index = self.get_current_page() # Gets the index of the selected tab in the logbook

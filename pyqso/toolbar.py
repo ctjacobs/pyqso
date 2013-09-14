@@ -30,25 +30,25 @@ class Toolbar(Gtk.HBox):
 
       self.buttons = {}
 
-      # Connect
+      # Create/open logbook
       icon = Gtk.Image()
-      icon.set_from_stock(Gtk.STOCK_CONNECT, Gtk.IconSize.BUTTON)
+      icon.set_from_stock(Gtk.STOCK_OPEN, Gtk.IconSize.BUTTON)
       button = Gtk.Button()
       button.add(icon)
-      button.set_tooltip_text('Connect to Logbook')
-      button.connect("clicked", parent.logbook.db_connect)
+      button.set_tooltip_text('Create/Open Logbook')
+      button.connect("clicked", parent.logbook.open)
       self.pack_start(button, False, False, 0)
-      self.buttons["CONNECT"] = button
+      self.buttons["OPEN_LOGBOOK"] = button
 
-      # Disconnect
+      # Close logbook
       icon = Gtk.Image()
-      icon.set_from_stock(Gtk.STOCK_DISCONNECT, Gtk.IconSize.BUTTON)
+      icon.set_from_stock(Gtk.STOCK_CLOSE, Gtk.IconSize.BUTTON)
       button = Gtk.Button()
       button.add(icon)
-      button.set_tooltip_text('Disconnect from Logbook')
-      button.connect("clicked", parent.logbook.db_disconnect)
+      button.set_tooltip_text('Close Logbook')
+      button.connect("clicked", parent.logbook.close)
       self.pack_start(button, False, False, 0)
-      self.buttons["DISCONNECT"] = button
+      self.buttons["CLOSE_LOGBOOK"] = button
 
       self.pack_start(Gtk.SeparatorToolItem(), False, False, 0)
 
@@ -92,8 +92,8 @@ class Toolbar(Gtk.HBox):
       self.filter_source.connect_after("changed", parent.logbook.filter_log, self.filter_source.get_text())
       self.pack_start(self.filter_source, False, False, 0)
 
+      self.set_logbook_button_sensitive(True)
       self.set_record_buttons_sensitive(False)
-      self.set_connect_button_sensitive(True)
 
       self.filter_source.set_sensitive(False)
 
@@ -104,9 +104,9 @@ class Toolbar(Gtk.HBox):
          self.buttons[button_name].set_sensitive(sensitive)
       return
 
-   def set_connect_button_sensitive(self, sensitive):
-      self.buttons["CONNECT"].set_sensitive(sensitive)
-      self.buttons["DISCONNECT"].set_sensitive(not sensitive)
+   def set_logbook_button_sensitive(self, sensitive):
+      self.buttons["OPEN_LOGBOOK"].set_sensitive(sensitive)
+      self.buttons["CLOSE_LOGBOOK"].set_sensitive(not sensitive)
       return
 
 
