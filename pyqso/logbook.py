@@ -564,6 +564,7 @@ class Logbook(Gtk.Notebook):
                   break
             elif(self.log_name_exists(log_name) is None):
                # Could not determine if the log name exists. It's safer to stop here than to try to add a new log.
+               error(parent=self.parent, message="Database error. Could not check if the log name exists.")
                dialog.destroy()
                return
             else:
@@ -867,7 +868,7 @@ SELECT MIN(rowid) FROM repeater_contacts GROUP BY call, qso_date, time_on, freq,
       return len(self.logs)
 
    def log_name_exists(self, table_name):
-      """ Return True if the log name already exists in the logbook, and False otherwise. """
+      """ Return True if the log name already exists in the logbook, and False if it does not already exist. Return None if there is a database error. """
       try:
          c = self.connection.cursor()
          c.execute("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE name=?)", [table_name])
@@ -877,8 +878,7 @@ SELECT MIN(rowid) FROM repeater_contacts GROUP BY call, qso_date, time_on, freq,
          else:
             return False
       except sqlite.Error as e:
-         logging.exception(e)
-         error(parent=self.parent, message="Database error. Could not check if the log name exists.")
+         logging.exception(e) # Database error. PyQSO could not check if the log name exists.
          return None
 
    def _get_log_index(self, name=None):

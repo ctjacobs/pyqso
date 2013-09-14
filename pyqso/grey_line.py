@@ -37,7 +37,7 @@ class GreyLine(Gtk.VBox):
    
    def __init__(self, parent):
       """ Set up the drawing canvas and the timer which will re-plot the grey line every 30 minutes. """
-         
+      logging.debug("Setting up the grey line...") 
       Gtk.VBox.__init__(self, spacing=2)
       self.parent = parent
 
@@ -49,6 +49,8 @@ class GreyLine(Gtk.VBox):
 
       self.show_all()
 
+      logging.debug("Grey line ready!") 
+
       return
 
    def draw(self):
@@ -59,6 +61,7 @@ class GreyLine(Gtk.VBox):
             # Don't re-draw if the grey line is not visible.
             return True # We need to return True in case this is method was called by a timer event.
          else:
+            logging.debug("Drawing the grey line...") 
             # Re-draw the grey line
             self.fig.clf()
             sub = self.fig.add_subplot(111)
@@ -73,7 +76,7 @@ class GreyLine(Gtk.VBox):
             m.drawmapboundary(fill_color='lightblue')
             m.fillcontinents(color='darkgreen', lake_color='lightblue')
             m.nightshade(datetime.utcnow()) # Add in the grey line using UTC time. Note that this requires NetCDF.
-
+            logging.debug("Grey line drawn.") 
             return True
       else:
          return False # Don't try to re-draw the canvas if the necessary modules to do so could not be imported.

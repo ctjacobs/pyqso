@@ -25,7 +25,7 @@ class Awards(Gtk.VBox):
    """ A tool for tracking progress towards an award. Currently this only supports the DXCC award. """
    
    def __init__(self, parent):
-      """ Sets up a table for progress tracking purposes. """
+      """ Set up a table for progress tracking purposes. """
       #TODO: This only considers the DXCC award for now.
       logging.debug("New Awards instance created!")
          
@@ -63,13 +63,15 @@ class Awards(Gtk.VBox):
       self.add(self.treeview)
       self.show_all()
 
+      logging.debug("Awards table set up successfully.") 
+
       self.count()
 
       return
 
    def count(self):
-      """ Updates the table for progress tracking. """
-      logging.debug("Counting the band/mode combinations for the awards table.")
+      """ Update the table for progress tracking. """
+      logging.debug("Counting the band/mode combinations for the awards table...")
       # Wipe everything and start again
       self.awards.clear()
       # For each mode, add a new list for holding the totals, and initialise the values to zero.
@@ -95,5 +97,6 @@ class Awards(Gtk.VBox):
       # Insert the rows containing the totals
       for i in range(0, len(self.modes)):
          self.awards.append([self.modes[i]] + count[i])
+      logging.debug("Awards table updated.") 
       return
 
