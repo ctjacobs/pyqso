@@ -74,10 +74,12 @@ Assuming that your current working directory is PyQSO's base directory (the dire
 \subsection{Command-line options}
 There are several options available when executing PyQSO from the command-line.
 
-\subsubsection{Load logbook file}
-In addition to being able to load a logbook through the GUI, users can also specify a logbook file to load at the command line with the \texttt{-l} or \texttt{--logbook} option. For example, to load a logbook file called \texttt{mylogbook.db}, use the following command:
+\subsubsection{Create/open a logbook file}
+In addition to being able to open a new or existing logbook through the GUI, users can also specify a logbook file to open at the command line with the \texttt{-l} or \texttt{--logbook} option. For example, to open a logbook file called \texttt{mylogbook.db}, use the following command:
 
   \texttt{pyqso --logbook /path/to/mylogbook.db}
+
+If the file does not already exist, PyQSO will create it.
 
 \subsubsection{Debugging mode}
 Running PyQSO with the \texttt{-d} or \texttt{--debug} flag enables the debugging mode:
@@ -92,7 +94,7 @@ Running PyQSO with the \texttt{-d} or \texttt{--debug} flag enables the debuggin
 
 
 \section{Creating a new logbook}
-Logbooks are SQL databases, and as such they must be accessed with a database connection. To create a connection, click \texttt{Connect to Logbook...} in the \texttt{Logbook} menu, and either:
+Logbooks are SQL databases, and as such they are accessed with a database connection. To create a connection and open the logbook, click \texttt{Create/Open Logbook...} in the \texttt{Logbook} menu, and either:
 \begin{itemize}
   \item Find and select an existing logbook database file (with the \texttt{.db} file extension), and click \texttt{Open} to create the database connection; or
   \item Create a new database by entering a (non-existing) file name and clicking \texttt{Open}. The logbook database file (and a connection to it) will then be created automatically.
