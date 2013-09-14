@@ -24,11 +24,10 @@ import logging
 class Toolbar(Gtk.HBox):
    
    def __init__(self, parent):
-      logging.debug("New Toolbar instance created!")
-      
+      logging.debug("Setting up the toolbar...")  
+ 
       Gtk.HBox.__init__(self, spacing=2)
 
-      logging.debug("Setting up the toolbar...")   
       self.buttons = {}
 
       # Create/open logbook
