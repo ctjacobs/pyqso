@@ -333,9 +333,13 @@ class Logbook(Gtk.Notebook):
 
       response = question(parent=self.parent, message="Are you sure you want to delete log %s?" % log.name)
       if(response == Gtk.ResponseType.YES):
-         with self.connection:
+         try:
             c = self.connection.cursor()
             c.execute("DROP TABLE %s" % log.name)
+         except sqlite.Error as e:
+            logging.exception(e)
+            error(parent=self.parent, message="Database error. Could not delete the log.")
+            return
 
          self.logs.pop(log_index)
          # Remove the log from the renderers too
@@ -558,6 +562,10 @@ class Logbook(Gtk.Notebook):
                response = question(parent=self.parent, message="Are you sure you want to import into an existing log?")
                if(response == Gtk.ResponseType.YES):
                   break
+            elif(self.log_name_exists(log_name) is None):
+               # Could not determine if the log name exists. It's safer to stop here than to try to add a new log.
+               dialog.destroy()
+               return
             else:
                # Create a new log with the name the user supplies
                exists = False
@@ -583,9 +591,8 @@ class Logbook(Gtk.Notebook):
 
       adif = ADIF()
       records = adif.read(path)      
-      print "Importing records..."
+      logging.debug("Importing records from the ADIF file with path: %s" % path)
       for record in records:
-         print record
          l.add_record(record)
       l.populate()
 
@@ -826,7 +833,7 @@ class Logbook(Gtk.Notebook):
 
       duplicates = []
       # Find the duplicates in the log, based on the CALL, QSO_DATE, TIME_ON, FREQ and MODE fields.
-      with self.connection:
+      try:
          c = self.connection.cursor()
          c.execute(
 """SELECT rowid FROM repeater_contacts WHERE rowid NOT IN
@@ -836,6 +843,10 @@ SELECT MIN(rowid) FROM repeater_contacts GROUP BY call, qso_date, time_on, freq,
          result = c.fetchall()
          for rowid in result:
             duplicates.append(rowid[0]) # Get the integers from inside the tuples.
+      except sqlite.Error as e:
+         logging.exception(e)
+         error(parent=self.parent, message="Database error.")
+         return
 
       removed = 0 # Count the number of records that are removed. Hopefully this will be the same as len(duplicates).
       path = Gtk.TreePath(0) # Start with the first row in the log.
@@ -857,13 +868,18 @@ SELECT MIN(rowid) FROM repeater_contacts GROUP BY call, qso_date, time_on, freq,
 
    def log_name_exists(self, table_name):
       """ Return True if the log name already exists in the logbook, and False otherwise. """
-      with self.connection:
+      try:
          c = self.connection.cursor()
          c.execute("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE name=?)", [table_name])
          exists = c.fetchone()
          if(exists[0] == 1):
             return True
-      return False
+         else:
+            return False
+      except sqlite.Error as e:
+         logging.exception(e)
+         error(parent=self.parent, message="Database error. Could not check if the log name exists.")
+         return None
 
    def _get_log_index(self, name=None):
       """ Given the name of a log, return its index in the self.log list. """

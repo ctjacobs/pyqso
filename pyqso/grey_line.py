@@ -76,5 +76,5 @@ class GreyLine(Gtk.VBox):
 
             return True
       else:
-         return True # Don't try to re-draw the canvas if the necessary modules to do so could not be imported.
+         return False # Don't try to re-draw the canvas if the necessary modules to do so could not be imported.
 
