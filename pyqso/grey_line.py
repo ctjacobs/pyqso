@@ -20,12 +20,17 @@
 
 from gi.repository import Gtk, GObject
 import logging
-import numpy
-import matplotlib
-matplotlib.rcParams['font.size'] = 10.0
-from mpl_toolkits.basemap import Basemap
 from datetime import datetime
-from backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
+try:
+   import numpy
+   import matplotlib
+   matplotlib.rcParams['font.size'] = 10.0
+   from mpl_toolkits.basemap import Basemap
+   from backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
+   have_necessary_modules = True
+except ImportError:
+   logging.error("Could not import a non-standard Python module needed by the GreyLine class. Check that all the PyQSO dependencies are satisfied.")
+   have_necessary_modules = False
 
 class GreyLine(Gtk.VBox):
    """ A tool for visualising the grey line. """
@@ -34,13 +39,13 @@ class GreyLine(Gtk.VBox):
       """ Set up the drawing canvas and the timer which will re-plot the grey line every 30 minutes. """
          
       Gtk.VBox.__init__(self, spacing=2)
-
-      self.fig = matplotlib.figure.Figure()
-      self.canvas = FigureCanvas(self.fig) # For embedding in the Gtk application
-      self.pack_start(self.canvas, True, True, 0)
-
       self.parent = parent
-      self.refresh_event = GObject.timeout_add(1800000, self.draw) # Re-draw the grey line automatically after 30 minutes (if the grey line tool is visible).
+
+      if(have_necessary_modules):
+         self.fig = matplotlib.figure.Figure()
+         self.canvas = FigureCanvas(self.fig) # For embedding in the Gtk application
+         self.pack_start(self.canvas, True, True, 0)
+         self.refresh_event = GObject.timeout_add(1800000, self.draw) # Re-draw the grey line automatically after 30 minutes (if the grey line tool is visible).
 
       self.show_all()
 
@@ -48,24 +53,28 @@ class GreyLine(Gtk.VBox):
 
    def draw(self):
       """ Draw the world map and the grey line on top of it. This method always returns True to satisfy the GObject timer. """
-      if(self.parent.toolbox.tools.get_current_page() != 1 or not self.parent.toolbox.get_visible()):
-         # Don't re-draw if the grey line is not visible.
-         return True # We need to return True in case this is method was called by a timer event.
+
+      if(have_necessary_modules):
+         if(self.parent.toolbox.tools.get_current_page() != 1 or not self.parent.toolbox.get_visible()):
+            # Don't re-draw if the grey line is not visible.
+            return True # We need to return True in case this is method was called by a timer event.
+         else:
+            # Re-draw the grey line
+            self.fig.clf()
+            sub = self.fig.add_subplot(111)
+
+            # Draw the map of the world. This is based on the example from:
+            # http://matplotlib.org/basemap/users/examples.html
+            m = Basemap(projection='mill', lon_0=0, ax=sub, resolution='c', fix_aspect=False)
+            m.drawcountries(linewidth=0.5)
+            m.drawcoastlines(linewidth=0.5)
+            m.drawparallels(numpy.arange(-90, 90, 30), labels=[1, 0, 0, 0])
+            m.drawmeridians(numpy.arange(m.lonmin, m.lonmax+30, 60), labels=[0, 0, 0, 1])
+            m.drawmapboundary(fill_color='lightblue')
+            m.fillcontinents(color='darkgreen', lake_color='lightblue')
+            m.nightshade(datetime.utcnow()) # Add in the grey line using UTC time. Note that this requires NetCDF.
+
+            return True
       else:
-         # Re-draw the grey line
-         self.fig.clf()
-         sub = self.fig.add_subplot(111)
-
-         # Draw the map of the world. This is based on the example from:
-         # http://matplotlib.org/basemap/users/examples.html
-         m = Basemap(projection='mill', lon_0=0, ax=sub, resolution='c', fix_aspect=False)
-         m.drawcountries(linewidth=0.5)
-         m.drawcoastlines(linewidth=0.5)
-         m.drawparallels(numpy.arange(-90, 90, 30), labels=[1, 0, 0, 0])
-         m.drawmeridians(numpy.arange(m.lonmin, m.lonmax+30, 60), labels=[0, 0, 0, 1])
-         m.drawmapboundary(fill_color='lightblue')
-         m.fillcontinents(color='darkgreen', lake_color='lightblue')
-         m.nightshade(datetime.utcnow()) # Add in the grey line using UTC time. Note that this requires NetCDF.
-
-         return True
+         return True # Don't try to re-draw the canvas if the necessary modules to do so could not be imported.
 

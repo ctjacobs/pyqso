@@ -27,7 +27,7 @@ import base64
 try:
    import Hamlib
    have_hamlib = True
-except:
+except ImportError:
    logging.error("Could not import the Hamlib module!")
    have_hamlib = False
 

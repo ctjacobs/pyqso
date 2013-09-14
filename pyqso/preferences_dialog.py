@@ -27,7 +27,7 @@ from math import ceil
 try:
    import Hamlib
    have_hamlib = True
-except:
+except ImportError:
    logging.error("Could not import the Hamlib module!")
    have_hamlib = False
 
@@ -57,7 +57,7 @@ class PreferencesDialog(Gtk.Dialog):
       return
 
    def commit(self):
-      """ Commits the user preferences to the configuration file. """
+      """ Commit the user preferences to the configuration file. """
 
       general_data = self.general.get_data()
       view_data = self.view.get_data()
