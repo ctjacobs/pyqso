@@ -30,7 +30,8 @@ class Menu(Gtk.MenuBar):
       
       # First let's call the constructor of the super class (Gtk.MenuBar)
       Gtk.MenuBar.__init__(self)
-      
+
+      logging.debug("Setting up the menu bar...")      
       agrp = Gtk.AccelGroup()
       parent.add_accel_group(agrp)
 
@@ -231,20 +232,28 @@ class Menu(Gtk.MenuBar):
       self.set_log_items_sensitive(False)
       self.set_record_items_sensitive(False)
       
+      logging.debug("Menu bar ready!") 
+
       return
       
    def set_logbook_item_sensitive(self, sensitive):
+      logging.debug("Setting the 'Create/Open Logbook' menu item's sensitivity to: %s..." % sensitive) 
       self.items["OPEN_LOGBOOK"].set_sensitive(sensitive)
       self.items["CLOSE_LOGBOOK"].set_sensitive(not sensitive)
+      logging.debug("Set the 'Create/Open Logbook' menu item's sensitivity to: %s." % sensitive) 
       return
 
    def set_log_items_sensitive(self, sensitive):
+      logging.debug("Setting log-related menu item sensitivity to: %s..." % sensitive) 
       for item_name in ["NEW_LOG", "DELETE_LOG", "RENAME_LOG", "IMPORT_LOG", "EXPORT_LOG", "PRINT_LOG"]:
          self.items[item_name].set_sensitive(sensitive)
+      logging.debug("Set log-related menu item sensitivity to: %s." % sensitive) 
       return
 
    def set_record_items_sensitive(self, sensitive):
+      logging.debug("Setting record-related menu item sensitivity to: %s..." % sensitive) 
       for item_name in ["ADD_RECORD", "EDIT_RECORD", "DELETE_RECORD", "REMOVE_DUPLICATES"]:
          self.items[item_name].set_sensitive(sensitive)
+      logging.debug("Set record-related menu item sensitivity to: %s." % sensitive) 
       return
 

@@ -28,6 +28,7 @@ class Toolbar(Gtk.HBox):
       
       Gtk.HBox.__init__(self, spacing=2)
 
+      logging.debug("Setting up the toolbar...")   
       self.buttons = {}
 
       # Create/open logbook
@@ -85,11 +86,11 @@ class Toolbar(Gtk.HBox):
       self.pack_start(Gtk.SeparatorToolItem(), False, False, 0)
 
       # Filter log
-      label = Gtk.Label("Search callsign: ")
+      label = Gtk.Label("Filter by callsign: ")
       self.pack_start(label, False, False, 0)
       self.filter_source = Gtk.Entry()
       self.filter_source.set_width_chars(11)
-      self.filter_source.connect_after("changed", parent.logbook.filter_log, self.filter_source.get_text())
+      self.filter_source.connect_after("changed", parent.logbook.filter_logs)
       self.pack_start(self.filter_source, False, False, 0)
 
       self.set_logbook_button_sensitive(True)
@@ -97,16 +98,23 @@ class Toolbar(Gtk.HBox):
 
       self.filter_source.set_sensitive(False)
 
-      return
+      logging.debug("Toolbar ready!") 
 
-   def set_record_buttons_sensitive(self, sensitive):
-      for button_name in ["ADD_RECORD", "EDIT_RECORD", "DELETE_RECORD"]:
-         self.buttons[button_name].set_sensitive(sensitive)
       return
 
    def set_logbook_button_sensitive(self, sensitive):
+      logging.debug("Setting the 'Create/Open Logbook' toolbar item's sensitivity to: %s..." % sensitive) 
       self.buttons["OPEN_LOGBOOK"].set_sensitive(sensitive)
       self.buttons["CLOSE_LOGBOOK"].set_sensitive(not sensitive)
+      logging.debug("Set the 'Create/Open Logbook' toolbar item's sensitivity to: %s." % sensitive) 
       return
+
+   def set_record_buttons_sensitive(self, sensitive):
+      logging.debug("Setting record-related menu item sensitivity to: %s..." % sensitive) 
+      for button_name in ["ADD_RECORD", "EDIT_RECORD", "DELETE_RECORD"]:
+         self.buttons[button_name].set_sensitive(sensitive)
+      logging.debug("Set record-related menu item sensitivity to: %s." % sensitive) 
+      return
+
 
 

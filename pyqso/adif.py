@@ -97,7 +97,7 @@ class ADIF:
       """ Reads an ADIF file with a specified path (given in the 'path' argument), and then parses it.
       The output is a list of dictionaries (one dictionary per QSO), with each dictionary containing field-value pairs,
       e.g. {FREQ:145.500, BAND:2M, MODE:FM}. """
-      logging.debug("Reading in ADIF file with path: %s." % path)
+      logging.debug("Reading in ADIF file with path: %s..." % path)
 
       text = ""      
       try:
@@ -111,14 +111,14 @@ class ADIF:
          logging.error("Unknown error occurred when reading the ADIF file.")
          raise
 
-      records = self.parse_adi(text)
+      records = self._parse_adi(text)
          
       if(records == []):
          logging.warning("No records found in the file. Empty file or wrong file type?")
          
       return records
       
-   def parse_adi(self, text):
+   def _parse_adi(self, text):
       """ Parses some raw text (defined in the 'text' argument) for ADIF field data.
       Outputs a list of dictionaries (one dictionary per QSO). Each dictionary contains the field-value pairs,
       e.g. {FREQ:145.500, BAND:2M, MODE:FM}. """
@@ -377,14 +377,14 @@ class ADIF:
 class TestADIF(unittest.TestCase):
    def test_adif_read(self):
       adif = ADIF()
-      f = open("../ADIF.test_read.adi.test", 'w')
+      f = open("ADIF.test_read.adi", 'w')
       f.write("""Some test ADI data.<eoh>
 
 <call:4>TEST<band:3>40M<mode:2>CW
 <qso_date:8:d>20130322<time_on:4>1955<eor>""")
       f.close()
     
-      records = adif.read("../ADIF.test_read.adi.test")
+      records = adif.read("ADIF.test_read.adi")
       
       assert records == [{'BAND': '40M', 'TIME_ON': '1955', 'CALL': 'TEST', 'MODE': 'CW', 'QSO_DATE': '20130322'}]
               

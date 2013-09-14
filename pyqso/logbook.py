@@ -87,7 +87,9 @@ class Logbook(Gtk.Notebook):
 
          for i in range(len(self.logs)):
             self._render_log(i) 
-         self._update_summary()  
+         logging.debug("All logs rendered successfully.")
+
+         self.update_summary()  
          self.parent.toolbox.awards.count()  
 
          context_id = self.parent.statusbar.get_context_id("Status")
@@ -98,14 +100,14 @@ class Logbook(Gtk.Notebook):
          self.parent.toolbar.filter_source.set_sensitive(True)
 
          self.show_all()
-         logging.debug("All logs rendered successfully.")
+
       else:
          logging.debug("No logs were opened.")
 
       return
 
    def close(self, widget=None):
-      """ Close the logbook that is currently open """
+      """ Close the logbook that is currently open. """
 
       disconnected = self.db_disconnect()
       if(disconnected):
@@ -167,8 +169,8 @@ class Logbook(Gtk.Notebook):
       return True
          
    def db_disconnect(self):
-      """ Destroy the connection to the Logbook's data source """
-      logging.debug("Attempting to disconnect from the logbook database...")
+      """ Destroy the connection to the Logbook's data source. """
+      logging.debug("Cleaning up any existing database connections...")
       if(self.connection):
          try:
             self.connection.close()
@@ -245,7 +247,7 @@ class Logbook(Gtk.Notebook):
 
       return
 
-   def _update_summary(self):
+   def update_summary(self):
       """ Update the information presented on the summary page. """
       self.summary["NUMBER_OF_LOGS"].set_label(str(self.get_number_of_logs()))
       t = datetime.fromtimestamp(getmtime(self.path)).strftime("%d %B %Y @ %H:%M")
@@ -300,12 +302,13 @@ class Logbook(Gtk.Notebook):
 
       self.logs.append(l)
       self._render_log(self.get_number_of_logs()-1)
-      self._update_summary()
+      self.update_summary()
 
       self.set_current_page(self.get_number_of_logs())
       return
 
    def delete_log(self, widget, page=None):
+      """ Delete the log that is currently selected in the logbook. """
       if(self.connection is None):
          return
          
@@ -343,16 +346,18 @@ class Logbook(Gtk.Notebook):
          # And finally remove the tab in the Logbook
          self.remove_page(page_index)
 
-      self._update_summary()
+      self.update_summary()
       self.parent.toolbox.awards.count()
       return
 
-   def filter_log(self, widget, callsign):
+   def filter_logs(self, widget):
+      """ Re-filter all the logs when the user-defined expression is changed. """
       for i in range(0, len(self.filter)):
          self.filter[i].refilter()
       return
 
    def _filter_by_callsign(self, model, iter, data):
+      """ Filter all the logs in the logbook by the callsign field, based on a user-defined expression. """
       value = model.get_value(iter, 1)
       callsign = self.parent.toolbar.filter_source.get_text()
       
@@ -360,11 +365,12 @@ class Logbook(Gtk.Notebook):
          # If there is nothing to filter with, then show all the records!
          return True
       else:
-         # We need this to be case insensitive
+         # This should be case insensitive. 
+         # Also, we could use value[:][0:len(callsign))] if we wanted to match from the very start of each callsign.
          return callsign.upper() in value or callsign.lower() in value
 
    def _render_log(self, index):
-      # Render the Log in the Gtk.Notebook.
+      """ Render the Log (identified by 'index') in the Gtk.Notebook. """
       self.filter.append(self.logs[index].filter_new(root=None))
       # Set the callsign column as the column we want to filter by
       self.filter[index].set_visible_func(self._filter_by_callsign, data=None)
@@ -425,6 +431,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def sort_log(self, widget, column_index):
+      """ Sort the log (that is currently selected) based on the column identified by column_index. """
       log_index = self._get_log_index()
       column = self.treeview[log_index].get_column(column_index)
 
@@ -456,6 +463,7 @@ class Logbook(Gtk.Notebook):
       return
       
    def rename_log(self, widget=None):
+      """ Rename the log that is currently selected. """
       if(self.connection is None):
          return
       page_index = self.get_current_page()
@@ -511,11 +519,12 @@ class Logbook(Gtk.Notebook):
       
       # The number of logs will obviously stay the same, but
       # we want to update the logbook's modification date.
-      self._update_summary()
+      self.update_summary()
       
       return
 
    def import_log(self, widget=None):
+      """ Import a log from an ADIF file. """
       dialog = Gtk.FileChooserDialog("Import ADIF Log File",
                                     None,
                                     Gtk.FileChooserAction.OPEN,
@@ -583,12 +592,13 @@ class Logbook(Gtk.Notebook):
       if(not exists):
          self.logs.append(l)
          self._render_log(self.get_number_of_logs()-1)
-      self._update_summary()
+      self.update_summary()
       self.parent.toolbox.awards.count()
       
       return
       
    def export_log(self, widget=None):
+      """ Export the log (that is currently selected) to an ADIF file. """
       page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
       if(page_index == 0): # If we are on the Summary page...
          logging.debug("No log currently selected!")
@@ -620,6 +630,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def print_log(self, widget=None):
+      """ Print all the records in the log (that is currently selected). Note that only a few important fields are printed because of the restricted width of the page. """
       page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
       if(page_index == 0): # If we are on the Summary page...
          logging.debug("No log currently selected!")
@@ -712,7 +723,7 @@ class Logbook(Gtk.Notebook):
             if(all_valid):
                # All data has been validated, so we can go ahead and add the new record.
                log.add_record(fields_and_data)
-               self._update_summary()
+               self.update_summary()
                self.parent.toolbox.awards.count()
                # Select the new Record's row in the treeview.
                self.treeselection[log_index].select_path(log.get_number_of_records())
@@ -741,7 +752,7 @@ class Logbook(Gtk.Notebook):
          # Deletes the record with index 'row_index' from the Records list.
          # 'iter' is needed to remove the record from the ListStore itself.
          log.delete_record(row_index, child_iter)
-         self._update_summary()
+         self.update_summary()
          self.parent.toolbox.awards.count()
       return
 
@@ -798,7 +809,7 @@ class Logbook(Gtk.Notebook):
                      # ...and then in the ListStore
                      # (we add 1 onto the column_index here because we don't want to consider the index column)
                      log.set(child_iter, i+1, fields_and_data[field_names[i]])
-               self._update_summary()
+               self.update_summary()
                self.parent.toolbox.awards.count()
 
       dialog.destroy()
@@ -840,11 +851,11 @@ SELECT MIN(rowid) FROM repeater_contacts GROUP BY call, qso_date, time_on, freq,
       return
 
    def get_number_of_logs(self):
-      """ Returns the total number of logs in the logbook. """
+      """ Return the total number of logs in the logbook. """
       return len(self.logs)
 
    def log_name_exists(self, table_name):
-      """ Returns True if the log name already exists in the logbook, and False otherwise. """
+      """ Return True if the log name already exists in the logbook, and False otherwise. """
       with self.connection:
          c = self.connection.cursor()
          c.execute("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE name=?)", [table_name])
@@ -854,6 +865,7 @@ SELECT MIN(rowid) FROM repeater_contacts GROUP BY call, qso_date, time_on, freq,
       return False
 
    def _get_log_index(self, name=None):
+      """ Given the name of a log, return its index in the self.log list. """
       if(name is None):
          # If no page name is supplied, then just use the currently selected page
          page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
