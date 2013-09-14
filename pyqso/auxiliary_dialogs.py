@@ -22,7 +22,7 @@ from gi.repository import Gtk, GObject
 import logging
 
 def error(parent, message):
-   """ Displays an error message. """
+   """ Display an error message. """
    logging.error(message)
    dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, message)
@@ -31,7 +31,7 @@ def error(parent, message):
    return
 
 def info(parent, message):
-   """ Displays some information. """
+   """ Display some information. """
    logging.debug(message)
    dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                                Gtk.MessageType.INFO, Gtk.ButtonsType.OK, message)
@@ -40,7 +40,7 @@ def info(parent, message):
    return
    
 def question(parent, message):
-   """ Asks the user a question. The dialog comes with 'Yes' and 'No' response buttons. """
+   """ Ask the user a question. The dialog comes with 'Yes' and 'No' response buttons. """
    dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                               Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
                               message)

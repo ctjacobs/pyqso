@@ -94,7 +94,7 @@ class ADIF:
       logging.debug("New ADIF instance created!")
       
    def read(self, path):
-      """ Reads an ADIF file with a specified path (given in the 'path' argument), and then parses it.
+      """ Read an ADIF file with a specified path (given in the 'path' argument), and then parse it.
       The output is a list of dictionaries (one dictionary per QSO), with each dictionary containing field-value pairs,
       e.g. {FREQ:145.500, BAND:2M, MODE:FM}. """
       logging.debug("Reading in ADIF file with path: %s..." % path)
@@ -119,7 +119,7 @@ class ADIF:
       return records
       
    def _parse_adi(self, text):
-      """ Parses some raw text (defined in the 'text' argument) for ADIF field data.
+      """ Parse some raw text (defined in the 'text' argument) for ADIF field data.
       Outputs a list of dictionaries (one dictionary per QSO). Each dictionary contains the field-value pairs,
       e.g. {FREQ:145.500, BAND:2M, MODE:FM}. """
       records = []
@@ -184,7 +184,7 @@ class ADIF:
 
       
    def write(self, records, path):
-      """ Writes an ADIF file containing all the QSOs in the 'records' list. The desired path is specified in the 'path' argument. 
+      """ Write an ADIF file containing all the QSOs in the 'records' list. The desired path is specified in the 'path' argument. 
       This method returns None. """
       try:
          f = open(path, 'w') # Open file for writing
@@ -219,7 +219,7 @@ class ADIF:
 
 
    def is_valid(self, field_name, data, data_type):
-      """ Validates the data in a field (with name 'field_name') with respect to the ADIF specification. 
+      """ Validate the data in a field (with name 'field_name') with respect to the ADIF specification. 
       This method returns either True or False to indicate whether the data is valid or not. """
       
       # Allow an empty string, in case the user doesn't want

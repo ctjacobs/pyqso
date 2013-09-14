@@ -26,8 +26,10 @@ import base64
 from math import ceil
 try:
    import Hamlib
+   have_hamlib = True
 except:
    logging.error("Could not import the Hamlib module!")
+   have_hamlib = False
 
 from pyqso.adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED
 
@@ -225,15 +227,17 @@ class HamlibPage(Gtk.VBox):
       label.set_width_chars(17)
       hbox_temp.pack_start(label, False, False, 2)
 
-      # Rig model
-      models = []
-      try:
-         for item in dir(Hamlib):
-            if(item.startswith("RIG_MODEL_")):
-               models.append(item)
-      except:
-         logging.error("Could not obtain rig models list via Hamlib!")
-         models.append("RIG_MODEL_NONE")
+      # Get the list of rig models
+      models = ["RIG_MODEL_NONE"]
+      if(have_hamlib):
+         try:
+            for item in dir(Hamlib):
+               if(item.startswith("RIG_MODEL_")):
+                  models.append(item)
+         except:
+            logging.error("Could not obtain rig models list via Hamlib!")
+      else:
+         logging.debug("Hamlib module not present. Could not obtain a list of rig models.")
 
       self.sources["RIG_MODEL"] = Gtk.ComboBoxText()
       for model in models:

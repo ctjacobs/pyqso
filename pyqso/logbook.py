@@ -102,7 +102,7 @@ class Logbook(Gtk.Notebook):
          self.show_all()
 
       else:
-         logging.debug("No logs were opened.")
+         logging.debug("Not connected to a logbook. No logs were opened.")
 
       return
 
@@ -630,7 +630,8 @@ class Logbook(Gtk.Notebook):
       return
 
    def print_log(self, widget=None):
-      """ Print all the records in the log (that is currently selected). Note that only a few important fields are printed because of the restricted width of the page. """
+      """ Print all the records in the log (that is currently selected). 
+      Note that only a few important fields are printed because of the restricted width of the page. """
       page_index = self.get_current_page() # Gets the index of the selected tab in the logbook
       if(page_index == 0): # If we are on the Summary page...
          logging.debug("No log currently selected!")
@@ -707,7 +708,7 @@ class Logbook(Gtk.Notebook):
          # The add/edit record window will stay open until the user gives valid data,
          # or until the Cancel button is clicked.
          all_valid = True
-         response = dialog.run() #FIXME: Is it ok to call .run() multiple times on the same RecordDialog object?
+         response = dialog.run()
          if(response == Gtk.ResponseType.OK):
             fields_and_data = {}
             field_names = AVAILABLE_FIELD_NAMES_ORDERED
@@ -785,7 +786,7 @@ class Logbook(Gtk.Notebook):
          # The add/edit record window will stay open until the user gives valid data,
          # or until the Cancel button is clicked.
          all_valid = True
-         response = dialog.run() #FIXME: Is it ok to call .run() multiple times on the same RecordDialog object?
+         response = dialog.run()
          if(response == Gtk.ResponseType.OK):
             fields_and_data = {}
             field_names = AVAILABLE_FIELD_NAMES_ORDERED
