@@ -284,7 +284,9 @@ class Logbook(Gtk.Notebook):
                query = query + ")"
                c.execute(query)
                exists = False
+               self.connection.commit()
             except sqlite.Error as e:
+               self.connection.rollback()
                logging.exception(e)
                # Data is not valid - inform the user.
                error(parent=self.parent, message="Database error. Try another log name.")
@@ -334,7 +336,9 @@ class Logbook(Gtk.Notebook):
          try:
             c = self.connection.cursor()
             c.execute("DROP TABLE %s" % log.name)
+            self.connection.commit()
          except sqlite.Error as e:
+            self.connection.rollback()
             logging.exception(e)
             error(parent=self.parent, message="Database error. Could not delete the log.")
             return
@@ -488,7 +492,9 @@ class Logbook(Gtk.Notebook):
                query = "ALTER TABLE %s RENAME TO %s" % (old_log_name, new_log_name)
                c.execute(query)
                exists = False
+               self.connection.commit()
             except sqlite.Error as e:
+               self.connection.rollback()
                logging.exception(e)
                # Data is not valid - inform the user.
                error(parent=self.parent, message="Database error. Try another log name.")
@@ -577,8 +583,10 @@ class Logbook(Gtk.Notebook):
                   query = query + ")"
                   c.execute(query)
                   l = Log(self.connection, log_name)
+                  self.connection.commit()
                   break
                except sqlite.Error as e:
+                  self.connection.rollback()
                   logging.exception(e)
                   # Data is not valid - inform the user.
                   error(parent=self.parent, message="Database error. Try another log name.")
@@ -631,8 +639,11 @@ class Logbook(Gtk.Notebook):
          logging.debug("No file path specified.")
       else:
          adif = ADIF()
-         adif.write(log.get_all_records(), path)
-
+         records = log.get_all_records()
+         if(records is not None):
+            adif.write(records, path)
+         else:
+            error(self.parent, "Could not retrieve the records from the SQL database. No records have been exported.")
       return
 
    def print_log(self, widget=None):
@@ -647,17 +658,20 @@ class Logbook(Gtk.Notebook):
 
       self.text_to_print = "Callsign\t---\tDate\t---\tTime\t---\tFrequency\t---\tMode\n"
       records = log.get_all_records()
-      for r in records:
-         self.text_to_print += str(r["CALL"]) + "\t---\t" + str(r["QSO_DATE"]) + "\t---\t" + str(r["TIME_ON"]) + "\t---\t" + str(r["FREQ"]) + "\t---\t" + str(r["MODE"]) + "\n"
+      if(records is not None):
+         for r in records:
+            self.text_to_print += str(r["CALL"]) + "\t---\t" + str(r["QSO_DATE"]) + "\t---\t" + str(r["TIME_ON"]) + "\t---\t" + str(r["FREQ"]) + "\t---\t" + str(r["MODE"]) + "\n"
 
-      action = Gtk.PrintOperationAction.PRINT_DIALOG
-      operation = Gtk.PrintOperation()
-      operation.set_default_page_setup(Gtk.PageSetup())
-      operation.set_unit(Gtk.Unit.MM)
+         action = Gtk.PrintOperationAction.PRINT_DIALOG
+         operation = Gtk.PrintOperation()
+         operation.set_default_page_setup(Gtk.PageSetup())
+         operation.set_unit(Gtk.Unit.MM)
 
-      operation.connect("begin_print", self._begin_print)
-      operation.connect("draw_page", self._draw_page)
-      result = operation.run(action, parent=self.parent)
+         operation.connect("begin_print", self._begin_print)
+         operation.connect("draw_page", self._draw_page)
+         result = operation.run(action, parent=self.parent)
+      else:
+         error(self.parent, "Could not retrieve the records from the SQL database. No records have been printed.")
       return
     
    def _begin_print(self, operation, context):
@@ -733,7 +747,9 @@ class Logbook(Gtk.Notebook):
                self.update_summary()
                self.parent.toolbox.awards.count()
                # Select the new Record's row in the treeview.
-               self.treeselection[log_index].select_path(log.get_number_of_records())
+               number_of_records = log.get_number_of_records()
+               if(number_of_records is not None):
+                  self.treeselection[log_index].select_path(number_of_records)
 
       dialog.destroy()
       return
@@ -807,17 +823,22 @@ class Logbook(Gtk.Notebook):
 
             if(all_valid):
                # All data has been validated, so we can go ahead and update the record.
-               record = log.get_record_by_index(row_index)           
-               for i in range(0, len(field_names)):
-                  # Check whether the data has actually changed. Database updates can be expensive.
-                  if(record[field_names[i].lower()] != fields_and_data[field_names[i]]):
-                     # First update the record in the database... 
-                     log.edit_record(row_index, field_names[i], fields_and_data[field_names[i]])
-                     # ...and then in the ListStore
-                     # (we add 1 onto the column_index here because we don't want to consider the index column)
-                     log.set(child_iter, i+1, fields_and_data[field_names[i]])
-               self.update_summary()
-               self.parent.toolbox.awards.count()
+               record = log.get_record_by_index(row_index)
+               if(record is None):
+                  message = "Could not retrieve record with row_index %d from the SQL database. The record has not been edited." % row_index
+                  logging.error(message)
+                  error(parent=self.parent, message=message)
+               else:
+                  for i in range(0, len(field_names)):
+                     # Check whether the data has actually changed. Database updates can be expensive.
+                     if(record[field_names[i].lower()] != fields_and_data[field_names[i]]):
+                        # First update the record in the database... 
+                        log.edit_record(row_index, field_names[i], fields_and_data[field_names[i]])
+                        # ...and then in the ListStore
+                        # (we add 1 onto the column_index here because we don't want to consider the index column)
+                        log.set(child_iter, i+1, fields_and_data[field_names[i]])
+                  self.update_summary()
+                  self.parent.toolbox.awards.count()
 
       dialog.destroy()
       return

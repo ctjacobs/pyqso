@@ -42,9 +42,12 @@ class Log(Gtk.ListStore):
       self.name = name
       
       logging.debug("New Log instance created!")
+      return
 
    def populate(self):
-      """ Remove everything in the Gtk.ListStore that is rendered already (via the TreeView), and start afresh """
+      """ Remove everything in the Gtk.ListStore that is rendered already (via the TreeView), and start afresh. """
+
+      logging.debug("Populating '%s'..." % self.name)
       self.add_missing_db_columns()
       self.clear()
       records = self.get_all_records()
@@ -56,30 +59,41 @@ class Log(Gtk.ListStore):
             # expect a specific number of columns.
             liststore_entry.append(r[field_name])
          self.append(liststore_entry)
+      logging.debug("Finished populating '%s'." % self.name)
       return
 
    def add_missing_db_columns(self):
       """ Check whether each field name in AVAILABLE_FIELD_NAMES_ORDERED is in the database table. If not, add it
       (with all entries being set to NULL initially). """
+      logging.debug("Adding any missing database columns...")
+
+      # Get all the column names in the current database table.
+      column_names = []
       try:
          c = self.connection.cursor()
-      except:
-         logging.exception("Could not obtain a database cursor.")
+         c.execute("PRAGMA table_info(%s)" % self.name) 
+         result = c.fetchall()
+         for t in result:
+            column_names.append(t[1].upper())
+      except sqlite.Error as e:
+         logging.exception("Could not obtain the database column names.")
          return
 
       for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
-         try:
-            # Tries to add a column, regardless of whether it already exists or not.
-            # If an error occurs, then PyQSO just continues onto the next field name without doing anything.
-            # FIXME: The error will (hopefully) be caused by the column name already existing. But in the case of a different error,
-            # a better solution should be implemented here.
-            c.execute('ALTER TABLE %s ADD COLUMN %s' % (self.name, field_name.lower()))
-         except:
-            pass # Column already exists, so don't do anything.
+         if(not(field_name in column_names)):
+            try:
+               c.execute('ALTER TABLE %s ADD COLUMN %s' % (self.name, field_name.lower()))
+               self.connection.commit()
+            except sqlite.Error as e:
+               self.connection.rollback()
+               logging.exception("Could not add the missing database column '%s'." % field_name)
+               pass
+      logging.debug("Finished adding any missing database columns.")
       return
 
    def add_record(self, fields_and_data):
       """ Add a record comprising data given in the 'fields_and_data' argument to the log. """
+      logging.debug("Adding record to log...")
       liststore_entry = []
       field_names = AVAILABLE_FIELD_NAMES_ORDERED
       for i in range(0, len(field_names)):
@@ -112,12 +126,16 @@ class Log(Gtk.ListStore):
          liststore_entry.insert(0, index) # Add the record's index.
 
          self.append(liststore_entry)
+         self.connection.commit()
+         logging.debug("Successfully added the record to the log.")
       except:
-         logging.error("Could not add record to the log.")
+         self.connection.rollback()
+         logging.error("Could not add the record to the log.")
       return
 
    def delete_record(self, index, iter=None):
       """ Delete a record with a specific index in the log. If 'iter' is not None, the corresponding record is also deleted from the Gtk.ListStore data structure. """
+      logging.debug("Deleting record from log...")
       # Get the selected row in the logbook
       try:
          c = self.connection.cursor()
@@ -125,39 +143,58 @@ class Log(Gtk.ListStore):
          c.execute(query+" WHERE id=?", [index])
          if(iter is not None):
             self.remove(iter)
+         self.connection.commit()
+         logging.debug("Successfully deleted the record from the log.")
       except:
-         logging.error("Could not delete record from the log.")
+         self.connection.rollback()
+         logging.error("Could not delete the record from the log.")
       return
 
    def edit_record(self, index, field_name, data):
       """ Edit a specified record by replacing the data in the field 'field_name' with the data given in the argument called 'data'. """
+      logging.debug("Editing field '%s' in record %d..." % (field_name, index))
       try:
          c = self.connection.cursor()
          query = "UPDATE %s SET %s" % (self.name, field_name)
          query = query + "=? WHERE id=?"
          c.execute(query, [data, index])
+         self.connection.commit()
+         logging.debug("Successfully edited field '%s' in record %d in the log." % (field_name, index))
       except:
+         self.connection.rollback()
          logging.error("Could not edit field %s in record %d in the log." % (field_name, index))
       return
 
    def get_record_by_index(self, index):
       """ Return a record with a given index in the log. The record is represented by a dictionary of field-value pairs. """
-      c = self.connection.cursor()
-      query = "SELECT * FROM %s WHERE id=?" % self.name
-      c.execute(query, [index])
-      return c.fetchone()
+      try:
+         c = self.connection.cursor()
+         query = "SELECT * FROM %s WHERE id=?" % self.name
+         c.execute(query, [index])
+         return c.fetchone()
+      except sqlite.Error as e:
+         logging.exception(e)
+         return None
 
    def get_all_records(self):
       """ Return a list of all the records in the log. Each record is represented by a dictionary. """
-      c = self.connection.cursor()
-      c.execute("SELECT * FROM %s" % self.name)
-      return c.fetchall()
+      try:
+         c = self.connection.cursor()
+         c.execute("SELECT * FROM %s" % self.name)
+         return c.fetchall()
+      except sqlite.Error as e:
+         logging.exception(e)
+         return None
 
    def get_number_of_records(self):
       """ Return the total number of records in the log. """
-      c = self.connection.cursor()
-      c.execute("SELECT Count(*) FROM %s" % self.name)
-      return c.fetchone()[0]
+      try:
+         c = self.connection.cursor()
+         c.execute("SELECT Count(*) FROM %s" % self.name)
+         return c.fetchone()[0]
+      except sqlite.Error as e:
+         logging.exception(e)
+         return None
 
 class TestLog(unittest.TestCase):
 
