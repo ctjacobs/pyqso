@@ -61,8 +61,12 @@ class Log(Gtk.ListStore):
    def add_missing_db_columns(self):
       """ Check whether each field name in AVAILABLE_FIELD_NAMES_ORDERED is in the database table. If not, add it
       (with all entries being set to NULL initially). """
-      with(self.connection):
+      try:
          c = self.connection.cursor()
+      except:
+         logging.exception("Could not obtain a database cursor.")
+         return
+
       for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
          try:
             # Tries to add a column, regardless of whether it already exists or not.
@@ -108,30 +112,32 @@ class Log(Gtk.ListStore):
          liststore_entry.insert(0, index) # Add the record's index.
 
          self.append(liststore_entry)
-         return True
       except:
          logging.error("Could not add record to the log.")
-         return False
+      return
 
    def delete_record(self, index, iter=None):
       """ Delete a record with a specific index in the log. If 'iter' is not None, the corresponding record is also deleted from the Gtk.ListStore data structure. """
       # Get the selected row in the logbook
-      with(self.connection):
+      try:
          c = self.connection.cursor()
          query = "DELETE FROM %s" % self.name
          c.execute(query+" WHERE id=?", [index])
-
-      if(iter is not None):
-         self.remove(iter)
+         if(iter is not None):
+            self.remove(iter)
+      except:
+         logging.error("Could not delete record from the log.")
       return
 
    def edit_record(self, index, field_name, data):
       """ Edit a specified record by replacing the data in the field 'field_name' with the data given in the argument called 'data'. """
-      with(self.connection):
+      try:
          c = self.connection.cursor()
          query = "UPDATE %s SET %s" % (self.name, field_name)
          query = query + "=? WHERE id=?"
          c.execute(query, [data, index])
+      except:
+         logging.error("Could not edit field %s in record %d in the log." % (field_name, index))
       return
 
    def get_record_by_index(self, index):
