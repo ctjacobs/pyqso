@@ -26,7 +26,6 @@ import calendar
 class LogNameDialog(Gtk.Dialog):
    
    def __init__(self, parent, title=None, name=None):
-      logging.debug("New LogNameDialog instance created!")
       
       if(title is None):
          title = "New Log"
@@ -46,9 +45,12 @@ class LogNameDialog(Gtk.Dialog):
 
       self.show_all()
 
+      logging.debug("New LogNameDialog instance created!")
+
       return
 
    def get_log_name(self):
+      logging.debug("Retrieving the log name from the LogNameDialog...")
       return self.entry.get_text()
 
 

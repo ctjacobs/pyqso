@@ -39,11 +39,11 @@ class RecordDialog(Gtk.Dialog):
    """ A dialog through which users can enter information about a QSO/record. """
    
    def __init__(self, parent, log, index=None):
-      """ Sets up the layout of the record dialog.
+      """ Set up the layout of the record dialog.
       If a record index is specified in the 'index' argument, then the dialog turns into 'edit record mode' and fills the data sources with the existing data in the log.
       If the 'index' argument is None, then the dialog starts off with nothing in the data sources (e.g. the Gtk.Entry boxes). """
 
-      logging.debug("New RecordDialog instance created!")
+      logging.debug("Setting up the record dialog...")
       
       if(index is not None):
          title = "Edit Record %d" % index
@@ -399,10 +399,13 @@ class RecordDialog(Gtk.Dialog):
 
       self.show_all()
 
+      logging.debug("Record dialog ready!")
+
       return
 
    def get_data(self, field_name):
-      """ Returns the data for a specified field (with name 'field_name') from the Gtk.Entry/Gtk.ComboBoxText/etc boxes in the record dialog. """
+      """ Return the data for a specified field (with name 'field_name') from the Gtk.Entry/Gtk.ComboBoxText/etc boxes in the record dialog. """
+      logging.debug("Retrieving the data in field %s from the record dialog..." % field_name)
       if(field_name == "BAND" or field_name == "MODE" or field_name == "QSL_SENT" or field_name == "QSL_RCVD"):
          return self.sources[field_name].get_active_text()
       elif(field_name == "NOTES"):
@@ -416,7 +419,7 @@ class RecordDialog(Gtk.Dialog):
          return self.sources[field_name].get_text()
 
    def lookup_callback(self, widget=None):
-      """ Gets the callsign-related data from the qrz.com database and stores it in the relevant Gtk.Entry boxes, but returns None. """
+      """ Get the callsign-related data from the qrz.com database and store it in the relevant Gtk.Entry boxes, but return None. """
       callsign_lookup = CallsignLookup(parent = self)
 
       config = ConfigParser.ConfigParser()
@@ -434,15 +437,15 @@ class RecordDialog(Gtk.Dialog):
          error(parent=self, message="To perform a callsign lookup, please specify your qrz.com username and password in the Preferences.")
          return
 
-      callsign_lookup.connect(username, password)
-      if(callsign_lookup.session_key is not None):
+      connected = callsign_lookup.connect(username, password)
+      if(connected):
          fields_and_data = callsign_lookup.lookup(self.sources["CALL"].get_text())
          for field_name in fields_and_data.keys():
             self.sources[field_name].set_text(fields_and_data[field_name])
       return
 
    def calendar_callback(self, widget):
-      """ Opens up a calendar widget for easy QSO_DATE selection. Returns None after the user destroys the dialog. """
+      """ Open up a calendar widget for easy QSO_DATE selection. Return None after the user destroys the dialog. """
       calendar = CalendarDialog(parent = self)
       response = calendar.run()
       if(response == Gtk.ResponseType.OK):
@@ -455,15 +458,17 @@ class CalendarDialog(Gtk.Dialog):
    """ A simple dialog containing a Gtk.Calendar widget. Using this ensures the date is in the correct YYYYMMDD format required by ADIF. """ 
    
    def __init__(self, parent):
-      logging.debug("New CalendarDialog instance created!")
+      logging.debug("Setting up a calendar dialog...")
       Gtk.Dialog.__init__(self, title="Select Date", parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
       self.calendar = Gtk.Calendar()
       self.vbox.add(self.calendar)
       self.show_all()
+      logging.debug("Calendar dialog ready!")
       return
 
    def get_date(self):
-      """ Returns the date from the Gtk.Calendar widget in YYYYMMDD format. """      
+      """ Return the date from the Gtk.Calendar widget in YYYYMMDD format. """      
+      logging.debug("Retrieving the date from the calendar widget...")
       (year, month, day) = self.calendar.get_date()
       # If necessary, add on leading zeros so the YYYYMMDD format is followed.
       if(month < 10):

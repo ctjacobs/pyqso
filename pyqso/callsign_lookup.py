@@ -29,14 +29,15 @@ class CallsignLookup():
    """ Uses qrz.com to lookup details about a particular callsign. """
 
    def __init__(self, parent):
-      logging.debug("New CallsignLookup instance created!")
       self.parent = parent
       self.connection = None
       self.session_key = None
+      logging.debug("New CallsignLookup instance created!")
       return
 
    def connect(self, username, password):
-      """ Initiates a session with the qrz.com server. Hopefully this will return a session key. """
+      """ Initiate a session with the qrz.com server. Hopefully this will return a session key. """
+      logging.debug("Connecting to the qrz.com server...")
       self.connection = httplib.HTTPConnection('xmldata.qrz.com')
       request = '/xml/current/?username=%s;password=%s;agent=pyqso' % (username, password)
       self.connection.request('GET', request)
@@ -47,17 +48,24 @@ class CallsignLookup():
       session_key_node = session_node.getElementsByTagName('Key')
       if(len(session_key_node) > 0):
          self.session_key = session_key_node[0].firstChild.nodeValue
+         logging.debug("Successfully connected to the qrz.com server...")
+         connected = True
+      else:
+         connected = False
 
       # If there are any errors or warnings, print them out
       session_error_node = session_node.getElementsByTagName('Error')
       if(len(session_error_node) > 0):
          session_error = session_error_node[0].firstChild.nodeValue
          error(parent=self.parent, message=session_error)
-      return
+         logging.error(session_error)
+
+      return connected
 
    def lookup(self, callsign):
-      """ Parses the XML tree that is returned from the qrz.com XML server to obtain the NAME, ADDRESS, STATE, COUNTRY, DXCC, CQZ, ITUZ, and IOTA field data (if present),
-      and returns the data in the dictionary called fields_and_data. """
+      """ Parse the XML tree that is returned from the qrz.com XML server to obtain the NAME, ADDRESS, STATE, COUNTRY, DXCC, CQZ, ITUZ, and IOTA field data (if present),
+      and return the data in the dictionary called fields_and_data. """
+      logging.debug("Performing a callsign lookup...")
       fields_and_data = {"NAME":"", "ADDRESS":"", "STATE":"", "COUNTRY":"", "DXCC":"", "CQZ":"", "ITUZ":"", "IOTA":""}
       if(self.session_key):
          request = '/xml/current/?s=%s;callsign=%s' % (self.session_key, callsign)
@@ -115,6 +123,6 @@ class CallsignLookup():
                   session_error = session_error_node[0].firstChild.nodeValue
                   error(parent=self.parent, message=session_error)
             # Return empty strings for the field data
-
+         logging.debug("Callsign lookup complete. Returning data...")
       return fields_and_data
 

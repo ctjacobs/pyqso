@@ -29,6 +29,7 @@ class Toolbox(Gtk.Frame):
    """ Contains a Gtk.Notebook full of amateur radio-related tools. """   
 
    def __init__(self, parent):
+      logging.debug("Setting up the toolbox...")
          
       Gtk.Frame.__init__(self)
       self.set_label("Toolbox")
@@ -45,6 +46,8 @@ class Toolbox(Gtk.Frame):
 
       self.add(self.tools)
       self.tools.connect_after("switch-page", self._on_switch_page)
+
+      logging.debug("Toolbox ready!")
 
       return
 

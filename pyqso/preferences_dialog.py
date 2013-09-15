@@ -36,7 +36,7 @@ from pyqso.adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORD
 class PreferencesDialog(Gtk.Dialog):
    
    def __init__(self, parent):
-      logging.debug("New PreferencesDialog instance created!")
+      logging.debug("Setting up the preferences dialog...")
 
       Gtk.Dialog.__init__(self, title="Preferences", parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
 
@@ -54,11 +54,13 @@ class PreferencesDialog(Gtk.Dialog):
       self.vbox.pack_start(self.preferences, True, True, 2)
       self.show_all()
 
+      logging.debug("Preferences dialog ready!")
+
       return
 
    def commit(self):
       """ Commit the user preferences to the configuration file. """
-
+      logging.debug("Committing the user preferences to the configuration file...")
       general_data = self.general.get_data()
       view_data = self.view.get_data()
       hamlib_data = self.hamlib.get_data()
@@ -88,7 +90,7 @@ class PreferencesDialog(Gtk.Dialog):
 class GeneralPage(Gtk.VBox):
    
    def __init__(self):
-      logging.debug("New GeneralPage instance created!")
+      logging.debug("Setting up the General page of the preferences dialog...")
 
       Gtk.VBox.__init__(self, spacing=2)
 
@@ -144,9 +146,11 @@ class GeneralPage(Gtk.VBox):
       frame.add(inner_vbox)
       self.pack_start(frame, False, False, 2)
 
+      logging.debug("General page of the preferences dialog ready!")
       return
 
    def get_data(self):
+      logging.debug("Retrieving data from the General page of the preferences dialog...")
       data = {}
       data["SHOW_TOOLBOX"] = self.sources["SHOW_TOOLBOX"].get_active()
       data["QRZ_USERNAME"] = self.sources["QRZ_USERNAME"].get_text()
@@ -156,7 +160,7 @@ class GeneralPage(Gtk.VBox):
 class ViewPage(Gtk.VBox):
    
    def __init__(self):
-      logging.debug("New ViewPage instance created!")
+      logging.debug("Setting up the View page of the preferences dialog...")
 
       Gtk.VBox.__init__(self, spacing=2)
 
@@ -189,9 +193,11 @@ class ViewPage(Gtk.VBox):
       self.label = Gtk.Label("Note: View-related changes will not take effect\nuntil PyQSO is restarted.")
       self.pack_start(self.label, False, False, 2)
 
+      logging.debug("View page of the preferences dialog ready!")
       return
 
    def get_data(self):
+      logging.debug("Retrieving data from the View page of the preferences dialog...")
       data = {}
       for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
          data[field_name] = self.sources[field_name].get_active()
@@ -200,7 +206,7 @@ class ViewPage(Gtk.VBox):
 class HamlibPage(Gtk.VBox):
    
    def __init__(self):
-      logging.debug("New HamlibPage instance created!")
+      logging.debug("Setting up the Hamlib page of the preferences dialog...")
 
       Gtk.VBox.__init__(self, spacing=2)
 
@@ -264,9 +270,11 @@ class HamlibPage(Gtk.VBox):
       frame.add(vbox_inner)
       self.pack_start(frame, True, True, 2)
 
+      logging.debug("Hamlib page of the preferences dialog ready!")
       return
 
    def get_data(self):
+      logging.debug("Retrieving data from the Hamlib page of the preferences dialog...")
       data = {}
       data["AUTOFILL"] = self.sources["AUTOFILL"].get_active()
       data["RIG_PATHNAME"] = self.sources["RIG_PATHNAME"].get_text()
