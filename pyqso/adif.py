@@ -106,10 +106,8 @@ class ADIF:
          f.close() # Close the file, otherwise "bad things" might happen!
       except IOError as e:
          logging.error("I/O error %d: %s" % (e.errno, e.strerror))
-         raise
       except:
          logging.error("Unknown error occurred when reading the ADIF file.")
-         raise
 
       records = self._parse_adi(text)
          
@@ -122,6 +120,9 @@ class ADIF:
       """ Parse some raw text (defined in the 'text' argument) for ADIF field data.
       Outputs a list of dictionaries (one dictionary per QSO). Each dictionary contains the field-value pairs,
       e.g. {FREQ:145.500, BAND:2M, MODE:FM}. """
+
+      logging.debug("Parsing text from the ADIF file...")
+
       records = []
 
       # Separate the text at the <eor> or <eoh> markers.
@@ -179,6 +180,8 @@ class ADIF:
             records.append(fields_and_data_dictionary)
       
       assert n_eor == n_record
+
+      logging.debug("Finished parsing text.")
       
       return records
 
@@ -186,6 +189,8 @@ class ADIF:
    def write(self, records, path):
       """ Write an ADIF file containing all the QSOs in the 'records' list. The desired path is specified in the 'path' argument. 
       This method returns None. """
+   
+      logging.debug("Writing records to an ADIF file...")
       try:
          f = open(path, 'w') # Open file for writing
          
@@ -206,22 +211,23 @@ class ADIF:
                   f.write("<%s:%d>%s\n" % (field_name.lower(), len(r[field_name]), r[field_name]))
             f.write("<eor>\n")
 
+         logging.debug("Finished writing records to the ADIF file.")
          f.close()
 
       except IOError as e:
          logging.error("I/O error %d: %s" % (e.errno, e.strerror))
-         raise
       except:
          logging.error("Unknown error occurred when writing the ADIF file.")
-         raise
-         
+
       return
 
 
    def is_valid(self, field_name, data, data_type):
       """ Validate the data in a field (with name 'field_name') with respect to the ADIF specification. 
       This method returns either True or False to indicate whether the data is valid or not. """
-      
+
+      logging.debug("Validating the following data in field '%s': %s" % (field_name, data))
+
       # Allow an empty string, in case the user doesn't want
       # to fill in this field.
       if(data == ""):

@@ -84,7 +84,7 @@ class Log(Gtk.ListStore):
          else:
             liststore_entry.append("")
 
-      with(self.connection):
+      try:
          c = self.connection.cursor()
          # What if the database columns are not necessarily in the same order as (or even exist in) AVAILABLE_FIELD_NAMES_ORDERED?
          # PyQSO handles this here, but needs a separate list (called database_entry) to successfully perform the SQL query.
@@ -95,7 +95,7 @@ class Log(Gtk.ListStore):
          for t in column_names:
             # 't' here is a tuple
             column_name = str(t[1])
-            if(column_name.upper() in AVAILABLE_FIELD_NAMES_ORDERED):
+            if( (column_name.upper() in AVAILABLE_FIELD_NAMES_ORDERED) and (column_name.upper() in fields_and_data.keys()) ):
                database_entry.append(fields_and_data[column_name.upper()])
                query = query + ",?"
             else:
@@ -105,11 +105,13 @@ class Log(Gtk.ListStore):
          c.execute(query, database_entry)
          index = c.lastrowid
 
-      liststore_entry.insert(0, index) # Add the record's index.
+         liststore_entry.insert(0, index) # Add the record's index.
 
-      self.append(liststore_entry)
-
-      return
+         self.append(liststore_entry)
+         return True
+      except:
+         logging.error("Could not add record to the log.")
+         return False
 
    def delete_record(self, index, iter=None):
       """ Delete a record with a specific index in the log. If 'iter' is not None, the corresponding record is also deleted from the Gtk.ListStore data structure. """

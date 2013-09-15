@@ -30,7 +30,7 @@ manual:
 
 unittest:
 	@echo **********Running the unit tests
-	cd pyqso; for file in *.py ; do (python $$file); done; cd ..
+	cd pyqso; for file in *.py; do (python $$file); done; cd ..
 
 clean:
 	@echo **********Cleaning build directory
