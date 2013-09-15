@@ -44,7 +44,7 @@ class Menu(Gtk.MenuBar):
       mitem_logbook.set_submenu(subm_logbook)
     
       # Create/open logbook
-      mitem_connect = Gtk.ImageMenuItem("Create/Open Logbook...")
+      mitem_connect = Gtk.ImageMenuItem("Open New or Existing Logbook...")
       icon = Gtk.Image()
       icon.set_from_stock(Gtk.STOCK_OPEN, Gtk.IconSize.MENU)
       mitem_connect.set_image(icon)

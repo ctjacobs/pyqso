@@ -16,7 +16,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-PyQSO is a simple Python-based contact logging tool for amateur radio operators. It is currently in the early stages of development.
+PyQSO is a simple Python-based contact logging tool for amateur radio operators.
 
 * Assuming that your current working directory is PyQSO's base directory (the directory that the Makefile is in), you can install PyQSO via the terminal with the following command:
 

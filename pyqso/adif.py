@@ -201,7 +201,7 @@ class ADIF:
          
 <adif_ver:5>%s
 <programid:5>PyQSO
-<programversion:8>0.1a.dev
+<programversion:4>0.1a
 <eoh>\n""" % (dt, len(records), ADIF_VERSION))
          
          # Then write each log to the file.

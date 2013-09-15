@@ -21,7 +21,7 @@
 from distutils.core import setup
 
 setup(name='PyQSO',
-      version='0.1a.dev',
+      version='0.1a',
       description='A Python-based QSO logging tool',
       author='Christian Jacobs',
       url='https://launchpad.net/pyqso',

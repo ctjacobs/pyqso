@@ -35,7 +35,7 @@ class Toolbar(Gtk.HBox):
       icon.set_from_stock(Gtk.STOCK_OPEN, Gtk.IconSize.BUTTON)
       button = Gtk.Button()
       button.add(icon)
-      button.set_tooltip_text('Create/Open Logbook')
+      button.set_tooltip_text('Open New or Existing Logbook')
       button.connect("clicked", parent.logbook.open)
       self.pack_start(button, False, False, 0)
       self.buttons["OPEN_LOGBOOK"] = button
@@ -57,7 +57,7 @@ class Toolbar(Gtk.HBox):
       icon.set_from_stock(Gtk.STOCK_ADD, Gtk.IconSize.BUTTON)
       button = Gtk.Button()
       button.add(icon)
-      button.set_tooltip_text('Add record')
+      button.set_tooltip_text('Add Record')
       button.connect("clicked", parent.logbook.add_record_callback)
       self.pack_start(button, False, False, 0)
       self.buttons["ADD_RECORD"] = button
@@ -67,7 +67,7 @@ class Toolbar(Gtk.HBox):
       icon.set_from_stock(Gtk.STOCK_EDIT, Gtk.IconSize.BUTTON)
       button = Gtk.Button()
       button.add(icon)
-      button.set_tooltip_text('Edit record')
+      button.set_tooltip_text('Edit Record')
       button.connect("clicked", parent.logbook.edit_record_callback, None, None)
       self.pack_start(button, False, False, 0)
       self.buttons["EDIT_RECORD"] = button
@@ -77,7 +77,7 @@ class Toolbar(Gtk.HBox):
       icon.set_from_stock(Gtk.STOCK_DELETE, Gtk.IconSize.BUTTON)
       button = Gtk.Button()
       button.add(icon)
-      button.set_tooltip_text('Delete record')
+      button.set_tooltip_text('Delete Record')
       button.connect("clicked", parent.logbook.delete_record_callback)
       self.pack_start(button, False, False, 0)
       self.buttons["DELETE_RECORD"] = button

@@ -35,14 +35,14 @@
 \begin{center}
 \vspace*{5cm}
 \huge{PyQSO User Manual}\\\vspace*{5cm}
-\LARGE{Version 0.1a.dev}
+\LARGE{Version 0.1a}
 \end{center}
 \end{titlepage}
 
 \tableofcontents
 
 \chapter{Introduction}\label{chap:introduction}
-PyQSO is a contact logging tool for amateur radio operators. It is currently in the early stages of development.
+PyQSO is a contact logging tool for amateur radio operators.
 
 As the name suggests, PyQSO is written primarily in the Python programming language. The graphical user interface (GUI) has been built using the GTK+ library through the PyGTK bindings. PyQSO also uses an SQLite embedded database to manage all the contacts an amateur radio operator makes.
 
@@ -74,7 +74,7 @@ Assuming that your current working directory is PyQSO's base directory (the dire
 \subsection{Command-line options}
 There are several options available when executing PyQSO from the command-line.
 
-\subsubsection{Create/open a logbook file}
+\subsubsection{Open a specified logbook file}
 In addition to being able to open a new or existing logbook through the GUI, users can also specify a logbook file to open at the command line with the \texttt{-l} or \texttt{--logbook} option. For example, to open a logbook file called \texttt{mylogbook.db}, use the following command:
 
   \texttt{pyqso --logbook /path/to/mylogbook.db}
@@ -93,8 +93,8 @@ Running PyQSO with the \texttt{-d} or \texttt{--debug} flag enables the debuggin
 
 
 
-\section{Creating a new logbook}
-Logbooks are SQL databases, and as such they are accessed with a database connection. To create a connection and open the logbook, click \texttt{Create/Open Logbook...} in the \texttt{Logbook} menu, and either:
+\section{Opening a new or existing logbook}
+Logbooks are SQL databases, and as such they are accessed with a database connection. To create a connection and open the logbook, click \texttt{Open a New or Existing Logbook...} in the \texttt{Logbook} menu, and either:
 \begin{itemize}
   \item Find and select an existing logbook database file (with the \texttt{.db} file extension), and click \texttt{Open} to create the database connection; or
   \item Create a new database by entering a (non-existing) file name and clicking \texttt{Open}. The logbook database file (and a connection to it) will then be created automatically.
