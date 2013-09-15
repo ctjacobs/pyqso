@@ -110,18 +110,18 @@ class Logbook(Gtk.Notebook):
       disconnected = self.db_disconnect()
       if(disconnected):
          logging.debug("Closing all logs in the logbook...")
-         context_id = self.parent.statusbar.get_context_id("Status")
-         self.parent.statusbar.push(context_id, "Not connected to a Logbook.")
-         self.parent.toolbar.set_logbook_button_sensitive(True)
-         self.parent.menu.set_logbook_item_sensitive(True)
-         self.parent.menu.set_log_items_sensitive(False)
-         self.parent.toolbar.filter_source.set_sensitive(False)
-
          while(self.get_n_pages() > 0):
             # Once a page is removed, the other pages get re-numbered,
             # so a 'for' loop isn't the best option here.
             self.remove_page(0)
          logging.debug("All logs now closed.")
+
+         context_id = self.parent.statusbar.get_context_id("Status")
+         self.parent.statusbar.push(context_id, "No logbook is currently open.")
+         self.parent.toolbar.set_logbook_button_sensitive(True)
+         self.parent.menu.set_logbook_item_sensitive(True)
+         self.parent.menu.set_log_items_sensitive(False)
+         self.parent.toolbar.filter_source.set_sensitive(False)
       else:
          logging.debug("Unable to disconnect from the database. No logs were closed.")
       return

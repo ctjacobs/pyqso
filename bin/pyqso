@@ -71,7 +71,7 @@ class PyQSO(Gtk.Window):
 
       self.statusbar = Gtk.Statusbar()
       context_id = self.statusbar.get_context_id("Status")
-      self.statusbar.push(context_id, "Not connected to a Logbook.")
+      self.statusbar.push(context_id, "No logbook is currently open.")
       
       # Create a Logbook so we can add/remove/edit logs and records,
       # once connected to the SQLite database.
