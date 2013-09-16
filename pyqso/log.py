@@ -150,7 +150,7 @@ class Log(Gtk.ListStore):
          logging.error("Could not delete the record from the log.")
       return
 
-   def edit_record(self, index, field_name, data, iter = None, column_index = None):
+   def edit_record(self, index, field_name, data, iter=None, column_index=None):
       """ Edit a specified record by replacing the data in the field 'field_name' with the data given in the argument called 'data'. Note that both iter and column_index should always be given. These are given default values of None for unit testing purposes only. """
       logging.debug("Editing field '%s' in record %d..." % (field_name, index))
       try:
