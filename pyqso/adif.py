@@ -435,7 +435,7 @@ class TestADIF(unittest.TestCase):
 <band:2>2m
 <mode:2>FM
 <eor>
-""" in text)
+""" in text) # Ignore the header line here, since it contains the date and time the ADIF file was written, which will change each time 'make unittest' is run.
       f.close()
 
    def test_adif_is_valid(self):

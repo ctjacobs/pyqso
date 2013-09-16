@@ -774,7 +774,7 @@ class Logbook(Gtk.Notebook):
       if(response == Gtk.ResponseType.YES):
          # Deletes the record with index 'row_index' from the Records list.
          # 'iter' is needed to remove the record from the ListStore itself.
-         log.delete_record(row_index, child_iter)
+         log.delete_record(row_index, iter=child_iter)
          self.update_summary()
          self.parent.toolbox.awards.count()
       return
@@ -832,11 +832,9 @@ class Logbook(Gtk.Notebook):
                   for i in range(0, len(field_names)):
                      # Check whether the data has actually changed. Database updates can be expensive.
                      if(record[field_names[i].lower()] != fields_and_data[field_names[i]]):
-                        # First update the record in the database... 
-                        log.edit_record(row_index, field_names[i], fields_and_data[field_names[i]])
-                        # ...and then in the ListStore
-                        # (we add 1 onto the column_index here because we don't want to consider the index column)
-                        log.set(child_iter, i+1, fields_and_data[field_names[i]])
+                        # Update the record in the database and then in the ListStore.
+                        # We add 1 onto the column_index here because we don't want to consider the index column.
+                        log.edit_record(row_index, field_names[i], fields_and_data[field_names[i]], iter=child_iter, column_index=i+1)
                   self.update_summary()
                   self.parent.toolbox.awards.count()
 
@@ -851,35 +849,8 @@ class Logbook(Gtk.Notebook):
       log_index = self._get_log_index()
       log = self.logs[log_index]
 
-      duplicates = []
-      # Find the duplicates in the log, based on the CALL, QSO_DATE, TIME_ON, FREQ and MODE fields.
-      try:
-         c = self.connection.cursor()
-         c.execute(
-"""SELECT rowid FROM repeater_contacts WHERE rowid NOT IN
-(
-SELECT MIN(rowid) FROM repeater_contacts GROUP BY call, qso_date, time_on, freq, mode
-)""")
-         result = c.fetchall()
-         for rowid in result:
-            duplicates.append(rowid[0]) # Get the integers from inside the tuples.
-      except sqlite.Error as e:
-         logging.exception(e)
-         error(parent=self.parent, message="Database error.")
-         return
-
-      removed = 0 # Count the number of records that are removed. Hopefully this will be the same as len(duplicates).
-      path = Gtk.TreePath(0) # Start with the first row in the log.
-      iter = log.get_iter(path)
-      while iter is not None:
-         row_index = log.get_value(iter, 0) # Get the index.
-         if(row_index in duplicates): # Is this a duplicate row? If so, delete it.
-            log.delete_record(row_index, iter)
-            removed += 1
-         iter = log.iter_next(iter) # Move on to the next row, until iter_next returns None.
-
-      info(self.parent, "Found %d duplicate(s). Successfully removed %d duplicate(s)." % (len(duplicates), removed))
-      assert(len(duplicates) == removed)
+      (number_of_duplicates, number_of_duplicates_removed) = log.remove_duplicates()
+      info(self.parent, "Found %d duplicate(s). Successfully removed %d duplicate(s)." % (number_of_duplicates, number_of_duplicates_removed))
       return
 
    def get_number_of_logs(self):

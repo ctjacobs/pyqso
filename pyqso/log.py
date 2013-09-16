@@ -134,7 +134,7 @@ class Log(Gtk.ListStore):
       return
 
    def delete_record(self, index, iter=None):
-      """ Delete a record with a specific index in the log. If 'iter' is not None, the corresponding record is also deleted from the Gtk.ListStore data structure. """
+      """ Delete a record with a specific index in the SQL database. The corresponding record is also deleted from the Gtk.ListStore data structure. Note that iter should always be given. It is given a default value of None for unit testing purposes only. """
       logging.debug("Deleting record from log...")
       # Get the selected row in the logbook
       try:
@@ -150,20 +150,54 @@ class Log(Gtk.ListStore):
          logging.error("Could not delete the record from the log.")
       return
 
-   def edit_record(self, index, field_name, data):
-      """ Edit a specified record by replacing the data in the field 'field_name' with the data given in the argument called 'data'. """
+   def edit_record(self, index, field_name, data, iter = None, column_index = None):
+      """ Edit a specified record by replacing the data in the field 'field_name' with the data given in the argument called 'data'. Note that both iter and column_index should always be given. These are given default values of None for unit testing purposes only. """
       logging.debug("Editing field '%s' in record %d..." % (field_name, index))
       try:
          c = self.connection.cursor()
          query = "UPDATE %s SET %s" % (self.name, field_name)
          query = query + "=? WHERE id=?"
-         c.execute(query, [data, index])
+         c.execute(query, [data, index]) # First update the SQL database...
+         if(iter is not None and column_index is not None):
+            self.set(iter, column_index, data) # ...and then the ListStore.
          self.connection.commit()
          logging.debug("Successfully edited field '%s' in record %d in the log." % (field_name, index))
       except:
          self.connection.rollback()
          logging.error("Could not edit field %s in record %d in the log." % (field_name, index))
       return
+
+   def remove_duplicates(self):
+      """ Find the duplicates in the log, based on the CALL, QSO_DATE, TIME_ON, FREQ and MODE fields. Return a tuple containing the number of duplicates in the log, and the number of duplicates successfully removed. Hopefully these will be the same. """
+      duplicates = []
+      try:
+         c = self.connection.cursor()
+         c.execute(
+"""SELECT rowid FROM %s WHERE rowid NOT IN
+(
+SELECT MIN(rowid) FROM %s GROUP BY call, qso_date, time_on, freq, mode
+)""" % (self.name, self.name))
+         result = c.fetchall()
+         for rowid in result:
+            duplicates.append(rowid[0]) # Get the integers from inside the tuples.
+         if(len(duplicates) == 0):
+            return (0, 0) # Nothing to do here.
+      except sqlite.Error as e:
+         logging.exception(e)
+         return (0, 0)
+
+      removed = 0 # Count the number of records that are removed. Hopefully this will be the same as len(duplicates).
+      path = Gtk.TreePath(0) # Start with the first row in the log.
+      iter = self.get_iter(path)
+      while iter is not None:
+         row_index = self.get_value(iter, 0) # Get the index.
+         if(row_index in duplicates): # Is this a duplicate row? If so, delete it.
+            self.delete_record(row_index, iter)
+            removed += 1
+         iter = self.iter_next(iter) # Move on to the next row, until iter_next returns None.
+
+      assert(len(duplicates) == removed)
+      return (len(duplicates), removed)
 
    def get_record_by_index(self, index):
       """ Return a record with a given index in the log. The record is represented by a dictionary of field-value pairs. """
