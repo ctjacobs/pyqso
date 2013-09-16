@@ -198,83 +198,90 @@ class Log(Gtk.ListStore):
 
 class TestLog(unittest.TestCase):
 
-   def test_log_add_record(self):
-      connection = sqlite.connect(":memory:")
-      connection.row_factory = sqlite.Row
-      
-      c = connection.cursor()
+   def setUp(self):
+      self.connection = sqlite.connect(":memory:")
+      self.connection.row_factory = sqlite.Row
+
+      self.field_names = ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]
+      self.fields_and_data = {"CALL":"TEST123", "QSO_DATE":"20130312", "TIME_ON":"1234", "FREQ":"145.500", "BAND":"2m", "MODE":"FM", "RST_SENT":"59", "RST_RCVD":"59"}
+
+      c = self.connection.cursor()
       query = "CREATE TABLE test (id INTEGER PRIMARY KEY AUTOINCREMENT"
-      for field_name in ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]:
+      for field_name in self.field_names:
          s = ", %s TEXT" % field_name.lower()
          query = query + s
       query = query + ")"
       c.execute(query)
-      
-      log = Log(connection, "test")
-      fields_and_data = {"CALL":"TEST123", "QSO_DATE":"123456789", "TIME_ON":"123456789", "FREQ":"145.500", "BAND":"2m", "MODE":"FM", "RST_SENT":"59", "RST_RCVD":"59"}
-      log.add_record(fields_and_data)
-      c = connection.cursor()
+
+      self.log = Log(self.connection, "test")
+
+   def tearDown(self):
+      self.connection.close()
+
+   def test_log_add_missing_db_columns(self):
+
+      column_names_before = []
+      column_names_after = []
+
+      c = self.connection.cursor()
+      c.execute("PRAGMA table_info(test)") 
+      result = c.fetchall()
+      for t in result:
+         column_names_before.append(t[1].upper())
+
+      self.log.add_missing_db_columns()
+
+      c.execute("PRAGMA table_info(test)") 
+      result = c.fetchall()
+      for t in result:
+         column_names_after.append(t[1].upper())
+
+      print "Column names before: ", column_names_before
+      print "Column names after: ", column_names_after
+
+      assert(len(column_names_before) == len(self.field_names) + 1) # Added 1 here because of the "ID" column in all database tables.
+      assert(len(column_names_after) == len(AVAILABLE_FIELD_NAMES_ORDERED) + 1)
+      for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
+         assert(field_name in column_names_after)
+
+   def test_log_add_record(self):
+      self.log.add_record(self.fields_and_data)
+      c = self.connection.cursor()
       c.execute("SELECT * FROM test")
       records = c.fetchall()
       
       assert len(records) == 1
       
-      for field_name in ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]:
-         print fields_and_data[field_name], records[0][field_name]
-         assert fields_and_data[field_name] == records[0][field_name]
-      
-      connection.close()
+      for field_name in self.field_names:
+         print self.fields_and_data[field_name], records[0][field_name]
+         assert self.fields_and_data[field_name] == records[0][field_name]
 
    def test_log_delete_record(self):
-      connection = sqlite.connect(":memory:")
-      connection.row_factory = sqlite.Row
-      
-      c = connection.cursor()
-      query = "CREATE TABLE test (id INTEGER PRIMARY KEY AUTOINCREMENT"
-      for field_name in ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]:
-         s = ", %s TEXT" % field_name.lower()
-         query = query + s
-      query = query + ")"
-      c.execute(query)
-      
-      log = Log(connection, "test")
       query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
-      c.execute(query, ("TEST123", "123456789", "123456789", "145.500", "2m", "FM", "59", "59"))
+      c = self.connection.cursor()
+      c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
 
       c.execute("SELECT * FROM test")
       records_before = c.fetchall()
 
-      log.delete_record(1)
+      self.log.delete_record(1)
 
       c.execute("SELECT * FROM test")
       records_after = c.fetchall()
 
       assert(len(records_before) == 1)
       assert(len(records_after) == 0)
-
-      connection.close()
       
    def test_log_edit_record(self):
-      connection = sqlite.connect(":memory:")
-      connection.row_factory = sqlite.Row
-      
-      c = connection.cursor()
-      query = "CREATE TABLE test (id INTEGER PRIMARY KEY AUTOINCREMENT"
-      for field_name in ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "RST_SENT", "RST_RCVD"]:
-         s = ", %s TEXT" % field_name.lower()
-         query = query + s
-      query = query + ")"
-      c.execute(query)
-      
-      log = Log(connection, "test")
       query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
-      c.execute(query, ("TEST123", "123456789", "123456789", "145.500", "2m", "FM", "59", "59"))
+      c = self.connection.cursor()
+      c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
 
       c.execute("SELECT * FROM test")
       record_before = c.fetchall()[0]
 
-      log.edit_record(1, "CALL", "TEST456")
-      log.edit_record(1, "FREQ", "145.450")
+      self.log.edit_record(1, "CALL", "TEST456")
+      self.log.edit_record(1, "FREQ", "145.450")
 
       c.execute("SELECT * FROM test")
       record_after = c.fetchall()[0]
@@ -284,7 +291,45 @@ class TestLog(unittest.TestCase):
       assert(record_before["FREQ"] == "145.500")
       assert(record_after["FREQ"] == "145.450")
 
-      connection.close()
-              
+   def test_log_get_record_by_index(self):
+      query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
+      c = self.connection.cursor()
+      c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
+
+      record = self.log.get_record_by_index(1)
+      print "Contents of retrieved record: ", record
+      for field_name in record.keys():
+         if(field_name.upper() == "ID"):
+            continue
+         else:
+            assert(record[field_name.upper()] == self.fields_and_data[field_name.upper()])
+      assert(len(record) == len(self.fields_and_data) + 1)
+
+   def test_log_get_all_records(self):
+      query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
+      c = self.connection.cursor()
+      # Add the same record twice
+      c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
+      c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
+
+      records = self.log.get_all_records()
+      print "Contents of all retrieved records: ", records
+      assert(len(records) == 2) # There should be 2 records
+      for field_name in self.field_names:
+         assert(records[0][field_name] == self.fields_and_data[field_name])
+         assert(records[1][field_name] == self.fields_and_data[field_name])
+
+   def test_log_get_number_of_records(self):
+      query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
+      c = self.connection.cursor()
+      # Add the same record twice
+      c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
+      c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
+
+      number_of_records = self.log.get_number_of_records()
+      print "Number of records in the log: ", number_of_records
+      assert(number_of_records == 2) # There should be 2 records
+
+
 if(__name__ == '__main__'):
    unittest.main()

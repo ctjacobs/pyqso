@@ -207,8 +207,13 @@ class ADIF:
          # Then write each log to the file.
          for r in records:
             for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
-               if( (r[field_name] != "NULL") and (r[field_name] != "") ):
-                  f.write("<%s:%d>%s\n" % (field_name.lower(), len(r[field_name]), r[field_name]))
+               if(not(field_name in r)): 
+                  # If the field_name does not exist in the record, then skip past it.
+                  # Only write out the fields that exist and that have some data in them.
+                  continue
+               else:
+                  if( (r[field_name] != "NULL") and (r[field_name] != "") ):
+                     f.write("<%s:%d>%s\n" % (field_name.lower(), len(r[field_name]), r[field_name]))
             f.write("<eor>\n")
 
          logging.debug("Finished writing records to the ADIF file.")
@@ -381,8 +386,11 @@ class ADIF:
       
    
 class TestADIF(unittest.TestCase):
+
+   def setUp(self):
+      self.adif = ADIF()
+
    def test_adif_read(self):
-      adif = ADIF()
       f = open("ADIF.test_read.adi", 'w')
       f.write("""Some test ADI data.<eoh>
 
@@ -390,14 +398,52 @@ class TestADIF(unittest.TestCase):
 <qso_date:8:d>20130322<time_on:4>1955<eor>""")
       f.close()
     
-      records = adif.read("ADIF.test_read.adi")
+      records = self.adif.read("ADIF.test_read.adi")
       expected_records = [{'TIME_ON': '1955', 'BAND': '40m', 'CALL': 'TEST', 'MODE': 'CW', 'QSO_DATE': '20130322'}]
       print "Imported records: ", records
       print "Expected records: ", expected_records
       assert(len(records) == 1)
       assert(len(records[0].keys()) == len(expected_records[0].keys()))
       assert(records == expected_records)
-              
+
+   def test_adif_write(self):
+      records = [{"CALL":"TEST123", "QSO_DATE":"20120402", "TIME_ON":"1234", "FREQ":"145.500", "BAND":"2m", "MODE":"FM", "RST_SENT":"59", "RST_RCVD":"59"},
+                 {"CALL":"TEST123", "QSO_DATE":"20130312", "TIME_ON":"0101", "FREQ":"145.750", "BAND":"2m", "MODE":"FM"}]
+      self.adif.write(records, "ADIF.test_write.adi")
+
+      f = open("ADIF.test_write.adi", 'r')
+      text = f.read()
+      print "File 'ADIF.test_write.adi' contains the following text:", text
+      assert("""        
+<adif_ver:5>1.0
+<programid:5>PyQSO
+<programversion:4>0.1a
+<eoh>
+<call:7>TEST123
+<qso_date:8>20120402
+<time_on:4>1234
+<freq:7>145.500
+<band:2>2m
+<mode:2>FM
+<rst_sent:2>59
+<rst_rcvd:2>59
+<eor>
+<call:7>TEST123
+<qso_date:8>20130312
+<time_on:4>0101
+<freq:7>145.750
+<band:2>2m
+<mode:2>FM
+<eor>
+""" in text)
+      f.close()
+
+   def test_adif_is_valid(self):
+      assert(self.adif.is_valid("CALL", "TEST123", "S") == True)
+      assert(self.adif.is_valid("QSO_DATE", "20120402", "D") == True)
+      assert(self.adif.is_valid("TIME_ON", "1230", "T") == True)
+      assert(self.adif.is_valid("TX_PWR", "5", "N") == True)
+
 if(__name__ == '__main__'):
    unittest.main()
 
