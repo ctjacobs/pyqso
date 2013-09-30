@@ -175,9 +175,8 @@ class Log(Gtk.ListStore):
    SELECT MIN(rowid) FROM %s GROUP BY call, qso_date, time_on, freq, mode
    )""" % (self.name, self.name))
             result = c.fetchall()
-         print result
          for rowid in result:
-            duplicates.append(rowid[0]) # Get the integers from inside the tuples.
+            duplicates.append(rowid[0]) # Get the integer from inside the tuple.
          if(len(duplicates) == 0):
             return (0, 0) # Nothing to do here.
       except (sqlite.Error, IndexError) as e:
