@@ -56,17 +56,18 @@ class Logbook(Gtk.Notebook):
          logging.debug("Trying to retrieve all the logs in the logbook...")
          self.logs = [] # A fresh stack of Log objects
          try:
-            c = self.connection.cursor()
-            c.execute("SELECT name FROM sqlite_master WHERE type='table'")
-            names = c.fetchall()
-
-            for name in names:
-               if(name[0][0:7] == "sqlite_"):
-                  continue # Skip SQLite internal tables
-               l = Log(self.connection, name[0])
-               l.populate()
-               self.logs.append(l)
-         except:
+            with self.connection:
+               c = self.connection.cursor()
+               c.execute("SELECT name FROM sqlite_master WHERE type='table'")
+               names = c.fetchall()
+               for name in names:
+                  if(name[0][0:7] == "sqlite_"):
+                     continue # Skip SQLite internal tables
+                  l = Log(self.connection, name[0])
+                  l.populate()
+                  self.logs.append(l)
+         except (sqlite.Error, IndexError) as e:
+            logging.exception(e)
             logging.exception("Oops! Something went wrong when trying to retrieve the logs from the logbook.")
             return
 
@@ -276,17 +277,16 @@ class Logbook(Gtk.Notebook):
          if(response == Gtk.ResponseType.OK):
             log_name = dialog.get_log_name()
             try:
-               c = self.connection.cursor()
-               query = "CREATE TABLE %s (id INTEGER PRIMARY KEY AUTOINCREMENT" % log_name
-               for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
-                  s = ", %s TEXT" % field_name.lower()
-                  query = query + s
-               query = query + ")"
-               c.execute(query)
-               exists = False
-               self.connection.commit()
+               with self.connection:
+                  c = self.connection.cursor()
+                  query = "CREATE TABLE %s (id INTEGER PRIMARY KEY AUTOINCREMENT" % log_name
+                  for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
+                     s = ", %s TEXT" % field_name.lower()
+                     query = query + s
+                  query = query + ")"
+                  c.execute(query)
+                  exists = False
             except sqlite.Error as e:
-               self.connection.rollback()
                logging.exception(e)
                # Data is not valid - inform the user.
                error(parent=self.parent, message="Database error. Try another log name.")
@@ -334,11 +334,10 @@ class Logbook(Gtk.Notebook):
       response = question(parent=self.parent, message="Are you sure you want to delete log %s?" % log.name)
       if(response == Gtk.ResponseType.YES):
          try:
-            c = self.connection.cursor()
-            c.execute("DROP TABLE %s" % log.name)
-            self.connection.commit()
+            with self.connection:
+               c = self.connection.cursor()
+               c.execute("DROP TABLE %s" % log.name)
          except sqlite.Error as e:
-            self.connection.rollback()
             logging.exception(e)
             error(parent=self.parent, message="Database error. Could not delete the log.")
             return
@@ -488,13 +487,12 @@ class Logbook(Gtk.Notebook):
          if(response == Gtk.ResponseType.OK):
             new_log_name = dialog.get_log_name()
             try:
-               c = self.connection.cursor()
-               query = "ALTER TABLE %s RENAME TO %s" % (old_log_name, new_log_name)
-               c.execute(query)
-               exists = False
-               self.connection.commit()
+               with self.connection:
+                  c = self.connection.cursor()
+                  query = "ALTER TABLE %s RENAME TO %s" % (old_log_name, new_log_name)
+                  c.execute(query)
+                  exists = False
             except sqlite.Error as e:
-               self.connection.rollback()
                logging.exception(e)
                # Data is not valid - inform the user.
                error(parent=self.parent, message="Database error. Try another log name.")
@@ -568,18 +566,17 @@ class Logbook(Gtk.Notebook):
                # Create a new log with the name the user supplies
                exists = False
                try:
-                  c = self.connection.cursor()
-                  query = "CREATE TABLE %s (id INTEGER PRIMARY KEY AUTOINCREMENT" % log_name
-                  for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
-                     s = ", %s TEXT" % field_name.lower()
-                     query = query + s
-                  query = query + ")"
-                  c.execute(query)
-                  l = Log(self.connection, log_name)
-                  self.connection.commit()
-                  break
+                  with self.connection:
+                     c = self.connection.cursor()
+                     query = "CREATE TABLE %s (id INTEGER PRIMARY KEY AUTOINCREMENT" % log_name
+                     for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
+                        s = ", %s TEXT" % field_name.lower()
+                        query = query + s
+                     query = query + ")"
+                     c.execute(query)
+                     l = Log(self.connection, log_name)
+                     break
                except sqlite.Error as e:
-                  self.connection.rollback()
                   logging.exception(e)
                   # Data is not valid - inform the user.
                   error(parent=self.parent, message="Database error. Try another log name.")
@@ -853,14 +850,15 @@ class Logbook(Gtk.Notebook):
    def log_name_exists(self, table_name):
       """ Return True if the log name already exists in the logbook, and False if it does not already exist. Return None if there is a database error. """
       try:
-         c = self.connection.cursor()
-         c.execute("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE name=?)", [table_name])
-         exists = c.fetchone()
+         with self.connection:
+            c = self.connection.cursor()
+            c.execute("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE name=?)", [table_name])
+            exists = c.fetchone()
          if(exists[0] == 1):
             return True
          else:
             return False
-      except sqlite.Error as e:
+      except (sqlite.Error, IndexError) as e:
          logging.exception(e) # Database error. PyQSO could not check if the log name exists.
          return None
 

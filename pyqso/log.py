@@ -64,28 +64,28 @@ class Log(Gtk.ListStore):
 
    def add_missing_db_columns(self):
       """ Check whether each field name in AVAILABLE_FIELD_NAMES_ORDERED is in the database table. If not, add it
-      (with all entries being set to NULL initially). """
+      (with all entries being set to an empty string initially). """
       logging.debug("Adding any missing database columns...")
 
       # Get all the column names in the current database table.
       column_names = []
       try:
-         c = self.connection.cursor()
-         c.execute("PRAGMA table_info(%s)" % self.name) 
-         result = c.fetchall()
+         with self.connection:
+            c = self.connection.cursor()
+            c.execute("PRAGMA table_info(%s)" % self.name) 
+            result = c.fetchall()
          for t in result:
             column_names.append(t[1].upper())
-      except sqlite.Error as e:
+      except (sqlite.Error, IndexError) as e:
          logging.exception("Could not obtain the database column names.")
          return
 
       for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
          if(not(field_name in column_names)):
             try:
-               c.execute('ALTER TABLE %s ADD COLUMN %s' % (self.name, field_name.lower()))
-               self.connection.commit()
+               with self.connection:
+                  c.execute("ALTER TABLE %s ADD COLUMN %s TEXT DEFAULT \"\"" % (self.name, field_name.lower()))
             except sqlite.Error as e:
-               self.connection.rollback()
                logging.exception("Could not add the missing database column '%s'." % field_name)
                pass
       logging.debug("Finished adding any missing database columns.")
@@ -103,33 +103,31 @@ class Log(Gtk.ListStore):
             liststore_entry.append("")
 
       try:
-         c = self.connection.cursor()
-         # What if the database columns are not necessarily in the same order as (or even exist in) AVAILABLE_FIELD_NAMES_ORDERED?
-         # PyQSO handles this here, but needs a separate list (called database_entry) to successfully perform the SQL query.
-         database_entry = []
-         c.execute("PRAGMA table_info(%s)" % self.name) # Get all the column names in the current database table.
-         column_names = c.fetchall()
-         query = "INSERT INTO %s VALUES (NULL" % self.name
-         for t in column_names:
-            # 't' here is a tuple
-            column_name = str(t[1])
-            if( (column_name.upper() in AVAILABLE_FIELD_NAMES_ORDERED) and (column_name.upper() in fields_and_data.keys()) ):
-               database_entry.append(fields_and_data[column_name.upper()])
-               query = query + ",?"
-            else:
-               if(column_name != "id"): # Ignore the row index field. This is a special case since it's not in AVAILABLE_FIELD_NAMES_ORDERED.
-                  query = query + ",NULL"
-         query = query + ")"
-         c.execute(query, database_entry)
-         index = c.lastrowid
+         with self.connection:
+            c = self.connection.cursor()
+            # What if the database columns are not necessarily in the same order as (or even exist in) AVAILABLE_FIELD_NAMES_ORDERED?
+            # PyQSO handles this here, but needs a separate list (called database_entry) to successfully perform the SQL query.
+            database_entry = []
+            c.execute("PRAGMA table_info(%s)" % self.name) # Get all the column names in the current database table.
+            column_names = c.fetchall()
+            query = "INSERT INTO %s VALUES (NULL" % self.name
+            for t in column_names:
+               # 't' here is a tuple
+               column_name = str(t[1])
+               if( (column_name.upper() in AVAILABLE_FIELD_NAMES_ORDERED) and (column_name.upper() in fields_and_data.keys()) ):
+                  database_entry.append(fields_and_data[column_name.upper()])
+                  query = query + ",?"
+               else:
+                  if(column_name != "id"): # Ignore the row index field. This is a special case since it's not in AVAILABLE_FIELD_NAMES_ORDERED.
+                     query = query + ",\"\""
+            query = query + ")"
+            c.execute(query, database_entry)
+            index = c.lastrowid
 
          liststore_entry.insert(0, index) # Add the record's index.
-
          self.append(liststore_entry)
-         self.connection.commit()
          logging.debug("Successfully added the record to the log.")
       except:
-         self.connection.rollback()
          logging.error("Could not add the record to the log.")
       return
 
@@ -138,15 +136,14 @@ class Log(Gtk.ListStore):
       logging.debug("Deleting record from log...")
       # Get the selected row in the logbook
       try:
-         c = self.connection.cursor()
-         query = "DELETE FROM %s" % self.name
-         c.execute(query+" WHERE id=?", [index])
+         with self.connection:
+            c = self.connection.cursor()
+            query = "DELETE FROM %s" % self.name
+            c.execute(query+" WHERE id=?", [index])
          if(iter is not None):
             self.remove(iter)
-         self.connection.commit()
          logging.debug("Successfully deleted the record from the log.")
-      except:
-         self.connection.rollback()
+      except (sqlite.Error, IndexError) as e:
          logging.error("Could not delete the record from the log.")
       return
 
@@ -154,16 +151,15 @@ class Log(Gtk.ListStore):
       """ Edit a specified record by replacing the data in the field 'field_name' with the data given in the argument called 'data'. Note that both iter and column_index should always be given. These are given default values of None for unit testing purposes only. """
       logging.debug("Editing field '%s' in record %d..." % (field_name, index))
       try:
-         c = self.connection.cursor()
-         query = "UPDATE %s SET %s" % (self.name, field_name)
-         query = query + "=? WHERE id=?"
-         c.execute(query, [data, index]) # First update the SQL database...
+         with self.connection:
+            c = self.connection.cursor()
+            query = "UPDATE %s SET %s" % (self.name, field_name)
+            query = query + "=? WHERE id=?"
+            c.execute(query, [data, index]) # First update the SQL database...
          if(iter is not None and column_index is not None):
             self.set(iter, column_index, data) # ...and then the ListStore.
-         self.connection.commit()
          logging.debug("Successfully edited field '%s' in record %d in the log." % (field_name, index))
-      except:
-         self.connection.rollback()
+      except (sqlite.Error, IndexError) as e:
          logging.error("Could not edit field %s in record %d in the log." % (field_name, index))
       return
 
@@ -171,18 +167,20 @@ class Log(Gtk.ListStore):
       """ Find the duplicates in the log, based on the CALL, QSO_DATE, TIME_ON, FREQ and MODE fields. Return a tuple containing the number of duplicates in the log, and the number of duplicates successfully removed. Hopefully these will be the same. """
       duplicates = []
       try:
-         c = self.connection.cursor()
-         c.execute(
-"""SELECT rowid FROM %s WHERE rowid NOT IN
-(
-SELECT MIN(rowid) FROM %s GROUP BY call, qso_date, time_on, freq, mode
-)""" % (self.name, self.name))
-         result = c.fetchall()
+         with self.connection:
+            c = self.connection.cursor()
+            c.execute(
+   """SELECT rowid FROM %s WHERE rowid NOT IN
+   (
+   SELECT MIN(rowid) FROM %s GROUP BY call, qso_date, time_on, freq, mode
+   )""" % (self.name, self.name))
+            result = c.fetchall()
+         print result
          for rowid in result:
             duplicates.append(rowid[0]) # Get the integers from inside the tuples.
          if(len(duplicates) == 0):
             return (0, 0) # Nothing to do here.
-      except sqlite.Error as e:
+      except (sqlite.Error, IndexError) as e:
          logging.exception(e)
          return (0, 0)
 
@@ -202,10 +200,11 @@ SELECT MIN(rowid) FROM %s GROUP BY call, qso_date, time_on, freq, mode
    def get_record_by_index(self, index):
       """ Return a record with a given index in the log. The record is represented by a dictionary of field-value pairs. """
       try:
-         c = self.connection.cursor()
-         query = "SELECT * FROM %s WHERE id=?" % self.name
-         c.execute(query, [index])
-         return c.fetchone()
+         with self.connection:
+            c = self.connection.cursor()
+            query = "SELECT * FROM %s WHERE id=?" % self.name
+            c.execute(query, [index])
+            return c.fetchone()
       except sqlite.Error as e:
          logging.exception(e)
          return None
@@ -213,9 +212,10 @@ SELECT MIN(rowid) FROM %s GROUP BY call, qso_date, time_on, freq, mode
    def get_all_records(self):
       """ Return a list of all the records in the log. Each record is represented by a dictionary. """
       try:
-         c = self.connection.cursor()
-         c.execute("SELECT * FROM %s" % self.name)
-         return c.fetchall()
+         with self.connection:
+            c = self.connection.cursor()
+            c.execute("SELECT * FROM %s" % self.name)
+            return c.fetchall()
       except sqlite.Error as e:
          logging.exception(e)
          return None
@@ -223,10 +223,11 @@ SELECT MIN(rowid) FROM %s GROUP BY call, qso_date, time_on, freq, mode
    def get_number_of_records(self):
       """ Return the total number of records in the log. """
       try:
-         c = self.connection.cursor()
-         c.execute("SELECT Count(*) FROM %s" % self.name)
-         return c.fetchone()[0]
-      except sqlite.Error as e:
+         with self.connection:
+            c = self.connection.cursor()
+            c.execute("SELECT Count(*) FROM %s" % self.name)
+            return c.fetchone()[0]
+      except (sqlite.Error, IndexError) as e:
          logging.exception(e)
          return None
 
