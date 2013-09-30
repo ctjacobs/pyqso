@@ -127,7 +127,8 @@ class Log(Gtk.ListStore):
          liststore_entry.insert(0, index) # Add the record's index.
          self.append(liststore_entry)
          logging.debug("Successfully added the record to the log.")
-      except:
+      except (sqlite.Error, IndexError) as e:
+         logging.error(e)
          logging.error("Could not add the record to the log.")
       return
 
