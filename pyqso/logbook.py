@@ -249,8 +249,11 @@ class Logbook(Gtk.Notebook):
    def update_summary(self):
       """ Update the information presented on the summary page. """
       self.summary["NUMBER_OF_LOGS"].set_label(str(self.get_number_of_logs()))
-      t = datetime.fromtimestamp(getmtime(self.path)).strftime("%d %B %Y @ %H:%M")
-      self.summary["DATE_MODIFIED"].set_label(str(t))
+      try:
+         t = datetime.fromtimestamp(getmtime(self.path)).strftime("%d %B %Y @ %H:%M")
+         self.summary["DATE_MODIFIED"].set_label(str(t))
+      except (IOError, OSError) as e:
+         logging.exception(e)
       return
 
    def _on_switch_page(self, widget, label, new_page):
