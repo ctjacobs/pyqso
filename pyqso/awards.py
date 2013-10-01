@@ -81,20 +81,22 @@ class Awards(Gtk.VBox):
 
       for log in self.parent.logbook.logs:
          records = log.get_all_records()
-         for r in records:
-            if(r["BAND"] is not None and r["MODE"] is not None):
-               if(r["BAND"].lower() in self.bands and r["MODE"] != ""):
-                  band = self.bands.index(r["BAND"].lower())
-                  # Phone modes
-                  if(r["MODE"].upper() in ["FM", "AM", "SSB", "SSTV"]):
-                     count[0][band] += 1
-                  elif(r["MODE"].upper() == "CW"):
-                     count[1][band] += 1
-                  else: 
-                     #FIXME: This assumes that all the other modes in the ADIF list are digital modes. Is this the case?
-                     count[2][band] += 1
-                  count[3][band] += 1 # Keep the total of each column in the "Mixed" mode
-
+         if(records is not None):
+            for r in records:
+               if(r["BAND"] is not None and r["MODE"] is not None):
+                  if(r["BAND"].lower() in self.bands and r["MODE"] != ""):
+                     band = self.bands.index(r["BAND"].lower())
+                     # Phone modes
+                     if(r["MODE"].upper() in ["FM", "AM", "SSB", "SSTV"]):
+                        count[0][band] += 1
+                     elif(r["MODE"].upper() == "CW"):
+                        count[1][band] += 1
+                     else: 
+                        #FIXME: This assumes that all the other modes in the ADIF list are digital modes. Is this the case?
+                        count[2][band] += 1
+                     count[3][band] += 1 # Keep the total of each column in the "Mixed" mode
+         else:
+            logging.error("Could not update the awards table for '%s' because of a database error." % log.name)
       # Insert the rows containing the totals
       for i in range(0, len(self.modes)):
          self.awards.append([self.modes[i]] + count[i])

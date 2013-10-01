@@ -51,15 +51,18 @@ class Log(Gtk.ListStore):
       self.add_missing_db_columns()
       self.clear()
       records = self.get_all_records()
-      for r in records:
-         liststore_entry = [r["id"]]
-         for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
-            # Note: r may contain column names that are not in AVAILABLE_FIELD_NAMES_ORDERED, 
-            # so we need to loop over and only select those that are, since the ListStore will
-            # expect a specific number of columns.
-            liststore_entry.append(r[field_name])
-         self.append(liststore_entry)
-      logging.debug("Finished populating '%s'." % self.name)
+      if(records is not None):
+         for r in records:
+            liststore_entry = [r["id"]]
+            for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
+               # Note: r may contain column names that are not in AVAILABLE_FIELD_NAMES_ORDERED, 
+               # so we need to loop over and only select those that are, since the ListStore will
+               # expect a specific number of columns.
+               liststore_entry.append(r[field_name])
+            self.append(liststore_entry)
+         logging.debug("Finished populating '%s'." % self.name)
+      else:
+         logging.error("Could not populate '%s' because of a database error." % self.name)
       return
 
    def add_missing_db_columns(self):
@@ -77,7 +80,8 @@ class Log(Gtk.ListStore):
          for t in result:
             column_names.append(t[1].upper())
       except (sqlite.Error, IndexError) as e:
-         logging.exception("Could not obtain the database column names.")
+         logging.exception(e)
+         logging.error("Could not obtain the database column names.")
          return
 
       for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
@@ -128,7 +132,7 @@ class Log(Gtk.ListStore):
          self.append(liststore_entry)
          logging.debug("Successfully added the record to the log.")
       except (sqlite.Error, IndexError) as e:
-         logging.error(e)
+         logging.exception(e)
          logging.error("Could not add the record to the log.")
       return
 
@@ -145,6 +149,7 @@ class Log(Gtk.ListStore):
             self.remove(iter)
          logging.debug("Successfully deleted the record from the log.")
       except (sqlite.Error, IndexError) as e:
+         logging.exception(e)
          logging.error("Could not delete the record from the log.")
       return
 
@@ -161,6 +166,7 @@ class Log(Gtk.ListStore):
             self.set(iter, column_index, data) # ...and then the ListStore.
          logging.debug("Successfully edited field '%s' in record %d in the log." % (field_name, index))
       except (sqlite.Error, IndexError) as e:
+         logging.exception(e)
          logging.error("Could not edit field %s in record %d in the log." % (field_name, index))
       return
 
