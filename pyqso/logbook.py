@@ -64,8 +64,9 @@ class Logbook(Gtk.Notebook):
                   if(name[0][0:7] == "sqlite_"):
                      continue # Skip SQLite internal tables
                   l = Log(self.connection, name[0])
-                  l.populate()
-                  self.logs.append(l)
+                  success = l.populate()
+                  if(success):
+                     self.logs.append(l)
          except (sqlite.Error, IndexError) as e:
             logging.exception(e)
             logging.exception("Oops! Something went wrong when trying to retrieve the logs from the logbook.")

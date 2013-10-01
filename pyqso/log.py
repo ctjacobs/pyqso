@@ -45,7 +45,8 @@ class Log(Gtk.ListStore):
       return
 
    def populate(self):
-      """ Remove everything in the Gtk.ListStore that is rendered already (via the TreeView), and start afresh. """
+      """ Remove everything in the Gtk.ListStore that is rendered already (via the TreeView), and start afresh. 
+      Return True if successful, and False otherwise. """
 
       logging.debug("Populating '%s'..." % self.name)
       self.add_missing_db_columns()
@@ -61,9 +62,10 @@ class Log(Gtk.ListStore):
                liststore_entry.append(r[field_name])
             self.append(liststore_entry)
          logging.debug("Finished populating '%s'." % self.name)
+         return True # Success
       else:
          logging.error("Could not populate '%s' because of a database error." % self.name)
-      return
+         return False # Failure
 
    def add_missing_db_columns(self):
       """ Check whether each field name in AVAILABLE_FIELD_NAMES_ORDERED is in the database table. If not, add it
@@ -90,7 +92,8 @@ class Log(Gtk.ListStore):
                with self.connection:
                   c.execute("ALTER TABLE %s ADD COLUMN %s TEXT DEFAULT \"\"" % (self.name, field_name.lower()))
             except sqlite.Error as e:
-               logging.exception("Could not add the missing database column '%s'." % field_name)
+               logging.exception(e)
+               logging.error("Could not add the missing database column '%s'." % field_name)
                pass
       logging.debug("Finished adding any missing database columns.")
       return
