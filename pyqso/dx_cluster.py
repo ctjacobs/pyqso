@@ -46,7 +46,7 @@ class DXCluster(Gtk.VBox):
       icon.set_from_stock(Gtk.STOCK_CONNECT, Gtk.IconSize.BUTTON)
       button = Gtk.Button()
       button.add(icon)
-      button.set_tooltip_text('Connect to Telnet server')
+      button.set_tooltip_text('Connect to Telnet Server')
       button.connect("clicked", self.telnet_connect)
       self.toolbar.pack_start(button, False, False, 0)
       self.buttons["CONNECT"] = button
@@ -56,7 +56,7 @@ class DXCluster(Gtk.VBox):
       icon.set_from_stock(Gtk.STOCK_DISCONNECT, Gtk.IconSize.BUTTON)
       button = Gtk.Button()
       button.add(icon)
-      button.set_tooltip_text('Disconnect from Telnet server')
+      button.set_tooltip_text('Disconnect from Telnet Server')
       button.connect("clicked", self.telnet_disconnect)
       self.toolbar.pack_start(button, False, False, 0)
       self.buttons["DISCONNECT"] = button

@@ -197,27 +197,33 @@ PyQSO can find and delete duplicate records in a log. A record is a duplicate of
 \chapter{Toolbox}\label{chap:toolbox}
 
 \section{DX cluster}
-A DX cluster is essentially a server through which radio operators can report and receive updates about QSOs that are in progress across the bands. PyQSO is able to connect to a DX cluster that operates using the Telnet protocol to provide a text-based alert service. As a result of the many different Telnet-based software products that DX clusters run, PyQSO currently outputs the raw data received from the DX cluster rather than trying to parse it in some way.
+A DX cluster is essentially a server through which amateur radio operators can report and receive updates about QSOs that are in progress across the bands. PyQSO is able to connect to a DX cluster that operates using the Telnet protocol to provide a text-based alert service. As a result of the many different Telnet-based software products that DX clusters run, PyQSO currently outputs the raw data received from the DX cluster rather than trying to parse it in some way.
 
 %\begin{center}
 %  \includegraphics[width=1\columnwidth]{images/dx_cluster.png}
 %\end{center}
 
-If no port is specified, PyQSO will use the default value of 23.
+Click on the \texttt{Connect to Telnet Server} button and enter the DX server details in the dialog that appears (see Figure \ref{fig:telnet_connection_dialog}). If no port is specified, PyQSO will use the default value of 23. A username and password may also need to be supplied.
 
-\begin{center}
+\begin{figure}
+  \centering
   \includegraphics[width=0.5\columnwidth]{images/telnet_connection_dialog.png}
-\end{center}
+  \caption{Telnet connection setup dialog.}
+  \label{fig:telnet_connection_dialog}
+\end{figure}
 
 \section{Grey line}
 The grey line tool can be used to check which parts of the world are in darkness. The position of the grey line is automatically updated every 30 minutes.
 
-\begin{center}
+\begin{figure}
+  \centering
   \includegraphics[width=1\columnwidth]{images/grey_line.png}
-\end{center}
+  \caption{The grey line tool.}
+  \label{fig:grey_line}
+\end{figure}
 
 \section{Awards}
-The awards data is updated each time a record is added, deleted, or modified. Currently only the DXCC award is supported, but additional awards will be added if there is user demand for them.
+The awards data is updated each time a record is added, deleted, or modified. Currently only the DXCC award is supported.
 
 \chapter{Preferences}\label{chap:preferences}
 PyQSO user preferences are stored in a configuration file located at \texttt{\textasciitilde/.pyqso.ini}, where \texttt{\textasciitilde} denotes the user's home directory.
@@ -233,9 +239,12 @@ Not all the available fields have to be displayed in the logbook. The user can c
 \section{Hamlib support}\label{sect:hamlib}
 PyQSO features rudimentary support for the Hamlib library. The name and path of the radio device connected to the user's computer can be specified in the \texttt{Hamlib} tab of the preferences dialog. Upon adding a new record to the log, PyQSO will use Hamlib to retrieve the current frequency that the radio device is set to and automatically fill in the Frequency field. 
 
-\begin{center}
+\begin{figure}
+  \centering
   \includegraphics[width=0.75\columnwidth]{images/preferences_hamlib.png}
-\end{center}
+  \caption{The Hamlib options in the Preferences dialog.}
+  \label{fig:preferences_hamlib}
+\end{figure}
 
 \bibliographystyle{plainnat}
 \end{document}
