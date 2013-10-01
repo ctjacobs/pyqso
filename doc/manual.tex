@@ -55,11 +55,14 @@ PyQSO is a general-purpose logging tool for amateur radio operators. It provides
   \item Grey line plotter.
   \item Filter out QSOs based on the callsign field (e.g. only display contacts with callsigns beginning with ``M6'').
   \item Remove duplicate QSOs.
-  \item Auto-fill the frequency field using the Hamlib module.
+  \item Basic support for the Hamlib library.
 \end{itemize}
+The source code for PyQSO is available for download at: \texttt{www.launchpad.net/pyqso}
 
-\section{Three-tier model}
-Many amateur radio operators choose to store all the contacts they ever make in a single \textit{logbook}, whereas others keep a separate logbook for each year, for example. Each logbook may be divided up to form multiple distinct \textit{logs}, perhaps one for casual repeater contacts and another for DX'ing. Finally, each log can contain multiple \textit{records}. PyQSO is based around this three-tier model, going from logbooks at the top to individual records at the bottom. From an implementation point-of-view, a database is analogous to a logbook, a table in the database is analogous to a log in the logbook, and the records in each table are analogous to the records in each log.
+\section{Data storage model}
+Many amateur radio operators choose to store all the contacts they ever make in a single \textit{logbook}, whereas others keep a separate logbook for each year, for example. Each logbook may be divided up to form multiple distinct \textit{logs}, perhaps one for casual repeater contacts and another for DX'ing. Finally, each log can contain multiple \textit{records}. PyQSO is based around this three-tier model for data storage, going from logbooks at the top to individual records at the bottom. 
+
+Rather than storing each log in a separate file, a single database can hold several logs together; in PyQSO, a database is therefore analogous to a logbook. Within a database the user can create multiple tables which are analogous to the logs. Within each table users can create/modify/delete the records which are analogous to the records in each log.
 
 \section{Licensing}
 PyQSO is free software, released under the GNU General Public License. Please see the file called COPYING for more information.
@@ -93,11 +96,11 @@ Assuming that your current working directory is PyQSO's base directory (the dire
 There are several options available when executing PyQSO from the command-line.
 
 \subsubsection{Open a specified logbook file}
-In addition to being able to open a new or existing logbook through the GUI, users can also specify a logbook file to open at the command line with the \texttt{-l} or \texttt{--logbook} option. For example, to open a logbook file called \texttt{mylogbook.db}, use the following command:
+In addition to being able to open a new or existing logbook through the graphical interface, users can also specify a logbook file to open at the command line with the \texttt{-l} or \texttt{--logbook} option. For example, to open a logbook file called \texttt{mylogbook.db}, use the following command:
 
   \texttt{pyqso --logbook /path/to/mylogbook.db}
 
-If the file does not already exist, PyQSO will create it.
+\noindent If the file does not already exist, PyQSO will create it.
 
 \subsubsection{Debugging mode}
 Running PyQSO with the \texttt{-d} or \texttt{--debug} flag enables the debugging mode:
