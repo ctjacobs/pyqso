@@ -123,8 +123,13 @@ Once the database connection has been established, the database file name will a
   \label{fig:log_view_with_awards}
 \end{figure}
 
+\section{Closing a logbook}
+A logbook can be closed (along with its corresponding database connection) by clicking the \texttt{Close Logbook} button in the toolbar, or by clicking \texttt{Close Logbook} in the \texttt{Logbook} menu.
+
 \chapter{Log management}\label{chap:log_management}
-\textbf{Note:} All the operations described below assume that a logbook is already open.
+\noindent\textbf{Note 1:} All the operations described below assume that a logbook is already open.
+
+\noindent\textbf{Note 2:} Any modifications made to the logs are permanent. Users should make sure they keep up-to-date backups.
 
 \section{Creating a new log}
 To create a new log, click \texttt{New Log} in the \texttt{Logbook} menu and enter the desired name of the log (e.g. repeater\_contacts, dx, mobile\_log). Alternatively, use the shortcut key combination \texttt{Ctrl + N}. 
@@ -155,10 +160,12 @@ To sort a log by a particular field name, left-click the column header that cont
 
 \chapter{Record management}\label{chap:record_management}
 
+\noindent\textbf{Note:} Any modifications made to the records are permanent. Users should make sure they keep up-to-date backups.
+
 \section{Creating a new record (QSO)}
 A new QSO can be added by either:
 \begin{itemize}
-  \item Clicking the `+' button in the toolbar.
+  \item Clicking the \texttt{Add Record} button in the toolbar.
   \item Pressing \texttt{Ctrl + R}.
   \item Clicking \texttt{Add Record...} in the \texttt{Records} menu.
 \end{itemize}
@@ -178,7 +185,7 @@ PyQSO can also resolve callsign-related information (e.g. the operator's name, a
 An existing record can be edited by:
 \begin{itemize}
   \item Double-clicking on it.
-  \item Selecting it and clicking the edit button in the toolbar.
+  \item Selecting it and clicking the \texttt{Edit Record} button in the toolbar.
   \item Selecting it and clicking \texttt{Edit Selected Record...} in the \texttt{Records} menu.
 \end{itemize}
 This will bring up the same dialog window as before.
@@ -186,7 +193,7 @@ This will bring up the same dialog window as before.
 \section{Deleting a record}
 An existing record can be deleted by:
 \begin{itemize}
-  \item Selecting it and clicking the `x' button in the toolbar.
+  \item Selecting it and clicking the \texttt{Delete Record} button in the toolbar.
   \item Selecting it and pressing the \texttt{Delete} key.
   \item Selecting it and clicking \texttt{Delete Selected Record...} in the \texttt{Records} menu.
 \end{itemize}
@@ -213,7 +220,7 @@ Click on the \texttt{Connect to Telnet Server} button and enter the DX server de
 \end{figure}
 
 \section{Grey line}
-The grey line tool can be used to check which parts of the world are in darkness. The position of the grey line is automatically updated every 30 minutes.
+The grey line tool (see Figure \ref{fig:grey_line}) can be used to check which parts of the world are in darkness. The position of the grey line is automatically updated every 30 minutes.
 
 \begin{figure}
   \centering
