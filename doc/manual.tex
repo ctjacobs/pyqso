@@ -112,7 +112,7 @@ Running PyQSO with the \texttt{-d} or \texttt{--debug} flag enables the debuggin
 \section{Opening a new or existing logbook}
 Logbooks are SQL databases, and as such they are accessed with a database connection. To create a connection and open the logbook, click \texttt{Open a New or Existing Logbook...} in the \texttt{Logbook} menu, and either:
 \begin{itemize}
-  \item Find and select an existing logbook database file (with the \texttt{.db} file extension), and click \texttt{Open} to create the database connection; or
+  \item Find and select an existing logbook database file (which usually has a \texttt{.db} file extension), and click \texttt{Open} to create the database connection; or
   \item Create a new database by entering a (non-existing) file name and clicking \texttt{Open}. The logbook database file (and a connection to it) will then be created automatically.
 \end{itemize}
 Once the database connection has been established, the database file name will appear in the status bar. All logs in the logbook will be opened automatically, and the interface will look something like the one shown in Figure \ref{fig:log_view_with_awards}.
@@ -126,7 +126,7 @@ Once the database connection has been established, the database file name will a
 \chapter{Log management}\label{chap:log_management}
 \textbf{Note:} All the operations described below assume that a logbook is already open.
 
-\section{New log}
+\section{Creating a new log}
 To create a new log, click \texttt{New Log} in the \texttt{Logbook} menu and enter the desired name of the log (e.g. repeater\_contacts, dx, mobile\_log). Alternatively, use the shortcut key combination \texttt{Ctrl + N}. 
 
 Note that the log name must be unique (i.e. it cannot already exist in the logbook). Furthermore, it can only be composed of alphanumeric characters and the underscore character, and the first character in the name must not be a number. 
@@ -155,7 +155,7 @@ To sort a log by a particular field name, left-click the column header that cont
 
 \chapter{Record management}\label{chap:record_management}
 
-\section{New record (QSO)}
+\section{Creating a new record (QSO)}
 A new QSO can be added by either:
 \begin{itemize}
   \item Clicking the `+' button in the toolbar.
@@ -164,15 +164,32 @@ A new QSO can be added by either:
 \end{itemize}
 A dialog window will appear where details of the QSO can be entered. Note that the current date and time are filled in automatically. When ready, click \texttt{OK} to save the changes.
 
-\subsection{Callsign lookup}
-PyQSO can also resolve callsign-related information (e.g. the operator's name, address, and ITU Zone) by querying the qrz.com database. Note that the user must first supply their qrz.com account information in the preferences dialog window.
-
-\section{Edit record}
-An existing record can be modified by double-clicking on it. This will bring up the same dialog window
-
 \begin{center}
   \includegraphics[width=1\columnwidth]{images/edit_record.png}
 \end{center}
+
+\subsection{Callsign lookup}
+PyQSO can also resolve callsign-related information (e.g. the operator's name, address, and ITU Zone) by querying the qrz.com database. Note that the user must first supply their qrz.com account information in the preferences dialog window.
+
+\section{Editing a record}
+An existing record can be edited by:
+\begin{itemize}
+  \item Double-clicking on it.
+  \item Selecting it and clicking the edit button in the toolbar.
+  \item Selecting it and clicking \texttt{Edit Selected Record...} in the \texttt{Records} menu.
+\end{itemize}
+This will bring up the same dialog window as before.
+
+\section{Deleting a record}
+An existing record can be deleted by:
+\begin{itemize}
+  \item Selecting it and clicking the `x' button in the toolbar.
+  \item Selecting it and pressing the \texttt{Delete} key.
+  \item Selecting it and clicking \texttt{Delete Selected Record...} in the \texttt{Records} menu.
+\end{itemize}
+
+\section{Removing duplicate records}
+PyQSO can find and delete duplicate records in a log. Click \texttt{Remove Duplicate Records} in the \texttt{Records} menu.
 
 \chapter{Toolbox}\label{chap:toolbox}
 

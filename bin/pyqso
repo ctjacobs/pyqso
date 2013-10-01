@@ -25,6 +25,7 @@ import ConfigParser
 import os
 import os.path
 import sys
+import signal
 
 # This will help Python find the PyQSO modules
 # that need to be imported below.
@@ -159,6 +160,7 @@ if(__name__ == "__main__"):
                         format="%(asctime)s %(levelname)s: %(message)s", 
                         datefmt="%Y-%m-%d %H:%M:%S")
 
+   signal.signal(signal.SIGINT, signal.SIG_DFL) # Exit PyQSO if a SIGINT signal is captured.
    application = PyQSO(options.logbook) # Populate the main window and show it
    Gtk.main() # Start up the event loop!
 
