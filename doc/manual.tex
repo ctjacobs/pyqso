@@ -116,7 +116,7 @@ Logbooks are SQL databases, and as such they are accessed with a database connec
   \item Create a new database by entering a (non-existing) file name and clicking \texttt{Open}. The logbook database file (and a connection to it) will then be created automatically.
 \end{itemize}
 Once the database connection has been established, the database file name will appear in the status bar. All logs in the logbook will be opened automatically, and the interface will look something like the one shown in Figure \ref{fig:log_view_with_awards}.
-\begin{figure}[H]
+\begin{figure}
   \centering
   \includegraphics[width=1\columnwidth]{images/log_with_awards.png}
   \caption{Log view.}
@@ -162,11 +162,14 @@ A new QSO can be added by either:
   \item Pressing \texttt{Ctrl + R}.
   \item Clicking \texttt{Add Record...} in the \texttt{Records} menu.
 \end{itemize}
-A dialog window will appear where details of the QSO can be entered. Note that the current date and time are filled in automatically. When ready, click \texttt{OK} to save the changes.
+A dialog window will appear where details of the QSO can be entered (see Figure \ref{fig:edit_record}). Note that the current date and time are filled in automatically. When ready, click \texttt{OK} to save the changes.
 
-\begin{center}
+\begin{figure}
+  \centering
   \includegraphics[width=1\columnwidth]{images/edit_record.png}
-\end{center}
+  \caption{Record dialog.}
+  \label{fig:edit_record}
+\end{figure}
 
 \subsection{Callsign lookup}
 PyQSO can also resolve callsign-related information (e.g. the operator's name, address, and ITU Zone) by querying the qrz.com database. Note that the user must first supply their qrz.com account information in the preferences dialog window.
@@ -189,7 +192,7 @@ An existing record can be deleted by:
 \end{itemize}
 
 \section{Removing duplicate records}
-PyQSO can find and delete duplicate records in a log. Click \texttt{Remove Duplicate Records} in the \texttt{Records} menu.
+PyQSO can find and delete duplicate records in a log. A record is a duplicate of another if its data in the Callsign, Date, Time, Frequency, and Mode fields are the same. Click \texttt{Remove Duplicate Records} in the \texttt{Records} menu.
 
 \chapter{Toolbox}\label{chap:toolbox}
 
