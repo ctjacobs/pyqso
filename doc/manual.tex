@@ -42,19 +42,37 @@
 \tableofcontents
 
 \chapter{Introduction}\label{chap:introduction}
-PyQSO is a contact logging tool for amateur radio operators.
+\section{Overview}
+PyQSO is a general-purpose logging tool for amateur radio operators. It provides a simple graphical interface through which users can manage information about the contacts/QSOs they make with other operators on the air. All information is stored in a light-weight SQL database. Other key features include:
+\begin{itemize}
+  \item Customisable interface (e.g. only show callsign and frequency information).
+  \item Import and export logs in ADIF format.
+  \item Perform callsign lookups and auto-fill data fields using the \texttt{qrz.com} database.
+  \item Sort the logs by individual fields.
+  \item Print a hard-copy of logs, or print to PDF.
+  \item Connect to Telnet-based DX clusters.
+  \item Progress tracker for the DXCC award.
+  \item Grey line plotter.
+  \item Filter out QSOs based on the callsign field (e.g. only display contacts with callsigns beginning with ``M6'').
+  \item Remove duplicate QSOs.
+  \item Auto-fill the frequency field using the Hamlib module.
+\end{itemize}
 
-As the name suggests, PyQSO is written primarily in the Python programming language. The graphical user interface (GUI) has been built using the GTK+ library through the PyGTK bindings. PyQSO also uses an SQLite embedded database to manage all the contacts an amateur radio operator makes.
-
+\section{Three-tier model}
 Many amateur radio operators choose to store all the contacts they ever make in a single \textit{logbook}, whereas others keep a separate logbook for each year, for example. Each logbook may be divided up to form multiple distinct \textit{logs}, perhaps one for casual repeater contacts and another for DX'ing. Finally, each log can contain multiple \textit{records}. PyQSO is based around this three-tier model, going from logbooks at the top to individual records at the bottom. From an implementation point-of-view, a database is analogous to a logbook, a table in the database is analogous to a log in the logbook, and the records in each table are analogous to the records in each log.
-
-The structure of this manual is as follows. Chapter \ref{chap:getting_started} is concerned with the installation, running, and overall layout of PyQSO. It also describes how to create a  new logbook and open an existing one. Chapter \ref{chap:log_management} explains how to create a log in the logbook, as well as the basic operations that users can perform with existing logs, such as printing, importing from/exporting to ADIF format, and sorting. Chapter \ref{chap:record_management} deals with the bottom layer of the three-tier model -- the creation, deletion, and modification of QSO records in a log. Chapter \ref{chap:toolbox} introduces the PyQSO toolbox which contains three tools that are useful to amateur radio operators: a DX cluster, grey line plotter, and an awards progress tracker. Finally, Chapter \ref{chap:preferences} explains how users can set up Hamlib support and show/hide various fields in a log, along with several other user preferences that can be set via the Preferences dialog window.
 
 \section{Licensing}
 PyQSO is free software, released under the GNU General Public License. Please see the file called COPYING for more information.
 
+\section{Structure of this manual}
+The structure of this manual is as follows. Chapter \ref{chap:getting_started} is concerned with the installation, running, and overall layout of PyQSO. It also describes how to create a  new logbook and open an existing one. Chapter \ref{chap:log_management} explains how to create a log in the logbook, as well as the basic operations that users can perform with existing logs, such as printing, importing from/exporting to ADIF format, and sorting. Chapter \ref{chap:record_management} deals with the bottom layer of the three-tier model -- the creation, deletion, and modification of QSO records in a log. Chapter \ref{chap:toolbox} introduces the PyQSO toolbox which contains three tools that are useful to amateur radio operators: a DX cluster, grey line plotter, and an awards progress tracker. Finally, Chapter \ref{chap:preferences} explains how users can set up Hamlib support and show/hide various fields in a log, along with several other user preferences that can be set via the Preferences dialog window.
 
 \chapter{Getting started}\label{chap:getting_started}
+
+\section{System requirements}
+It is recommended that users run PyQSO on the Linux operating system, since all development and testing of PyQSO takes place there.
+
+As the name suggests, PyQSO is written primarily in the Python programming language. The graphical user interface has been built using the GTK+ library through the PyGTK bindings. PyQSO also uses an SQLite embedded database to manage all the contacts an amateur radio operator makes. Users must therefore make sure that the Python interpreter and any additional software dependencies are satisfied before PyQSO can be run successfully. The list of software packages that PyQSO depends on is provided in the README file.
 
 \section{Installation and running}
 Assuming that your current working directory is PyQSO's base directory (the directory that the Makefile is in), you can install PyQSO via the terminal with the following command:
@@ -90,6 +108,7 @@ Running PyQSO with the \texttt{-d} or \texttt{--debug} flag enables the debuggin
 
 
 \section{Window layout}
+While PyQSO can read and write ADIF files, please note that only a subset of all ADIF fields are supported.
 
 
 
@@ -201,7 +220,7 @@ Not all the available fields have to be displayed in the logbook. Users can choo
 
 PyQSO must be restarted in order for any changes to take effect.
 
-\section{Hamlib support}
+\section{Hamlib support}\label{sect:hamlib}
 PyQSO features rudimentary support for the Hamlib library. The name and path of the radio device connected to the user's computer can be specified in the \texttt{Hamlib} tab of the preferences dialog. Upon adding a new record to the log, PyQSO will use Hamlib to retrieve the current frequency that the radio device is set to and automatically fill in the Frequency field. 
 
 \begin{center}
