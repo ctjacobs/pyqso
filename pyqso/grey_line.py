@@ -26,7 +26,7 @@ try:
    import matplotlib
    matplotlib.rcParams['font.size'] = 10.0
    from mpl_toolkits.basemap import Basemap
-   from backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
+   from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
    have_necessary_modules = True
 except ImportError:
    logging.error("Could not import a non-standard Python module needed by the GreyLine class. Check that all the PyQSO dependencies are satisfied.")
