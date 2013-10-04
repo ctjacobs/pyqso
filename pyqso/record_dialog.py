@@ -471,8 +471,11 @@ class CalendarDialog(Gtk.Dialog):
       logging.debug("Retrieving the date from the calendar widget...")
       (year, month, day) = self.calendar.get_date()
       # If necessary, add on leading zeros so the YYYYMMDD format is followed.
-      if(month < 10):
-         month = "0" + str(month+1) # Note: the months start from an index of 0 when retrieved from the calendar widget.
+      print month, day
+      if(month + 1 < 10):
+         month = "0" + str(month + 1) # Note: the months start from an index of 0 when retrieved from the calendar widget.
+      else:
+         month = month + 1
       if(day < 10):
          day = "0" + str(day)
       date = str(year) + str(month) + str(day)
