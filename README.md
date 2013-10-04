@@ -1,4 +1,4 @@
-<--- File: README
+    File: README.md
     Copyright (C) 2013 Christian Jacobs.
 
     This file is part of PyQSO.
@@ -14,9 +14,9 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>. -->
+    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-pyqso
+PyQSO
 =====
 
 PyQSO is a simple Python-based contact logging tool for amateur radio operators.
