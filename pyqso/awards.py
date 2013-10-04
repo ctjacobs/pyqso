@@ -22,7 +22,7 @@ from gi.repository import Gtk, GObject
 import logging
 
 class Awards(Gtk.VBox):
-   """ A tool for tracking progress towards an award. Currently this only supports the DXCC award. """
+   """ A tool for tracking progress towards an award. Currently this only supports the DXCC award. For more information visit http://www.arrl.org/dxcc """
    
    def __init__(self, parent):
       """ Set up a table for progress tracking purposes. """

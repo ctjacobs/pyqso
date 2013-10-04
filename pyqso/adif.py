@@ -87,7 +87,7 @@ DATA_TYPES = ["A", "B", "N", "S", "I", "D", "T", "M", "G", "L", "E"]
 ADIF_VERSION = "1.0"
 
 class ADIF:
-   """ The ADIF class supplies methods for reading, parsing, and writing log files in the Amateur Data Interchange Format (ADIF). """
+   """ The ADIF class supplies methods for reading, parsing, and writing log files in the Amateur Data Interchange Format (ADIF). For more information, visit http://adif.org/ """
    
    def __init__(self):
       # Class for I/O of files using the Amateur Data Interchange Format (ADIF).
