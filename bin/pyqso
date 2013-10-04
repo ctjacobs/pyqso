@@ -127,7 +127,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.""")
-      about.set_comments("PyQSO: A Python-based contact logging tool for amateur radio operators")
+      about.set_comments("PyQSO: A contact logging tool for amateur radio operators.")
       possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
       for icon_path in possible_icon_paths:
          try:
