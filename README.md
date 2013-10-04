@@ -30,7 +30,7 @@ Assuming that the current working directory is PyQSO's base directory (the direc
 
 Note: 'sudo' may be needed for this. Once installed, the following command will run PyQSO:
    
-   pyqso
+   `pyqso`
 
 Alternatively, PyQSO can be run with:
 
