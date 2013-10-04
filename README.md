@@ -55,5 +55,5 @@ PyQSO depends on:
 * gir1.2-gtk-3.0
 * python-mpltoolkits.basemap
 * python-numpy
-* python-matplotlib (version 1.3.0)
+* python-matplotlib (version 1.3.0 or later)
 
