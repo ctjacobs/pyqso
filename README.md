@@ -53,6 +53,7 @@ Dependencies
 PyQSO depends on the following packages:
 
 * gir1.2-gtk-3.0
+* python2.7
 * python-mpltoolkits.basemap
 * python-numpy
 * python-matplotlib (version 1.3.0 or later)
