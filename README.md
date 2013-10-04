@@ -19,13 +19,13 @@
 PyQSO
 =====
 
-PyQSO is a simple Python-based contact logging tool for amateur radio operators.
+PyQSO is a general-purpose contact logging tool for amateur radio operators.
 
 Assuming that the current working directory is PyQSO's base directory (the directory that the Makefile is in), PyQSO can be installed via the terminal with the following command:
 
    `make install`
 
-Note: `sudo` may be needed for this. Once installed, the following command will run PyQSO:
+Note: 'sudo' may be needed for this. Once installed, the following command will run PyQSO:
    
    pyqso
 
@@ -49,5 +49,5 @@ PyQSO depends on:
 * gir1.2-gtk-3.0
 * python-mpltoolkits.basemap
 * python-numpy
-* python-matplotlib-1.3.0
+* python-matplotlib (version 1.3.0)
 
