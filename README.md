@@ -50,7 +50,7 @@ which will produce the manual.pdf file.
 Dependencies
 ------------
 
-PyQSO depends on:
+PyQSO depends on the following packages:
 
 * gir1.2-gtk-3.0
 * python-mpltoolkits.basemap
