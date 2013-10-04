@@ -19,7 +19,7 @@
 PyQSO
 =====
 
-PyQSO is a general-purpose contact logging tool for amateur radio operators.
+PyQSO is a contact logging tool for amateur radio operators.
 
 Installation and running
 ------------------------
@@ -50,11 +50,18 @@ which will produce the manual.pdf file.
 Dependencies
 ------------
 
-PyQSO depends on the following packages:
+PyQSO depends on the following Debian packages:
 
 * gir1.2-gtk-3.0
 * python2.7
+
+The following extra packages are necessary to enable the grey line tool:
+
 * python-mpltoolkits.basemap
 * python-numpy
 * python-matplotlib (version 1.3.0 or later)
+
+The following extra package is necessary to enable Hamlib support:
+
+* python-libhamlib2
 

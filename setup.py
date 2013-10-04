@@ -22,7 +22,7 @@ from distutils.core import setup
 
 setup(name='PyQSO',
       version='0.1a',
-      description='A Python-based QSO logging tool',
+      description='A contact logging tool for amateur radio operators.',
       author='Christian Jacobs',
       url='https://launchpad.net/pyqso',
       packages=['pyqso'],
