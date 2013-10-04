@@ -32,7 +32,7 @@ Note: 'sudo' may be needed for this. Once installed, the following command will 
    
    `pyqso`
 
-Alternatively, PyQSO can be run with:
+Alternatively, PyQSO can be run (without installing) with:
 
    `python bin/pyqso`
 
