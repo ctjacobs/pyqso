@@ -209,17 +209,13 @@ The toolbox is hidden by default. To show it, click \texttt{Toolbox} in the \tex
 \section{DX cluster}
 A DX cluster is essentially a server through which amateur radio operators can report and receive updates about QSOs that are in progress across the bands. PyQSO is able to connect to a DX cluster that operates using the Telnet protocol to provide a text-based alert service. As a result of the many different Telnet-based software products that DX clusters run, PyQSO currently outputs the raw data received from the DX cluster rather than trying to parse it in some way.
 
-%\begin{center}
-%  \includegraphics[width=1\columnwidth]{images/dx_cluster.png}
-%\end{center}
-
-Click on the \texttt{Connect to Telnet Server} button and enter the DX server details in the dialog that appears (see Figure \ref{fig:telnet_connection_dialog}). If no port is specified, PyQSO will use the default value of 23. A username and password may also need to be supplied.
+Click on the \texttt{Connect to Telnet Server} button and enter the DX server details in the dialog that appears. If no port is specified, PyQSO will use the default value of 23. A username and password may also need to be supplied. Once connected, the server output will appear in the DX cluster frame (see Figure \ref{fig:dx_cluster}). A command can also be sent to the server by typing it into the entry box and clicking the adjacent \texttt{Send Command} button.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.5\columnwidth]{images/telnet_connection_dialog.png}
-  \caption{Telnet connection setup dialog.}
-  \label{fig:telnet_connection_dialog}
+  \includegraphics[width=1\columnwidth]{images/dx_cluster.png}
+  \caption{The DX cluster frame.}
+  \label{fig:dx_cluster}
 \end{figure}
 
 \section{Grey line}
@@ -233,7 +229,7 @@ The grey line tool (see Figure \ref{fig:grey_line}) can be used to check which p
 \end{figure}
 
 \section{Awards}
-The awards data is updated each time a record is added, deleted, or modified. Currently only the DXCC award is supported (see Figure \ref{fig:awards})
+The awards data is updated each time a record is added, deleted, or modified. Currently only the DXCC award is supported (see Figure \ref{fig:awards}).
 
 \begin{figure}
   \centering
