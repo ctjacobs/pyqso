@@ -427,6 +427,12 @@ class Logbook(Gtk.Notebook):
          column.set_resizable(True)
          column.set_min_width(50)
          column.set_clickable(True)
+         if(field_names[i] == "NOTES"):
+            # Give the 'Notes' column some extra space, since this is likely to contain some long sentences...
+            column.set_min_width(300)
+            # ... but don't let it automatically re-size itself.
+            column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+
          column.connect("clicked", self.sort_log, i+1)
 
          config = ConfigParser.ConfigParser()
