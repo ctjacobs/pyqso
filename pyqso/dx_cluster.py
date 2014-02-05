@@ -154,7 +154,7 @@ class DXCluster(Gtk.VBox):
       """ Retrieve any new data from the Telnet server and print it out in the Gtk.TextView widget. Always returns True to satisfy the GObject timer. """
       if(self.connection):
          text = self.connection.read_very_eager()
-         #text = text.replace(u"\u0007", "") # Remove the BEL Unicode character from the end of the line
+         text = text.replace(u"\u0007", "") # Remove the BEL Unicode character from the end of the line
 
          # Allow auto-scrolling to the new text entry if the focus is already at
          # the very end of the Gtk.TextView. Otherwise, don't auto-scroll
