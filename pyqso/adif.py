@@ -207,7 +207,7 @@ class ADIF:
          # Then write each log to the file.
          for r in records:
             for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
-               if(not(field_name in r)): 
+               if(not(field_name.lower() in r.keys() or field_name.upper() in r.keys())): 
                   # If the field_name does not exist in the record, then skip past it.
                   # Only write out the fields that exist and that have some data in them.
                   continue
