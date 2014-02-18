@@ -54,6 +54,7 @@ PyQSO depends on the following Debian packages:
 
 * gir1.2-gtk-3.0
 * python2.7
+* python-gi-cairo (for log printing purposes)
 
 The following extra packages are necessary to enable the grey line tool:
 
