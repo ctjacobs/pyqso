@@ -579,8 +579,13 @@ class Logbook(Gtk.Notebook):
                                     (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                     Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
       filter = Gtk.FileFilter()
-      filter.set_name("All ADIF files")
+      filter.set_name("All ADIF files (*.adi)")
       filter.add_pattern("*.adi")
+      dialog.add_filter(filter)
+
+      filter = Gtk.FileFilter()
+      filter.set_name("All files")
+      filter.add_pattern("*")
       dialog.add_filter(filter)
       
       response = dialog.run()
@@ -666,7 +671,17 @@ class Logbook(Gtk.Notebook):
                               (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                               Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
       dialog.set_do_overwrite_confirmation(True)
-            
+
+      filter = Gtk.FileFilter()
+      filter.set_name("All ADIF files (*.adi)")
+      filter.add_pattern("*.adi")
+      dialog.add_filter(filter)
+
+      filter = Gtk.FileFilter()
+      filter.set_name("All files")
+      filter.add_pattern("*")
+      dialog.add_filter(filter)
+
       response = dialog.run()
       if(response == Gtk.ResponseType.OK):
          path = dialog.get_filename()
