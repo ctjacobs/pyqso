@@ -427,6 +427,8 @@ class Logbook(Gtk.Notebook):
          column.set_resizable(True)
          column.set_min_width(50)
          column.set_clickable(True)
+
+         # Special cases
          if(field_names[i] == "NOTES"):
             # Give the 'Notes' column some extra space, since this is likely to contain some long sentences...
             column.set_min_width(300)
@@ -444,10 +446,48 @@ class Logbook(Gtk.Notebook):
       self.show_all()
       return
 
+   def _compare_date_and_time(self, model, row1, row2, user_data):
+      """ Compares two rows in a Gtk.ListStore, and sorts by both date and time. """
+      date1 = model.get_value(row1, user_data[0])
+      date2 = model.get_value(row2, user_data[0])
+      time1 = model.get_value(row1, user_data[1])
+      time2 = model.get_value(row2, user_data[1])
+      if(date1 < date2):
+         return 1
+      elif(date1 == date2):
+         # If the dates are the same, then let's also sort by time.
+         if(time1 > time2):
+            return -1
+         elif(time1 == time2):
+            return 0
+         else:
+            return 1
+      else:
+         return -1
+
+   def _compare_default(self, model, row1, row2, user_data):
+      """ The default sorting function for all Gtk.ListStore objects. """
+      value1 = model.get_value(row1, user_data)
+      value2 = model.get_value(row2, user_data)
+      if(value1 < value2):
+         return 1
+      elif(value1 == value2):
+         return 0
+      else:
+         return -1
+
    def sort_log(self, widget, column_index):
       """ Sort the log (that is currently selected) based on the column identified by column_index. """
       log_index = self._get_log_index()
       column = self.treeview[log_index].get_column(column_index)
+
+      if(AVAILABLE_FIELD_NAMES_ORDERED[column_index-1] == "QSO_DATE"):
+         # If the field being sorted is the QSO_DATE, then also sort by the TIME_ON field so we get the
+         # correct chronological order.
+         # Note: This assumes that the TIME_ON field is always immediately to the right of the QSO_DATE field.
+         self.sorter[log_index].set_sort_func(column_index, self._compare_date_and_time, user_data=[column_index, column_index+1])
+      else:
+         self.sorter[log_index].set_sort_func(column_index, self._compare_default, user_data=column_index)
 
       # If we are operating on the currently-sorted column...
       if(self.sorter[log_index].get_sort_column_id()[0] == column_index):
