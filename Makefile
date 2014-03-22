@@ -35,6 +35,8 @@ unittest:
 clean:
 	@echo **********Cleaning build directory
 	rm -rf build
+	@echo **********Cleaning pyqso directory
+	cd pyqso; rm -rf *.pyc ADIF.test_read.adi ADIF.test_write.adi; cd ..
 	@echo **********Cleaning doc directory
 	cd doc; rm -rf *.log *.aux *.dvi *.pdf *.ps *.toc; cd ..
 
