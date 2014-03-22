@@ -47,7 +47,7 @@ class PyQSO(Gtk.Window):
       """ Set up the main (root) window, start the event loop, and open a logbook (if the logbook's path is specified by the user in the command line). """
          
       # Call the constructor of the super class (Gtk.Window)
-      Gtk.Window.__init__(self, title="PyQSO 0.1b")
+      Gtk.Window.__init__(self, title="PyQSO 0.1")
 
       # Get any application-specific preferences from the configuration file      
       config = ConfigParser.ConfigParser()
@@ -113,7 +113,7 @@ class PyQSO(Gtk.Window):
       about.set_modal(True)
       about.set_transient_for(parent=self)
       about.set_program_name("PyQSO")
-      about.set_version("0.1b")
+      about.set_version("0.1")
       about.set_authors(["Christian Jacobs"])
       about.set_license("""This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
