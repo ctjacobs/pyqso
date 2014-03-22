@@ -199,10 +199,10 @@ class ADIF:
          
          f.write("""Amateur radio log file. Generated on %s. Contains %d record(s). 
          
-<adif_ver:5>%s
+<adif_ver:%d>%s
 <programid:5>PyQSO
 <programversion:4>0.1b
-<eoh>\n""" % (dt, len(records), ADIF_VERSION))
+<eoh>\n""" % (dt, len(records), len(str(ADIF_VERSION)), ADIF_VERSION))
          
          # Then write each log to the file.
          for r in records:
@@ -415,7 +415,7 @@ class TestADIF(unittest.TestCase):
       text = f.read()
       print "File 'ADIF.test_write.adi' contains the following text:", text
       assert("""        
-<adif_ver:5>1.0
+<adif_ver:3>1.0
 <programid:5>PyQSO
 <programversion:4>0.1b
 <eoh>
@@ -454,7 +454,7 @@ class TestADIF(unittest.TestCase):
       text = f.read()
       print "File 'ADIF.test_write_sqlite3_Row.adi' contains the following text:", text
       assert("""        
-<adif_ver:5>1.0
+<adif_ver:3>1.0
 <programid:5>PyQSO
 <programversion:4>0.1b
 <eoh>
