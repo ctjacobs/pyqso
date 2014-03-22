@@ -446,7 +446,6 @@ class TestADIF(unittest.TestCase):
       c = self.connection.cursor()
       c.execute("SELECT * FROM test")
       records = c.fetchall()
-
       print records
 
       self.adif.write(records, "ADIF.test_write_sqlite3_Row.adi")
@@ -477,6 +476,8 @@ class TestADIF(unittest.TestCase):
 <eor>
 """ in text) # Ignore the header line here, since it contains the date and time the ADIF file was written, which will change each time 'make unittest' is run.
       f.close()
+
+      self.connection.close()
 
    def test_adif_is_valid(self):
       assert(self.adif.is_valid("CALL", "TEST123", "S") == True)
