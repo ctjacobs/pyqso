@@ -36,7 +36,7 @@ clean:
 	@echo **********Cleaning build directory
 	rm -rf build
 	@echo **********Cleaning pyqso directory
-	cd pyqso; rm -rf *.pyc ADIF.test_read.adi ADIF.test_write.adi; cd ..
+	cd pyqso; rm -rf *.pyc ADIF.test_read.adi ADIF.test_write_*.adi; cd ..
 	@echo **********Cleaning doc directory
 	cd doc; rm -rf *.log *.aux *.dvi *.pdf *.ps *.toc; cd ..
 
