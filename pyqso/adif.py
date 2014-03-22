@@ -438,6 +438,46 @@ class TestADIF(unittest.TestCase):
 """ in text) # Ignore the header line here, since it contains the date and time the ADIF file was written, which will change each time 'make unittest' is run.
       f.close()
 
+   def test_adif_write_sqlite3_Row(self):
+      import sqlite3
+      self.connection = sqlite3.connect("./unittest_resources/test.db")
+      self.connection.row_factory = sqlite3.Row
+
+      c = self.connection.cursor()
+      c.execute("SELECT * FROM test")
+      records = c.fetchall()
+
+      print records
+
+      self.adif.write(records, "ADIF.test_write_sqlite3_Row.adi")
+
+      f = open("ADIF.test_write_sqlite3_Row.adi", 'r')
+      text = f.read()
+      print "File 'ADIF.test_write_sqlite3_Row.adi' contains the following text:", text
+      assert("""        
+<adif_ver:5>1.0
+<programid:5>PyQSO
+<programversion:4>0.1b
+<eoh>
+<call:7>TEST123
+<qso_date:8>20120402
+<time_on:4>1234
+<freq:7>145.500
+<band:2>2m
+<mode:2>FM
+<rst_sent:2>59
+<rst_rcvd:2>59
+<eor>
+<call:7>TEST456
+<qso_date:8>20130312
+<time_on:4>0101
+<freq:7>145.750
+<band:2>2m
+<mode:2>FM
+<eor>
+""" in text) # Ignore the header line here, since it contains the date and time the ADIF file was written, which will change each time 'make unittest' is run.
+      f.close()
+
    def test_adif_is_valid(self):
       assert(self.adif.is_valid("CALL", "TEST123", "S") == True)
       assert(self.adif.is_valid("QSO_DATE", "20120402", "D") == True)
