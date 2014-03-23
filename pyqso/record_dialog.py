@@ -359,16 +359,6 @@ class RecordDialog(Gtk.Dialog):
                # Remember to put the new line escape characters back in when displaying the data in a Gtk.TextView
                text = data.replace("\\n", "\n") 
                self.sources[field_names[i]].set_text(text)
-            elif(field_names[i] == "FREQ"):
-               self.sources[field_names[i]].set_text(data)
-               # Do we want PyQSO to autocomplete the Band field?
-               if(have_config):
-                  autocomplete_band = (config.get("records", "autocomplete_band") == "False")
-                  if(autocomplete_band):
-                     self.sources[field_names[i]].connect("changed", self._autocomplete_band)
-               else:
-                  self.sources[field_names[i]].connect("changed", self._autocomplete_band)
-
             else:
                self.sources[field_names[i]].set_text(data)
       else:
@@ -409,6 +399,14 @@ class RecordDialog(Gtk.Dialog):
                   except:
                      logging.error("Could not obtain Frequency data via Hamlib!")
 
+      # Do we want PyQSO to autocomplete the Band field based on the Frequency field?
+      if(have_config):
+         autocomplete_band = (config.get("records", "autocomplete_band") == "True")
+         if(autocomplete_band):
+            self.sources["FREQ"].connect("changed", self._autocomplete_band)
+      else:
+         self.sources["FREQ"].connect("changed", self._autocomplete_band)
+
       self.show_all()
 
       logging.debug("Record dialog ready!")
@@ -439,7 +437,10 @@ class RecordDialog(Gtk.Dialog):
          self.sources["BAND"].set_active(0)
          return
       else:
-         frequency = float(frequency)
+         try:
+            frequency = float(frequency)
+         except ValueError:
+            return
 
       speed_of_light = 3.0e8 # Units: m/s
       wave_length = speed_of_light/(frequency*1e6) # Here we convert the frequency in MHz to the frequency in Hz. The wave length is in metres.
