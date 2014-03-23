@@ -405,6 +405,7 @@ class RecordDialog(Gtk.Dialog):
          if(autocomplete_band):
             self.sources["FREQ"].connect("changed", self._autocomplete_band)
       else:
+         # If no configuration file exists, autocomplete the Band field by default.
          self.sources["FREQ"].connect("changed", self._autocomplete_band)
 
       self.show_all()
@@ -430,7 +431,7 @@ class RecordDialog(Gtk.Dialog):
 
 
    def _autocomplete_band(self, widget=None):
-      """ If a value for the Frequency is entered, this function autocompletes the Band field (if desired). """
+      """ If a value for the Frequency is entered, this function autocompletes the Band field. """
 
       frequency = self.sources["FREQ"].get_text()
       # Check whether we actually have a (valid) value to use. If not, set the BAND field to an empty string ("").
