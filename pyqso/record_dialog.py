@@ -31,7 +31,7 @@ except ImportError:
    logging.error("Could not import the Hamlib module!")
    have_hamlib = False
 
-from adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED
+from adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED, MODES, BANDS, BANDS_RANGES
 from callsign_lookup import *
 from auxiliary_dialogs import *
 
@@ -128,9 +128,9 @@ class RecordDialog(Gtk.Dialog):
       label.set_alignment(0, 0.5)
       label.set_width_chars(15)
       hbox_temp.pack_start(label, False, False, 2)
-      bands = ["", "2190m", "560m", "160m", "80m", "60m", "40m", "30m", "20m", "17m", "15m", "12m", "10m", "6m", "4m", "2m", "1.25m", "70cm", "33cm", "23cm", "13cm", "9cm", "6cm", "3cm", "1.25cm", "6mm", "4mm", "2.5mm", "2mm", "1mm"]
+
       self.sources["BAND"] = Gtk.ComboBoxText()
-      for band in bands:
+      for band in BANDS:
          self.sources["BAND"].append_text(band)
       self.sources["BAND"].set_active(0) # Set an empty string as the default option.
       hbox_temp.pack_start(self.sources["BAND"], False, False, 2)
@@ -142,9 +142,9 @@ class RecordDialog(Gtk.Dialog):
       label.set_alignment(0, 0.5)
       label.set_width_chars(15)
       hbox_temp.pack_start(label, False, False, 2)
-      modes = ["", "AM", "AMTORFEC", "ASCI", "ATV", "CHIP64", "CHIP128", "CLO", "CONTESTI", "CW", "DSTAR", "DOMINO", "DOMINOF", "FAX", "FM", "FMHELL", "FSK31", "FSK441", "GTOR", "HELL", "HELL80", "HFSK", "ISCAT", "JT44", "JT4A", "JT4B", "JT4C", "JT4D", "JT4E", "JT4F", "JT4G", "JT65", "JT65A", "JT65B", "JT65C", "JT6M", "MFSK8", "MFSK16", "MT63", "OLIVIA", "PAC", "PAC2", "PAC3", "PAX", "PAX2", "PCW", "PKT", "PSK10", "PSK31", "PSK63", "PSK63F", "PSK125", "PSKAM10", "PSKAM31", "PSKAM50", "PSKFEC31", "PSKHELL", "Q15", "QPSK31", "QPSK63", "QPSK125", "ROS", "RTTY", "RTTYM", "SSB", "SSTV", "THRB", "THOR", "THRBX", "TOR", "V4", "VOI", "WINMOR", "WSPR"]
+
       self.sources["MODE"] = Gtk.ComboBoxText()
-      for mode in modes:
+      for mode in MODES:
          self.sources["MODE"].append_text(mode)
       self.sources["MODE"].set_active(0) # Set an empty string as the default option.
       hbox_temp.pack_start(self.sources["MODE"], False, False, 2)
@@ -350,9 +350,9 @@ class RecordDialog(Gtk.Dialog):
             if(data is None):
                data = ""
             if(field_names[i] == "BAND"):
-               self.sources[field_names[i]].set_active(bands.index(data))
+               self.sources[field_names[i]].set_active(BANDS.index(data))
             elif(field_names[i] == "MODE"):
-               self.sources[field_names[i]].set_active(modes.index(data))
+               self.sources[field_names[i]].set_active(MODES.index(data))
             elif(field_names[i] == "QSL_SENT" or field_names[i] == "QSL_RCVD"):
                self.sources[field_names[i]].set_active(qsl_options.index(data))
             elif(field_names[i] == "NOTES"):
@@ -433,6 +433,7 @@ class RecordDialog(Gtk.Dialog):
       """ If a value for the Frequency is entered, this function autocompletes the Band field (if desired). """
 
       frequency = self.sources["FREQ"].get_text()
+      # Check whether we actually have a (valid) value to use. If not, set the BAND field to an empty string ("").
       if((frequency == "") or (frequency is None)):
          self.sources["BAND"].set_active(0)
          return
@@ -440,20 +441,16 @@ class RecordDialog(Gtk.Dialog):
          try:
             frequency = float(frequency)
          except ValueError:
+            self.sources["BAND"].set_active(0)
+            return
+      
+      # Find which band the frequency lies in.
+      for i in range(1, len(BANDS)):
+         if(frequency >= BANDS_RANGES[i][0] and frequency <= BANDS_RANGES[i][1]):
+            self.sources["BAND"].set_active(i)
             return
 
-      speed_of_light = 3.0e8 # Units: m/s
-      wave_length = speed_of_light/(frequency*1e6) # Here we convert the frequency in MHz to the frequency in Hz. The wave length is in metres.
-      
-      bands = [2190.0, 560.0, 160.0, 80.0, 60.0, 40.0, 30.0, 20.0, 17.0, 15.0, 12.0, 10.0, 6.0, 4.0, 2.0, 1.25, 0.7, 0.33, 0.23, 0.13, 0.09, 0.06, 0.03, 0.0125, 0.006, 0.004, 0.0025, 0.002, 0.001]
-
-      # Find the band which is closest to the wave_length
-      for i in range(0, len(bands)-1):
-         if(abs(bands[i] - wave_length) < abs(bands[i+1] - wave_length)):
-            band = bands[i]
-            self.sources["BAND"].set_active(bands.index(band) + 1)
-            break
-
+      self.sources["BAND"].set_active(0) # If we've reached this, then the frequency does not lie in any of the specified bands.
       return
 
 
