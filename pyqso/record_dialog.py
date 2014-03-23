@@ -434,15 +434,11 @@ class RecordDialog(Gtk.Dialog):
 
       frequency = self.sources["FREQ"].get_text()
       # Check whether we actually have a (valid) value to use. If not, set the BAND field to an empty string ("").
-      if((frequency == "") or (frequency is None)):
+      try:
+         frequency = float(frequency)
+      except ValueError:
          self.sources["BAND"].set_active(0)
          return
-      else:
-         try:
-            frequency = float(frequency)
-         except ValueError:
-            self.sources["BAND"].set_active(0)
-            return
       
       # Find which band the frequency lies in.
       for i in range(1, len(BANDS)):
