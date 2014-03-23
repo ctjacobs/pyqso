@@ -51,6 +51,9 @@ class PreferencesDialog(Gtk.Dialog):
       self.hamlib = HamlibPage()
       self.preferences.insert_page(self.hamlib, Gtk.Label("Hamlib"), 2)
 
+      self.records = RecordsPage()
+      self.preferences.insert_page(self.records, Gtk.Label("Records"), 2)
+
       self.vbox.pack_start(self.preferences, True, True, 2)
       self.show_all()
 
@@ -64,6 +67,7 @@ class PreferencesDialog(Gtk.Dialog):
       general_data = self.general.get_data()
       view_data = self.view.get_data()
       hamlib_data = self.hamlib.get_data()
+      records_data = self.records.get_data()
 
       config = ConfigParser.ConfigParser()
 
@@ -82,6 +86,11 @@ class PreferencesDialog(Gtk.Dialog):
       for key in hamlib_data.keys():
          config.set("hamlib", key.lower(), hamlib_data[key])
       
+      # Records
+      config.add_section("records")
+      for key in records_data.keys():
+         config.set("records", key.lower(), records_data[key])
+
       with open(os.path.expanduser('~/.pyqso.ini'), 'w') as f:
          config.write(f)
 
@@ -279,5 +288,40 @@ class HamlibPage(Gtk.VBox):
       data["AUTOFILL"] = self.sources["AUTOFILL"].get_active()
       data["RIG_PATHNAME"] = self.sources["RIG_PATHNAME"].get_text()
       data["RIG_MODEL"] = self.sources["RIG_MODEL"].get_active_text()
+      return data
+
+class RecordsPage(Gtk.VBox):
+   
+   def __init__(self):
+      logging.debug("Setting up the Records page of the preferences dialog...")
+
+      Gtk.VBox.__init__(self, spacing=2)
+
+      # Remember that the have_config conditional in the PyQSO class may be out-of-date the next time the user opens up the preferences dialog
+      # because a configuration file may have been created after launching the application. Let's check to see if one exists again...
+      config = ConfigParser.ConfigParser()
+      have_config = (config.read(os.path.expanduser('~/.pyqso.ini')) != [])
+
+      self.sources = {}
+
+      frame = Gtk.Frame()
+      frame.set_label("Records")
+      hbox = Gtk.HBox()
+      self.sources["AUTOCOMPLETE_BAND"] = Gtk.CheckButton("Autocomplete the Band field")
+      if(have_config):
+         self.sources["AUTOCOMPLETE_BAND"].set_active(config.get("records", "autocomplete_band") == "True")
+      else:
+         self.sources["AUTOCOMPLETE_BAND"].set_active(True)
+      hbox.pack_start(self.sources["AUTOCOMPLETE_BAND"], False, False, 2)
+      frame.add(hbox)
+      self.pack_start(frame, False, False, 2)
+
+      logging.debug("Records page of the preferences dialog ready!")
+      return
+
+   def get_data(self):
+      logging.debug("Retrieving data from the Records page of the preferences dialog...")
+      data = {}
+      data["AUTOCOMPLETE_BAND"] = self.sources["AUTOCOMPLETE_BAND"].get_active()
       return data
 

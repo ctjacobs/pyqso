@@ -337,6 +337,10 @@ class RecordDialog(Gtk.Dialog):
 
       station_frame.add(hbox_inner)
 
+      # Check if a configuration file is present, since we might need it to set up the rest of the dialog.
+      config = ConfigParser.ConfigParser()
+      have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
+
       if(index is not None):
          # The record already exists, so display its current data in the input boxes.
          record = log.get_record_by_index(index)
@@ -357,7 +361,14 @@ class RecordDialog(Gtk.Dialog):
                self.sources[field_names[i]].set_text(text)
             elif(field_names[i] == "FREQ"):
                self.sources[field_names[i]].set_text(data)
-               self.sources[field_names[i]].connect("changed", self._autocomplete_band)
+               # Do we want PyQSO to autocomplete the Band field?
+               if(have_config):
+                  autocomplete_band = (config.get("records", "autocomplete_band") == "False")
+                  if(autocomplete_band):
+                     self.sources[field_names[i]].connect("changed", self._autocomplete_band)
+               else:
+                  self.sources[field_names[i]].connect("changed", self._autocomplete_band)
+
             else:
                self.sources[field_names[i]].set_text(data)
       else:
@@ -381,8 +392,6 @@ class RecordDialog(Gtk.Dialog):
 
          if(have_hamlib):
             # If the Hamlib module is present, then use it to fill in the Frequency field if desired.
-            config = ConfigParser.ConfigParser()
-            have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
             if(have_config):
                autofill = (config.get("hamlib", "autofill") == "True")
                rig_model = config.get("hamlib", "rig_model")
