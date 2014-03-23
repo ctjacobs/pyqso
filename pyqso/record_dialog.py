@@ -355,6 +355,9 @@ class RecordDialog(Gtk.Dialog):
                # Remember to put the new line escape characters back in when displaying the data in a Gtk.TextView
                text = data.replace("\\n", "\n") 
                self.sources[field_names[i]].set_text(text)
+            elif(field_names[i] == "FREQ"):
+               self.sources[field_names[i]].set_text(data)
+               self.sources[field_names[i]].connect("changed", self._autocomplete_band)
             else:
                self.sources[field_names[i]].set_text(data)
       else:
@@ -417,6 +420,32 @@ class RecordDialog(Gtk.Dialog):
          return text
       else:
          return self.sources[field_name].get_text()
+
+
+   def _autocomplete_band(self, widget=None):
+      """ If a value for the Frequency is entered, this function autocompletes the Band field (if desired). """
+
+      frequency = self.sources["FREQ"].get_text()
+      if((frequency == "") or (frequency is None)):
+         self.sources["BAND"].set_active(0)
+         return
+      else:
+         frequency = float(frequency)
+
+      speed_of_light = 3.0e8 # Units: m/s
+      wave_length = speed_of_light/(frequency*1e6) # Here we convert the frequency in MHz to the frequency in Hz. The wave length is in metres.
+      
+      bands = [2190.0, 560.0, 160.0, 80.0, 60.0, 40.0, 30.0, 20.0, 17.0, 15.0, 12.0, 10.0, 6.0, 4.0, 2.0, 1.25, 0.7, 0.33, 0.23, 0.13, 0.09, 0.06, 0.03, 0.0125, 0.006, 0.004, 0.0025, 0.002, 0.001]
+
+      # Find the band which is closest to the wave_length
+      for i in range(0, len(bands)-1):
+         if(abs(bands[i] - wave_length) < abs(bands[i+1] - wave_length)):
+            band = bands[i]
+            self.sources["BAND"].set_active(bands.index(band) + 1)
+            break
+
+      return
+
 
    def lookup_callback(self, widget=None):
       """ Get the callsign-related data from the qrz.com database and store it in the relevant Gtk.Entry boxes, but return None. """
