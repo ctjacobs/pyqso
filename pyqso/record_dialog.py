@@ -363,7 +363,17 @@ class RecordDialog(Gtk.Dialog):
                self.sources[field_names[i]].set_text(data)
       else:
          # Automatically fill in the current date and time
-         dt = datetime.now()
+
+         # Do we want to use UTC or the computer's local time?
+         if(have_config):
+            use_utc = (config.get("records", "use_utc") == "True")
+            if(use_utc):
+               dt = datetime.utcnow()
+            else:
+               dt = datetime.now()
+         else:
+            dt = datetime.utcnow() # Use UTC by default, since this is expected by ADIF.
+
          (year, month, day) = (dt.year, dt.month, dt.day)
          (hour, minute) = (dt.hour, dt.minute)
          # If necessary, add on leading zeros so the YYYYMMDD and HHMM format is followed.

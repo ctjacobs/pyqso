@@ -305,15 +305,23 @@ class RecordsPage(Gtk.VBox):
       self.sources = {}
 
       frame = Gtk.Frame()
-      frame.set_label("Records")
-      hbox = Gtk.HBox()
+      frame.set_label("Autocomplete")
+      vbox = Gtk.VBox()
       self.sources["AUTOCOMPLETE_BAND"] = Gtk.CheckButton("Autocomplete the Band field")
       if(have_config):
          self.sources["AUTOCOMPLETE_BAND"].set_active(config.get("records", "autocomplete_band") == "True")
       else:
          self.sources["AUTOCOMPLETE_BAND"].set_active(True)
-      hbox.pack_start(self.sources["AUTOCOMPLETE_BAND"], False, False, 2)
-      frame.add(hbox)
+      vbox.pack_start(self.sources["AUTOCOMPLETE_BAND"], False, False, 2)
+
+      self.sources["USE_UTC"] = Gtk.CheckButton("Use UTC when autocompleting the Date and Time")
+      if(have_config):
+         self.sources["USE_UTC"].set_active(config.get("records", "use_utc") == "True")
+      else:
+         self.sources["USE_UTC"].set_active(True)
+      vbox.pack_start(self.sources["USE_UTC"], False, False, 2)
+
+      frame.add(vbox)
       self.pack_start(frame, False, False, 2)
 
       logging.debug("Records page of the preferences dialog ready!")
@@ -323,5 +331,6 @@ class RecordsPage(Gtk.VBox):
       logging.debug("Retrieving data from the Records page of the preferences dialog...")
       data = {}
       data["AUTOCOMPLETE_BAND"] = self.sources["AUTOCOMPLETE_BAND"].get_active()
+      data["USE_UTC"] = self.sources["USE_UTC"].get_active()
       return data
 
