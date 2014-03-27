@@ -488,8 +488,6 @@ class RecordDialog(Gtk.Dialog):
       connected = callsign_lookup.connect(username, password)
       if(connected):
          full_callsign = self.sources["CALL"].get_text()
-                    
-         # Commence lookup.
          fields_and_data = callsign_lookup.lookup(full_callsign)
          for field_name in fields_and_data.keys():
             self.sources[field_name].set_text(fields_and_data[field_name])

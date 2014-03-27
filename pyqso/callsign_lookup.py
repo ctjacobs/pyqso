@@ -67,7 +67,7 @@ class CallsignLookup():
       and return the data in the dictionary called fields_and_data. """
       logging.debug("Performing a callsign lookup...")
       
-      # Remove any prefix or suffix from the callsign.
+      # Remove any prefix or suffix from the callsign before performing the lookup.
       logging.debug("Looking up callsign. The full callsign (with a prefix and/or suffix) is %s" % full_callsign)
       components = full_callsign.split("/") # We assume that prefixes or suffixes come before/after a forward slash character "/".
       suffixes = ["P", "M", "A", "PM", "MM", "AM", "QRP"]
@@ -100,8 +100,8 @@ class CallsignLookup():
             raise ValueError
       except ValueError:
          callsign = full_callsign
-            
-            
+                          
+      # Commence lookup.
       fields_and_data = {"NAME":"", "ADDRESS":"", "STATE":"", "COUNTRY":"", "DXCC":"", "CQZ":"", "ITUZ":"", "IOTA":""}
       if(self.session_key):
          request = '/xml/current/?s=%s;callsign=%s' % (self.session_key, callsign)
