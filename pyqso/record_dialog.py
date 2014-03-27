@@ -51,6 +51,10 @@ class RecordDialog(Gtk.Dialog):
          title = "Add Record"
       Gtk.Dialog.__init__(self, title=title, parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
 
+      # Check if a configuration file is present, since we might need it to set up the rest of the dialog.
+      config = ConfigParser.ConfigParser()
+      have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
+      
       ## QSO DATA FRAME
       qso_frame = Gtk.Frame()
       qso_frame.set_label("QSO Information")
@@ -113,7 +117,11 @@ class RecordDialog(Gtk.Dialog):
 
       # FREQ
       hbox_temp = Gtk.HBox(spacing=0)
-      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["FREQ"], halign=Gtk.Align.START)
+      if(have_config):
+         frequency_unit = config.get("view", "default_freq_unit")
+      else:
+         frequency_unit = "MHz"
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["FREQ"] + " (" + frequency_unit + ")", halign=Gtk.Align.START)
       label.set_alignment(0, 0.5)
       label.set_width_chars(15)
       hbox_temp.pack_start(label, False, False, 2)
@@ -337,10 +345,7 @@ class RecordDialog(Gtk.Dialog):
 
       station_frame.add(hbox_inner)
 
-      # Check if a configuration file is present, since we might need it to set up the rest of the dialog.
-      config = ConfigParser.ConfigParser()
-      have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
-
+      # Populate various fields, if possible.
       if(index is not None):
          # The record already exists, so display its current data in the input boxes.
          record = log.get_record_by_index(index)
@@ -482,7 +487,10 @@ class RecordDialog(Gtk.Dialog):
 
       connected = callsign_lookup.connect(username, password)
       if(connected):
-         fields_and_data = callsign_lookup.lookup(self.sources["CALL"].get_text())
+         full_callsign = self.sources["CALL"].get_text()
+                    
+         # Commence lookup.
+         fields_and_data = callsign_lookup.lookup(full_callsign)
          for field_name in fields_and_data.keys():
             self.sources[field_name].set_text(fields_and_data[field_name])
       return

@@ -32,6 +32,7 @@ except ImportError:
    have_hamlib = False
 
 from pyqso.adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED
+FREQUENCY_UNITS = ["Hz", "kHz", "MHz", "GHz"]
 
 class PreferencesDialog(Gtk.Dialog):
    
@@ -178,8 +179,12 @@ class ViewPage(Gtk.VBox):
 
       self.sources = {}
 
+      # Visible fields frame
+      frame = Gtk.Frame()
+      frame.set_label("Visible fields")
+
       # Divide the list of available field names up into multiple columns (of maximum length 'max_buttons_per_column')
-      # so we don't make the Preferences dialog too long. 
+      # so we don't make the Preferences dialog too long.      
       hbox = Gtk.HBox(spacing=2)
       max_buttons_per_column = 6
       number_of_columns = int( len(AVAILABLE_FIELD_NAMES_ORDERED)/max_buttons_per_column ) + 1 # Number of check buttons per column
@@ -197,7 +202,32 @@ class ViewPage(Gtk.VBox):
             self.sources[field_name] = button
             vbox.pack_start(button, False, False, 2)
          hbox.pack_start(vbox, False, False, 2)
-      self.pack_start(hbox, False, False, 2)
+      frame.add(hbox)
+      self.pack_start(frame, False, False, 2)
+
+      # Default values
+      frame = Gtk.Frame()
+      frame.set_label("Default values")
+      vbox = Gtk.VBox()
+      
+      hbox_temp = Gtk.HBox()
+      label = Gtk.Label("Default unit of frequency: ")
+      label.set_width_chars(17)
+      label.set_alignment(0, 0.5)
+      hbox_temp.pack_start(label, False, False, 2)
+      
+      self.sources["DEFAULT_FREQ_UNIT"] = Gtk.ComboBoxText()
+      for unit in FREQUENCY_UNITS:
+         self.sources["DEFAULT_FREQ_UNIT"].append_text(unit)
+      if(have_config):
+         self.sources["DEFAULT_FREQ_UNIT"].set_active(FREQUENCY_UNITS.index(config.get("view", "default_freq_unit")))
+      else:
+         self.sources["DEFAULT_FREQ_UNIT"].set_active(FREQUENCY_UNITS.index("MHz")) # Set to MHz as the default option.
+      hbox_temp.pack_start(self.sources["DEFAULT_FREQ_UNIT"], False, False, 2)
+      vbox.pack_start(hbox_temp, False, False, 2)
+      
+      frame.add(vbox)
+      self.pack_start(frame, False, False, 2)
 
       self.label = Gtk.Label("Note: View-related changes will not take effect\nuntil PyQSO is restarted.")
       self.pack_start(self.label, False, False, 2)
@@ -210,6 +240,7 @@ class ViewPage(Gtk.VBox):
       data = {}
       for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
          data[field_name] = self.sources[field_name].get_active()
+      data["DEFAULT_FREQ_UNIT"] = self.sources["DEFAULT_FREQ_UNIT"].get_active_text()
       return data
 
 class HamlibPage(Gtk.VBox):
@@ -304,6 +335,7 @@ class RecordsPage(Gtk.VBox):
 
       self.sources = {}
 
+      # Autocomplete frame
       frame = Gtk.Frame()
       frame.set_label("Autocomplete")
       vbox = Gtk.VBox()
