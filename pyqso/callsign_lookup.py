@@ -77,19 +77,14 @@ class CallsignLookup():
             callsign = components[1]
             
          elif(len(components) == 2):
-            if(components[1].upper() in suffixes or components[1].lower() in suffixes or len(components[1]) <= 2):
+            if(components[1].upper() in suffixes or components[1].lower() in suffixes):
                # If the last part of the full_callsign is a valid suffix, then use the part before that.
-               # Alternatively, if the last part has 2 characters or less, then assume it is a suffix too.
                callsign = components[0]
-               logging.debug("Suffix %s found. Callsign to lookup is %s" % (components[-1], callsign))
-            elif(len(components[1]) > 2):
+               logging.debug("Suffix %s found. Callsign to lookup is %s" % (components[1], callsign))
+            else:
                # We have a prefix, so take the part after the first "/".
-               # The check for len(components[1]) > 2 checks that the callsign is at least 2 characters long,
-               # since it is possible that the suffix might not be recognised and we end up in this branch of the if statement.
                callsign = components[1]
                logging.debug("Prefix %s found. Callsign to lookup is %s" % (components[0], callsign))
-            else:
-               raise ValueError
                
          elif(len(components) == 1):
             # We have neither a prefix nor a suffix, so use the full_callsign.
