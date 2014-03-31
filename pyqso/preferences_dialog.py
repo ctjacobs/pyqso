@@ -115,8 +115,9 @@ class GeneralPage(Gtk.VBox):
       frame.set_label("Startup")
       hbox = Gtk.HBox()
       self.sources["SHOW_TOOLBOX"] = Gtk.CheckButton("Show toolbox by default")
-      if(have_config):
-         self.sources["SHOW_TOOLBOX"].set_active(config.get("general", "show_toolbox") == "True")
+      (section, option) = ("general", "show_toolbox")
+      if(have_config and config.has_option(section, option)):
+         self.sources["SHOW_TOOLBOX"].set_active(config.get(section, option) == "True")
       else:
          self.sources["SHOW_TOOLBOX"].set_active(False)
       hbox.pack_start(self.sources["SHOW_TOOLBOX"], False, False, 2)
@@ -133,8 +134,9 @@ class GeneralPage(Gtk.VBox):
       label.set_alignment(0, 0.5)
       hbox.pack_start(label, False, False, 2)
       self.sources["QRZ_USERNAME"] = Gtk.Entry()
-      if(have_config):
-         self.sources["QRZ_USERNAME"].set_text(config.get("general", "qrz_username"))
+      (section, option) = ("general", "qrz_username")
+      if(have_config and config.has_option(section, option)):
+         self.sources["QRZ_USERNAME"].set_text(config.get(section, option))
       hbox.pack_start(self.sources["QRZ_USERNAME"], False, False, 2)
       inner_vbox.pack_start(hbox, False, False, 2)
 
@@ -145,8 +147,9 @@ class GeneralPage(Gtk.VBox):
       hbox.pack_start(label, False, False, 2)
       self.sources["QRZ_PASSWORD"] = Gtk.Entry()
       self.sources["QRZ_PASSWORD"].set_visibility(False) # Mask the password with the "*" character.
-      if(have_config):
-         self.sources["QRZ_PASSWORD"].set_text(base64.b64decode(config.get("general", "qrz_password")))
+      (section, option) = ("general", "qrz_password")
+      if(have_config and config.has_option(section, option)):
+         self.sources["QRZ_PASSWORD"].set_text(base64.b64decode(config.get(section, option)))
       hbox.pack_start(self.sources["QRZ_PASSWORD"], False, False, 2)
       inner_vbox.pack_start(hbox, False, False, 2)
 
@@ -195,7 +198,7 @@ class ViewPage(Gtk.VBox):
                break
             field_name = AVAILABLE_FIELD_NAMES_ORDERED[i*max_buttons_per_column + j]
             button = Gtk.CheckButton(AVAILABLE_FIELD_NAMES_FRIENDLY[field_name ])
-            if(have_config):
+            if(have_config and config.has_option("view", field_name.lower())):
                button.set_active(config.get("view", field_name.lower()) == "True")
             else:
                button.set_active(True)
@@ -219,8 +222,9 @@ class ViewPage(Gtk.VBox):
       self.sources["DEFAULT_FREQ_UNIT"] = Gtk.ComboBoxText()
       for unit in FREQUENCY_UNITS:
          self.sources["DEFAULT_FREQ_UNIT"].append_text(unit)
-      if(have_config):
-         self.sources["DEFAULT_FREQ_UNIT"].set_active(FREQUENCY_UNITS.index(config.get("view", "default_freq_unit")))
+      (section, option) = ("view", "default_freq_unit")
+      if(have_config and config.has_option(section, option)):
+         self.sources["DEFAULT_FREQ_UNIT"].set_active(FREQUENCY_UNITS.index(config.get(section, option)))
       else:
          self.sources["DEFAULT_FREQ_UNIT"].set_active(FREQUENCY_UNITS.index("MHz")) # Set to MHz as the default option.
       hbox_temp.pack_start(self.sources["DEFAULT_FREQ_UNIT"], False, False, 2)
@@ -261,8 +265,9 @@ class HamlibPage(Gtk.VBox):
       vbox_inner = Gtk.VBox(spacing=2)
 
       self.sources["AUTOFILL"] = Gtk.CheckButton("Auto-fill Frequency field")
-      if(have_config):
-         self.sources["AUTOFILL"].set_active(config.get("hamlib", "autofill") == "True")
+      (section, option) = ("hamlib", "autofill")
+      if(have_config and config.has_option(section, option)):
+         self.sources["AUTOFILL"].set_active(config.get(section, option) == "True")
       else:
          self.sources["AUTOFILL"].set_active(False)
       vbox_inner.pack_start(self.sources["AUTOFILL"], False, False, 2)
@@ -288,7 +293,8 @@ class HamlibPage(Gtk.VBox):
       self.sources["RIG_MODEL"] = Gtk.ComboBoxText()
       for model in models:
          self.sources["RIG_MODEL"].append_text(model)
-      if(have_config):
+      (section, option) = ("hamlib", "rig_model")
+      if(have_config and config.has_option("hamlib", "rig_model")):
          self.sources["RIG_MODEL"].set_active(models.index(config.get("hamlib", "rig_model")))
       else:
          self.sources["RIG_MODEL"].set_active(models.index("RIG_MODEL_NONE")) # Set to RIG_MODEL_NONE as the default option.
@@ -302,8 +308,9 @@ class HamlibPage(Gtk.VBox):
       label.set_alignment(0, 0.5)
       hbox_temp.pack_start(label, False, False, 2)
       self.sources["RIG_PATHNAME"] = Gtk.Entry()
-      if(have_config):
-         self.sources["RIG_PATHNAME"].set_text(config.get("hamlib", "rig_pathname"))
+      (section, option) = ("hamlib", "rig_pathname")
+      if(have_config and config.has_option(section, option)):
+         self.sources["RIG_PATHNAME"].set_text(config.get(section, option))
       hbox_temp.pack_start(self.sources["RIG_PATHNAME"], True, True, 2)
       vbox_inner.pack_start(hbox_temp, False, False, 2)
 
@@ -340,15 +347,17 @@ class RecordsPage(Gtk.VBox):
       frame.set_label("Autocomplete")
       vbox = Gtk.VBox()
       self.sources["AUTOCOMPLETE_BAND"] = Gtk.CheckButton("Autocomplete the Band field")
-      if(have_config):
-         self.sources["AUTOCOMPLETE_BAND"].set_active(config.get("records", "autocomplete_band") == "True")
+      (section, option) = ("records", "autocomplete_band")
+      if(have_config and config.has_option(section, option)):
+         self.sources["AUTOCOMPLETE_BAND"].set_active(config.get(section, option) == "True")
       else:
          self.sources["AUTOCOMPLETE_BAND"].set_active(True)
       vbox.pack_start(self.sources["AUTOCOMPLETE_BAND"], False, False, 2)
 
       self.sources["USE_UTC"] = Gtk.CheckButton("Use UTC when autocompleting the Date and Time")
-      if(have_config):
-         self.sources["USE_UTC"].set_active(config.get("records", "use_utc") == "True")
+      (section, option) = ("records", "use_utc")
+      if(have_config and config.has_option(section, option)):
+         self.sources["USE_UTC"].set_active(config.get(section, option) == "True")
       else:
          self.sources["USE_UTC"].set_active(True)
       vbox.pack_start(self.sources["USE_UTC"], False, False, 2)

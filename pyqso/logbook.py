@@ -439,8 +439,9 @@ class Logbook(Gtk.Notebook):
 
          config = ConfigParser.ConfigParser()
          have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
-         if(have_config):
-            column.set_visible(config.get("view", AVAILABLE_FIELD_NAMES_ORDERED[i].lower()) == "True")
+         (section, option) = ("view", AVAILABLE_FIELD_NAMES_ORDERED[i].lower())
+         if(have_config and config.has_option(section, option)):
+            column.set_visible(config.get(section, option) == "True")
          self.treeview[index].append_column(column)
 
       self.show_all()

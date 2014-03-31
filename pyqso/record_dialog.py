@@ -117,8 +117,9 @@ class RecordDialog(Gtk.Dialog):
 
       # FREQ
       hbox_temp = Gtk.HBox(spacing=0)
-      if(have_config):
-         frequency_unit = config.get("view", "default_freq_unit")
+      (section, option) = ("view", "default_freq_unit")
+      if(have_config and config.has_option(section, option)):
+         frequency_unit = config.get(section, option)
       else:
          frequency_unit = "MHz"
       label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["FREQ"] + " (" + frequency_unit + ")", halign=Gtk.Align.START)
@@ -370,8 +371,9 @@ class RecordDialog(Gtk.Dialog):
          # Automatically fill in the current date and time
 
          # Do we want to use UTC or the computer's local time?
-         if(have_config):
-            use_utc = (config.get("records", "use_utc") == "True")
+         (section, option) = ("records", "use_utc")
+         if(have_config and config.has_option(section, option)):
+            use_utc = (config.get(section, option) == "True")
             if(use_utc):
                dt = datetime.utcnow()
             else:
@@ -397,7 +399,7 @@ class RecordDialog(Gtk.Dialog):
 
          if(have_hamlib):
             # If the Hamlib module is present, then use it to fill in the Frequency field if desired.
-            if(have_config):
+            if(have_config and config.has_option("hamlib", "autofill") and config.has_option("hamlib", "rig_model") and config.has_option("hamlib", "rig_pathname")):
                autofill = (config.get("hamlib", "autofill") == "True")
                rig_model = config.get("hamlib", "rig_model")
                rig_pathname = config.get("hamlib", "rig_pathname")
@@ -415,8 +417,9 @@ class RecordDialog(Gtk.Dialog):
                      logging.error("Could not obtain Frequency data via Hamlib!")
 
       # Do we want PyQSO to autocomplete the Band field based on the Frequency field?
-      if(have_config):
-         autocomplete_band = (config.get("records", "autocomplete_band") == "True")
+      (section, option) = ("records", "autocomplete_band")
+      if(have_config and config.get(section, option)):
+         autocomplete_band = (config.get(section, option) == "True")
          if(autocomplete_band):
             self.sources["FREQ"].connect("changed", self._autocomplete_band)
       else:
@@ -472,7 +475,7 @@ class RecordDialog(Gtk.Dialog):
 
       config = ConfigParser.ConfigParser()
       have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
-      if(have_config):
+      if(have_config and config.has_option("general", "qrz_username") and config.has_option("general", "qrz_password")):
          username = config.get("general", "qrz_username")
          password = base64.b64decode(config.get("general", "qrz_password"))
          if(username == "" or password == ""):

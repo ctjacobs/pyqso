@@ -197,8 +197,9 @@ class Menu(Gtk.MenuBar):
       mitem_toolbox = Gtk.CheckMenuItem("Toolbox")
       config = ConfigParser.ConfigParser()
       have_config = (config.read(os.path.expanduser('~/.pyqso.ini')) != [])
-      if(have_config):
-         mitem_toolbox.set_active(config.get("general", "show_toolbox") == "True")
+      (section, option) = ("general", "show_toolbox")
+      if(have_config and config.has_option(section, option)):
+         mitem_toolbox.set_active(config.get(section, option) == "True")
       else:
          mitem_toolbox.set_active(False) # Don't show the toolbox by default
       mitem_toolbox.connect("activate", parent.toolbox.toggle_visible_callback)
