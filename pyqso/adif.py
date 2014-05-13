@@ -178,9 +178,8 @@ class ADIF:
                   field_data = field_data.lower()
                elif(field_name == "MODE"):
                   field_data = field_data.upper()
-                  
-               # Also force all the callsigns to be in upper case.
-               if(field_name == "CALL"):
+               elif(field_name == "CALL"):
+                  # Also force all the callsigns to be in upper case.
                   field_data = field_data.upper()
 
                if(field_name in AVAILABLE_FIELD_NAMES_ORDERED):
