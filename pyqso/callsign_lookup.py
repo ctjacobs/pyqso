@@ -62,38 +62,16 @@ class CallsignLookup():
 
       return connected
 
-   def lookup(self, full_callsign):
+   def lookup(self, full_callsign, ignore_prefix_suffix = True):
       """ Parse the XML tree that is returned from the qrz.com XML server to obtain the NAME, ADDRESS, STATE, COUNTRY, DXCC, CQZ, ITUZ, and IOTA field data (if present),
       and return the data in the dictionary called fields_and_data. """
-      logging.debug("Performing a callsign lookup...")
+      
+      logging.debug("Looking up callsign. The full callsign (with a prefix and/or suffix) is %s" % full_callsign)
       
       # Remove any prefix or suffix from the callsign before performing the lookup.
-      logging.debug("Looking up callsign. The full callsign (with a prefix and/or suffix) is %s" % full_callsign)
-      components = full_callsign.split("/") # We assume that prefixes or suffixes come before/after a forward slash character "/".
-      suffixes = ["P", "M", "A", "PM", "MM", "AM", "QRP"]
-      try:
-         if(len(components) == 3):
-            # We have both a prefix and a suffix.
-            callsign = components[1]
-            
-         elif(len(components) == 2):
-            if(components[1].upper() in suffixes or components[1].lower() in suffixes):
-               # If the last part of the full_callsign is a valid suffix, then use the part before that.
-               callsign = components[0]
-               logging.debug("Suffix %s found. Callsign to lookup is %s" % (components[1], callsign))
-            else:
-               # We have a prefix, so take the part after the first "/".
-               callsign = components[1]
-               logging.debug("Prefix %s found. Callsign to lookup is %s" % (components[0], callsign))
-               
-         elif(len(components) == 1):
-            # We have neither a prefix nor a suffix, so use the full_callsign.
-            callsign = full_callsign
-            logging.debug("No prefix or suffix found. Callsign to lookup is %s" % callsign)
-            
-         else:
-            raise ValueError
-      except ValueError:
+      if(ignore_prefix_suffix):
+         callsign = self.strip(full_callsign)
+      else:
          callsign = full_callsign
                           
       # Commence lookup.
@@ -157,3 +135,32 @@ class CallsignLookup():
          logging.debug("Callsign lookup complete. Returning data...")
       return fields_and_data
 
+   def strip(self, full_callsign):
+      components = full_callsign.split("/") # We assume that prefixes or suffixes come before/after a forward slash character "/".
+      suffixes = ["P", "M", "A", "PM", "MM", "AM", "QRP"]
+      try:
+         if(len(components) == 3):
+            # We have both a prefix and a suffix.
+            callsign = components[1]
+            
+         elif(len(components) == 2):
+            if(components[1].upper() in suffixes or components[1].lower() in suffixes):
+               # If the last part of the full_callsign is a valid suffix, then use the part before that.
+               callsign = components[0]
+               logging.debug("Suffix %s found. Callsign to lookup is %s" % (components[1], callsign))
+            else:
+               # We have a prefix, so take the part after the first "/".
+               callsign = components[1]
+               logging.debug("Prefix %s found. Callsign to lookup is %s" % (components[0], callsign))
+               
+         elif(len(components) == 1):
+            # We have neither a prefix nor a suffix, so use the full_callsign.
+            callsign = full_callsign
+            logging.debug("No prefix or suffix found. Callsign to lookup is %s" % callsign)
+            
+         else:
+            raise ValueError
+      except ValueError:
+         callsign = full_callsign
+      return callsign
+      

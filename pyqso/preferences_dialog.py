@@ -124,41 +124,6 @@ class GeneralPage(Gtk.VBox):
       frame.add(hbox)
       self.pack_start(frame, False, False, 2)
 
-      frame = Gtk.Frame()
-      frame.set_label("Login details (qrz.com)")
-      inner_vbox = Gtk.VBox()
-
-      hbox = Gtk.HBox()
-      label = Gtk.Label("Username: ")
-      label.set_width_chars(9)
-      label.set_alignment(0, 0.5)
-      hbox.pack_start(label, False, False, 2)
-      self.sources["QRZ_USERNAME"] = Gtk.Entry()
-      (section, option) = ("general", "qrz_username")
-      if(have_config and config.has_option(section, option)):
-         self.sources["QRZ_USERNAME"].set_text(config.get(section, option))
-      hbox.pack_start(self.sources["QRZ_USERNAME"], False, False, 2)
-      inner_vbox.pack_start(hbox, False, False, 2)
-
-      hbox = Gtk.HBox()
-      label = Gtk.Label("Password: ")
-      label.set_width_chars(9)
-      label.set_alignment(0, 0.5)
-      hbox.pack_start(label, False, False, 2)
-      self.sources["QRZ_PASSWORD"] = Gtk.Entry()
-      self.sources["QRZ_PASSWORD"].set_visibility(False) # Mask the password with the "*" character.
-      (section, option) = ("general", "qrz_password")
-      if(have_config and config.has_option(section, option)):
-         self.sources["QRZ_PASSWORD"].set_text(base64.b64decode(config.get(section, option)))
-      hbox.pack_start(self.sources["QRZ_PASSWORD"], False, False, 2)
-      inner_vbox.pack_start(hbox, False, False, 2)
-
-      label = Gtk.Label("Warning: Login details are currently stored as\nBase64-encoded plain text in the configuration file.")
-      inner_vbox.pack_start(label, False, False, 2)
-
-      frame.add(inner_vbox)
-      self.pack_start(frame, False, False, 2)
-
       logging.debug("General page of the preferences dialog ready!")
       return
 
@@ -166,8 +131,6 @@ class GeneralPage(Gtk.VBox):
       logging.debug("Retrieving data from the General page of the preferences dialog...")
       data = {}
       data["SHOW_TOOLBOX"] = self.sources["SHOW_TOOLBOX"].get_active()
-      data["QRZ_USERNAME"] = self.sources["QRZ_USERNAME"].get_text()
-      data["QRZ_PASSWORD"] = base64.b64encode(self.sources["QRZ_PASSWORD"].get_text())
       return data
 
 class ViewPage(Gtk.VBox):
@@ -365,6 +328,57 @@ class RecordsPage(Gtk.VBox):
       frame.add(vbox)
       self.pack_start(frame, False, False, 2)
 
+      # Callsign lookup frame
+      frame = Gtk.Frame()
+      frame.set_label("Callsign lookup")
+      vbox = Gtk.VBox()
+
+      subframe = Gtk.Frame()
+      subframe.set_label("Login details (qrz.com)")
+      inner_vbox = Gtk.VBox()
+
+      hbox = Gtk.HBox()
+      label = Gtk.Label("Username: ")
+      label.set_width_chars(9)
+      label.set_alignment(0, 0.5)
+      hbox.pack_start(label, False, False, 2)
+      self.sources["QRZ_USERNAME"] = Gtk.Entry()
+      (section, option) = ("records", "qrz_username")
+      if(have_config and config.has_option(section, option)):
+         self.sources["QRZ_USERNAME"].set_text(config.get(section, option))
+      hbox.pack_start(self.sources["QRZ_USERNAME"], False, False, 2)
+      inner_vbox.pack_start(hbox, False, False, 2)
+
+      hbox = Gtk.HBox()
+      label = Gtk.Label("Password: ")
+      label.set_width_chars(9)
+      label.set_alignment(0, 0.5)
+      hbox.pack_start(label, False, False, 2)
+      self.sources["QRZ_PASSWORD"] = Gtk.Entry()
+      self.sources["QRZ_PASSWORD"].set_visibility(False) # Mask the password with the "*" character.
+      (section, option) = ("records", "qrz_password")
+      if(have_config and config.has_option(section, option)):
+         self.sources["QRZ_PASSWORD"].set_text(base64.b64decode(config.get(section, option)))
+      hbox.pack_start(self.sources["QRZ_PASSWORD"], False, False, 2)
+      inner_vbox.pack_start(hbox, False, False, 2)
+
+      label = Gtk.Label("Warning: Login details are currently stored as\nBase64-encoded plain text in the configuration file.")
+      inner_vbox.pack_start(label, False, False, 2)
+
+      subframe.add(inner_vbox)
+      vbox.pack_start(subframe, False, False, 2)
+
+      self.sources["IGNORE_PREFIX_SUFFIX"] = Gtk.CheckButton("Ignore callsign prefixes and/or suffixes")
+      (section, option) = ("records", "ignore_prefix_suffix")
+      if(have_config and config.has_option(section, option)):
+         self.sources["IGNORE_PREFIX_SUFFIX"].set_active(config.get(section, option) == "True")
+      else:
+         self.sources["IGNORE_PREFIX_SUFFIX"].set_active(True)
+      vbox.pack_start(self.sources["IGNORE_PREFIX_SUFFIX"], False, False, 2)
+      
+      frame.add(vbox)
+      self.pack_start(frame, False, False, 2)
+      
       logging.debug("Records page of the preferences dialog ready!")
       return
 
@@ -373,5 +387,8 @@ class RecordsPage(Gtk.VBox):
       data = {}
       data["AUTOCOMPLETE_BAND"] = self.sources["AUTOCOMPLETE_BAND"].get_active()
       data["USE_UTC"] = self.sources["USE_UTC"].get_active()
+      data["QRZ_USERNAME"] = self.sources["QRZ_USERNAME"].get_text()
+      data["QRZ_PASSWORD"] = base64.b64encode(self.sources["QRZ_PASSWORD"].get_text())
+      data["IGNORE_PREFIX_SUFFIX"] = self.sources["IGNORE_PREFIX_SUFFIX"].get_active()
       return data
 

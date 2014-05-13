@@ -475,9 +475,9 @@ class RecordDialog(Gtk.Dialog):
 
       config = ConfigParser.ConfigParser()
       have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
-      if(have_config and config.has_option("general", "qrz_username") and config.has_option("general", "qrz_password")):
-         username = config.get("general", "qrz_username")
-         password = base64.b64decode(config.get("general", "qrz_password"))
+      if(have_config and config.has_option("records", "qrz_username") and config.has_option("records", "qrz_password")):
+         username = config.get("records", "qrz_username")
+         password = base64.b64decode(config.get("records", "qrz_password"))
          if(username == "" or password == ""):
             details_given = False
          else:
@@ -491,7 +491,14 @@ class RecordDialog(Gtk.Dialog):
       connected = callsign_lookup.connect(username, password)
       if(connected):
          full_callsign = self.sources["CALL"].get_text()
-         fields_and_data = callsign_lookup.lookup(full_callsign)
+         # Check whether we want to ignore any prefixes (e.g. "IA/") or suffixes "(e.g. "/M") in the callsign
+         # before performing the lookup.
+         if(have_config and config.has_option("records", "ignore_prefix_suffix")):
+            ignore_prefix_suffix = config.get("records", "ignore_prefix_suffix")
+         else:
+            ignore_prefix_suffix = True
+            
+         fields_and_data = callsign_lookup.lookup(full_callsign, ignore_prefix_suffix=ignore_prefix_suffix)
          for field_name in fields_and_data.keys():
             self.sources[field_name].set_text(fields_and_data[field_name])
       return
