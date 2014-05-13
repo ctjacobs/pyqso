@@ -113,6 +113,13 @@ class RecordDialog(Gtk.Dialog):
       self.sources["TIME_ON"] = Gtk.Entry()
       self.sources["TIME_ON"].set_width_chars(15)
       hbox_temp.pack_start(self.sources["TIME_ON"], False, False, 2)
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_MEDIA_PLAY, Gtk.IconSize.MENU)
+      button = Gtk.Button()
+      button.add(icon)
+      button.connect("clicked", self.set_current_datetime_callback)
+      button.set_tooltip_text("Use the current time and date")
+      hbox_temp.pack_start(button, True, True, 2)
       vbox_inner.pack_start(hbox_temp, False, False, 2)
 
       # FREQ
@@ -369,33 +376,7 @@ class RecordDialog(Gtk.Dialog):
                self.sources[field_names[i]].set_text(data)
       else:
          # Automatically fill in the current date and time
-
-         # Do we want to use UTC or the computer's local time?
-         (section, option) = ("records", "use_utc")
-         if(have_config and config.has_option(section, option)):
-            use_utc = (config.get(section, option) == "True")
-            if(use_utc):
-               dt = datetime.utcnow()
-            else:
-               dt = datetime.now()
-         else:
-            dt = datetime.utcnow() # Use UTC by default, since this is expected by ADIF.
-
-         (year, month, day) = (dt.year, dt.month, dt.day)
-         (hour, minute) = (dt.hour, dt.minute)
-         # If necessary, add on leading zeros so the YYYYMMDD and HHMM format is followed.
-         if(month < 10):
-            month = "0" + str(month) # Note: Unlike the calendar widget, the months start from an index of 1 here.
-         if(day < 10):
-            day = "0" + str(day)
-         if(hour < 10):
-            hour = "0" + str(hour)
-         if(minute < 10):
-            minute = "0" + str(minute)
-         date = str(year) + str(month) + str(day)
-         time = str(hour) + str(minute)
-         self.sources["QSO_DATE"].set_text(date)
-         self.sources["TIME_ON"].set_text(time)
+         self.set_current_datetime_callback()
 
          if(have_hamlib):
             # If the Hamlib module is present, then use it to fill in the Frequency field if desired.
@@ -514,6 +495,42 @@ class RecordDialog(Gtk.Dialog):
          date = calendar.get_date()
          self.sources["QSO_DATE"].set_text(date)
       calendar.destroy()
+      return
+      
+   def set_current_datetime_callback(self, widget=None):
+      """ Insert the current date and time. """
+      
+       # Check if a configuration file is present.
+      config = ConfigParser.ConfigParser()
+      have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
+      
+      # Do we want to use UTC or the computer's local time?
+      (section, option) = ("records", "use_utc")
+      if(have_config and config.has_option(section, option)):
+         use_utc = (config.get(section, option) == "True")
+         if(use_utc):
+            dt = datetime.utcnow()
+         else:
+            dt = datetime.now()
+      else:
+         dt = datetime.utcnow() # Use UTC by default, since this is expected by ADIF.
+
+      (year, month, day) = (dt.year, dt.month, dt.day)
+      (hour, minute) = (dt.hour, dt.minute)
+      # If necessary, add on leading zeros so the YYYYMMDD and HHMM format is followed.
+      if(month < 10):
+         month = "0" + str(month) # Note: Unlike the calendar widget, the months start from an index of 1 here.
+      if(day < 10):
+         day = "0" + str(day)
+      if(hour < 10):
+         hour = "0" + str(hour)
+      if(minute < 10):
+         minute = "0" + str(minute)
+      date = str(year) + str(month) + str(day)
+      time = str(hour) + str(minute)
+      self.sources["QSO_DATE"].set_text(date)
+      self.sources["TIME_ON"].set_text(time)
+      
       return
 
 class CalendarDialog(Gtk.Dialog):
