@@ -435,7 +435,10 @@ class RecordDialog(Gtk.Dialog):
    def get_data(self, field_name):
       """ Return the data for a specified field (with name 'field_name') from the Gtk.Entry/Gtk.ComboBoxText/etc boxes in the record dialog. """
       logging.debug("Retrieving the data in field %s from the record dialog..." % field_name)
-      if(field_name == "BAND" or field_name == "MODE" or field_name == "QSL_SENT" or field_name == "QSL_RCVD"):
+      if(field_name == "CALL"):
+         # Always show the callsigns in upper case.
+         return self.sources[field_name].get_text().upper()
+      elif(field_name == "BAND" or field_name == "MODE" or field_name == "QSL_SENT" or field_name == "QSL_RCVD"):
          return self.sources[field_name].get_active_text()
       elif(field_name == "NOTES"):
          (start, end) = self.sources[field_name].get_bounds()
