@@ -182,7 +182,7 @@ class Logbook(Gtk.Notebook):
 
    def _create_dummy_page(self):
       """ Create a blank page in the Gtk.Notebook for the "+" (New Log) tab. """
-      blank_treeview = Gtk.TreeView([])
+      blank_treeview = Gtk.TreeView()
       # Allow the Log to be scrolled up/down
       sw = Gtk.ScrolledWindow()
       sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
