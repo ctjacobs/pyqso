@@ -24,6 +24,7 @@ from datetime import datetime
 try:
    import numpy
    import matplotlib
+   matplotlib.use('Agg')
    matplotlib.rcParams['font.size'] = 10.0
    from mpl_toolkits.basemap import Basemap
    from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
