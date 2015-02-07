@@ -31,6 +31,9 @@ import signal
 pyqso_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir)
 sys.path.insert(0, pyqso_path)
 
+import logging
+logging.basicConfig(level=logging.INFO)
+      
 # PyQSO modules
 from pyqso.adif import *
 from pyqso.logbook import *
@@ -153,14 +156,17 @@ if(__name__ == "__main__"):
    parser.add_argument("-l", "--logbook", action="store", type=str, metavar="/path/to/my_logbook_file.db", default=None, help="Path to a Logbook file. If this file does not already exist, then it will be created.")
    args = parser.parse_args()
 
-   import logging
-
-   # Set up debugging output
+   # Output debugging messages to a file
    if(args.debug):
-      logging.basicConfig(level=logging.DEBUG, filename="pyqso.debug", filemode='w', 
-                        format="%(asctime)s %(levelname)s: %(message)s", 
-                        datefmt="%Y-%m-%d %H:%M:%S")
-
+      # Get the root logger
+      logger = logging.getLogger()
+      logger.setLevel(logging.DEBUG)
+      # Add a file handler
+      handler = logging.FileHandler("pyqso.debug", mode="w")
+      formatter = logging.Formatter(fmt="%(asctime)s %(levelname)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+      handler.setFormatter(formatter)
+      logger.addHandler(handler)
+      
    signal.signal(signal.SIGINT, signal.SIG_DFL) # Exit PyQSO if a SIGINT signal is captured.
    application = PyQSO(args.logbook) # Populate the main window and show it
    Gtk.main() # Start up the event loop!
