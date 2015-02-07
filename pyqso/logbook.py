@@ -45,8 +45,9 @@ class Logbook(Gtk.Notebook):
       return
    
    def new(self, widget=None):
-
-      # If no path has been provided, get one from a "File Open" dialog.
+      """ Create a new logbook, and open it. """
+      
+      # Get the new file's path from a dialog.
       dialog = Gtk.FileChooserDialog("Create a New SQLite Database File",
                                  None,
                                  Gtk.FileChooserAction.SAVE,
@@ -65,6 +66,7 @@ class Logbook(Gtk.Notebook):
          logging.debug("No file path specified.")
          return
       else:
+         # Open the new logbook, ready for use.
          self.open(path=path)
    
    def open(self, widget=None, path=None):
