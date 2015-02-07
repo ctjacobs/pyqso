@@ -157,7 +157,6 @@ if(__name__ == "__main__"):
 
    # Set up debugging output
    if(args.debug):
-      print "hello"
       logging.basicConfig(level=logging.DEBUG, filename="pyqso.debug", filemode='w', 
                         format="%(asctime)s %(levelname)s: %(message)s", 
                         datefmt="%Y-%m-%d %H:%M:%S")
