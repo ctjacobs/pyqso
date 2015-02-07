@@ -44,16 +44,6 @@ class Logbook(Gtk.Notebook):
       logging.debug("New Logbook instance created!")
       return
    
-   
-   def _confirm_overwrite(self, dialog):
-      path = dialog.get_filename()
-      if not path.endswith('.db'):
-         path += '.db'
-      if(exists(path)):
-         return Gtk.FileChooserConfirmation.CONFIRM
-      else:
-         return Gtk.FileChooserConfirmation.ACCEPT_FILENAME
-               
    def new(self, widget=None):
 
       # If no path has been provided, get one from a "File Open" dialog.
@@ -76,7 +66,6 @@ class Logbook(Gtk.Notebook):
          return
       else:
          self.open(path=path)
-   
    
    def open(self, widget=None, path=None):
       """ Open a logbook, and render all the logs within it. 
