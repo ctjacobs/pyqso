@@ -21,7 +21,7 @@
 from gi.repository import Gtk, GObject, Pango, PangoCairo
 import logging
 import sqlite3 as sqlite
-from os.path import basename, getctime, getmtime, expanduser
+from os.path import basename, getctime, getmtime, expanduser, exists
 import datetime
 import ConfigParser
 
@@ -44,15 +44,68 @@ class Logbook(Gtk.Notebook):
       logging.debug("New Logbook instance created!")
       return
    
+   
+   def _confirm_overwrite(self, dialog):
+      path = dialog.get_filename()
+      if not path.endswith('.db'):
+         path += '.db'
+      if(exists(path)):
+         return Gtk.FileChooserConfirmation.CONFIRM
+      else:
+         return Gtk.FileChooserConfirmation.ACCEPT_FILENAME
+               
+   def new(self, widget=None):
+
+      # If no path has been provided, get one from a "File Open" dialog.
+      dialog = Gtk.FileChooserDialog("Create a New SQLite Database File",
+                                 None,
+                                 Gtk.FileChooserAction.SAVE,
+                                 (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                 Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+      dialog.set_do_overwrite_confirmation(True)
+
+      response = dialog.run()
+      if(response == Gtk.ResponseType.OK):
+         path = dialog.get_filename()
+      else:
+         path = None
+      dialog.destroy()
+
+      if(path is None): # If the Cancel button has been clicked, path will still be None
+         logging.debug("No file path specified.")
+         return
+      else:
+         self.open(path=path)
+   
+   
    def open(self, widget=None, path=None):
       """ Open a logbook, and render all the logs within it. 
       An optional 'path' argument can be specified if the database file location is known.
       Otherwise, a file selection dialog will appear. """
 
-      connected = self.db_connect(path)
+      if(path is None):
+         # If no path has been provided, get one from a "File Open" dialog.
+         dialog = Gtk.FileChooserDialog("Open SQLite Database File",
+                                    None,
+                                    Gtk.FileChooserAction.OPEN,
+                                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                    Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+         
+         response = dialog.run()
+         if(response == Gtk.ResponseType.OK):
+            path = dialog.get_filename()
+         dialog.destroy()
+         
+         if(path is None): # If the Cancel button has been clicked, path will still be None
+            logging.debug("No file path specified.")
+            return
+         
+      connected = self.db_connect(path=path)
       if(connected):
          # If the connection setup was successful, then open all the logs in the database
-
+         
+         self.path = path
+         
          logging.debug("Trying to retrieve all the logs in the logbook...")
          self.logs = [] # A fresh stack of Log objects
          try:
@@ -131,32 +184,10 @@ class Logbook(Gtk.Notebook):
       """ Create an SQL database connection to the Logbook's data source """
 
       logging.debug("Attempting to connect to the logbook database...")
-      if(path is None):
-         # If no path has been provided, get one from a "File Open" dialog.
-         dialog = Gtk.FileChooserDialog("Open SQLite Database File",
-                                    None,
-                                    Gtk.FileChooserAction.OPEN,
-                                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                                    Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-         
-         response = dialog.run()
-         if(response == Gtk.ResponseType.OK):
-            path = dialog.get_filename()
-         dialog.destroy()
-         
-         if(path is None): # If the Cancel button has been clicked, path will still be None
-            logging.debug("No file path specified.")
-            return False
-         else:
-            self.path = path
-      else:
-         # Use existing user input
-         self.path = path
-
       # Try setting up the SQL database connection
       try:
          self.db_disconnect() # Destroy any existing connections first.
-         self.connection = sqlite.connect(self.path)
+         self.connection = sqlite.connect(path)
          self.connection.row_factory = sqlite.Row
       except sqlite.Error as e:
          # PyQSO can't connect to the database.

@@ -42,9 +42,18 @@ class Menu(Gtk.MenuBar):
       self.append(mitem_logbook)  
       subm_logbook = Gtk.Menu()
       mitem_logbook.set_submenu(subm_logbook)
-    
-      # Create/open logbook
-      mitem_connect = Gtk.ImageMenuItem("Open New or Existing Logbook...")
+
+      # Create logbook
+      mitem_connect = Gtk.ImageMenuItem("Create a New Logbook...")
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_NEW, Gtk.IconSize.MENU)
+      mitem_connect.set_image(icon)
+      mitem_connect.connect("activate", parent.logbook.new)
+      subm_logbook.append(mitem_connect)
+      self.items["NEW_LOGBOOK"] = mitem_connect
+          
+      # Open logbook
+      mitem_connect = Gtk.ImageMenuItem("Open an Existing Logbook...")
       icon = Gtk.Image()
       icon.set_from_stock(Gtk.STOCK_OPEN, Gtk.IconSize.MENU)
       mitem_connect.set_image(icon)
@@ -239,6 +248,7 @@ class Menu(Gtk.MenuBar):
       
    def set_logbook_item_sensitive(self, sensitive):
       logging.debug("Setting the 'Create/Open Logbook' menu item's sensitivity to: %s..." % sensitive) 
+      self.items["NEW_LOGBOOK"].set_sensitive(sensitive)
       self.items["OPEN_LOGBOOK"].set_sensitive(sensitive)
       self.items["CLOSE_LOGBOOK"].set_sensitive(not sensitive)
       logging.debug("Set the 'Create/Open Logbook' menu item's sensitivity to: %s." % sensitive) 

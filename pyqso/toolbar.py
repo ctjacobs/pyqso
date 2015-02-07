@@ -30,12 +30,22 @@ class Toolbar(Gtk.HBox):
 
       self.buttons = {}
 
-      # Create/open logbook
+      # Create logbook
+      icon = Gtk.Image()
+      icon.set_from_stock(Gtk.STOCK_NEW, Gtk.IconSize.BUTTON)
+      button = Gtk.Button()
+      button.add(icon)
+      button.set_tooltip_text('Create a New Logbook')
+      button.connect("clicked", parent.logbook.new)
+      self.pack_start(button, False, False, 0)
+      self.buttons["NEW_LOGBOOK"] = button
+      
+      # Open logbook
       icon = Gtk.Image()
       icon.set_from_stock(Gtk.STOCK_OPEN, Gtk.IconSize.BUTTON)
       button = Gtk.Button()
       button.add(icon)
-      button.set_tooltip_text('Open New or Existing Logbook')
+      button.set_tooltip_text('Open an Existing Logbook')
       button.connect("clicked", parent.logbook.open)
       self.pack_start(button, False, False, 0)
       self.buttons["OPEN_LOGBOOK"] = button
@@ -103,6 +113,7 @@ class Toolbar(Gtk.HBox):
 
    def set_logbook_button_sensitive(self, sensitive):
       logging.debug("Setting the 'Create/Open Logbook' toolbar item's sensitivity to: %s..." % sensitive) 
+      self.buttons["NEW_LOGBOOK"].set_sensitive(sensitive)
       self.buttons["OPEN_LOGBOOK"].set_sensitive(sensitive)
       self.buttons["CLOSE_LOGBOOK"].set_sensitive(not sensitive)
       logging.debug("Set the 'Create/Open Logbook' toolbar item's sensitivity to: %s." % sensitive) 
