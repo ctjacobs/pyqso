@@ -66,6 +66,8 @@ class Logbook(Gtk.Notebook):
          logging.debug("No file path specified.")
          return
       else:
+         # Clear the contents of the file, in case the file exists already.
+         open(path, 'w').close()
          # Open the new logbook, ready for use.
          self.open(path=path)
    
