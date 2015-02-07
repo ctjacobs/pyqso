@@ -19,8 +19,7 @@
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
 from gi.repository import Gtk, GObject, Gdk, GdkPixbuf
-import logging
-import optparse
+import argparse
 import ConfigParser
 import os
 import os.path
@@ -149,18 +148,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.""")
 
 if(__name__ == "__main__"):
    # Get any command line arguments
-   parser = optparse.OptionParser()
-   parser.add_option("-d", "--debug", action="store_true", default=False, help="Enable debugging. All debugging messages will be written to pyqso.debug.")
-   parser.add_option("-l", "--logbook", action="store", type="string", dest="logbook", default=None, help="Path to the Logbook file.")
-   (options, args) = parser.parse_args()
+   parser = argparse.ArgumentParser()
+   parser.add_argument("-d", "--debug", action="store_true", default=False, help="Enable debugging. All debugging messages will be written to pyqso.debug.")
+   parser.add_argument("-l", "--logbook", action="store", type=str, metavar="/path/to/my_logbook_file.db", default=None, help="Path to a Logbook file. If this file does not already exist, then it will be created.")
+   args = parser.parse_args()
+
+   import logging
 
    # Set up debugging output
-   if(options.debug):
-      logging.basicConfig(level=logging.DEBUG, filename="pyqso.debug", 
+   if(args.debug):
+      print "hello"
+      logging.basicConfig(level=logging.DEBUG, filename="pyqso.debug", filemode='w', 
                         format="%(asctime)s %(levelname)s: %(message)s", 
                         datefmt="%Y-%m-%d %H:%M:%S")
 
    signal.signal(signal.SIGINT, signal.SIG_DFL) # Exit PyQSO if a SIGINT signal is captured.
-   application = PyQSO(options.logbook) # Populate the main window and show it
+   application = PyQSO(args.logbook) # Populate the main window and show it
    Gtk.main() # Start up the event loop!
 
