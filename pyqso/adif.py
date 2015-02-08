@@ -164,7 +164,7 @@ class ADIF:
             # Note: This is based on the code written by OK4BX.
             # (http://web.bxhome.org/blog/ok4bx/2012/05/adif-parser-python)
             fields_and_data_dictionary = {}
-            fields_and_data = re.findall('<(.*?):(\d*).*?>([^<\t\n\r\f\v\Z]+)', t)  
+            fields_and_data = re.findall('<(.*?):(\d*).*?>([^<\t\n\r\f\v]+)', t)
             for fd in fields_and_data:
                # Let's force all field names to be in upper case.
                # This will help us later when comparing the field names
@@ -181,7 +181,6 @@ class ADIF:
                elif(field_name == "CALL"):
                   # Also force all the callsigns to be in upper case.
                   field_data = field_data.upper()
-
                if(field_name in AVAILABLE_FIELD_NAMES_ORDERED):
                   field_data_type = AVAILABLE_FIELD_NAMES_TYPES[field_name]
                   if(self.is_valid(field_name, field_data, field_data_type)):
