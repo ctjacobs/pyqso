@@ -16,20 +16,23 @@ A new QSO can be added by either:
 -  Clicking ``Add Record...`` in the ``Records`` menu.
 
 A dialog window will appear where details of the QSO can be entered (see
-Figure [fig:edit:sub:`r`\ ecord]). Note that the current date and time
+figure:edit_record_). Note that the current date and time
 are filled in automatically. When ready, click ``OK`` to save the
 changes.
 
-|Record dialog used to add new records and edit existing ones.|
-[fig:edit:sub:`r`\ ecord]
-
+   .. _figure:edit_record:
+   .. figure::  images/edit_record.png
+      :align:   center
+      
+      Record dialog used to add new records and edit existing ones.
+      
 Callsign lookup
 ~~~~~~~~~~~~~~~
 
-PyQSO can also resolve station-related information (e.g. the operator’s
+PyQSO can also resolve station-related information (e.g. the operator's
 name, address, and ITU Zone) by clicking the ``Lookup on qrz.com``
 button adjacent to the Callsign data entry box. Note that the user must
-first supply their qrz.com account information in the preferences dialog
+first supply their `qrz.com <http://qrz.com/>`_ account information in the preferences dialog
 window.
 
 Editing a record

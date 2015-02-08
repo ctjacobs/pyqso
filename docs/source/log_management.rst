@@ -23,14 +23,13 @@ Note: When logs are stored in the database file, field/column names from
 the ADIF standard are used. However, please note that only the following
 subset of all the ADIF fields is considered: CALL, QSO\_DATE, TIME\_ON,
 FREQ, BAND, MODE, TX\_PWR, RST\_SENT, RST\_RCVD, QSL\_SENT, QSL\_RCVD,
-NOTES, NAME, ADDRESS, STATE, COUNTRY, DXCC, CQZ, ITUZ, IOTA. Visit
-http://adif.org/ for more information about these fields.
+NOTES, NAME, ADDRESS, STATE, COUNTRY, DXCC, CQZ, ITUZ, IOTA. Visit the `ADIF website <http://adif.org/>`_ for more information about these fields.
 
 Renaming a log
 --------------
 
 To rename the currently selected log, click ``Rename Selected Log`` in
-the ``Logbook`` menu. Remember that the log’s new name cannot be the
+the ``Logbook`` menu. Remember that the log's new name cannot be the
 same as another log in the logbook.
 
 Deleting a log

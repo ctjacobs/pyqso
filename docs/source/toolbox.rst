@@ -19,28 +19,40 @@ Click on the ``Connect to Telnet Server`` button and enter the DX server
 details in the dialog that appears. If no port is specified, PyQSO will
 use the default value of 23. A username and password may also need to be
 supplied. Once connected, the server output will appear in the DX
-cluster frame (see Figure [fig:dx:sub:`c`\ luster]). A command can also
+cluster frame (see figure:dx_cluster_). A command can also
 be sent to the server by typing it into the entry box and clicking the
 adjacent ``Send Command`` button.
 
-|The DX cluster frame.| [fig:dx:sub:`c`\ luster]
+   .. _figure:dx_cluster:
+   .. figure::  images/dx_cluster.png
+      :align:   center
+      
+      The DX cluster frame.
 
 Grey line
 ---------
 
-The grey line tool (see Figure [fig:grey:sub:`l`\ ine]) can be used to
+The grey line tool (see figure:grey_line_) can be used to
 check which parts of the world are in darkness. The position of the grey
 line is automatically updated every 30 minutes.
 
-|The grey line tool.| [fig:grey:sub:`l`\ ine]
+   .. _figure:grey_line:
+   .. figure::  images/grey_line.png
+      :align:   center
+      
+      The grey line tool.
 
 Awards
 ------
 
-The awards progress tracker (see Figure [fig:awards]) updates its data
+The awards progress tracker (see figure:awards_) updates its data
 each time a record is added, deleted, or modified. Currently only the
-DXCC award is supported (visit http://www.arrl.org/dxcc for more
+DXCC award is supported (visit the `ARRL DXCC website <http://www.arrl.org/dxcc>`_ for more
 information).
 
-|The award progress tracker.| [fig:awards]
+   .. _figure:awards:
+   .. figure::  images/awards.png
+      :align:   center
+      
+      The award progress tracker
 
