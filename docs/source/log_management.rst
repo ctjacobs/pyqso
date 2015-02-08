@@ -43,7 +43,7 @@ Importing and exporting a log
 -----------------------------
 
 While PyQSO stores logbooks in SQL format, it is possible to export
-individual logs in the well-known ADIF format. Select the log to export,
+individual logs in the well-known `ADIF <http://www.adif.org/>`_ format. Select the log to export,
 and click ``Export Log`` in the ``Logbook`` menu.
 
 Similarly, records can be imported from an ADIF file. Upon importing,
