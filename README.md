@@ -48,7 +48,7 @@ The PyQSO documentation is stored in the `docs` directory. It can be built with 
 
    `make docs`
 
-which will produce an HTML version of the documentation in `docs/_build/html` that can be opened in a web browser.
+which will produce an HTML version of the documentation in `docs/build/html` that can be opened in a web browser.
 
 Alternatively, a ready-built version of the PyQSO documentation can be found on [Read the Docs](http://pyqso.readthedocs.org/en/latest/).
 
