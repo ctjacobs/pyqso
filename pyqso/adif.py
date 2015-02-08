@@ -212,7 +212,7 @@ class ADIF:
          
 <adif_ver:%d>%s
 <programid:5>PyQSO
-<programversion:8>0.2a-dev
+<programversion:3>0.2
 <eoh>\n""" % (dt, len(records), len(str(ADIF_VERSION)), ADIF_VERSION))
          
          # Then write each log to the file.
@@ -426,7 +426,7 @@ class TestADIF(unittest.TestCase):
       assert("""        
 <adif_ver:3>1.0
 <programid:5>PyQSO
-<programversion:8>0.2a-dev
+<programversion:3>0.2
 <eoh>
 <call:7>TEST123
 <qso_date:8>20120402
@@ -466,7 +466,7 @@ class TestADIF(unittest.TestCase):
       assert("""        
 <adif_ver:3>1.0
 <programid:5>PyQSO
-<programversion:8>0.2a-dev
+<programversion:3>0.2
 <eoh>
 <call:7>TEST123
 <qso_date:8>20120402
