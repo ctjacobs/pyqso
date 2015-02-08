@@ -116,7 +116,7 @@ class PyQSO(Gtk.Window):
       about.set_transient_for(parent=self)
       about.set_program_name("PyQSO")
       about.set_version("0.2a-dev")
-      about.set_authors(["Christian Jacobs"])
+      about.set_authors(["Christian Jacobs (M6RDG)"])
       about.set_license("""This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
