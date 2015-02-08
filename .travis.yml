@@ -20,5 +20,5 @@ before_script:
   
 script:
   - make unittest
+  - make docs
   - sudo make clean
-
