@@ -68,6 +68,10 @@ The following extra package is necessary to enable Hamlib support:
 
 * python-libhamlib2
 
+The following extra package is necessary to build the documentation:
+
+* python-sphinx
+
 Contact
 -------
 
