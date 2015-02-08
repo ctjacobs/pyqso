@@ -192,16 +192,17 @@ class Log(Gtk.ListStore):
          return (0, 0)
 
       removed = 0 # Count the number of records that are removed. Hopefully this will be the same as len(duplicates).
-      path = Gtk.TreePath(0) # Start with the first row in the log.
-      iter = self.get_iter(path)
-      while iter is not None:
-         row_index = self.get_value(iter, 0) # Get the index.
-         if(row_index in duplicates): # Is this a duplicate row? If so, delete it.
-            self.delete_record(row_index, iter)
-            removed += 1
-         iter = self.iter_next(iter) # Move on to the next row, until iter_next returns None.
+      while removed != len(duplicates): # Unfortunately, in certain cases, extra passes may be necessary to ensure that all duplicates are removed.
+         path = Gtk.TreePath(0) # Start with the first row in the log.
+         iter = self.get_iter(path)
+         while iter is not None:
+            row_index = self.get_value(iter, 0) # Get the index.
+            if(row_index in duplicates): # Is this a duplicate row? If so, delete it.
+               self.delete_record(row_index, iter)
+               removed += 1
+            iter = self.iter_next(iter) # Move on to the next row, until iter_next returns None.
 
-      assert(len(duplicates) == removed)
+      assert(removed == len(duplicates))
       return (len(duplicates), removed)
 
    def get_record_by_index(self, index):
