@@ -3,10 +3,15 @@ language: python
 python:
   - "2.7"
 
+virtualenv:
+  system_site_packages: true
+
 before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -y python2.7 python-gi python3-gi python3-gi-cairo python-gobject python-gobject-2 gir1.2-glib-2.0 gir1.2-gtk-3.0 python-gi-cairo python-mpltoolkits.basemap python-numpy python-matplotlib python-libhamlib2
- - sudo pip install gi
+ - pip install gi
+ - pip install gi.repository
+
 install:
   - sudo make install
 
