@@ -151,7 +151,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.""")
 
 if(__name__ == "__main__"):
    # Get any command line arguments
-   parser = argparse.ArgumentParser()
+   parser = argparse.ArgumentParser(prog="pyqso")
    parser.add_argument("-d", "--debug", action="store_true", default=False, help="Enable debugging. All debugging messages will be written to pyqso.debug.")
    parser.add_argument("-l", "--logbook", action="store", type=str, metavar="/path/to/my_logbook_file.db", default=None, help="Path to a Logbook file. If this file does not already exist, then it will be created.")
    args = parser.parse_args()
