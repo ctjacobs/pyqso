@@ -21,6 +21,8 @@ PyQSO
 
 PyQSO is a contact logging tool for amateur radio operators.
 
+[![Build Status](https://travis-ci.org/ctjacobs/pyqso.svg)](https://travis-ci.org/ctjacobs/pyqso)
+
 Installation and running
 ------------------------
 
