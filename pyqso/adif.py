@@ -449,7 +449,8 @@ class TestADIF(unittest.TestCase):
 
    def test_adif_write_sqlite3_Row(self):
       import sqlite3
-      self.connection = sqlite3.connect("./unittest_resources/test.db")
+      import os.path
+      self.connection = sqlite3.connect(os.path.dirname(os.path.realpath(__file__))+"/unittest_resources/test.db")
       self.connection.row_factory = sqlite3.Row
 
       c = self.connection.cursor()
