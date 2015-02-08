@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/bin/sh
 # File: Makefile
 
 #    Copyright (C) 2013 Christian Jacobs.
@@ -20,7 +20,7 @@
 
 .PHONY: input clean install docs unittest
 
-input: 	clean install documentation
+input: 	clean install docs
 
 install:
 	@echo "*** Installing PyQSO"
@@ -32,7 +32,7 @@ docs:
 
 unittest:
 	@echo "*** Running the unit tests"
-	cd pyqso; for file in *.py; do (python $$file); done; cd ..
+	python -m unittest discover --start-directory=pyqso --pattern=*.py --verbose
 
 clean:
 	@echo "*** Cleaning build directory"
