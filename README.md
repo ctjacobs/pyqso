@@ -44,11 +44,13 @@ from PyQSO's base directory.
 Documentation
 -------------
 
-The PyQSO user manual is stored as a LaTeX source file in the doc/ directory. It can be compiled with the following command:
+The PyQSO documentation is stored in the `docs` directory. It can be built with the following command:
 
-   `make manual`
+   `make docs`
 
-which will produce the manual.pdf file.
+which will produce an HTML version of the documentation in `docs/_build/html` that can be opened in a web browser.
+
+Alternatively, a ready-built version of the PyQSO documentation can be found on [Read the Docs](http://pyqso.readthedocs.org/en/latest/).
 
 Dependencies
 ------------
