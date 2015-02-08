@@ -1,0 +1,18 @@
+language: python
+
+python:
+  - "2.7"
+
+before_install:
+ - sudo apt-get update -qq
+ - sudo apt-get install -qq python2.7 gir1.2-gtk-3.0 python-gi-cairo python-mpltoolkits.basemap python-numpy python-matplotlib python-libhamlib2
+
+install:
+  - sudo make install
+
+before_script:
+  - export PYTHONPATH=`pwd`:$PYTHONPATH
+  
+script:
+  - make unittest
+  - make clean
