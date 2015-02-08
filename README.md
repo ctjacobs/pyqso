@@ -68,3 +68,8 @@ The following extra package is necessary to enable Hamlib support:
 
 * python-libhamlib2
 
+Contact
+-------
+
+If you have any comments or questions about PyQSO, please send them via email to <c.jacobs10@imperial.ac.uk>.
+
