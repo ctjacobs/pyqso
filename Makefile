@@ -18,6 +18,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
+.PHONY: input clean install docs unittest
+
 input: 	clean install documentation
 
 install:
