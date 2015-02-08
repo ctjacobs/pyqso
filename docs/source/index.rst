@@ -11,7 +11,12 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-
+   introduction
+   getting_started
+   log_management
+   record_management
+   toolbox
+   preferences
 
 Indices and tables
 ==================
