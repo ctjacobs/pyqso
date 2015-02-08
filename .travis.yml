@@ -5,7 +5,7 @@ python:
 
 before_install:
  - sudo apt-get update -qq
- - sudo apt-get install -qq python2.7 python-gobject gir1.2-gtk-3.0 python-gi-cairo python-mpltoolkits.basemap python-numpy python-matplotlib python-libhamlib2
+ - sudo apt-get install -qq python2.7 python-gi python-gobject gir1.2-gtk-3.0 python-gi-cairo python-mpltoolkits.basemap python-numpy python-matplotlib python-libhamlib2
 
 install:
   - sudo make install
