@@ -31,8 +31,7 @@ except ImportError:
    logging.error("Could not import the Hamlib module!")
    have_hamlib = False
 
-from pyqso.adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED
-FREQUENCY_UNITS = ["Hz", "kHz", "MHz", "GHz"]
+from pyqso.adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED, MODES
 
 class PreferencesDialog(Gtk.Dialog):
    
@@ -171,31 +170,6 @@ class ViewPage(Gtk.VBox):
       frame.add(hbox)
       self.pack_start(frame, False, False, 2)
 
-      # Default values
-      frame = Gtk.Frame()
-      frame.set_label("Default values")
-      vbox = Gtk.VBox()
-      
-      hbox_temp = Gtk.HBox()
-      label = Gtk.Label("Default unit of frequency: ")
-      label.set_width_chars(17)
-      label.set_alignment(0, 0.5)
-      hbox_temp.pack_start(label, False, False, 2)
-      
-      self.sources["DEFAULT_FREQ_UNIT"] = Gtk.ComboBoxText()
-      for unit in FREQUENCY_UNITS:
-         self.sources["DEFAULT_FREQ_UNIT"].append_text(unit)
-      (section, option) = ("view", "default_freq_unit")
-      if(have_config and config.has_option(section, option)):
-         self.sources["DEFAULT_FREQ_UNIT"].set_active(FREQUENCY_UNITS.index(config.get(section, option)))
-      else:
-         self.sources["DEFAULT_FREQ_UNIT"].set_active(FREQUENCY_UNITS.index("MHz")) # Set to MHz as the default option.
-      hbox_temp.pack_start(self.sources["DEFAULT_FREQ_UNIT"], False, False, 2)
-      vbox.pack_start(hbox_temp, False, False, 2)
-      
-      frame.add(vbox)
-      self.pack_start(frame, False, False, 2)
-
       self.label = Gtk.Label("Note: View-related changes will not take effect\nuntil PyQSO is restarted.")
       self.pack_start(self.label, False, False, 2)
 
@@ -207,7 +181,6 @@ class ViewPage(Gtk.VBox):
       data = {}
       for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
          data[field_name] = self.sources[field_name].get_active()
-      data["DEFAULT_FREQ_UNIT"] = self.sources["DEFAULT_FREQ_UNIT"].get_active_text()
       return data
 
 class HamlibPage(Gtk.VBox):
@@ -328,6 +301,50 @@ class RecordsPage(Gtk.VBox):
       frame.add(vbox)
       self.pack_start(frame, False, False, 2)
 
+
+      ## Default values frame
+      frame = Gtk.Frame()
+      frame.set_label("Default values")
+      vbox = Gtk.VBox()
+      
+      # Mode
+      hbox_temp = Gtk.HBox()
+      label = Gtk.Label("Mode: ")
+      label.set_width_chars(17)
+      label.set_alignment(0, 0.5)
+      hbox_temp.pack_start(label, False, False, 2)
+      
+      self.sources["DEFAULT_MODE"] = Gtk.ComboBoxText()
+      for mode in MODES:
+         self.sources["DEFAULT_MODE"].append_text(mode)
+      (section, option) = ("records", "default_mode")
+      if(have_config and config.has_option(section, option)):
+         self.sources["DEFAULT_MODE"].set_active(MODES.index(config.get(section, option)))
+      else:
+         self.sources["DEFAULT_MODE"].set_active(MODES.index(""))
+      hbox_temp.pack_start(self.sources["DEFAULT_MODE"], False, False, 2)
+      vbox.pack_start(hbox_temp, False, False, 2)
+
+      # Power
+      hbox_temp = Gtk.HBox()
+      label = Gtk.Label("TX Power (W): ")
+      label.set_width_chars(17)
+      label.set_alignment(0, 0.5)
+      hbox_temp.pack_start(label, False, False, 2)
+      
+      self.sources["DEFAULT_POWER"] = Gtk.Entry()
+      (section, option) = ("records", "default_power")
+      if(have_config and config.has_option(section, option)):
+         self.sources["DEFAULT_POWER"].set_text(config.get(section, option))
+      else:
+         self.sources["DEFAULT_POWER"].set_text("")
+      hbox_temp.pack_start(self.sources["DEFAULT_POWER"], False, False, 2)
+      vbox.pack_start(hbox_temp, False, False, 2)
+      
+      frame.add(vbox)
+      self.pack_start(frame, False, False, 2)
+      
+      
       # Callsign lookup frame
       frame = Gtk.Frame()
       frame.set_label("Callsign lookup")
@@ -387,6 +404,10 @@ class RecordsPage(Gtk.VBox):
       data = {}
       data["AUTOCOMPLETE_BAND"] = self.sources["AUTOCOMPLETE_BAND"].get_active()
       data["USE_UTC"] = self.sources["USE_UTC"].get_active()
+      
+      data["DEFAULT_MODE"] = self.sources["DEFAULT_MODE"].get_active_text()
+      data["DEFAULT_POWER"] = self.sources["DEFAULT_POWER"].get_text()
+      
       data["QRZ_USERNAME"] = self.sources["QRZ_USERNAME"].get_text()
       data["QRZ_PASSWORD"] = base64.b64encode(self.sources["QRZ_PASSWORD"].get_text())
       data["IGNORE_PREFIX_SUFFIX"] = self.sources["IGNORE_PREFIX_SUFFIX"].get_active()

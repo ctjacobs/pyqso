@@ -124,12 +124,7 @@ class RecordDialog(Gtk.Dialog):
 
       # FREQ
       hbox_temp = Gtk.HBox(spacing=0)
-      (section, option) = ("view", "default_freq_unit")
-      if(have_config and config.has_option(section, option)):
-         frequency_unit = config.get(section, option)
-      else:
-         frequency_unit = "MHz"
-      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["FREQ"] + " (" + frequency_unit + ")", halign=Gtk.Align.START)
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["FREQ"], halign=Gtk.Align.START)
       label.set_alignment(0, 0.5)
       label.set_width_chars(15)
       hbox_temp.pack_start(label, False, False, 2)
@@ -378,6 +373,23 @@ class RecordDialog(Gtk.Dialog):
          # Automatically fill in the current date and time
          self.set_current_datetime_callback()
 
+         ## Set up default field values
+         # Mode
+         (section, option) = ("records", "default_mode")
+         if(have_config and config.has_option(section, option)):
+            mode = config.get(section, option)
+         else:
+            mode = ""
+         self.sources["MODE"].set_active(MODES.index(mode))
+
+         # Power
+         (section, option) = ("records", "default_power")
+         if(have_config and config.has_option(section, option)):
+            power = config.get(section, option)
+         else:
+            power = ""
+         self.sources["TX_PWR"].set_text(power)
+         
          if(have_hamlib):
             # If the Hamlib module is present, then use it to fill in the Frequency field if desired.
             if(have_config and config.has_option("hamlib", "autofill") and config.has_option("hamlib", "rig_model") and config.has_option("hamlib", "rig_pathname")):
