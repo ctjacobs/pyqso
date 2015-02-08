@@ -9,6 +9,8 @@ virtualenv:
 before_install:
  - sudo apt-get update -qq
  - sudo apt-get install -y python2.7 gir1.2-gtk-3.0 python-gi-cairo python-mpltoolkits.basemap python-numpy python-matplotlib python-libhamlib2
+ - "export DISPLAY=:99.0"
+ - "sh -e /etc/init.d/xvfb start"
 
 install:
   - sudo make install
