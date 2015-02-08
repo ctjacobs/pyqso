@@ -15,6 +15,7 @@ install:
 
 before_script:
   - export PYTHONPATH=`pwd`:$PYTHONPATH
+  - "export DISPLAY=:99.0"
   
 script:
   - make unittest
