@@ -75,29 +75,16 @@ mode:
 All debugging-related messages are written to a file called ``pyqso.debug``,
 located in the current working directory.
 
-Opening a new or existing logbook
----------------------------------
 
-Logbooks are SQL databases, and as such they are accessed with a
-database connection. To create a connection and open the logbook, click
-``Open a New or Existing Logbook...`` in the ``Logbook`` menu, and
-either:
+Creating and opening a logbook
+------------------------------
 
--  Find and select an existing logbook database file (which usually has
-   a ``.db`` file extension), and click ``Open`` to create the database
-   connection; or
+A PyQSO-based logbook is essentially an SQL database. To create a new database/logbook file, click ``Create a New Logbook...`` in the ``Logbook`` menu, choose the directory where you want the file to be saved, and enter the file's name (e.g. ``my_new_logbook.db``). The new logbook will then be opened automatically. If you would like to open an *existing* logbook file, click ``Open an Existing Logbook...`` in the ``Logbook`` menu. Note that logbook files usually have a ``.db`` file extension.
 
--  Create a new database by entering a (non-existing) file name and
-   clicking ``Open``. The logbook database file (and a connection to it)
-   will then be created automatically.
+Once the logbook has been opened, its name will appear in the status bar. All logs in the logbook will be opened automatically, and the interface will look something like the one shown in figure:log_with_awards_.
 
-Once the database connection has been established, the database file
-name will appear in the status bar. All logs in the logbook will be
-opened automatically, and the interface will look something like the one
-shown in figure:view_with_awards_.
-
-   .. _figure:view_with_awards:
-   .. figure::  images/awards.png
+   .. _figure:log_with_awards:
+   .. figure::  images/log_with_awards.png
       :align:   center
       
       The PyQSO main window, showing the records in a log called ``repeater_contacts``, and the awards tool in the toolbox below it.
@@ -105,7 +92,5 @@ shown in figure:view_with_awards_.
 Closing a logbook
 -----------------
 
-A logbook can be closed (along with its corresponding database
-connection) by clicking the ``Close Logbook`` button in the toolbar, or
-by clicking ``Close Logbook`` in the ``Logbook`` menu.
+A logbook can be closed by clicking the ``Close Logbook`` button in the toolbar, or by clicking ``Close Logbook`` in the ``Logbook`` menu.
 

@@ -54,5 +54,5 @@ information).
    .. figure::  images/awards.png
       :align:   center
       
-      The award progress tracker
+      The award progress tracker.
 
