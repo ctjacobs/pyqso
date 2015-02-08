@@ -23,16 +23,22 @@ Assuming that the current working directory is PyQSO's base directory
 (the directory that the Makefile is in), PyQSO can be installed via the
 terminal with the following command:
 
-``make install``
+.. code-block:: bash
+
+   make install
 
 Note: ``sudo`` may be needed for this. Once installed, the following
 command will run PyQSO:
 
-``pyqso``
+.. code-block:: bash
+
+   pyqso
 
 Alternatively, PyQSO can be run (without installing) with:
 
-``python bin/pyqso``
+.. code-block:: bash
+
+   python bin/pyqso
 
 from PyQSO's base directory.
 
@@ -50,7 +56,9 @@ graphical interface, users can also specify a logbook file to open at
 the command line with the ``-l`` or ``--logbook`` option. For example, to
 open a logbook file called ``mylogbook.db``, use the following command:
 
-``pyqso --logbook /path/to/mylogbook.db``
+.. code-block:: bash
+
+   pyqso --logbook /path/to/mylogbook.db
 
 If the file does not already exist, PyQSO will create it.
 
@@ -60,7 +68,9 @@ Debugging mode
 Running PyQSO with the ``-d`` or ``--debug`` flag enables the debugging
 mode:
 
-``pyqso --debug``
+.. code-block:: bash
+
+   pyqso --debug
 
 All debugging-related messages are written to a file called ``pyqso.debug``,
 located in the current working directory.
