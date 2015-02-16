@@ -25,7 +25,7 @@ def error(parent, message):
    """ Display an error message. """
    logging.error(message)
    dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                               Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, message)
+                               Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, message, title="Error")
    dialog.run()
    dialog.destroy()
    return
@@ -34,7 +34,7 @@ def info(parent, message):
    """ Display some information. """
    logging.debug(message)
    dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                               Gtk.MessageType.INFO, Gtk.ButtonsType.OK, message)
+                               Gtk.MessageType.INFO, Gtk.ButtonsType.OK, message, title="Information")
    dialog.run()
    dialog.destroy()
    return
@@ -43,7 +43,7 @@ def question(parent, message):
    """ Ask the user a question. The dialog comes with 'Yes' and 'No' response buttons. """
    dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
                               Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
-                              message)
+                              message, title="Question")
    response = dialog.run()
    dialog.destroy()
    return response
