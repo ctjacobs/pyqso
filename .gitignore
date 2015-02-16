@@ -1,1 +1,4 @@
 *.pyc
+pyqso.debug
+build/
+docs/build
