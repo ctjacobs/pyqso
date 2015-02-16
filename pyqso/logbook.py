@@ -795,7 +795,14 @@ class Logbook(Gtk.Notebook):
       return
 
    def add_record_callback(self, widget):
-      log_index = self._get_log_index()
+      # Get the log index
+      try:
+         log_index = self._get_log_index()
+         if(log_index is None):
+            raise ValueError("The log index could not be determined. Perhaps you tried adding a record when the Summary page was selected?")
+      except ValueError as e:
+         error(self.parent, e)
+         return
       log = self.logs[log_index]
       
       dialog = RecordDialog(parent=self.parent, log=log, index=None)
@@ -812,7 +819,7 @@ class Logbook(Gtk.Notebook):
             fields_and_data = {}
             field_names = AVAILABLE_FIELD_NAMES_ORDERED
             for i in range(0, len(field_names)):
-               #TODO: Validate user input!
+               # Validate user input.
                fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
                if(not(adif.is_valid(field_names[i], fields_and_data[field_names[i]], AVAILABLE_FIELD_NAMES_TYPES[field_names[i]]))):
                   # Data is not valid - inform the user.
@@ -834,8 +841,16 @@ class Logbook(Gtk.Notebook):
       return
       
    def delete_record_callback(self, widget):
-      log_index = self._get_log_index()
+      # Get the log index
+      try:
+         log_index = self._get_log_index()
+         if(log_index is None):
+            raise ValueError("The log index could not be determined. Perhaps you tried deleting a record when the Summary page was selected?")
+      except ValueError as e:
+         error(self.parent, e)
+         return
       log = self.logs[log_index]
+      
       (sort_model, path) = self.treeselection[log_index].get_selected_rows() # Get the selected row in the log
       try:
          sort_iter = sort_model.get_iter(path[0])
@@ -862,7 +877,14 @@ class Logbook(Gtk.Notebook):
       # Note: the path and view_column arguments need to be passed in
       # since they associated with the row-activated signal.
 
-      log_index = self._get_log_index()
+      # Get the log index
+      try:
+         log_index = self._get_log_index()
+         if(log_index is None):
+            raise ValueError("The log index could not be determined. Perhaps you tried editing a record when the Summary page was selected?")
+      except ValueError as e:
+         error(self.parent, e)
+         return
       log = self.logs[log_index]
 
       (sort_model, path) = self.treeselection[log_index].get_selected_rows() # Get the selected row in the log
@@ -892,7 +914,7 @@ class Logbook(Gtk.Notebook):
             fields_and_data = {}
             field_names = AVAILABLE_FIELD_NAMES_ORDERED
             for i in range(0, len(field_names)):
-               #TODO: Validate user input!
+               # Validate user input.
                fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
                if(not(adif.is_valid(field_names[i], fields_and_data[field_names[i]], AVAILABLE_FIELD_NAMES_TYPES[field_names[i]]))):
                   # Data is not valid - inform the user.
