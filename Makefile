@@ -35,9 +35,9 @@ unittest:
 	python -m unittest discover --start-directory=pyqso --pattern=*.py --verbose
 
 clean:
-	@echo "*** Cleaning build directory"
+	@echo "*** Removing build directory"
 	rm -rf build
 	@echo "*** Cleaning pyqso directory"
 	cd pyqso; rm -f *.pyc ADIF.test_read.adi ADIF.test_write*.adi; cd ..
-	@echo "*** Cleaning doc directory"
+	@echo "*** Cleaning docs directory"
 	cd docs; make clean; cd ..
