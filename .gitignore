@@ -2,3 +2,4 @@
 pyqso.debug
 build/
 docs/build
+ADIF.test*.adi
