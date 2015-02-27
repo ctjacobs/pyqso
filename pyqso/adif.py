@@ -394,11 +394,14 @@ class ADIF:
       
    
 class TestADIF(unittest.TestCase):
+   """ The unit tests for the ADIF module. """
 
    def setUp(self):
+      """ Set up the ADIF object needed for the unit tests. """
       self.adif = ADIF()
 
    def test_adif_read(self):
+      """ Check that a single ADIF record can be read and parsed correctly. """
       f = open("ADIF.test_read.adi", 'w')
       f.write("""Some test ADI data.<eoh>
 
@@ -414,7 +417,88 @@ class TestADIF(unittest.TestCase):
       assert(len(records[0].keys()) == len(expected_records[0].keys()))
       assert(records == expected_records)
 
+   def test_adif_read_multiple(self):
+      """ Check that multiple ADIF records can be read and parsed correctly. """
+      f = open("ADIF.test_read_multiple.adi", 'w')
+      f.write("""Some test ADI data.<eoh>
+
+<call:4>TEST<band:3>40m<mode:2>CW
+<qso_date:8:d>20130322<time_on:4>1955<eor>
+
+<call:8>TEST2ABC<band:3>20m<mode:3>SSB
+<qso_date:8>20150227<time_on:4>0820<eor>
+
+<call:5>HELLO<band:2>2m<mode:2>FM<qso_date:8:d>20150227<time_on:4>0832<eor>""")
+      f.close()
+    
+      records = self.adif.read("ADIF.test_read_multiple.adi")
+      expected_records = [{'TIME_ON': '1955', 'BAND': '40m', 'CALL': 'TEST', 'MODE': 'CW', 'QSO_DATE': '20130322'}, {'TIME_ON': '0820', 'BAND': '20m', 'CALL': 'TEST2ABC', 'MODE': 'SSB', 'QSO_DATE': '20150227'}, {'TIME_ON': '0832', 'BAND': '2m', 'CALL': 'HELLO', 'MODE': 'FM', 'QSO_DATE': '20150227'}]
+      print "Imported records: ", records
+      print "Expected records: ", expected_records
+      assert(len(records) == 3)
+      for i in range(len(expected_records)):
+         assert(len(records[i].keys()) == len(expected_records[i].keys()))
+      assert(records == expected_records)
+
+   def test_adif_read_alphabet(self):
+      """ Check that none of the letters of the alphabet are ignored during parsing. """
+      f = open("ADIF.test_read_alphabet.adi", 'w')
+      f.write("""Some test ADI data.<eoh>
+<call:64>ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ<eor>""")
+      f.close()
+    
+      records = self.adif.read("ADIF.test_read_alphabet.adi")
+      expected_records = [{'CALL': 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'}]
+      print "Imported records: ", records
+      print "Expected records: ", expected_records
+      assert(len(records) == 1)
+      assert(len(records[0].keys()) == len(expected_records[0].keys()))
+      assert(records == expected_records)
+
+   def test_adif_read_capitalisation(self):
+      """ Check that the CALL field is capitalised correctly. """
+      f = open("ADIF.test_read_capitalisation.adi", 'w')
+      f.write("""Some test ADI data.<eoh>
+<call:4>test<eor>""")
+      f.close()
+    
+      records = self.adif.read("ADIF.test_read_capitalisation.adi")
+      expected_records = [{'CALL': 'TEST'}]
+      print "Imported records: ", records
+      print "Expected records: ", expected_records
+      assert(len(records) == 1)
+      assert(len(records[0].keys()) == len(expected_records[0].keys()))
+      assert(records == expected_records)
+      
+   def test_adif_read_header_only(self):
+      """ Check that no records are read in if the ADIF file only contains header information. """
+      f = open("ADIF.test_read_header_only.adi", 'w')
+      f.write("""Some test ADI data.<eoh>""")
+      f.close()
+    
+      records = self.adif.read("ADIF.test_read_header_only.adi")
+      expected_records = []
+      print "Imported records: ", records
+      print "Expected records: ", expected_records
+      assert(len(records) == 0)
+      assert(records == expected_records)
+
+   def test_adif_read_no_header(self):
+      """ Check that an ADIF file can be parsed with no header information. """
+      f = open("ADIF.test_read_no_header.adi", 'w')
+      f.write("""<call:4>TEST<band:3>40m<mode:2>CW<qso_date:8:d>20130322<time_on:4>1955<eor>""")
+      f.close()
+    
+      records = self.adif.read("ADIF.test_read_no_header.adi")
+      expected_records = [{'TIME_ON': '1955', 'BAND': '40m', 'CALL': 'TEST', 'MODE': 'CW', 'QSO_DATE': '20130322'}]
+      print "Imported records: ", records
+      print "Expected records: ", expected_records
+      assert(len(records) == 1)
+      assert(len(records[0].keys()) == len(expected_records[0].keys()))
+      assert(records == expected_records)
+
    def test_adif_write(self):
+      """ Check that records can be written to an ADIF file correctly. """
       records = [{"CALL":"TEST123", "QSO_DATE":"20120402", "TIME_ON":"1234", "FREQ":"145.500", "BAND":"2m", "MODE":"FM", "RST_SENT":"59", "RST_RCVD":"59"},
                  {"CALL":"TEST123", "QSO_DATE":"20130312", "TIME_ON":"0101", "FREQ":"145.750", "BAND":"2m", "MODE":"FM"}]
       self.adif.write(records, "ADIF.test_write.adi")
@@ -447,6 +531,7 @@ class TestADIF(unittest.TestCase):
       f.close()
 
    def test_adif_write_sqlite3_Row(self):
+      """ Check that records can be written to an ADIF file from a test database file. """
       import sqlite3
       import os.path
       self.connection = sqlite3.connect(os.path.dirname(os.path.realpath(__file__))+"/unittest_resources/test.db")
@@ -489,6 +574,7 @@ class TestADIF(unittest.TestCase):
       self.connection.close()
 
    def test_adif_is_valid(self):
+      """ Check that ADIF field validation is working correctly for different data types. """
       assert(self.adif.is_valid("CALL", "TEST123", "S") == True)
       assert(self.adif.is_valid("QSO_DATE", "20120402", "D") == True)
       assert(self.adif.is_valid("TIME_ON", "1230", "T") == True)
