@@ -87,7 +87,7 @@ Once the logbook has been opened, its name will appear in the status bar. All lo
    .. figure::  images/logbook.png
       :align:   center
       
-      The PyQSO main window, showing the records in a log called ``HF``, and the awards tool in the toolbox below it.
+      The PyQSO main window, showing the records in a log called ``HF``, and the DX cluster tool in the toolbox below it.
 
 Closing a logbook
 -----------------
