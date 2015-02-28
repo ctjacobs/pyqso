@@ -81,10 +81,10 @@ Creating and opening a logbook
 
 A PyQSO-based logbook is essentially an SQL database. To create a new database/logbook file, click ``Create a New Logbook...`` in the ``Logbook`` menu, choose the directory where you want the file to be saved, and enter the file's name (e.g. ``my_new_logbook.db``). The new logbook will then be opened automatically. If you would like to open an *existing* logbook file, click ``Open an Existing Logbook...`` in the ``Logbook`` menu. Note that logbook files usually have a ``.db`` file extension.
 
-Once the logbook has been opened, its name will appear in the status bar. All logs in the logbook will be opened automatically, and the interface will look something like the one shown in figure:log_with_awards_.
+Once the logbook has been opened, its name will appear in the status bar. All logs in the logbook will be opened automatically, and the interface will look something like the one shown in figure:logbook_.
 
-   .. _figure:log_with_awards:
-   .. figure::  images/log_with_awards.png
+   .. _figure:logbook:
+   .. figure::  images/logbook.png
       :align:   center
       
       The PyQSO main window, showing the records in a log called ``HF``, and the awards tool in the toolbox below it.
