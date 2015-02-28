@@ -11,6 +11,7 @@
 ### Changed
 - Migrated the documentation to a Sphinx-based setup.
 - Separate the Create and Open functionality for logbooks.
+- In the record dialog, the labels "TX RST" and "RX RST" have been changed to "RST Sent" and "RST Received". The underlying ADIF field names remain the same (RST_SENT and RST_RCVD).
 
 ### Fixed
 - Logging debug messages to file.
