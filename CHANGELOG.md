@@ -18,7 +18,8 @@
 - Specifed the Agg backend for matplotlib to workaround a bug in Ubuntu 14.10.
 - Sorting the date and time fields in the correct chronological order.
 - Removal of duplicate records.
-- Handling ConfigParser.NoOptionError exceptions.
+- Handling of ConfigParser.NoOptionError exceptions when trying to load preferences.
+- Handling of UnicodeDecodeError exceptions when parsing the output from DX cluster servers.
 
 ## [0.1] - 2014-03-22
 
