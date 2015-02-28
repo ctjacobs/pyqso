@@ -20,6 +20,7 @@
 
 from gi.repository import Gtk, GObject
 import logging
+import unittest
 import httplib
 from xml.dom import minidom
 
@@ -164,3 +165,28 @@ class CallsignLookup():
          callsign = full_callsign
       return callsign
       
+class TestCallsignLookup(unittest.TestCase):
+   """ The unit tests for the CallsignLookup class. """
+
+   def setUp(self):
+      """ Set up the CallsignLookup object needed for the unit tests. """
+      self.cl = CallsignLookup(parent=None)
+
+   def test_strip(self):
+      callsign = "EA3/MYCALL/MM"
+      assert self.cl.strip(callsign) == "MYCALL"
+      
+   def test_strip_prefix_only(self):
+      callsign = "EA3/MYCALL"
+      assert self.cl.strip(callsign) == "MYCALL"
+      
+   def test_strip_suffix_only(self):
+      callsign = "MYCALL/M"
+      assert self.cl.strip(callsign) == "MYCALL"
+
+   def test_strip_no_prefix_or_suffix(self):
+      callsign = "MYCALL"
+      assert self.cl.strip(callsign) == "MYCALL"
+
+if(__name__ == '__main__'):
+   unittest.main()
