@@ -992,3 +992,25 @@ class Logbook(Gtk.Notebook):
             break
       return log_index
 
+class TestLogbook(unittest.TestCase):
+   """ The unit tests for the Logbook class. """
+
+   def setUp(self):
+      """ Set up the Logbook object and connection to the test database needed for the unit tests. """
+      import os
+      self.logbook = Logbook(parent=None)
+      success = self.logbook.db_connect(os.path.dirname(os.path.realpath(__file__))+"/unittest_resources/test.db")
+      assert success
+      
+   def tearDown(self):
+      """ Disconnect from the test database. """
+      success = self.logbook.db_disconnect()
+      assert success
+
+   def test_log_name_exists(self):
+      """ Check that only the log called 'test' exists. """
+      assert self.logbook.log_name_exists("test") # Log 'test' exists.
+      assert not self.logbook.log_name_exists("hello") # Log 'hello' should not exist.
+      
+if(__name__ == '__main__'):
+   unittest.main()
