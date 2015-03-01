@@ -172,24 +172,10 @@ class Log(Gtk.ListStore):
       return
 
    def remove_duplicates(self):
-      """ Find the duplicates in the log, based on the CALL, QSO_DATE, TIME_ON, FREQ and MODE fields. Return a tuple containing the number of duplicates in the log, and the number of duplicates successfully removed. Hopefully these will be the same. """
-      duplicates = []
-      try:
-         with self.connection:
-            c = self.connection.cursor()
-            c.execute(
-   """SELECT rowid FROM %s WHERE rowid NOT IN
-   (
-   SELECT MIN(rowid) FROM %s GROUP BY call, qso_date, time_on, freq, mode
-   )""" % (self.name, self.name))
-            result = c.fetchall()
-         for rowid in result:
-            duplicates.append(rowid[0]) # Get the integer from inside the tuple.
-         if(len(duplicates) == 0):
-            return (0, 0) # Nothing to do here.
-      except (sqlite.Error, IndexError) as e:
-         logging.exception(e)
-         return (0, 0)
+      """ Remove any duplicate records from the log. Return the total number of duplicates, and the number of duplicates that were successfully removed. Hopefully these will be the same. """
+      duplicates = self.get_duplicates()
+      if(len(duplicates) == 0):
+         return (0, 0) # Nothing to do here.
 
       removed = 0 # Count the number of records that are removed. Hopefully this will be the same as len(duplicates).
       while removed != len(duplicates): # Unfortunately, in certain cases, extra passes may be necessary to ensure that all duplicates are removed.
@@ -205,6 +191,24 @@ class Log(Gtk.ListStore):
       assert(removed == len(duplicates))
       return (len(duplicates), removed)
 
+   def get_duplicates(self):
+      """ Find the duplicates in the log, based on the CALL, QSO_DATE, TIME_ON, FREQ and MODE fields, and return a list of their row IDs. """
+      duplicates = []
+      try:
+         with self.connection:
+            c = self.connection.cursor()
+            c.execute(
+   """SELECT rowid FROM %s WHERE rowid NOT IN
+   (
+   SELECT MIN(rowid) FROM %s GROUP BY call, qso_date, time_on, freq, mode
+   )""" % (self.name, self.name))
+            result = c.fetchall()
+         for rowid in result:
+            duplicates.append(rowid[0]) # Get the integer from inside the tuple.
+      except (sqlite.Error, IndexError) as e:
+         logging.exception(e)
+      return duplicates
+         
    def get_record_by_index(self, index):
       """ Return a record with a given index in the log. The record is represented by a dictionary of field-value pairs. """
       try:
@@ -373,6 +377,13 @@ class TestLog(unittest.TestCase):
       print "Number of records in the log: ", number_of_records
       assert(number_of_records == 2) # There should be 2 records
 
+   def test_log_get_duplicates(self):
+      query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
+      c = self.connection.cursor()
+      n = 5 # The total number of records to insert.
+      for i in range(0, n):
+         c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
+      assert len(self.log.get_duplicates()) == n-1 # Expecting n-1 duplicates.
 
 if(__name__ == '__main__'):
    unittest.main()
