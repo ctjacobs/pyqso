@@ -29,8 +29,9 @@ try:
    from mpl_toolkits.basemap import Basemap
    from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
    have_necessary_modules = True
-except ImportError:
+except ImportError as e:
    logging.error("Could not import a non-standard Python module needed by the GreyLine class. Check that all the PyQSO dependencies are satisfied.")
+   logging.exception(e)
    have_necessary_modules = False
 
 class GreyLine(Gtk.VBox):
