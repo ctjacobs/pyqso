@@ -512,7 +512,7 @@ class RecordDialog(Gtk.Dialog):
    def set_current_datetime_callback(self, widget=None):
       """ Insert the current date and time. """
       
-       # Check if a configuration file is present.
+      # Check if a configuration file is present.
       config = ConfigParser.ConfigParser()
       have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
       
