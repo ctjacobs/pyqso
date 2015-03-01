@@ -24,15 +24,14 @@ from datetime import datetime
 try:
    import numpy
    import matplotlib
-   print "Imported version %s of matplotlib" % (matplotlib.__version__)
+   logging.debug("Using version %s of matplotlib." % (matplotlib.__version__))
    matplotlib.use('Agg')
    matplotlib.rcParams['font.size'] = 10.0
    from mpl_toolkits.basemap import Basemap
    from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
    have_necessary_modules = True
-except ImportError as e:
-   logging.error("Could not import a non-standard Python module needed by the GreyLine class. Check that all the PyQSO dependencies are satisfied.")
-   logging.exception(e)
+except ImportError:
+   logging.error("Could not import a non-standard Python module needed by the GreyLine class, or the version of the non-standard module is too old. Check that all the PyQSO dependencies are satisfied.")
    have_necessary_modules = False
 
 class GreyLine(Gtk.VBox):
