@@ -24,6 +24,7 @@ from datetime import datetime
 try:
    import numpy
    import matplotlib
+   logging.debug("Imported version %s of matplotlib" % matplotlib.__version__)
    matplotlib.use('Agg')
    matplotlib.rcParams['font.size'] = 10.0
    from mpl_toolkits.basemap import Basemap
