@@ -39,11 +39,15 @@ class CallsignLookup():
    def connect(self, username, password):
       """ Initiate a session with the qrz.com server. Hopefully this will return a session key. """
       logging.debug("Connecting to the qrz.com server...")
-      self.connection = httplib.HTTPConnection('xmldata.qrz.com')
-      request = '/xml/current/?username=%s;password=%s;agent=pyqso' % (username, password)
-      self.connection.request('GET', request)
-      response = self.connection.getresponse()
-
+      try:
+         self.connection = httplib.HTTPConnection('xmldata.qrz.com')
+         request = '/xml/current/?username=%s;password=%s;agent=pyqso' % (username, password)
+         self.connection.request('GET', request)
+         response = self.connection.getresponse()
+      except:
+         error(parent=self.parent, message="Could not connect to the qrz.com server. Check connection to the internets?")
+         return False
+     
       xml_data = minidom.parseString(response.read())
       session_node = xml_data.getElementsByTagName('Session')[0] # There should only be one Session element
       session_key_node = session_node.getElementsByTagName('Key')
