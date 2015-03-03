@@ -19,6 +19,7 @@
 - Specifed the Agg backend for matplotlib to workaround a bug in Ubuntu 14.10.
 - Sorting the date and time fields in the correct chronological order.
 - Removal of duplicate records.
+- Error handling when looking up a callsign that does not have an entry on qrz.com.
 - Handling of ConfigParser.NoOptionError exceptions when trying to load preferences.
 - Handling of UnicodeDecodeError exceptions when parsing the output from DX cluster servers.
 

@@ -99,7 +99,7 @@ class CallsignLookup():
             if(len(callsign_addr1_node) > 0):
                fields_and_data["ADDRESS"] = callsign_addr1_node[0].firstChild.nodeValue
             if(len(callsign_addr2_node) > 0): # Add the second line of the address, if present
-               fields_and_data["ADDRESS"] = fields_and_data["ADDRESS"] + ", " + callsign_addr2_node[0].firstChild.nodeValue
+               fields_and_data["ADDRESS"] = (fields_and_data["ADDRESS"] + ", " if len(callsign_addr1_node) > 0 else "") + callsign_addr2_node[0].firstChild.nodeValue
 
             callsign_state_node = callsign_node.getElementsByTagName('state')
             if(len(callsign_state_node) > 0):
@@ -128,7 +128,7 @@ class CallsignLookup():
             # If there is no Callsign element, then print out the error message in the Session element
             session_node = xml_data.getElementsByTagName('Session')
             if(len(session_node) > 0): 
-               session_error_node = session_node.getElementsByTagName('Error')
+               session_error_node = session_node[0].getElementsByTagName('Error')
                if(len(session_error_node) > 0):
                   session_error = session_error_node[0].firstChild.nodeValue
                   error(parent=self.parent, message=session_error)
