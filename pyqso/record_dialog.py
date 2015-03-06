@@ -490,7 +490,7 @@ class RecordDialog(Gtk.Dialog):
          # Check whether we want to ignore any prefixes (e.g. "IA/") or suffixes "(e.g. "/M") in the callsign
          # before performing the lookup.
          if(have_config and config.has_option("records", "ignore_prefix_suffix")):
-            ignore_prefix_suffix = config.get("records", "ignore_prefix_suffix")
+            ignore_prefix_suffix = (config.get("records", "ignore_prefix_suffix") == "True")
          else:
             ignore_prefix_suffix = True
             
