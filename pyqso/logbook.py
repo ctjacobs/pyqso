@@ -1,5 +1,4 @@
-#!/usr/bin/env python 
-# File: logbook.py
+#!/usr/bin/env python
 
 #    Copyright (C) 2012 Christian T. Jacobs.
 

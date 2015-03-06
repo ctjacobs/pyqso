@@ -1,5 +1,4 @@
 #!/usr/bin/env python 
-# File: adif.py
 
 #    Copyright (C) 2012 Christian T. Jacobs.
 

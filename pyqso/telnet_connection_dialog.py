@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# File: telnet_connection_dialog.py
 
 #    Copyright (C) 2013 Christian T. Jacobs.
 

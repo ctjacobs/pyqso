@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# File: toolbox.py
 
 #    Copyright (C) 2013 Christian T. Jacobs.
 

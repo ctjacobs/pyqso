@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# File: toolbar.py
 
 #    Copyright (C) 2013 Christian T. Jacobs.
 

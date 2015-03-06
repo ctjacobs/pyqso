@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# File: new_log_dialog.py
 
 #    Copyright (C) 2013 Christian T. Jacobs.
 

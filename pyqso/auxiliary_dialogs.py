@@ -1,5 +1,4 @@
 #!/usr/bin/env python 
-# File: auxiliary_dialogs.py
 
 #    Copyright (C) 2013 Christian T. Jacobs.
 
