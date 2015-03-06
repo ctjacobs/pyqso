@@ -1,7 +1,6 @@
 #!/bin/sh
-# File: Makefile
 
-#    Copyright (C) 2013 Christian Jacobs.
+#    Copyright (C) 2013 Christian T. Jacobs.
 
 #    This file is part of PyQSO.
 
