@@ -248,7 +248,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'PyQSO', u'PyQSO Documentation',
-   u'Christian T. Jacobs', 'PyQSO', 'One line description of project.',
+   u'Christian T. Jacobs', 'PyQSO', 'A contact logging tool for amateur radio operators.',
    'Miscellaneous'),
 ]
 
