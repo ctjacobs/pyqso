@@ -113,7 +113,7 @@ class Logbook(Gtk.Notebook):
                   self.logs.append(l)
          except (sqlite.Error, IndexError) as e:
             logging.exception(e)
-            logging.exception("Oops! Something went wrong when trying to retrieve the logs from the logbook.")
+            error(parent = self.parent, message = "Oops! Something went wrong when trying to retrieve the logs from the logbook. Perhaps the logbook file is encrypted, corrupted, or in the wrong format?")
             return
 
          logging.debug("All logs retrieved successfully. Now attempting to render them all in the Gtk.Notebook...")
