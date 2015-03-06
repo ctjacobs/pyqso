@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # File: setup.py
 
-#    Copyright (C) 2013 Christian Jacobs.
+#    Copyright (C) 2013 Christian T. Jacobs.
 
 #    This file is part of PyQSO.
 
@@ -23,7 +23,7 @@ from distutils.core import setup
 setup(name='PyQSO',
       version='0.2',
       description='A contact logging tool for amateur radio operators.',
-      author='Christian Jacobs',
+      author='Christian T. Jacobs',
       author_email='c.jacobs10@imperial.ac.uk',
       url='https://github.com/ctjacobs/pyqso',
       packages=['pyqso'],

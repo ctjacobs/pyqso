@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # logbook: menu.py
 
-#    Copyright (C) 2012 Christian Jacobs.
+#    Copyright (C) 2012 Christian T. Jacobs.
 
 #    This logbook is part of PyQSO.
 
