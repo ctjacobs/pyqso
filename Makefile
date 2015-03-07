@@ -37,6 +37,6 @@ clean:
 	@echo "*** Cleaning docs directory"
 	cd docs; make clean; cd ..
 	@echo "*** Cleaning pyqso directory"
-	cd pyqso; rm -f *.pyc ADIF.test_read.adi ADIF.test_write*.adi; cd ..
+	rm -f ADIF.test_*.adi; cd pyqso; rm -f *.pyc ADIF.test_*.adi; cd ..
 	@echo "*** Removing build directory"
 	rm -rf build
