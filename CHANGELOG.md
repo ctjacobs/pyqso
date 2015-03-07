@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.2] - unreleased
+## [0.2] - 2015-03-07
 ### Added
 - Travis CI configuration file for automated building and testing.
 - Button to add the current date and time.
@@ -46,5 +46,5 @@
 - QSO filtering and sorting.
 - Duplicate record removal.
 
-[unreleased]: https://github.com/ctjacobs/pyqso/compare/v0.1...HEAD
+[0.2]: https://github.com/ctjacobs/pyqso/compare/v0.1...v0.2
 [0.1]: https://github.com/ctjacobs/pyqso/compare/v0.1b...v0.1
