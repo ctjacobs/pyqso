@@ -241,21 +241,28 @@ class Logbook(Gtk.Notebook):
       label = Gtk.Label(halign=Gtk.Align.START)
       label.set_markup("<span size=\"x-large\">%s</span>" % basename(self.path))
       hbox.pack_start(label, False, False, 6)
-      vbox.pack_start(hbox, False, False, 2)
+      vbox.pack_start(hbox, False, False, 4)
 
       hbox = Gtk.HBox()
       label = Gtk.Label("Number of logs: ", halign=Gtk.Align.START)
       hbox.pack_start(label, False, False, 6)
-      self.summary["NUMBER_OF_LOGS"] = Gtk.Label("0")
-      hbox.pack_start(self.summary["NUMBER_OF_LOGS"], False, False, 2)
-      vbox.pack_start(hbox, False, False, 2)
+      self.summary["LOG_COUNT"] = Gtk.Label("0")
+      hbox.pack_start(self.summary["LOG_COUNT"], False, False, 4)
+      vbox.pack_start(hbox, False, False, 4)
 
+      hbox = Gtk.HBox()
+      label = Gtk.Label("Total number of QSOs: ", halign=Gtk.Align.START)
+      hbox.pack_start(label, False, False, 6)
+      self.summary["QSO_COUNT"] = Gtk.Label("0")
+      hbox.pack_start(self.summary["QSO_COUNT"], False, False, 4)
+      vbox.pack_start(hbox, False, False, 4)
+      
       hbox = Gtk.HBox()
       label = Gtk.Label("Date modified: ", halign=Gtk.Align.START)
       hbox.pack_start(label, False, False, 6)
       self.summary["DATE_MODIFIED"] = Gtk.Label("0")
-      hbox.pack_start(self.summary["DATE_MODIFIED"], False, False, 2)
-      vbox.pack_start(hbox, False, False, 2)
+      hbox.pack_start(self.summary["DATE_MODIFIED"], False, False, 4)
+      vbox.pack_start(hbox, False, False, 4)
 
       hbox = Gtk.HBox(False, 0)
       label = Gtk.Label("Summary  ")
@@ -271,7 +278,8 @@ class Logbook(Gtk.Notebook):
 
    def update_summary(self):
       """ Update the information presented on the summary page. """
-      self.summary["NUMBER_OF_LOGS"].set_label(str(self.get_number_of_logs()))
+      self.summary["LOG_COUNT"].set_label(str(self.get_number_of_logs()))
+      self.summary["QSO_COUNT"].set_label(str(self.get_number_of_qsos()))
       try:
          t = datetime.fromtimestamp(getmtime(self.path)).strftime("%d %B %Y @ %H:%M")
          self.summary["DATE_MODIFIED"].set_label(str(t))
@@ -956,6 +964,13 @@ class Logbook(Gtk.Notebook):
    def get_number_of_logs(self):
       """ Return the total number of logs in the logbook. """
       return len(self.logs)
+      
+   def get_number_of_qsos(self):
+      """ Return the total number of QSOs/records in the whole logbook. """
+      total = 0
+      for log in self.logs:
+         total += log.get_number_of_records()
+      return total
 
    def log_name_exists(self, table_name):
       """ Return True if the log name already exists in the logbook, and False if it does not already exist. Return None if there is a database error. """
