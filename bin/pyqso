@@ -47,7 +47,7 @@ class PyQSO(Gtk.Window):
       """ Set up the main (root) window, start the event loop, and open a logbook (if the logbook's path is specified by the user in the command line). """
          
       # Call the constructor of the super class (Gtk.Window)
-      Gtk.Window.__init__(self, title="PyQSO 0.2")
+      Gtk.Window.__init__(self, title="PyQSO")
 
       # Get any application-specific preferences from the configuration file      
       config = ConfigParser.ConfigParser()
