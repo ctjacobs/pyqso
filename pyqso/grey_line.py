@@ -22,13 +22,17 @@ import logging
 from datetime import datetime
 try:
    import numpy
+   logging.debug("Using version %s of numpy." % (numpy.__version__))
    import matplotlib
    logging.debug("Using version %s of matplotlib." % (matplotlib.__version__))
    matplotlib.use('Agg')
    matplotlib.rcParams['font.size'] = 10.0
    from mpl_toolkits.basemap import Basemap
+   logging.debug("Basemap imported from mpl_toolkits.basemap.")
    from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
+   logging.debug("FigureCanvasGTK3Agg imported from matplotlib.backends.")
    have_necessary_modules = True
+   logging.debug("All dependencies satisfied for the GreyLine class.")
 except ImportError:
    logging.error("Could not import a non-standard Python module needed by the GreyLine class, or the version of the non-standard module is too old. Check that all the PyQSO dependencies are satisfied.")
    have_necessary_modules = False

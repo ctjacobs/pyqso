@@ -30,7 +30,7 @@ pyqso_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir
 sys.path.insert(0, pyqso_path)
 
 import logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
       
 # PyQSO modules
 from pyqso.adif import *
