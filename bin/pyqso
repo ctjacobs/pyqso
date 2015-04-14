@@ -30,8 +30,9 @@ pyqso_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir
 sys.path.insert(0, pyqso_path)
 
 import logging
-logging.basicConfig(level=logging.DEBUG)
-      
+logging.basicConfig(level=logging.INFO)
+logging.info("PyQSO development version.")
+
 # PyQSO modules
 from pyqso.adif import *
 from pyqso.logbook import *
@@ -39,7 +40,7 @@ from pyqso.menu import *
 from pyqso.toolbar import *
 from pyqso.toolbox import *
 from pyqso.preferences_dialog import *
-   
+
 class PyQSO(Gtk.Window):
    """ The PyQSO application class. """
    

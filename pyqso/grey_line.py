@@ -22,18 +22,17 @@ import logging
 from datetime import datetime
 try:
    import numpy
-   logging.debug("Using version %s of numpy." % (numpy.__version__))
+   logging.info("Using version %s of numpy." % (numpy.__version__))
    import matplotlib
-   logging.debug("Using version %s of matplotlib." % (matplotlib.__version__))
+   logging.info("Using version %s of matplotlib." % (matplotlib.__version__))
    matplotlib.use('Agg')
    matplotlib.rcParams['font.size'] = 10.0
-   from mpl_toolkits.basemap import Basemap
-   logging.debug("Basemap imported from mpl_toolkits.basemap.")
+   import mpl_toolkits.basemap
+   logging.info("Using version %s of mpl_toolkits.basemap." % (mpl_toolkits.basemap.__version__))
    from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
-   logging.debug("FigureCanvasGTK3Agg imported from matplotlib.backends.")
    have_necessary_modules = True
-   logging.debug("All dependencies satisfied for the GreyLine class.")
-except ImportError:
+except ImportError as e:
+   logging.warning(e)
    logging.warning("Could not import a non-standard Python module needed by the GreyLine class, or the version of the non-standard module is too old. Check that all the PyQSO dependencies are satisfied.")
    have_necessary_modules = False
 
@@ -73,7 +72,7 @@ class GreyLine(Gtk.VBox):
 
             # Draw the map of the world. This is based on the example from:
             # http://matplotlib.org/basemap/users/examples.html
-            m = Basemap(projection='mill', lon_0=0, ax=sub, resolution='c', fix_aspect=False)
+            m = mpl_toolkits.basemap.Basemap(projection='mill', lon_0=0, ax=sub, resolution='c', fix_aspect=False)
             m.drawcountries(linewidth=0.5)
             m.drawcoastlines(linewidth=0.5)
             m.drawparallels(numpy.arange(-90, 90, 30), labels=[1, 0, 0, 0])
