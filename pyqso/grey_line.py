@@ -34,7 +34,7 @@ try:
    have_necessary_modules = True
    logging.debug("All dependencies satisfied for the GreyLine class.")
 except ImportError:
-   logging.error("Could not import a non-standard Python module needed by the GreyLine class, or the version of the non-standard module is too old. Check that all the PyQSO dependencies are satisfied.")
+   logging.warning("Could not import a non-standard Python module needed by the GreyLine class, or the version of the non-standard module is too old. Check that all the PyQSO dependencies are satisfied.")
    have_necessary_modules = False
 
 class GreyLine(Gtk.VBox):
