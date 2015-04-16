@@ -4,7 +4,7 @@ Introduction
 Overview
 --------
 
-PyQSO is a logging tool for amateur radio operators. It provides a
+`PyQSO <http://www.christianjacobs.uk/pyqso>`_ is a logging tool for amateur radio operators. It provides a
 simple graphical interface through which users can manage information
 about the contacts/QSOs they make with other operators on the air. All
 information is stored in a light-weight SQL database. Other key features
