@@ -465,14 +465,40 @@ class RecordDialog(Gtk.Dialog):
 
 
    def lookup_callback(self, widget=None):
-      """ Get the callsign-related data from the qrz.com database and store it in the relevant Gtk.Entry boxes, but return None. """
-      callsign_lookup = CallsignLookup(parent = self)
-
+      """ Get the callsign-related data from an online database and store it in the relevant Gtk.Entry boxes, but return None. """
+      
+      # Get the database name.
       config = ConfigParser.ConfigParser()
       have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
-      if(have_config and config.has_option("records", "qrz_username") and config.has_option("records", "qrz_password")):
-         username = config.get("records", "qrz_username")
-         password = base64.b64decode(config.get("records", "qrz_password"))
+      try:
+         if(have_config and config.has_option("records", "callsign_database")):
+            database = config.get("records", "callsign_database")
+            if(database == ""):
+               raise ValueError
+         else:
+            raise ValueError
+      except ValueError:
+         error(parent=self, message="To perform a callsign lookup, please specify the name of the callsign database in the Preferences.")
+         return
+         
+      try:
+         if(database == "qrz.com"):
+            # QRZ.com
+            callsign_lookup = CallsignLookupQRZ(parent = self)
+         elif(database == "hamqth.com"):
+            # HamQTH
+            callsign_lookup = CallsignLookupHamQTH(parent = self)
+         else:
+            raise ValueError("Unknown callsign database: %s" % database)
+      except ValueError as e:
+         logging.exception(e)
+         error(e)
+         return
+
+      # Get username and password from configuration file
+      if(have_config and config.has_option("records", "callsign_database_username") and config.has_option("records", "callsign_database_password")):
+         username = config.get("records", "callsign_database_username")
+         password = base64.b64decode(config.get("records", "callsign_database_password"))
          if(username == "" or password == ""):
             details_given = False
          else:
@@ -480,9 +506,10 @@ class RecordDialog(Gtk.Dialog):
       else:
          details_given = False
       if(not details_given):
-         error(parent=self, message="To perform a callsign lookup, please specify your qrz.com username and password in the Preferences.")
+         error(parent=self, message="To perform a callsign lookup, please specify your username and password in the Preferences.")
          return
-
+              
+      # Connect and look up 
       connected = callsign_lookup.connect(username, password)
       if(connected):
          full_callsign = self.sources["CALL"].get_text()

@@ -349,8 +349,28 @@ class RecordsPage(Gtk.VBox):
       frame.set_label("Callsign lookup")
       vbox = Gtk.VBox()
 
+      # Callsign database
+      hbox_temp = Gtk.HBox()
+      label = Gtk.Label("Database: ")
+      label.set_width_chars(17)
+      label.set_alignment(0, 0.5)
+      hbox_temp.pack_start(label, False, False, 2)
+      
+      self.sources["CALLSIGN_DATABASE"] = Gtk.ComboBoxText()
+      callsign_database = ["", "qrz.com", "hamqth.com"]
+      for database in callsign_database:
+         self.sources["CALLSIGN_DATABASE"].append_text(database)
+      (section, option) = ("records", "callsign_database")
+      if(have_config and config.has_option(section, option)):
+         self.sources["CALLSIGN_DATABASE"].set_active(callsign_database.index(config.get(section, option)))
+      else:
+         self.sources["CALLSIGN_DATABASE"].set_active(callsign_database.index(""))
+      hbox_temp.pack_start(self.sources["CALLSIGN_DATABASE"], False, False, 2)
+      vbox.pack_start(hbox_temp, False, False, 2)
+      
+      # Login details
       subframe = Gtk.Frame()
-      subframe.set_label("Login details (qrz.com)")
+      subframe.set_label("Login details")
       inner_vbox = Gtk.VBox()
 
       hbox = Gtk.HBox()
@@ -358,11 +378,11 @@ class RecordsPage(Gtk.VBox):
       label.set_width_chars(9)
       label.set_alignment(0, 0.5)
       hbox.pack_start(label, False, False, 2)
-      self.sources["QRZ_USERNAME"] = Gtk.Entry()
-      (section, option) = ("records", "qrz_username")
+      self.sources["CALLSIGN_DATABASE_USERNAME"] = Gtk.Entry()
+      (section, option) = ("records", "callsign_database_username")
       if(have_config and config.has_option(section, option)):
-         self.sources["QRZ_USERNAME"].set_text(config.get(section, option))
-      hbox.pack_start(self.sources["QRZ_USERNAME"], False, False, 2)
+         self.sources["CALLSIGN_DATABASE_USERNAME"].set_text(config.get(section, option))
+      hbox.pack_start(self.sources["CALLSIGN_DATABASE_USERNAME"], False, False, 2)
       inner_vbox.pack_start(hbox, False, False, 2)
 
       hbox = Gtk.HBox()
@@ -370,12 +390,12 @@ class RecordsPage(Gtk.VBox):
       label.set_width_chars(9)
       label.set_alignment(0, 0.5)
       hbox.pack_start(label, False, False, 2)
-      self.sources["QRZ_PASSWORD"] = Gtk.Entry()
-      self.sources["QRZ_PASSWORD"].set_visibility(False) # Mask the password with the "*" character.
-      (section, option) = ("records", "qrz_password")
+      self.sources["CALLSIGN_DATABASE_PASSWORD"] = Gtk.Entry()
+      self.sources["CALLSIGN_DATABASE_PASSWORD"].set_visibility(False) # Mask the password with the "*" character.
+      (section, option) = ("records", "callsign_database_password")
       if(have_config and config.has_option(section, option)):
-         self.sources["QRZ_PASSWORD"].set_text(base64.b64decode(config.get(section, option)))
-      hbox.pack_start(self.sources["QRZ_PASSWORD"], False, False, 2)
+         self.sources["CALLSIGN_DATABASE_PASSWORD"].set_text(base64.b64decode(config.get(section, option)))
+      hbox.pack_start(self.sources["CALLSIGN_DATABASE_PASSWORD"], False, False, 2)
       inner_vbox.pack_start(hbox, False, False, 2)
 
       label = Gtk.Label("Warning: Login details are currently stored as\nBase64-encoded plain text in the configuration file.")
@@ -407,8 +427,9 @@ class RecordsPage(Gtk.VBox):
       data["DEFAULT_MODE"] = self.sources["DEFAULT_MODE"].get_active_text()
       data["DEFAULT_POWER"] = self.sources["DEFAULT_POWER"].get_text()
       
-      data["QRZ_USERNAME"] = self.sources["QRZ_USERNAME"].get_text()
-      data["QRZ_PASSWORD"] = base64.b64encode(self.sources["QRZ_PASSWORD"].get_text())
+      data["CALLSIGN_DATABASE"] = self.sources["CALLSIGN_DATABASE"].get_active_text()
+      data["CALLSIGN_DATABASE_USERNAME"] = self.sources["CALLSIGN_DATABASE_USERNAME"].get_text()
+      data["CALLSIGN_DATABASE_PASSWORD"] = base64.b64encode(self.sources["CALLSIGN_DATABASE_PASSWORD"].get_text())
       data["IGNORE_PREFIX_SUFFIX"] = self.sources["IGNORE_PREFIX_SUFFIX"].get_active()
       return data
 
