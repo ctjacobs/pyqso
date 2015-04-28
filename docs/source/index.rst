@@ -17,4 +17,4 @@ Contents:
    record_management
    toolbox
    preferences
-
+   shortcuts
