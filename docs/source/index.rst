@@ -18,3 +18,4 @@ Contents:
    toolbox
    preferences
    shortcuts
+
