@@ -143,7 +143,7 @@ class ADIF:
          # up to and including the <eoh> marker. Note that
          # re.search has been used here to handle any case sensitivity.
          # Previously we were checking for <eoh>. <EOH> is also valid
-         # but wasn't been detected before.
+         # but wasn't being detected before.
          while len(tokens) > 0:
             t = tokens.pop(0)
             if(re.match('<eoh>', t, flags=re.IGNORECASE) is not None):
