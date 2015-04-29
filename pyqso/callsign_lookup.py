@@ -42,7 +42,6 @@ class CallsignLookupQRZ():
          request = '/xml/current/?username=%s;password=%s;agent=pyqso' % (username, password)
          self.connection.request('GET', request)
          response = self.connection.getresponse()
-         logging.debug(response)
       except:
          error(parent=self.parent, message="Could not connect to the qrz.com server. Check connection to the internets?")
          return False
@@ -156,7 +155,6 @@ class CallsignLookupHamQTH():
          request = '/xml.php?u=%s&p=%s' % (username, password)
          self.connection.request('GET', request)
          response = self.connection.getresponse()
-         logging.debug(response)
       except:
          error(parent=self.parent, message="Could not connect to the hamqth.com server. Check connection to the internets?")
          return False
@@ -199,40 +197,40 @@ class CallsignLookupHamQTH():
          response = self.connection.getresponse()
 
          xml_data = minidom.parseString(response.read())
-         callsign_node = xml_data.getElementsByTagName('callsign')
-         if(len(callsign_node) > 0): 
-            callsign_node = callsign_node[0] # There should only be a maximum of one Callsign element
+         search_node = xml_data.getElementsByTagName('search')
+         if(len(search_node) > 0):
+            search_node = search_node[0] # There should only be a maximum of one Callsign element
 
-            callsign_name_node = callsign_node.getElementsByTagName('nick')
-            if(len(callsign_name_node) > 0):
-               fields_and_data["NAME"] = fields_and_data["NAME"] + " " + callsign_name_node[0].firstChild.nodeValue
+            search_name_node = search_node.getElementsByTagName('nick')
+            if(len(search_name_node) > 0):
+               fields_and_data["NAME"] = fields_and_data["NAME"] + " " + search_name_node[0].firstChild.nodeValue
 
-            callsign_addr1_node = callsign_node.getElementsByTagName('addr_street1')
-            callsign_addr2_node = callsign_node.getElementsByTagName('addr_street2')
-            if(len(callsign_addr1_node) > 0):
-               fields_and_data["ADDRESS"] = callsign_addr1_node[0].firstChild.nodeValue
-            if(len(callsign_addr2_node) > 0): # Add the second line of the address, if present
-               fields_and_data["ADDRESS"] = (fields_and_data["ADDRESS"] + ", " if len(callsign_addr1_node) > 0 else "") + callsign_addr2_node[0].firstChild.nodeValue
+            search_addr1_node = search_node.getElementsByTagName('addr_street1')
+            search_addr2_node = search_node.getElementsByTagName('addr_street2')
+            if(len(search_addr1_node) > 0):
+               fields_and_data["ADDRESS"] = search_addr1_node[0].firstChild.nodeValue
+            if(len(search_addr2_node) > 0): # Add the second line of the address, if present
+               fields_and_data["ADDRESS"] = (fields_and_data["ADDRESS"] + ", " if len(search_addr1_node) > 0 else "") + search_addr2_node[0].firstChild.nodeValue
 
-            callsign_state_node = callsign_node.getElementsByTagName('us_state')
-            if(len(callsign_state_node) > 0):
-               fields_and_data["STATE"] = callsign_state_node[0].firstChild.nodeValue
+            search_state_node = search_node.getElementsByTagName('us_state')
+            if(len(search_state_node) > 0):
+               fields_and_data["STATE"] = search_state_node[0].firstChild.nodeValue
 
-            callsign_country_node = callsign_node.getElementsByTagName('country')
-            if(len(callsign_country_node) > 0):
-               fields_and_data["COUNTRY"] = callsign_country_node[0].firstChild.nodeValue
+            search_country_node = search_node.getElementsByTagName('country')
+            if(len(search_country_node) > 0):
+               fields_and_data["COUNTRY"] = search_country_node[0].firstChild.nodeValue
 
-            callsign_cqzone_node = callsign_node.getElementsByTagName('CQ')
-            if(len(callsign_cqzone_node) > 0):
-               fields_and_data["CQZ"] = callsign_cqzone_node[0].firstChild.nodeValue
+            search_cqzone_node = search_node.getElementsByTagName('CQ')
+            if(len(search_cqzone_node) > 0):
+               fields_and_data["CQZ"] = search_cqzone_node[0].firstChild.nodeValue
 
-            callsign_ituzone_node = callsign_node.getElementsByTagName('itu')
-            if(len(callsign_ituzone_node) > 0):
-               fields_and_data["ITUZ"] = callsign_ituzone_node[0].firstChild.nodeValue
+            search_ituzone_node = search_node.getElementsByTagName('itu')
+            if(len(search_ituzone_node) > 0):
+               fields_and_data["ITUZ"] = search_ituzone_node[0].firstChild.nodeValue
 
-            callsign_iota_node = callsign_node.getElementsByTagName('grid')
-            if(len(callsign_iota_node) > 0):
-               fields_and_data["IOTA"] = callsign_iota_node[0].firstChild.nodeValue
+            search_iota_node = search_node.getElementsByTagName('grid')
+            if(len(search_iota_node) > 0):
+               fields_and_data["IOTA"] = search_iota_node[0].firstChild.nodeValue
          else:
             # If there is no Callsign element, then print out the error message in the Session element
             session_node = xml_data.getElementsByTagName('session')
