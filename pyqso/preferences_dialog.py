@@ -53,6 +53,9 @@ class PreferencesDialog(Gtk.Dialog):
       self.records = RecordsPage()
       self.preferences.insert_page(self.records, Gtk.Label("Records"), 2)
 
+      self.adif = ADIFPage()
+      self.preferences.insert_page(self.adif, Gtk.Label("ADIF"), 2)
+      
       self.vbox.pack_start(self.preferences, True, True, 2)
       self.show_all()
 
@@ -67,6 +70,7 @@ class PreferencesDialog(Gtk.Dialog):
       view_data = self.view.get_data()
       hamlib_data = self.hamlib.get_data()
       records_data = self.records.get_data()
+      adif_data = self.adif.get_data()
 
       config = ConfigParser.ConfigParser()
 
@@ -431,5 +435,43 @@ class RecordsPage(Gtk.VBox):
       data["CALLSIGN_DATABASE_USERNAME"] = self.sources["CALLSIGN_DATABASE_USERNAME"].get_text()
       data["CALLSIGN_DATABASE_PASSWORD"] = base64.b64encode(self.sources["CALLSIGN_DATABASE_PASSWORD"].get_text())
       data["IGNORE_PREFIX_SUFFIX"] = self.sources["IGNORE_PREFIX_SUFFIX"].get_active()
+      return data
+
+class ADIFPage(Gtk.VBox):
+   
+   def __init__(self):
+      logging.debug("Setting up the ADIF page of the preferences dialog...")
+
+      Gtk.VBox.__init__(self, spacing=2)
+
+      # Remember that the have_config conditional in the PyQSO class may be out-of-date the next time the user opens up the preferences dialog
+      # because a configuration file may have been created after launching the application. Let's check to see if one exists again...
+      config = ConfigParser.ConfigParser()
+      have_config = (config.read(os.path.expanduser('~/.pyqso.ini')) != [])
+
+      self.sources = {}
+
+      # Autocomplete frame
+      frame = Gtk.Frame()
+      frame.set_label("Import")
+      vbox = Gtk.VBox()
+      self.sources["MERGE_COMMENT"] = Gtk.CheckButton("Merge any text in the COMMENT field with the NOTES field.")
+      (section, option) = ("records", "merge_comment")
+      if(have_config and config.has_option(section, option)):
+         self.sources["MERGE_COMMENT"].set_active(config.get(section, option) == "True")
+      else:
+         self.sources["MERGE_COMMENT"].set_active(False)
+      vbox.pack_start(self.sources["MERGE_COMMENT"], False, False, 2)
+
+      frame.add(vbox)
+      self.pack_start(frame, False, False, 2)
+      
+      logging.debug("ADIF page of the preferences dialog ready!")
+      return
+
+   def get_data(self):
+      logging.debug("Retrieving data from the ADIF page of the preferences dialog...")
+      data = {}
+      data["MERGE_COMMENT"] = self.sources["MERGE_COMMENT"].get_active()
       return data
 
