@@ -1,5 +1,15 @@
 # Change Log
 
+## [Unreleased]
+### Added
+- Support for callsign lookups using the HamQTH.com database.
+- Added a table of keyboard shortcuts to the documentation.
+- More helpful messages regarding missing dependencies.
+- Added the option of merging the COMMENT field with the NOTES field when importing records from an ADIF file.
+
+### Changed
+- The the Summary page now also contains the total number of QSOs in the logbook.
+
 ## [0.2] - 2015-03-07
 ### Added
 - Travis CI configuration file for automated building and testing.
@@ -46,5 +56,6 @@
 - QSO filtering and sorting.
 - Duplicate record removal.
 
+[Unreleased]: https://github.com/ctjacobs/pyqso/compare/v0.2...master
 [0.2]: https://github.com/ctjacobs/pyqso/compare/v0.1...v0.2
 [0.1]: https://github.com/ctjacobs/pyqso/compare/v0.1b...v0.1
