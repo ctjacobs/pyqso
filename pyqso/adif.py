@@ -22,6 +22,8 @@ import logging
 import unittest
 from datetime import datetime
 import calendar
+import ConfigParser
+from os.path import expanduser
 
 # ADIF field names and their associated data types available in PyQSO.
 AVAILABLE_FIELD_NAMES_TYPES = {"CALL": "S", 
@@ -132,6 +134,15 @@ class ADIF:
 
       records = []
 
+      # ADIF-related configuration options
+      config = ConfigParser.ConfigParser()
+      have_config = (config.read(expanduser('~/.pyqso.ini')) != [])         
+      (section, option) = ("adif", "merge_comment")
+      if(have_config and config.has_option(section, option) and config.get(section, option) == "True"):
+         merge_comment = True
+      else:
+         merge_comment = False
+         
       # Separate the text at the <eor> or <eoh> markers.
       tokens = re.split('(<eor>|<eoh>)', text, flags=re.IGNORECASE)
       tokens.pop() # Anything after the final <eor> marker should be ignored.
@@ -164,6 +175,7 @@ class ADIF:
             # (http://web.bxhome.org/blog/ok4bx/2012/05/adif-parser-python)
             fields_and_data_dictionary = {}
             fields_and_data = re.findall('<(.*?):(\d*).*?>([^<\t\n\r\f\v]+)', t)
+            comment = None
             for fd in fields_and_data:
                # Let's force all field names to be in upper case.
                # This will help us later when comparing the field names
@@ -179,13 +191,28 @@ class ADIF:
                   field_data = field_data.upper()
                elif(field_name == "CALL"):
                   # Also force all the callsigns to be in upper case.
-                  field_data = field_data.upper()
+                  field_data = field_data.upper()      
+               elif(field_name == "COMMENT"):
+                  # Keep a copy of the COMMENT field data, in case we want to merge
+                  # it with the NOTES field.
+                  comment = field_data            
                if(field_name in AVAILABLE_FIELD_NAMES_ORDERED):
                   field_data_type = AVAILABLE_FIELD_NAMES_TYPES[field_name]
                   if(self.is_valid(field_name, field_data, field_data_type)):
                      # Only add the field if it is a standard ADIF field and it holds valid data.
                      fields_and_data_dictionary[field_name] = field_data
 
+            # Merge the COMMENT field with the NOTES field, if desired and applicable.
+            if(merge_comment):
+               if("NOTES" in fields_and_data_dictionary.keys() and comment):
+                  logging.debug("Merging COMMENT field with NOTES field...")
+                  fields_and_data_dictionary["NOTES"] += "\\n" + comment
+                  logging.debug("Merged fields.")
+               elif(comment):
+                  # Create the NOTES entry, but only store the contents of the COMMENT field.
+                  fields_and_data_dictionary["NOTES"] = comment
+               else:
+                  pass
             records.append(fields_and_data_dictionary)
       
       assert n_eor == n_record
@@ -193,7 +220,6 @@ class ADIF:
       logging.debug("Finished parsing text.")
       
       return records
-
       
    def write(self, records, path):
       """ Write an ADIF file containing all the QSOs in the 'records' list. The desired path is specified in the 'path' argument. 

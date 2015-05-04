@@ -84,6 +84,11 @@ class PreferencesDialog(Gtk.Dialog):
       for key in view_data.keys():
          config.set("view", key.lower(), view_data[key])
 
+      # ADIF
+      config.add_section("adif")
+      for key in adif_data.keys():
+         config.set("adif", key.lower(), adif_data[key])
+         
       # Hamlib
       config.add_section("hamlib")
       for key in hamlib_data.keys():
@@ -451,12 +456,12 @@ class ADIFPage(Gtk.VBox):
 
       self.sources = {}
 
-      # Autocomplete frame
+      # Import frame
       frame = Gtk.Frame()
       frame.set_label("Import")
       vbox = Gtk.VBox()
       self.sources["MERGE_COMMENT"] = Gtk.CheckButton("Merge any text in the COMMENT field with the NOTES field.")
-      (section, option) = ("records", "merge_comment")
+      (section, option) = ("adif", "merge_comment")
       if(have_config and config.has_option(section, option)):
          self.sources["MERGE_COMMENT"].set_active(config.get(section, option) == "True")
       else:
