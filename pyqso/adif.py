@@ -163,6 +163,8 @@ class ADIF:
       n_eor = 0 
       n_record = 0
       records = []
+      pattern = re.compile('<(.*?):(\d*).*?>([^<\t\n\r\f\v]+)')
+      
       for t in tokens:
          if(re.match('<eor>', t, flags=re.IGNORECASE) is not None):
             n_eor = n_eor + 1
@@ -174,7 +176,7 @@ class ADIF:
             # Note: This is based on the code written by OK4BX.
             # (http://web.bxhome.org/blog/ok4bx/2012/05/adif-parser-python)
             fields_and_data_dictionary = {}
-            fields_and_data = re.findall('<(.*?):(\d*).*?>([^<\t\n\r\f\v]+)', t)
+            fields_and_data = pattern.findall(t)
             comment = None
             for fd in fields_and_data:
                # Let's force all field names to be in upper case.
