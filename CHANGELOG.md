@@ -8,7 +8,7 @@
 - Added the option of merging the COMMENT field with the NOTES field when importing records from an ADIF file.
 
 ### Changed
-- The the Summary page now also contains the total number of QSOs in the logbook.
+- The Summary page now also contains the total number of QSOs in the logbook.
 
 ## [0.2] - 2015-03-07
 ### Added
