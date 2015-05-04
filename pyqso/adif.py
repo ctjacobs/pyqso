@@ -212,6 +212,7 @@ class ADIF:
                   logging.debug("Merged fields.")
                elif(comment):
                   # Create the NOTES entry, but only store the contents of the COMMENT field.
+                  logging.debug("The COMMENT field is present, but not the NOTES field. The NOTES field will be created and will only hold the COMMENT.")
                   fields_and_data_dictionary["NOTES"] = comment
                else:
                   pass
