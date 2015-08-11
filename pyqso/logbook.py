@@ -611,8 +611,8 @@ class Logbook(Gtk.Notebook):
                                     (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                     Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
       filter = Gtk.FileFilter()
-      filter.set_name("All ADIF files (*.adi)")
-      filter.add_pattern("*.adi")
+      filter.set_name("All ADIF files (*.adi, *.ADI)")
+      filter.add_pattern("*.adi"); filter.add_pattern("*.ADI")
       dialog.add_filter(filter)
 
       filter = Gtk.FileFilter()
@@ -705,8 +705,8 @@ class Logbook(Gtk.Notebook):
       dialog.set_do_overwrite_confirmation(True)
 
       filter = Gtk.FileFilter()
-      filter.set_name("All ADIF files (*.adi)")
-      filter.add_pattern("*.adi")
+      filter.set_name("All ADIF files (*.adi, *.ADI)")
+      filter.add_pattern("*.adi"); filter.add_pattern("*.ADI")
       dialog.add_filter(filter)
 
       filter = Gtk.FileFilter()
