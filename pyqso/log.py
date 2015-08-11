@@ -97,43 +97,65 @@ class Log(Gtk.ListStore):
 
    def add_record(self, fields_and_data):
       """ Add a record comprising data given in the 'fields_and_data' argument to the log. """
-      logging.debug("Adding record to log...")
-      liststore_entry = []
-      field_names = AVAILABLE_FIELD_NAMES_ORDERED
-      for i in range(0, len(field_names)):
-         if(field_names[i] in fields_and_data.keys()):
-            liststore_entry.append(fields_and_data[field_names[i]])
-         else:
-            liststore_entry.append("")
+      logging.debug("Adding record(s) to log...")
+      
+      # If a dictionary is given, assume that we only have one record to add.
+      if isinstance(fields_and_data, dict):
+         fields_and_data = [fields_and_data]
+      
+      with self.connection:
+         # Get all the column names in the current database table.
+         c = self.connection.cursor()
+         c.execute("PRAGMA table_info(%s)" % self.name)
+         column_names = c.fetchall()
+         # Get the index of the last inserted record in the database.
+         last_index = c.lastrowid
+         if last_index is None:
+            # Assume no records are currently present.
+            last_index = 0
+      
+      # A list of all the database entries, to be inserted in one go into the database.
+      database_entries = []
 
-      try:
-         with self.connection:
-            c = self.connection.cursor()
-            # What if the database columns are not necessarily in the same order as (or even exist in) AVAILABLE_FIELD_NAMES_ORDERED?
-            # PyQSO handles this here, but needs a separate list (called database_entry) to successfully perform the SQL query.
-            database_entry = []
-            c.execute("PRAGMA table_info(%s)" % self.name) # Get all the column names in the current database table.
-            column_names = c.fetchall()
-            query = "INSERT INTO %s VALUES (NULL" % self.name
-            for t in column_names:
-               # 't' here is a tuple
-               column_name = str(t[1])
-               if( (column_name.upper() in AVAILABLE_FIELD_NAMES_ORDERED) and (column_name.upper() in fields_and_data.keys()) ):
-                  database_entry.append(fields_and_data[column_name.upper()])
-                  query = query + ",?"
-               else:
-                  if(column_name != "id"): # Ignore the row index field. This is a special case since it's not in AVAILABLE_FIELD_NAMES_ORDERED.
-                     query = query + ",\"\""
-            query = query + ")"
-            c.execute(query, database_entry)
-            index = c.lastrowid
+      # Construct the SQL query.
+      query = "INSERT INTO %s VALUES (NULL" % self.name
+      for i in range(len(column_names)-1): # -1 here because we don't want to count the database's 'id' field.
+         query = query + ",?"
+      query = query + ")"
+      
+      # Gather all the records (making sure that the entries of each record are in the correct order).
+      for r in range(len(fields_and_data)):
+         # What if the database columns are not necessarily in the same order as (or even exist in) AVAILABLE_FIELD_NAMES_ORDERED?
+         # PyQSO handles this here, but needs a separate list (called database_entry) to successfully perform the SQL query.
+         database_entry = []
+         for t in column_names:
+            column_name = str(t[1]) # 't' here is a tuple
+            if( (column_name.upper() in AVAILABLE_FIELD_NAMES_ORDERED) and (column_name.upper() in fields_and_data[r].keys()) ):
+               database_entry.append(fields_and_data[r][column_name.upper()])
+            else:
+               if(column_name != "id"): # Ignore the row index field. This is a special case since it's not in AVAILABLE_FIELD_NAMES_ORDERED.
+                  database_entry.append("")
+         database_entries.append(database_entry)
+         
+         # Add the data to the ListStore as well.
+         liststore_entry = []
+         field_names = AVAILABLE_FIELD_NAMES_ORDERED
+         for i in range(0, len(field_names)):
+            if(field_names[i] in fields_and_data[r].keys()):
+               liststore_entry.append(fields_and_data[r][field_names[i]])
+            else:
+               liststore_entry.append("")
 
-         liststore_entry.insert(0, index) # Add the record's index.
+         # Add the record's index.
+         index = last_index + (r+1) # +1 here because r begins at zero, and we don't want to count the already-present record with index last_index.
+         liststore_entry.insert(0, index)
          self.append(liststore_entry)
-         logging.debug("Successfully added the record to the log.")
-      except (sqlite.Error, IndexError) as e:
-         logging.exception(e)
-         logging.error("Could not add the record to the log.")
+      
+      # Execute the query.
+      with self.connection:
+         c.executemany(query, database_entries)
+      
+      logging.debug("Successfully added the record(s) to the log.")
       return
 
    def delete_record(self, index, iter=None):

@@ -673,10 +673,9 @@ class Logbook(Gtk.Notebook):
       dialog.destroy()
 
       adif = ADIF()
-      records = adif.read(path)      
       logging.debug("Importing records from the ADIF file with path: %s" % path)
-      for record in records:
-         l.add_record(record)
+      records = adif.read(path)
+      l.add_record(records)
       l.populate()
 
       if(not exists):
