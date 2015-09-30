@@ -790,7 +790,7 @@ class Logbook(Gtk.Notebook):
          cr.move_to(5, current_line_number*self.line_height)
          PangoCairo.update_layout(cr, layout)
          PangoCairo.show_layout(cr, layout)
-         current_line_number = current_line_number + 1
+         current_line_number += 1
          if(current_line_number*self.line_height > context.get_height()):
             for j in range(0, current_line_number):
                self.text_to_print.pop(0) # Remove what has been printed already before draw_page is called again
