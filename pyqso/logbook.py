@@ -17,10 +17,10 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, GObject, Pango, PangoCairo
+from gi.repository import Gtk, Pango, PangoCairo
 import logging
 import sqlite3 as sqlite
-from os.path import basename, getctime, getmtime, expanduser, exists
+from os.path import basename, getmtime, expanduser
 import datetime
 import ConfigParser
 

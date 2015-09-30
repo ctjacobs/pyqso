@@ -19,9 +19,6 @@
 
 from gi.repository import Gtk, GObject
 import logging
-import os
-import os.path
-import sys
 import telnetlib
 
 from pyqso.telnet_connection_dialog import *

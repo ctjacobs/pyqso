@@ -17,13 +17,12 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, GObject
-from os.path import basename
+from gi.repository import Gtk
 import logging
 import sqlite3 as sqlite
 import unittest
 
-from adif import AVAILABLE_FIELD_NAMES_TYPES, AVAILABLE_FIELD_NAMES_ORDERED
+from adif import AVAILABLE_FIELD_NAMES_ORDERED
 from record_dialog import *
 
 class Log(Gtk.ListStore):
