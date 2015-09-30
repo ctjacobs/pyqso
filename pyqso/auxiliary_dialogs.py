@@ -23,26 +23,22 @@ import logging
 def error(parent, message):
    """ Display an error message. """
    logging.error(message)
-   dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                               Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, message, title="Error")
-   dialog.run()
-   dialog.destroy()
-   return
+   _handle_gtk_dialog(parent, Gtk.MessageType.ERROR, message, "Error")
 
 def info(parent, message):
    """ Display some information. """
    logging.debug(message)
-   dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                               Gtk.MessageType.INFO, Gtk.ButtonsType.OK, message, title="Information")
-   dialog.run()
-   dialog.destroy()
-   return
+   _handle_gtk_dialog(parent, Gtk.MessageType.INFO, message, "Information")
    
 def question(parent, message):
    """ Ask the user a question. The dialog comes with 'Yes' and 'No' response buttons. """
+   return _handle_gtk_dialog(parent, Gtk.MessageType.QUESTION, message, "Question")
+
+def _handle_gtk_dialog(parent, msgtype, message, title):
+   bt = Gtk.ButtonsType
+   buttons = bt.YES_NO if msgtype == Gtk.MessageType.QUESTION else bt.OK
    dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-                              Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, 
-                              message, title="Question")
+         msgtype, buttons, message, title=title)
    response = dialog.run()
    dialog.destroy()
    return response
