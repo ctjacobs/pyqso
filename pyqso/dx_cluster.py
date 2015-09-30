@@ -152,7 +152,7 @@ class DXCluster(Gtk.VBox):
          text = self.connection.read_very_eager()
          try:
             text = text.replace(u"\u0007", "") # Remove the BEL Unicode character from the end of the line
-         except UnicodeDecodeError as e:
+         except UnicodeDecodeError:
             pass
             
          # Allow auto-scrolling to the new text entry if the focus is already at
