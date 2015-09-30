@@ -103,11 +103,8 @@ class Logbook(Gtk.Notebook):
          try:
             with self.connection:
                c = self.connection.cursor()
-               c.execute("SELECT name FROM sqlite_master WHERE type='table'")
-               names = c.fetchall()
-               for name in names:
-                  if(name[0][0:7] == "sqlite_"):
-                     continue # Skip SQLite internal tables
+               c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT GLOB 'sqlite_*'")
+               for name in c:
                   l = Log(self.connection, name[0])
                   l.populate()
                   self.logs.append(l)
