@@ -19,9 +19,6 @@
 
 from gi.repository import Gtk, GObject
 import logging
-import os
-import os.path
-import sys
 import telnetlib
 
 from pyqso.telnet_connection_dialog import *
@@ -155,7 +152,7 @@ class DXCluster(Gtk.VBox):
          text = self.connection.read_very_eager()
          try:
             text = text.replace(u"\u0007", "") # Remove the BEL Unicode character from the end of the line
-         except UnicodeDecodeError as e:
+         except UnicodeDecodeError:
             pass
             
          # Allow auto-scrolling to the new text entry if the focus is already at

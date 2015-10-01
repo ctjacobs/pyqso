@@ -17,10 +17,10 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, GObject, Pango, PangoCairo
+from gi.repository import Gtk, Pango, PangoCairo
 import logging
 import sqlite3 as sqlite
-from os.path import basename, getctime, getmtime, expanduser, exists
+from os.path import basename, getmtime, expanduser
 import datetime
 import ConfigParser
 
@@ -103,11 +103,8 @@ class Logbook(Gtk.Notebook):
          try:
             with self.connection:
                c = self.connection.cursor()
-               c.execute("SELECT name FROM sqlite_master WHERE type='table'")
-               names = c.fetchall()
-               for name in names:
-                  if(name[0][0:7] == "sqlite_"):
-                     continue # Skip SQLite internal tables
+               c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT GLOB 'sqlite_*'")
+               for name in c:
                   l = Log(self.connection, name[0])
                   l.populate()
                   self.logs.append(l)
@@ -754,7 +751,7 @@ class Logbook(Gtk.Notebook):
 
          operation.connect("begin_print", self._begin_print)
          operation.connect("draw_page", self._draw_page)
-         result = operation.run(action, parent=self.parent)
+         operation.run(action, parent=self.parent)
       else:
          error(self.parent, "Could not retrieve the records from the SQL database. No records have been printed.")
       return
@@ -793,7 +790,7 @@ class Logbook(Gtk.Notebook):
          cr.move_to(5, current_line_number*self.line_height)
          PangoCairo.update_layout(cr, layout)
          PangoCairo.show_layout(cr, layout)
-         current_line_number = current_line_number + 1
+         current_line_number += 1
          if(current_line_number*self.line_height > context.get_height()):
             for j in range(0, current_line_number):
                self.text_to_print.pop(0) # Remove what has been printed already before draw_page is called again
@@ -860,8 +857,6 @@ class Logbook(Gtk.Notebook):
       (sort_model, path) = self.treeselection[log_index].get_selected_rows() # Get the selected row in the log
       try:
          sort_iter = sort_model.get_iter(path[0])
-         # Remember that the filter model is a child of the sort model...
-         filter_model = sort_model.get_model()
          filter_iter = self.sorter[log_index].convert_iter_to_child_iter(sort_iter)
          # ...and the ListStore model (i.e. the log) is a child of the filter model.
          child_iter = self.filter[log_index].convert_iter_to_child_iter(filter_iter)
@@ -896,8 +891,6 @@ class Logbook(Gtk.Notebook):
       (sort_model, path) = self.treeselection[log_index].get_selected_rows() # Get the selected row in the log
       try:
          sort_iter = sort_model.get_iter(path[0])
-         # Remember that the filter model is a child of the sort model...
-         filter_model = sort_model.get_model()
          filter_iter = self.sorter[log_index].convert_iter_to_child_iter(sort_iter)
          # ...and the ListStore model (i.e. the log) is a child of the filter model.
          child_iter = self.filter[log_index].convert_iter_to_child_iter(filter_iter)

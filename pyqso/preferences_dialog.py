@@ -17,12 +17,11 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, GObject
+from gi.repository import Gtk
 import logging
 import ConfigParser
 import os.path
 import base64
-from math import ceil
 try:
    import Hamlib
    have_hamlib = True

@@ -167,10 +167,10 @@ class ADIF:
       
       for t in tokens:
          if(re.match('<eor>', t, flags=re.IGNORECASE) is not None):
-            n_eor = n_eor + 1
+            n_eor += 1
             continue
          else:
-            n_record = n_record + 1
+            n_record += 1
             # Each record will have field names and corresponding
             # data entries. Store this in a dictionary.
             # Note: This is based on the code written by OK4BX.

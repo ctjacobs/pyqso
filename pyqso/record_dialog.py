@@ -17,7 +17,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, GObject
+from gi.repository import Gtk
 import logging
 import ConfigParser
 from datetime import datetime
@@ -553,21 +553,8 @@ class RecordDialog(Gtk.Dialog):
       else:
          dt = datetime.utcnow() # Use UTC by default, since this is expected by ADIF.
 
-      (year, month, day) = (dt.year, dt.month, dt.day)
-      (hour, minute) = (dt.hour, dt.minute)
-      # If necessary, add on leading zeros so the YYYYMMDD and HHMM format is followed.
-      if(month < 10):
-         month = "0" + str(month) # Note: Unlike the calendar widget, the months start from an index of 1 here.
-      if(day < 10):
-         day = "0" + str(day)
-      if(hour < 10):
-         hour = "0" + str(hour)
-      if(minute < 10):
-         minute = "0" + str(minute)
-      date = str(year) + str(month) + str(day)
-      time = str(hour) + str(minute)
-      self.sources["QSO_DATE"].set_text(date)
-      self.sources["TIME_ON"].set_text(time)
+      self.sources["QSO_DATE"].set_text(dt.strftime("%Y%m%d"))
+      self.sources["TIME_ON"].set_text(dt.strftime("%H%M"))
       
       return
 
@@ -591,7 +578,7 @@ class CalendarDialog(Gtk.Dialog):
       if(month + 1 < 10):
          month = "0" + str(month + 1) # Note: the months start from an index of 0 when retrieved from the calendar widget.
       else:
-         month = month + 1
+         month += 1
       if(day < 10):
          day = "0" + str(day)
       date = str(year) + str(month) + str(day)
