@@ -109,7 +109,8 @@ class Log(Gtk.ListStore):
          c.execute("PRAGMA table_info(%s)" % self.name)
          column_names = c.fetchall()
          # Get the index of the last inserted record in the database.
-         last_index = c.lastrowid
+         c.execute('SELECT max(id) FROM %s' % self.name)
+         last_index = c.fetchone()[0]
          if last_index is None:
             # Assume no records are currently present.
             last_index = 0
