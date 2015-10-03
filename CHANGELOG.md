@@ -9,6 +9,8 @@
 
 ### Changed
 - The Summary page now also contains the total number of QSOs in the logbook.
+- Improvements to docstrings.
+- Various code cleanups (thanks to András Veres-Szentkirályi).
 
 ## [0.2] - 2015-03-07
 ### Added
