@@ -2,7 +2,7 @@
 
 #    Copyright (C) 2012 Christian T. Jacobs.
 
-#    This logbook is part of PyQSO.
+#    This file is part of PyQSO.
 
 #    PyQSO is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,8 +23,14 @@ import ConfigParser
 import os.path
 
 class Menu(Gtk.MenuBar):
-   
+   """ The PyQSO menu bar along the top of the main window. """
+
    def __init__(self, parent):
+      """ Set up all menu items and connect to the various functions. 
+      
+      :arg parent: The parent Gtk window.
+      """
+
       logging.debug("New Menu instance created!")
       
       # First let's call the constructor of the super class (Gtk.MenuBar)
@@ -246,6 +252,10 @@ class Menu(Gtk.MenuBar):
       return
       
    def set_logbook_item_sensitive(self, sensitive):
+      """ Enable/disable logbook-related menu items.
+      
+      :arg bool sensitive: If True, enable the 'new logbook' and 'open logbook' menu items. If False, disable them.
+      """
       logging.debug("Setting the 'Create/Open Logbook' menu item's sensitivity to: %s..." % sensitive) 
       self.items["NEW_LOGBOOK"].set_sensitive(sensitive)
       self.items["OPEN_LOGBOOK"].set_sensitive(sensitive)
@@ -254,6 +264,10 @@ class Menu(Gtk.MenuBar):
       return
 
    def set_log_items_sensitive(self, sensitive):
+      """ Enable/disable log-related menu items.
+      
+      :arg bool sensitive: If True, enable all the log-related menu items. If False, disable them all.
+      """
       logging.debug("Setting log-related menu item sensitivity to: %s..." % sensitive) 
       for item_name in ["NEW_LOG", "DELETE_LOG", "RENAME_LOG", "IMPORT_LOG", "EXPORT_LOG", "PRINT_LOG"]:
          self.items[item_name].set_sensitive(sensitive)
@@ -261,6 +275,10 @@ class Menu(Gtk.MenuBar):
       return
 
    def set_record_items_sensitive(self, sensitive):
+      """ Enable/disable record-related menu items.
+      
+      :arg bool sensitive: If True, enable all the record-related menu items. If False, disable them all.
+      """
       logging.debug("Setting record-related menu item sensitivity to: %s..." % sensitive) 
       for item_name in ["ADD_RECORD", "EDIT_RECORD", "DELETE_RECORD", "REMOVE_DUPLICATES"]:
          self.items[item_name].set_sensitive(sensitive)

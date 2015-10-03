@@ -25,16 +25,26 @@ from xml.dom import minidom
 from auxiliary_dialogs import *
 
 class CallsignLookupQRZ():
-   """ Uses qrz.com to lookup details about a particular callsign. """
+   """ Use qrz.com to lookup details about a particular callsign. """
 
    def __init__(self, parent):
+      """ Initialise a new callsign lookup handler.
+      
+      :arg parent: The parent Gtk dialog.
+      """
       self.parent = parent
       self.connection = None
       self.session_key = None
       return
 
    def connect(self, username, password):
-      """ Initiate a session with the qrz.com server. Hopefully this will return a session key. """
+      """ Initiate a session with the qrz.com server. Hopefully this will provide a session key.
+      
+      :arg str username: The username of the qrz.com user account.
+      :arg str password: The password of the qrz.com user account.
+      :returns: True if a successful connection was made to the server, and False otherwise.
+      :rtype: bool
+      """
       logging.debug("Connecting to the qrz.com server...")
       try:
          self.connection = httplib.HTTPConnection('xmldata.qrz.com')
@@ -64,8 +74,13 @@ class CallsignLookupQRZ():
       return connected
 
    def lookup(self, full_callsign, ignore_prefix_suffix = True):
-      """ Parse the XML tree that is returned from the qrz.com XML server to obtain the NAME, ADDRESS, STATE, COUNTRY, DXCC, CQZ, ITUZ, and IOTA field data (if present),
-      and return the data in the dictionary called fields_and_data. """
+      """ Parse the XML tree that is returned from the qrz.com XML server to obtain the NAME, ADDRESS, STATE, COUNTRY, DXCC, CQZ, ITUZ, and IOTA field data (if present).
+      
+      :arg str full_callsign: The callsign to look up (without any prefix/suffix stripping).
+      :arg bool ignore_prefix_suffix: True if callsign prefixes/suffixes should be removed prior to querying the server, False otherwise.
+      :returns: The data in a dictionary called fields_and_data. 
+      :rtype: dict
+      """
       
       logging.debug("Looking up callsign. The full callsign (with a prefix and/or suffix) is %s" % full_callsign)
       
@@ -138,7 +153,7 @@ class CallsignLookupQRZ():
 
 
 class CallsignLookupHamQTH():
-   """ Uses hamqth.com to lookup details about a particular callsign. """
+   """ Use hamqth.com to lookup details about a particular callsign. """
 
    def __init__(self, parent):
       self.parent = parent
@@ -147,7 +162,14 @@ class CallsignLookupHamQTH():
       return
 
    def connect(self, username, password):
-      """ Initiate a session with the hamqth.com server. Hopefully this will return a session key. """
+      """ Initiate a session with the hamqth.com server. Hopefully this will provide a session key.
+      
+      :arg str username: The username of the hamqth.com user account.
+      :arg str password: The password of the hamqth.com user account.
+      :returns: True if a successful connection was made to the server, and False otherwise.
+      :rtype: bool
+      """
+
       logging.debug("Connecting to the hamqth.com server...")
       try:
          self.connection = httplib.HTTPConnection('www.hamqth.com')
@@ -178,7 +200,12 @@ class CallsignLookupHamQTH():
 
    def lookup(self, full_callsign, ignore_prefix_suffix = True):
       """ Parse the XML tree that is returned from the hamqth.com XML server to obtain the NAME, ADDRESS, STATE, COUNTRY, DXCC, CQZ, ITUZ, and IOTA field data (if present),
-      and return the data in the dictionary called fields_and_data. """
+
+      :arg str full_callsign: The callsign to look up (without any prefix/suffix stripping).
+      :arg bool ignore_prefix_suffix: True if callsign prefixes/suffixes should be removed prior to querying the server, False otherwise.
+      :returns: The data in a dictionary called fields_and_data. 
+      :rtype: dict
+      """
       
       logging.debug("Looking up callsign. The full callsign (with a prefix and/or suffix) is %s" % full_callsign)
       
@@ -244,7 +271,12 @@ class CallsignLookupHamQTH():
 
 
 def strip(full_callsign):
-   """ Remove any prefixes or suffixes from a callsign. """
+   """ Remove any prefixes or suffixes from a callsign.
+   
+   :arg str full_callsign: The callsign to be considered for prefix/suffix removal.
+   :returns: The callsign with prefixes/suffixes removed.
+   :rtype: str
+   """
    
    components = full_callsign.split("/") # We assume that prefixes or suffixes come before/after a forward slash character "/".
    suffixes = ["P", "M", "A", "PM", "MM", "AM", "QRP"]

@@ -25,6 +25,11 @@ class TelnetConnectionDialog(Gtk.Dialog):
    This can be used to connect to DX clusters. """
    
    def __init__(self, parent):
+      """ Set up and show the Telnet connection dialog to the user.
+      
+      :arg parent: The parent Gtk window/dialog.
+      """
+
       logging.debug("Setting up the Telnet connection dialog...")
       
       Gtk.Dialog.__init__(self, title="New Telnet Connection", parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
@@ -74,7 +79,11 @@ class TelnetConnectionDialog(Gtk.Dialog):
       return
 
    def get_connection_info(self):
-      """ Return the host and login information stored in the Gtk.Entry boxes. """
+      """ Return the host and login information stored in the Gtk.Entry boxes.
+      
+      :returns: A dictionary of Telnet connection-related information (username, password, port, host).
+      :rtype: dict
+      """
       logging.debug("Returning Telnet connection information...") 
       return self.sources
 

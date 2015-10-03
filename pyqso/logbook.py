@@ -33,7 +33,11 @@ class Logbook(Gtk.Notebook):
    """ A Logbook object can store multiple Log objects. """
    
    def __init__(self, parent):
-
+      """ Create a new Logbook object and initialise the list of Logs.
+      
+      :arg parent: The parent Gtk window.
+      """
+      
       Gtk.Notebook.__init__(self)
 
       self.parent = parent
@@ -69,11 +73,13 @@ class Logbook(Gtk.Notebook):
          open(path, 'w').close()
          # Open the new logbook, ready for use.
          self.open(path=path)
+      return
    
    def open(self, widget=None, path=None):
-      """ Open a logbook, and render all the logs within it. 
-      An optional 'path' argument can be specified if the database file location is known.
-      Otherwise, a file selection dialog will appear. """
+      """ Open a logbook, and render all the logs within it.
+      
+      :arg str path: An optional argument containing the database file location, if already known. If this is None, a file selection dialog will appear.
+      """
 
       if(path is None):
          # If no path has been provided, get one from a "File Open" dialog.
@@ -92,7 +98,7 @@ class Logbook(Gtk.Notebook):
             logging.debug("No file path specified.")
             return
          
-      connected = self.db_connect(path=path)
+      connected = self.db_connect(path)
       if(connected):
          # If the connection setup was successful, then open all the logs in the database
          
@@ -169,8 +175,11 @@ class Logbook(Gtk.Notebook):
          logging.debug("Unable to disconnect from the database. No logs were closed.")
       return
 
-   def db_connect(self, path=None):
-      """ Create an SQL database connection to the Logbook's data source """
+   def db_connect(self, path):
+      """ Create an SQL database connection to the Logbook's data source.
+      
+      :arg str path: The path of the database file.
+      """
 
       logging.debug("Attempting to connect to the logbook database...")
       # Try setting up the SQL database connection
@@ -188,7 +197,12 @@ class Logbook(Gtk.Notebook):
       return True
          
    def db_disconnect(self):
-      """ Destroy the connection to the Logbook's data source. """
+      """ Destroy the connection to the Logbook's data source.
+      
+      :returns: True if the connection was successfully destroyed, and False otherwise.
+      :rtype: bool
+      """
+
       logging.debug("Cleaning up any existing database connections...")
       if(self.connection):
          try:
@@ -202,6 +216,7 @@ class Logbook(Gtk.Notebook):
 
    def _create_dummy_page(self):
       """ Create a blank page in the Gtk.Notebook for the "+" (New Log) tab. """
+
       blank_treeview = Gtk.TreeView()
       # Allow the Log to be scrolled up/down
       sw = Gtk.ScrolledWindow()
@@ -231,6 +246,7 @@ class Logbook(Gtk.Notebook):
 
    def _create_summary_page(self):
       """ Create a summary page containing the number of logs in the logbook, and the logbook's modification date. """
+
       vbox = Gtk.VBox()
 
       # Database name in large font at the top of the summary page
@@ -275,6 +291,7 @@ class Logbook(Gtk.Notebook):
 
    def update_summary(self):
       """ Update the information presented on the summary page. """
+
       self.summary["LOG_COUNT"].set_label(str(self.get_number_of_logs()))
       self.summary["QSO_COUNT"].set_label(str(self.get_number_of_qsos()))
       try:
@@ -285,6 +302,8 @@ class Logbook(Gtk.Notebook):
       return
 
    def _on_switch_page(self, widget, label, new_page):
+      """ Handle a tab/page change, and enable/disable the relevant Record-related buttons. """
+
       if(new_page == self.get_n_pages()-1): # The last (right-most) tab is the "New Log" tab.
          self.stop_emission("switch-page")
          
@@ -299,6 +318,7 @@ class Logbook(Gtk.Notebook):
 
    def new_log(self, widget=None):
       """ Create a new log in the logbook. """
+
       if(self.connection is None):
          return
       exists = True
@@ -339,7 +359,10 @@ class Logbook(Gtk.Notebook):
       return
 
    def delete_log(self, widget, page=None):
-      """ Delete the log that is currently selected in the logbook. """
+      """ Delete the log that is currently selected in the logbook.
+      
+      :arg Gtk.Widget page: An optional argument corresponding to the currently-selected page/tab.
+      """
       if(self.connection is None):
          return
          
@@ -386,14 +409,21 @@ class Logbook(Gtk.Notebook):
       self.parent.toolbox.awards.count()
       return
 
-   def filter_logs(self, widget):
+   def filter_logs(self, widget=None):
       """ Re-filter all the logs when the user-defined expression is changed. """
       for i in range(0, len(self.filter)):
          self.filter[i].refilter()
       return
 
    def _filter_by_callsign(self, model, iter, data):
-      """ Filter all the logs in the logbook by the callsign field, based on a user-defined expression. """
+      """ Filter all the logs in the logbook by the callsign field, based on a user-defined expression.
+      
+      :arg Gtk.TreeModel model: The model used to filter the log data.
+      :arg Gtk.TreeIter iter: A pointer to a particular row in the model.
+      :arg data: The user-defined expression to filter by.
+      :returns: True if a record matches the expression, or if there is nothing to filter. Otherwise, returns False.
+      :rtype: bool
+      """
       value = model.get_value(iter, 1)
       callsign = self.parent.toolbar.filter_source.get_text()
       
@@ -406,7 +436,10 @@ class Logbook(Gtk.Notebook):
          return callsign.upper() in value or callsign.lower() in value
 
    def _render_log(self, index):
-      """ Render the Log (identified by 'index') in the Gtk.Notebook. """
+      """ Render a Log in the Gtk.Notebook.
+      
+      :arg int index: The index of the Log (in the list of Logs) to render.
+      """
       self.filter.append(self.logs[index].filter_new(root=None))
       # Set the callsign column as the column we want to filter by
       self.filter[index].set_visible_func(self._filter_by_callsign, data=None)
@@ -476,7 +509,15 @@ class Logbook(Gtk.Notebook):
       return
 
    def _compare_date_and_time(self, model, row1, row2, user_data):
-      """ Compares two rows in a Gtk.ListStore, and sorts by both date and time. """
+      """ Compare two rows (let's call them A and B) in a Gtk.ListStore, and sort by both date and time.
+      
+      :arg Gtk.TreeModel model: The model used to sort the log data.
+      :arg Gtk.TreeIter row1: The pointer to row A.
+      :arg Gtk.TreeIter row2: The pointer to row B.
+      :arg user_data: The specific column from which to retrieve data for rows A and B.
+      :returns: 1 if Row B's date/time is more recent than Row A's; 0 if both dates and times are the same; -1 if Row A's date/time is more recent than Row B's.
+      :rtype: int
+      """
       date1 = model.get_value(row1, user_data[0])
       date2 = model.get_value(row2, user_data[0])
       time1 = model.get_value(row1, user_data[1])
@@ -495,7 +536,15 @@ class Logbook(Gtk.Notebook):
          return -1
 
    def _compare_default(self, model, row1, row2, user_data):
-      """ The default sorting function for all Gtk.ListStore objects. """
+      """ The default sorting function for all Gtk.ListStore objects.
+      
+      :arg Gtk.TreeModel model: The model used to sort the log data.
+      :arg Gtk.TreeIter row1: The pointer to row A.
+      :arg Gtk.TreeIter row2: The pointer to row B.
+      :arg user_data: The specific column from which to retrieve data for rows A and B.
+      :returns: 1 if the value of Row A's column value is less than Row B's column value; 0 if both values are the same; -1 if Row A's column value is greater than Row B's column value.
+      :rtype: int
+      """
       value1 = model.get_value(row1, user_data)
       value2 = model.get_value(row2, user_data)
       if(value1 < value2):
@@ -506,7 +555,11 @@ class Logbook(Gtk.Notebook):
          return -1
 
    def sort_log(self, widget, column_index):
-      """ Sort the log (that is currently selected) based on the column identified by column_index. """
+      """ Sort the log (that is currently selected) with respect to a given field.
+      
+      :arg int column_index: The index of the column to sort by.
+      """
+
       log_index = self._get_log_index()
       column = self.treeview[log_index].get_column(column_index)
 
@@ -757,6 +810,11 @@ class Logbook(Gtk.Notebook):
       return
     
    def _begin_print(self, operation, context):
+      """ Specify the layout/position/font of the text on the pages to be printed.
+      
+      :arg Gtk.PrintOperation operation: The printing API.
+      :arg Gtk.PrintContext context: Used to draw/render the pages to print.
+      """
       width = context.get_width()
       height = context.get_height()
       layout = context.create_pango_layout()
@@ -780,6 +838,12 @@ class Logbook(Gtk.Notebook):
       return
 
    def _draw_page(self, operation, context, page_number):
+      """ Render the QSO details on the page.
+      
+      :arg Gtk.PrintOperation operation: The printing API.
+      :arg Gtk.PrintContext context: Used to draw/render the pages to print.
+      :arg int page_number: The current page number.
+      """
       cr = context.get_cairo_context()
       cr.set_source_rgb(0, 0, 0)
       layout = context.create_pango_layout()
@@ -798,6 +862,7 @@ class Logbook(Gtk.Notebook):
       return
 
    def add_record_callback(self, widget):
+      """ A callback function used to add a particular record/QSO. """
       # Get the log index
       try:
          log_index = self._get_log_index()
@@ -844,6 +909,8 @@ class Logbook(Gtk.Notebook):
       return
       
    def delete_record_callback(self, widget):
+      """ A callback function used to delete a particular record/QSO. """
+
       # Get the log index
       try:
          log_index = self._get_log_index()
@@ -875,8 +942,10 @@ class Logbook(Gtk.Notebook):
       return
 
    def edit_record_callback(self, widget, path, view_column):
-      # Note: the path and view_column arguments need to be passed in
-      # since they associated with the row-activated signal.
+      """ A callback function used to edit a particular record/QSO.
+      Note that the widget, path and view_column arguments are not used,
+      but need to be passed in since they associated with the row-activated signal
+      which is generated when the user double-clicks on a record. """
 
       # Get the log index
       try:
@@ -954,18 +1023,31 @@ class Logbook(Gtk.Notebook):
       return
 
    def get_number_of_logs(self):
-      """ Return the total number of logs in the logbook. """
+      """ Return the total number of logs in the logbook.
+      
+      :returns: The total number of logs in the logbook.
+      :rtype: int
+      """
       return len(self.logs)
       
    def get_number_of_qsos(self):
-      """ Return the total number of QSOs/records in the whole logbook. """
+      """ Return the total number of QSOs/records in the whole logbook.
+      
+      :returns: The total number of QSOs/records in the whole logbook.
+      :rtype: int
+      """
       total = 0
       for log in self.logs:
          total += log.get_number_of_records()
       return total
 
    def log_name_exists(self, table_name):
-      """ Return True if the log name already exists in the logbook, and False if it does not already exist. Return None if there is a database error. """
+      """ Determine whether a Log object with a given name exists in the SQL database.
+      
+      :arg str table_name: The name of the log (i.e. the name of the table in the SQL database).
+      :returns: True if the log name already exists in the logbook; False if it does not already exist; None if there is a database error.
+      :rtype: bool or None
+      """
       try:
          with self.connection:
             c = self.connection.cursor()
@@ -980,7 +1062,12 @@ class Logbook(Gtk.Notebook):
          return None
 
    def _get_log_index(self, name=None):
-      """ Given the name of a log, return its index in the self.log list. """
+      """ Given the name of a log, return its index in the list of Log objects.
+      
+      :arg str name: The name of the log. If None, use the name of the currently-selected log.
+      :returns: The index of the named log in the list of Log objects.
+      :rtype: int
+      """
       if(name is None):
          # If no page name is supplied, then just use the currently selected page
          page_index = self.get_current_page() # Gets the index of the selected tab in the logbook

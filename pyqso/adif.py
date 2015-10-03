@@ -96,16 +96,21 @@ BANDS_RANGES = [(None, None), (0.136, 0.137), (0.501, 0.504), (1.8, 2.0), (3.5, 
 ADIF_VERSION = "1.0"
 
 class ADIF:
-   """ The ADIF class supplies methods for reading, parsing, and writing log files in the Amateur Data Interchange Format (ADIF). For more information, visit http://adif.org/ """
+   """ The ADIF class supplies methods for reading, parsing, and writing log files in the Amateur Data Interchange Format (ADIF).
+   For more information, visit http://adif.org/ """
    
    def __init__(self):
-      # Class for I/O of files using the Amateur Data Interchange Format (ADIF).
+      """ Initialise class for I/O of files using the Amateur Data Interchange Format (ADIF). """
       logging.debug("New ADIF instance created!")
       
    def read(self, path):
-      """ Read an ADIF file with a specified path (given in the 'path' argument), and then parse it.
-      The output is a list of dictionaries (one dictionary per QSO), with each dictionary containing field-value pairs,
-      e.g. {FREQ:145.500, BAND:2M, MODE:FM}. """
+      """ Read an ADIF file and parse it.
+      
+      :arg str path: The path to the ADIF file to read.
+      :returns: A list of dictionaries (one dictionary per QSO), with each dictionary containing field-value pairs, e.g. {FREQ:145.500, BAND:2M, MODE:FM}.
+      :rtype: list
+      :raises IOError: if the ADIF file does not exist or cannot be read (e.g. due to lack of read permissions).
+      """
       logging.debug("Reading in ADIF file with path: %s..." % path)
 
       text = ""      
@@ -127,8 +132,11 @@ class ADIF:
       
    def _parse_adi(self, text):
       """ Parse some raw text (defined in the 'text' argument) for ADIF field data.
-      Outputs a list of dictionaries (one dictionary per QSO). Each dictionary contains the field-value pairs,
-      e.g. {FREQ:145.500, BAND:2M, MODE:FM}. """
+      
+      :arg str text: The raw text from the ADIF file to parse.
+      :returns: A list of dictionaries (one dictionary per QSO). Each dictionary contains the field-value pairs, e.g. {FREQ:145.500, BAND:2M, MODE:FM}. 
+      :rtype: list
+      """
 
       logging.debug("Parsing text from the ADIF file...")
 
@@ -225,8 +233,13 @@ class ADIF:
       return records
       
    def write(self, records, path):
-      """ Write an ADIF file containing all the QSOs in the 'records' list. The desired path is specified in the 'path' argument. 
-      This method returns None. """
+      """ Write an ADIF file containing all the QSOs in the 'records' list.
+      
+      :arg list records: The list of QSO records to write.
+      :arg str path: The desired path of the ADIF file to write to.
+      :returns: None
+      :raises IOError: if the ADIF file cannot be written (e.g. due to lack of write permissions).
+      """
    
       logging.debug("Writing records to an ADIF file...")
       try:
@@ -266,8 +279,14 @@ class ADIF:
 
 
    def is_valid(self, field_name, data, data_type):
-      """ Validate the data in a field (with name 'field_name') with respect to the ADIF specification. 
-      This method returns either True or False to indicate whether the data is valid or not. """
+      """ Validate the data in a field with respect to the ADIF specification.
+      
+      :arg str field_name: The name of the ADIF field.
+      :arg str data: The data of the ADIF field to validate.
+      :arg str data_type: The type of data to be validated. See http://www.adif.org/304/ADIF_304.htm#Data_Types for the full list with descriptions.
+      :returns: True or False to indicate whether the data is valid or not.
+      :rtype: bool
+      """
 
       logging.debug("Validating the following data in field '%s': %s" % (field_name, data))
 

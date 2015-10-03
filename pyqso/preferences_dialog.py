@@ -32,8 +32,11 @@ except ImportError:
 from pyqso.adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED, MODES
 
 class PreferencesDialog(Gtk.Dialog):
-   
+   """ A dialog to specify the PyQSO preferences. """
+
    def __init__(self, parent):
+      """ Set up the various pages of the preferences dialog. """
+
       logging.debug("Setting up the preferences dialog...")
 
       Gtk.Dialog.__init__(self, title="Preferences", parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
@@ -64,6 +67,7 @@ class PreferencesDialog(Gtk.Dialog):
 
    def commit(self):
       """ Commit the user preferences to the configuration file. """
+
       logging.debug("Committing the user preferences to the configuration file...")
       general_data = self.general.get_data()
       view_data = self.view.get_data()
@@ -104,7 +108,8 @@ class PreferencesDialog(Gtk.Dialog):
       return
 
 class GeneralPage(Gtk.VBox):
-   
+   """ The section of the preferences dialog containing general preferences. """
+
    def __init__(self):
       logging.debug("Setting up the General page of the preferences dialog...")
 
@@ -140,7 +145,8 @@ class GeneralPage(Gtk.VBox):
       return data
 
 class ViewPage(Gtk.VBox):
-   
+   """ The section of the preferences dialog containing view-related preferences. """
+
    def __init__(self):
       logging.debug("Setting up the View page of the preferences dialog...")
 
@@ -191,7 +197,8 @@ class ViewPage(Gtk.VBox):
       return data
 
 class HamlibPage(Gtk.VBox):
-   
+   """ The section of the preferences dialog containing Hamlib-related preferences. """
+
    def __init__(self):
       logging.debug("Setting up the Hamlib page of the preferences dialog...")
 
@@ -272,7 +279,8 @@ class HamlibPage(Gtk.VBox):
       return data
 
 class RecordsPage(Gtk.VBox):
-   
+   """ The section of the preferences dialog containing record-related preferences. """
+
    def __init__(self):
       logging.debug("Setting up the Records page of the preferences dialog...")
 
@@ -442,6 +450,7 @@ class RecordsPage(Gtk.VBox):
       return data
 
 class ADIFPage(Gtk.VBox):
+   """ The section of the preferences dialog containing ADIF-related preferences. """
    
    def __init__(self):
       logging.debug("Setting up the ADIF page of the preferences dialog...")

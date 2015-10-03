@@ -21,9 +21,16 @@ from gi.repository import Gtk
 import logging
 
 class LogNameDialog(Gtk.Dialog):
+   """ A Gtk.Dialog where a user can specify the name of a Log object. """
    
    def __init__(self, parent, title=None, name=None):
+      """ Create and show the log name dialog to the user.
       
+      :arg parent: The parent Gtk window.
+      :arg title: The title of the dialog. If this is None, it is assumed that a new log is going to be created.
+      :arg name: The existing name of the Log object. Defaults to None if not specified (because the Log does not yet exist).
+      """
+
       if(title is None):
          title = "New Log"
       else:
@@ -47,6 +54,12 @@ class LogNameDialog(Gtk.Dialog):
       return
 
    def get_log_name(self):
+      """ Return the log name specified in the Gtk.Entry box by the user.
+      
+      :returns: The log's name.
+      :rtype: str
+      """
+
       logging.debug("Retrieving the log name from the LogNameDialog...")
       return self.entry.get_text()
 

@@ -27,7 +27,10 @@ class DXCluster(Gtk.VBox):
    """ A tool for connecting to a DX cluster (specifically Telnet-based DX clusters). """
    
    def __init__(self, parent):
-      """ Set up the DX cluster's Gtk.VBox, and set up a timer so that PyQSO can retrieve new data from the Telnet server every few seconds. """
+      """ Set up the DX cluster's Gtk.VBox, and set up a timer so that PyQSO can retrieve new data from the Telnet server every few seconds.
+      
+      :arg parent: The parent Gtk window.
+      """
       logging.debug("Setting up the DX cluster...") 
       Gtk.VBox.__init__(self, spacing=2)
 
@@ -147,7 +150,11 @@ class DXCluster(Gtk.VBox):
       return
 
    def _on_telnet_io(self):
-      """ Retrieve any new data from the Telnet server and print it out in the Gtk.TextView widget. Always returns True to satisfy the GObject timer. """
+      """ Retrieve any new data from the Telnet server and print it out in the Gtk.TextView widget.
+      
+      :returns: Always returns True to satisfy the GObject timer.
+      :rtype: bool
+      """
       if(self.connection):
          text = self.connection.read_very_eager()
          try:
@@ -171,7 +178,10 @@ class DXCluster(Gtk.VBox):
       return True
 
    def set_connect_button_sensitive(self, sensitive):
-      """ Enable/disable the relevant buttons for connecting/disconnecting from a DX cluster, so that users cannot click the connect button if PyQSO is already connected. """
+      """ Enable/disable the relevant buttons for connecting/disconnecting from a DX cluster, so that users cannot click the connect button if PyQSO is already connected.
+      
+      :arg bool sensitive: If True, enable the Connect button and disable the Disconnect button. If False, vice versa.
+      """
       self.buttons["CONNECT"].set_sensitive(sensitive)
       self.buttons["DISCONNECT"].set_sensitive(not sensitive)
       self.send.set_sensitive(not sensitive)

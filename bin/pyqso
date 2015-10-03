@@ -44,9 +44,12 @@ from pyqso.preferences_dialog import *
 class PyQSO(Gtk.Window):
    """ The PyQSO application class. """
    
-   def __init__(self, logbook_path):
-      """ Set up the main (root) window, start the event loop, and open a logbook (if the logbook's path is specified by the user in the command line). """
-         
+   def __init__(self, logbook_path=None):
+      """ Set up the main (root) window, start the event loop, and open a logbook (if the logbook's path is specified by the user in the command line).
+      
+      :arg str logbook_path: An optional argument containing the path of the logbook file to open. If no value is provided, this defaults to None and no logbook is opened.
+      """
+
       # Call the constructor of the super class (Gtk.Window)
       Gtk.Window.__init__(self, title="PyQSO")
 
@@ -109,7 +112,7 @@ class PyQSO(Gtk.Window):
       return
 
    def show_about(self, widget):
-      """ Show the About dialog, which includes license information. This method returns None after the user destroys the dialog. """
+      """ Show the About dialog, which includes license information. """
       about = Gtk.AboutDialog()
       about.set_modal(True)
       about.set_transient_for(parent=self)
@@ -140,7 +143,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.""")
       return      
 
    def show_preferences(self, widget):
-      """ Show the Preferences dialog. Any changes made by the user after clicking the 'Ok' button are saved in the .cfg file. This method returns None after the user destroys the dialog. """
+      """ Show the Preferences dialog. Any changes made by the user after clicking the 'Ok' button are saved in the .cfg file. """
       preferences = PreferencesDialog(self)
       response = preferences.run()
       if(response == Gtk.ResponseType.OK):

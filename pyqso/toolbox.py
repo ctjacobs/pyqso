@@ -28,6 +28,8 @@ class Toolbox(Gtk.Frame):
    """ Contains a Gtk.Notebook full of amateur radio-related tools. """   
 
    def __init__(self, parent):
+      """ Instantiate and insert the various tools into the toolbox. """
+
       logging.debug("Setting up the toolbox...")
          
       Gtk.Frame.__init__(self)

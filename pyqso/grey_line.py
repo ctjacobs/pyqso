@@ -40,7 +40,10 @@ class GreyLine(Gtk.VBox):
    """ A tool for visualising the grey line. """
    
    def __init__(self, parent):
-      """ Set up the drawing canvas and the timer which will re-plot the grey line every 30 minutes. """
+      """ Set up the drawing canvas and the timer which will re-plot the grey line every 30 minutes.
+      
+      :arg parent: The parent Gtk window.
+      """
       logging.debug("Setting up the grey line...") 
       Gtk.VBox.__init__(self, spacing=2)
       self.parent = parent
@@ -58,7 +61,11 @@ class GreyLine(Gtk.VBox):
       return
 
    def draw(self):
-      """ Draw the world map and the grey line on top of it. This method always returns True to satisfy the GObject timer. """
+      """ Draw the world map and the grey line on top of it.
+      
+      :returns: Always returns True to satisfy the GObject timer, unless the necessary GreyLine dependencies are not satisfied (in which case, the method returns False so as to not re-draw the canvas).
+      :rtype: bool
+      """
 
       if(have_necessary_modules):
          if(self.parent.toolbox.tools.get_current_page() != 1 or not self.parent.toolbox.get_visible()):

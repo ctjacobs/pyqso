@@ -36,11 +36,14 @@ from auxiliary_dialogs import *
 
 class RecordDialog(Gtk.Dialog):
    """ A dialog through which users can enter information about a QSO/record. """
-   
+
    def __init__(self, parent, log, index=None):
-      """ Set up the layout of the record dialog.
-      If a record index is specified in the 'index' argument, then the dialog turns into 'edit record mode' and fills the data sources with the existing data in the log.
-      If the 'index' argument is None, then the dialog starts off with nothing in the data sources (e.g. the Gtk.Entry boxes). """
+      """ Set up the layout of the record dialog, populate the various fields with the QSO details (if the record already exists), and show the dialog to the user.
+      
+      :arg parent: The parent Gtk window.
+      :arg log: The log to which the record belongs (or will belong).
+      :arg int index: If specified, then the dialog turns into 'edit record mode' and fills the data sources (e.g. the Gtk.Entry boxes) with the existing data in the log. If not specified (i.e. index is None), then the dialog starts off with nothing in the data sources.
+      """
 
       logging.debug("Setting up the record dialog...")
       
@@ -425,7 +428,12 @@ class RecordDialog(Gtk.Dialog):
       return
 
    def get_data(self, field_name):
-      """ Return the data for a specified field (with name 'field_name') from the Gtk.Entry/Gtk.ComboBoxText/etc boxes in the record dialog. """
+      """ Return the data for a specified field from the Gtk.Entry/Gtk.ComboBoxText/etc boxes in the record dialog.
+      
+      :arg str field_name: The name of the field containing the desired data.
+      :returns: The data in the specified field.
+      :rtype: str
+      """
       logging.debug("Retrieving the data in field %s from the record dialog..." % field_name)
       if(field_name == "CALL"):
          # Always show the callsigns in upper case.
@@ -562,6 +570,10 @@ class CalendarDialog(Gtk.Dialog):
    """ A simple dialog containing a Gtk.Calendar widget. Using this ensures the date is in the correct YYYYMMDD format required by ADIF. """ 
    
    def __init__(self, parent):
+      """ Set up the calendar widget and show it to the user.
+      
+      :arg parent: The parent Gtk window/dialog.
+      """
       logging.debug("Setting up a calendar dialog...")
       Gtk.Dialog.__init__(self, title="Select Date", parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
       self.calendar = Gtk.Calendar()
@@ -571,7 +583,11 @@ class CalendarDialog(Gtk.Dialog):
       return
 
    def get_date(self):
-      """ Return the date from the Gtk.Calendar widget in YYYYMMDD format. """      
+      """ Return the date from the Gtk.Calendar widget in YYYYMMDD format.
+      
+      :returns: The date from the calendar in YYYYMMDD format.
+      :rtype: str
+      """
       logging.debug("Retrieving the date from the calendar widget...")
       (year, month, day) = self.calendar.get_date()
       # If necessary, add on leading zeros so the YYYYMMDD format is followed.

@@ -26,9 +26,14 @@ from adif import AVAILABLE_FIELD_NAMES_ORDERED
 from record_dialog import *
 
 class Log(Gtk.ListStore):
-   """ A Log object can store multiple Record objects. """
+   """ A single log inside of the whole logbook. A Log object can store multiple Record objects. """
    
    def __init__(self, connection, name):
+      """ Set up a new Log object.
+      
+      :arg connection: An sqlite database connection.
+      :arg str name: The name of the log (i.e. the sqlite table name).
+      """
 
       # The ListStore constructor needs to know the data types of the columns.
       # The index is always an integer. We will assume the fields are strings.
@@ -65,7 +70,10 @@ class Log(Gtk.ListStore):
 
    def add_missing_db_columns(self):
       """ Check whether each field name in AVAILABLE_FIELD_NAMES_ORDERED is in the database table. If not, add it
-      (with all entries being set to an empty string initially). """
+      (with all entries being set to an empty string initially).
+      
+      :raises sqlite.Error, IndexError: if the existing database column names could not be obtained, or missing column names could not be added.
+      """
       logging.debug("Adding any missing database columns...")
 
       # Get all the column names in the current database table.
@@ -95,7 +103,10 @@ class Log(Gtk.ListStore):
       return
 
    def add_record(self, fields_and_data):
-      """ Add a record comprising data given in the 'fields_and_data' argument to the log. """
+      """ Add a record (or multiple records) to the log.
+      
+      :arg fields_and_data: A list of dictionaries (or possibly just a single dictionary), with each dictionary representing a single QSO, to be added to the log.
+      """
       logging.debug("Adding record(s) to log...")
       
       # If a dictionary is given, assume that we only have one record to add.
@@ -159,7 +170,12 @@ class Log(Gtk.ListStore):
       return
 
    def delete_record(self, index, iter=None):
-      """ Delete a record with a specific index in the SQL database. The corresponding record is also deleted from the Gtk.ListStore data structure. Note that iter should always be given. It is given a default value of None for unit testing purposes only. """
+      """ Delete a specified record from the log. The corresponding record is also deleted from the Gtk.ListStore data structure.
+      
+      :arg int index: The index of the record in the SQL database.
+      :arg iter: iter should always be given. It is given a default value of None for unit testing purposes only.
+      :raises sqlite.Error, IndexError: if the record could not be deleted.
+      """
       logging.debug("Deleting record from log...")
       # Get the selected row in the logbook
       try:
@@ -176,7 +192,15 @@ class Log(Gtk.ListStore):
       return
 
    def edit_record(self, index, field_name, data, iter=None, column_index=None):
-      """ Edit a specified record by replacing the data in the field 'field_name' with the data given in the argument called 'data'. Note that both iter and column_index should always be given. These are given default values of None for unit testing purposes only. """
+      """ Edit a specified record by replacing the current data in a specified field with the data provided.
+      
+      :arg int index: The index of the record in the SQL database.
+      :arg str field_name: The name of the field whose data should be modified.
+      :arg str data: The data that should replace the current data in the field.
+      :arg iter: Should always be given. A default value of None is used for unit testing purposes only.
+      :arg column_index: Should always be given. A default value of None is used for unit testing purposes only.
+      :raises sqlite.Error, IndexError: if the record could not be edited.
+      """
       logging.debug("Editing field '%s' in record %d..." % (field_name, index))
       try:
          with self.connection:
@@ -193,7 +217,11 @@ class Log(Gtk.ListStore):
       return
 
    def remove_duplicates(self):
-      """ Remove any duplicate records from the log. Return the total number of duplicates, and the number of duplicates that were successfully removed. Hopefully these will be the same. """
+      """ Remove any duplicate records from the log.
+      
+      :returns: The total number of duplicates, and the number of duplicates that were successfully removed. Hopefully these will be the same.
+      :rtype: tuple
+      """
       duplicates = self.get_duplicates()
       if(len(duplicates) == 0):
          return (0, 0) # Nothing to do here.
@@ -213,7 +241,11 @@ class Log(Gtk.ListStore):
       return (len(duplicates), removed)
 
    def get_duplicates(self):
-      """ Find the duplicates in the log, based on the CALL, QSO_DATE, TIME_ON, FREQ and MODE fields, and return a list of their row IDs. """
+      """ Find the duplicates in the log, based on the CALL, QSO_DATE, TIME_ON, FREQ and MODE fields.
+      
+      :returns: A list of row IDs corresponding to the duplicate records.
+      :rtype: list
+      """
       duplicates = []
       try:
          with self.connection:
@@ -231,7 +263,12 @@ class Log(Gtk.ListStore):
       return duplicates
          
    def get_record_by_index(self, index):
-      """ Return a record with a given index in the log. The record is represented by a dictionary of field-value pairs. """
+      """ Return a record with a given index in the log.
+      
+      :arg int index: The index of the record in the SQL database.
+      :returns: The desired record, represented by a dictionary of field-value pairs.
+      :rtype: dict
+      """
       try:
          with self.connection:
             c = self.connection.cursor()
@@ -243,7 +280,11 @@ class Log(Gtk.ListStore):
          return None
 
    def get_all_records(self):
-      """ Return a list of all the records in the log. Each record is represented by a dictionary. """
+      """ Return a list of all the records in the log.
+      
+      :returns: A list of all the records in the log. Each record is represented by a dictionary. 
+      :rtype: dict
+      """
       try:
          with self.connection:
             c = self.connection.cursor()
@@ -254,7 +295,11 @@ class Log(Gtk.ListStore):
          return None
 
    def get_number_of_records(self):
-      """ Return the total number of records in the log. """
+      """ Return the total number of records in the log.
+      
+      :returns: The total number of records in the log.
+      :rtype: int
+      """
       try:
          with self.connection:
             c = self.connection.cursor()

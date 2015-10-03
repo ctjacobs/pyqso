@@ -21,8 +21,11 @@ from gi.repository import Gtk
 import logging
 
 class Toolbar(Gtk.HBox):
-   
+   """ The toolbar underneath the menu bar. """
+
    def __init__(self, parent):
+      """ Set up the various buttons in the toolbar, and connect to their corresponding functions. """
+
       logging.debug("Setting up the toolbar...")  
  
       Gtk.HBox.__init__(self, spacing=2)
@@ -111,18 +114,26 @@ class Toolbar(Gtk.HBox):
       return
 
    def set_logbook_button_sensitive(self, sensitive):
-      logging.debug("Setting the 'Create/Open Logbook' toolbar item's sensitivity to: %s..." % sensitive) 
+      """ Enable/disable logbook-related toolbar items.
+      
+      :arg bool sensitive: If True, enable the 'new logbook' and 'open logbook' toolbar items. If False, disable them.
+      """
+      logging.debug("Setting logbook-related toolbar item sensitivity to: %s..." % sensitive) 
       self.buttons["NEW_LOGBOOK"].set_sensitive(sensitive)
       self.buttons["OPEN_LOGBOOK"].set_sensitive(sensitive)
       self.buttons["CLOSE_LOGBOOK"].set_sensitive(not sensitive)
-      logging.debug("Set the 'Create/Open Logbook' toolbar item's sensitivity to: %s." % sensitive) 
+      logging.debug("Set logbook-related toolbar item sensitivity to: %s." % sensitive) 
       return
 
    def set_record_buttons_sensitive(self, sensitive):
-      logging.debug("Setting record-related menu item sensitivity to: %s..." % sensitive) 
+      """ Enable/disable record-related toolbar items.
+      
+      :arg bool sensitive: If True, enable all the record-related toolbar items. If False, disable them all.
+      """
+      logging.debug("Setting record-related toolbar item sensitivity to: %s..." % sensitive) 
       for button_name in ["ADD_RECORD", "EDIT_RECORD", "DELETE_RECORD"]:
          self.buttons[button_name].set_sensitive(sensitive)
-      logging.debug("Set record-related menu item sensitivity to: %s." % sensitive) 
+      logging.debug("Set record-related toolbar item sensitivity to: %s." % sensitive) 
       return
 
 
