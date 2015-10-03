@@ -30,9 +30,9 @@ Callsign lookup
 ~~~~~~~~~~~~~~~
 
 PyQSO can also resolve station-related information (e.g. the operator's
-name, address, and ITU Zone) by clicking the ``Lookup on qrz.com``
+name, address, and ITU Zone) by clicking the ``Callsign lookup``
 button adjacent to the Callsign data entry box. Note that the user must
-first supply their `qrz.com <http://qrz.com/>`_ account information in the preferences dialog
+first supply their `qrz.com <http://qrz.com/>`_ or `hamqth.com <http://hamqth.com/>`_ account information in the preferences dialog
 window.
 
 Editing a record

@@ -83,8 +83,8 @@ class RecordDialog(Gtk.Dialog):
       icon.set_from_stock(Gtk.STOCK_INFO, Gtk.IconSize.MENU)
       button = Gtk.Button()
       button.add(icon)
-      button.connect("clicked", self.lookup_callback) # Looks up the callsign on qrz.com for callsign and station information.
-      button.set_tooltip_text("Lookup on qrz.com")
+      button.connect("clicked", self.lookup_callback) # Looks up the callsign using an online database, for callsign and station information.
+      button.set_tooltip_text("Callsign lookup")
       hbox_temp.pack_start(button, True, True, 2)
       vbox_inner.pack_start(hbox_temp, False, False, 2)
 
