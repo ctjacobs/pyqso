@@ -15,8 +15,7 @@ include:
 
 -  Import and export logs in ADIF format.
 
--  Perform callsign lookups and auto-fill data fields using the qrz.com
-   database.
+-  Perform callsign lookups and auto-fill data fields using the qrz.com and hamqth.com online databases.
 
 -  Sort the logs by individual fields.
 
