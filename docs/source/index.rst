@@ -18,4 +18,4 @@ Contents:
    toolbox
    preferences
    shortcuts
-
+   pyqso
