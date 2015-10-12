@@ -4,15 +4,13 @@ language: python
 
 python:
   - "3.4"
-
-virtualenv:
-  system_site_packages: true
-
+  
 addons:
   apt:
     packages:
     - python3
     - gir1.2-gtk-3.0
+    - python3-gi
     - python3-gi-cairo
     - python3-mpltoolkits.basemap
     - python3-numpy
