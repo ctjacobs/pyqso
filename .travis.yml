@@ -14,7 +14,7 @@ addons:
     - python3-gi-cairo
     - python3-mpltoolkits.basemap
     - python3-numpy
-    - python3-matplotlib
+    - python3-mathplotlib
     - python3-libhamlib2
     - python3-sphinx
 
