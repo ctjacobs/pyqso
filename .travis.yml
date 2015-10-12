@@ -10,7 +10,7 @@ virtualenv:
 
 addons:
   apt:
-    sources:
+    packages:
     - gir1.2-gtk-3.0
     - python-gi-cario
     - python-mpltoolkits.basemap
