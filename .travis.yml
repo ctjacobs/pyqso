@@ -4,20 +4,18 @@ language: python
 
 python:
   - "3.4"
-
-virtualenv:
-  system_site_packages: true
-
+  
 addons:
   apt:
     packages:
+    - python3
     - gir1.2-gtk-3.0
-    - python-gi-cairo
-    - python-mpltoolkits.basemap
-    - python-numpy
-    - python-matplotlib
-    - python-libhamlib2
-    - python-sphinx
+    - python3-gi-cairo
+    - python3-mpltoolkits.basemap
+    - python3-numpy
+    - python3-matplotlib
+    - python3-libhamlib2
+    - python3-sphinx
 
 before_install:
  - "export DISPLAY=:99.0"
