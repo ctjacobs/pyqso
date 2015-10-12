@@ -23,7 +23,7 @@ input: 	clean install docs
 
 install:
 	@echo "*** Installing PyQSO"
-	python setup.py install
+	python3 setup.py install
 
 docs:
 	@echo "*** Building the documentation"
@@ -31,7 +31,7 @@ docs:
 
 unittest:
 	@echo "*** Running the unit tests"
-	python -m unittest discover --start-directory=pyqso --pattern=*.py --verbose
+	python3 -m unittest discover --start-directory=pyqso --pattern=*.py --verbose
 
 clean:
 	@echo "*** Cleaning docs directory"

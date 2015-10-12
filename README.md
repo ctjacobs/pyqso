@@ -57,25 +57,24 @@ Dependencies
 PyQSO depends on the following Debian packages:
 
 * gir1.2-gtk-3.0
-* python2.7
-* python-gi-cairo (for log printing purposes)
+* python3
+* python3-gi-cairo (for log printing purposes)
 
 The following extra packages are necessary to enable the grey line tool:
 
-* python-mpltoolkits.basemap
-* python-numpy
-* python-matplotlib (version 1.3.0 or later)
-
-The following extra package is necessary to enable Hamlib support:
-
-* python-libhamlib2
+* python3-mpltoolkits.basemap
+* python3-numpy
+* python3-matplotlib (version 1.3.0 or later)
+* libxcb-render0-dev
+* python3-cairocffi
 
 The following extra package is necessary to build the documentation:
 
-* python-sphinx
+* python3-sphinx
+
+There currently does not exist a Python 3-compatible Debian package for [Hamlib](http://www.hamlib.org). This library must be built manually to enable Hamlib support.
 
 Contact
 -------
 
-If you have any comments or questions about PyQSO, please send them via email to <c.jacobs10@imperial.ac.uk>.
-
+If you have any comments or questions about PyQSO, please send them via email to Christian Jacobs (2E0ICL) at <c.jacobs10@imperial.ac.uk>.

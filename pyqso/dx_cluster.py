@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #    Copyright (C) 2013 Christian T. Jacobs.
 
@@ -158,7 +158,7 @@ class DXCluster(Gtk.VBox):
       if(self.connection):
          text = self.connection.read_very_eager()
          try:
-            text = text.replace(u"\u0007", "") # Remove the BEL Unicode character from the end of the line
+            text = text.replace("\u0007", "") # Remove the BEL Unicode character from the end of the line
          except UnicodeDecodeError:
             pass
             

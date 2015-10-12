@@ -34,7 +34,7 @@ include:
 
 -  Basic support for the Hamlib library.
 
-The source code for PyQSO is available for download from the `GitHub repository <https://github.com/ctjacobs/pyqso>`_.
+The source code for PyQSO, written in Python (version 3.x), is available for download from the `GitHub repository <https://github.com/ctjacobs/pyqso>`_.
 
 Data storage model
 ------------------
