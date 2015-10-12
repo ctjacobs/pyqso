@@ -22,8 +22,8 @@ import logging
 import sqlite3 as sqlite
 import unittest
 
-from adif import AVAILABLE_FIELD_NAMES_ORDERED
-from record_dialog import *
+from .adif import AVAILABLE_FIELD_NAMES_ORDERED
+from .record_dialog import *
 
 class Log(Gtk.ListStore):
    """ A single log inside of the whole logbook. A Log object can store multiple Record objects. """
@@ -141,7 +141,7 @@ class Log(Gtk.ListStore):
          database_entry = []
          for t in column_names:
             column_name = str(t[1]) # 't' here is a tuple
-            if( (column_name.upper() in AVAILABLE_FIELD_NAMES_ORDERED) and (column_name.upper() in fields_and_data[r].keys()) ):
+            if( (column_name.upper() in AVAILABLE_FIELD_NAMES_ORDERED) and (column_name.upper() in list(fields_and_data[r].keys())) ):
                database_entry.append(fields_and_data[r][column_name.upper()])
             else:
                if(column_name != "id"): # Ignore the row index field. This is a special case since it's not in AVAILABLE_FIELD_NAMES_ORDERED.
@@ -152,7 +152,7 @@ class Log(Gtk.ListStore):
          liststore_entry = []
          field_names = AVAILABLE_FIELD_NAMES_ORDERED
          for i in range(0, len(field_names)):
-            if(field_names[i] in fields_and_data[r].keys()):
+            if(field_names[i] in list(fields_and_data[r].keys())):
                liststore_entry.append(fields_and_data[r][field_names[i]])
             else:
                liststore_entry.append("")
@@ -349,8 +349,8 @@ class TestLog(unittest.TestCase):
       for t in result:
          column_names_after.append(t[1].upper())
 
-      print "Column names before: ", column_names_before
-      print "Column names after: ", column_names_after
+      print("Column names before: ", column_names_before)
+      print("Column names after: ", column_names_after)
 
       assert(len(column_names_before) == len(self.field_names) + 1) # Added 1 here because of the "ID" column in all database tables.
       assert(len(column_names_after) == len(AVAILABLE_FIELD_NAMES_ORDERED) + 1)
@@ -366,7 +366,7 @@ class TestLog(unittest.TestCase):
       assert len(records) == 1
       
       for field_name in self.field_names:
-         print self.fields_and_data[field_name], records[0][field_name]
+         print(self.fields_and_data[field_name], records[0][field_name])
          assert self.fields_and_data[field_name] == records[0][field_name]
 
    def test_log_delete_record(self):
@@ -410,8 +410,8 @@ class TestLog(unittest.TestCase):
       c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
 
       record = self.log.get_record_by_index(1)
-      print "Contents of retrieved record: ", record
-      for field_name in record.keys():
+      print("Contents of retrieved record: ", record)
+      for field_name in list(record.keys()):
          if(field_name.upper() == "ID"):
             continue
          else:
@@ -426,7 +426,7 @@ class TestLog(unittest.TestCase):
       c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
 
       records = self.log.get_all_records()
-      print "Contents of all retrieved records: ", records
+      print("Contents of all retrieved records: ", records)
       assert(len(records) == 2) # There should be 2 records
       for field_name in self.field_names:
          assert(records[0][field_name] == self.fields_and_data[field_name])
@@ -440,7 +440,7 @@ class TestLog(unittest.TestCase):
       c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
 
       number_of_records = self.log.get_number_of_records()
-      print "Number of records in the log: ", number_of_records
+      print("Number of records in the log: ", number_of_records)
       assert(number_of_records == 2) # There should be 2 records
 
    def test_log_get_duplicates(self):

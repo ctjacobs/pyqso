@@ -19,7 +19,7 @@
 
 from gi.repository import Gtk
 import logging
-import ConfigParser
+import configparser
 import os.path
 
 class Menu(Gtk.MenuBar):
@@ -209,7 +209,7 @@ class Menu(Gtk.MenuBar):
       mitem_view.set_submenu(subm_view)
 
       mitem_toolbox = Gtk.CheckMenuItem("Toolbox")
-      config = ConfigParser.ConfigParser()
+      config = configparser.ConfigParser()
       have_config = (config.read(os.path.expanduser('~/.pyqso.ini')) != [])
       (section, option) = ("general", "show_toolbox")
       if(have_config and config.has_option(section, option)):

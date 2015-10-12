@@ -19,7 +19,7 @@
 
 from gi.repository import Gtk, GdkPixbuf
 import argparse
-import ConfigParser
+import configparser
 import os
 import os.path
 import sys
@@ -54,7 +54,7 @@ class PyQSO(Gtk.Window):
       Gtk.Window.__init__(self, title="PyQSO")
 
       # Get any application-specific preferences from the configuration file      
-      config = ConfigParser.ConfigParser()
+      config = configparser.ConfigParser()
       # Check that the configuration file actually exists (and is readable)
       # otherwise, we will resort to the defaults.
       have_config = (config.read(os.path.expanduser("~/.pyqso.ini")) != [])
@@ -65,8 +65,8 @@ class PyQSO(Gtk.Window):
       for icon_path in possible_icon_paths:
          try:
             self.set_icon_from_file(icon_path)
-         except Exception, error:
-            print error.message
+         except Exception as error:
+            print(error.message)
 
       # Kills the application if the close button is clicked on the main window itself. 
       self.connect("delete-event", Gtk.main_quit)
@@ -136,8 +136,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.""")
       for icon_path in possible_icon_paths:
          try:
             about.set_logo(GdkPixbuf.Pixbuf.new_from_file_at_scale(icon_path, 64, 64, False))
-         except Exception, error:
-            print error.message
+         except Exception as error:
+            print(error.message)
       about.run()
       about.destroy()
       return      

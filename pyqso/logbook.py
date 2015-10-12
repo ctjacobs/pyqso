@@ -22,12 +22,12 @@ import logging
 import sqlite3 as sqlite
 from os.path import basename, getmtime, expanduser
 import datetime
-import ConfigParser
+import configparser
 
-from adif import *
-from log import *
-from log_name_dialog import *
-from auxiliary_dialogs import *
+from .adif import *
+from .log import *
+from .log_name_dialog import *
+from .auxiliary_dialogs import *
 
 class Logbook(Gtk.Notebook):
    """ A Logbook object can store multiple Log objects. """
@@ -498,7 +498,7 @@ class Logbook(Gtk.Notebook):
 
          column.connect("clicked", self.sort_log, i+1)
 
-         config = ConfigParser.ConfigParser()
+         config = configparser.ConfigParser()
          have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
          (section, option) = ("view", AVAILABLE_FIELD_NAMES_ORDERED[i].lower())
          if(have_config and config.has_option(section, option)):

@@ -19,10 +19,10 @@
 
 import logging
 import unittest
-import httplib
+import http.client
 from xml.dom import minidom
 
-from auxiliary_dialogs import *
+from .auxiliary_dialogs import *
 
 class CallsignLookupQRZ():
    """ Use qrz.com to lookup details about a particular callsign. """
@@ -47,7 +47,7 @@ class CallsignLookupQRZ():
       """
       logging.debug("Connecting to the qrz.com server...")
       try:
-         self.connection = httplib.HTTPConnection('xmldata.qrz.com')
+         self.connection = http.client.HTTPConnection('xmldata.qrz.com')
          request = '/xml/current/?username=%s;password=%s;agent=pyqso' % (username, password)
          self.connection.request('GET', request)
          response = self.connection.getresponse()
@@ -172,7 +172,7 @@ class CallsignLookupHamQTH():
 
       logging.debug("Connecting to the hamqth.com server...")
       try:
-         self.connection = httplib.HTTPConnection('www.hamqth.com')
+         self.connection = http.client.HTTPConnection('www.hamqth.com')
          request = '/xml.php?u=%s&p=%s' % (username, password)
          self.connection.request('GET', request)
          response = self.connection.getresponse()
