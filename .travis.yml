@@ -27,6 +27,7 @@ install:
 
 before_script:
   - export PYTHONPATH=`pwd`:$PYTHONPATH
+  - echo $PYTHONPATH
   
 script:
   - make unittest
