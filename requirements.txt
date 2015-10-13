@@ -1,0 +1,6 @@
+gi
+gi-cario
+numpy
+matplotlib
+libhamlib2
+sphinx
