@@ -1,4 +1,3 @@
-pygobject
 numpy
 matplotlib
 sphinx
