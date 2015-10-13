@@ -1,5 +1,4 @@
 gi
 numpy
 matplotlib
-libhamlib2
 sphinx
