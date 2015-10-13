@@ -1,22 +1,36 @@
+sudo: false
+
 language: python
 
 python:
   - "3.5"
+  
+addons:
+  apt:
+    packages:
+    - python3
+    - gir1.2-gtk-3.0
+    - python3-gi
+    - python3-gi-cairo
+    - python3-mpltoolkits.basemap
+    - python3-numpy
+    - python3-matplotlib
+    - python3-libhamlib2
+    - python3-sphinx
 
 before_install:
- - sudo apt-get update -qq
- - sudo apt-get install -y python3 gir1.2-gtk-3.0 python3-gi-cairo python3-numpy python3-sphinx
  - "export DISPLAY=:99.0"
  - "sh -e /etc/init.d/xvfb start"
 
 install:
-  - sudo make install
+  - "pip3 install -r requirements.txt"
+  - make install
 
 before_script:
   - export PYTHONPATH=`pwd`:$PYTHONPATH
-  - uname -a
+  - echo $PYTHONPATH
   
 script:
   - make unittest
   - make docs
-  - sudo make clean
+  - make clean
