@@ -14,6 +14,7 @@ install:
 
 before_script:
   - export PYTHONPATH=`pwd`:$PYTHONPATH
+  - uname -a
   
 script:
   - make unittest
