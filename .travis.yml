@@ -8,10 +8,10 @@ addons:
     - python3-cairo
     - python3-gi
     - python3-gi-cairo
-    - python3-mpltoolkits.basemap
-    - python3-numpy
-    - python3-matplotlib
-    - python3-libhamlib2
+    - python-mpltoolkits.basemap
+    - python-numpy
+    - python-matplotlib
+    - python-libhamlib2
     - python3-sphinx
 
 language: python
