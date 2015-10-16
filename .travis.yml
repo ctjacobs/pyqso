@@ -1,39 +1,24 @@
 sudo: required
 dist: trusty
 
-addons:
-  apt:
-    packages:
-    - python3
-    - gir1.2-gtk-3.0
-    - python3-cairo
-    - python3-gi
-    - python3-gi-cairo
-    - python-mpltoolkits.basemap
-    - python-numpy
-    - python-matplotlib
-    - python-libhamlib2
-    - python3-sphinx
-
 language: python
 
 python:
-  - "3.5"
-  
+  - "3.4"
+
 before_install:
+ - sudo apt-get update -qq
+ - sudo apt-get install -y gir1.2-gtk-3.0 python3-gi-cairo python-mpltoolkits.basemap python-numpy python-matplotlib python-libhamlib2 python-sphinx
  - "export DISPLAY=:99.0"
  - "sh -e /etc/init.d/xvfb start"
 
 install:
-  - "pip install -r requirements.txt"
-  - make install
+  - sudo make install
 
 before_script:
-  - uname -a
   - export PYTHONPATH=`pwd`:$PYTHONPATH
-  - echo $PYTHONPATH
   
 script:
   - make unittest
   - make docs
-  - make clean
+  - sudo make clean
