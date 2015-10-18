@@ -14,9 +14,6 @@ before_install:
 
 install:
   - sudo make install
-
-before_script:
-  - export PYTHONPATH=`pwd`:$PYTHONPATH
   
 script:
   - make unittest
