@@ -25,9 +25,9 @@ import datetime
 import configparser
 
 from adif import *
-from .log import *
-from .log_name_dialog import *
-from .auxiliary_dialogs import *
+from log import *
+from log_name_dialog import *
+from auxiliary_dialogs import *
 
 class Logbook(Gtk.Notebook):
    """ A Logbook object can store multiple Log objects. """
