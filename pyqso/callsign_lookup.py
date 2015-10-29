@@ -22,7 +22,7 @@ import unittest
 import http.client
 from xml.dom import minidom
 
-from .auxiliary_dialogs import *
+from auxiliary_dialogs import *
 
 class CallsignLookupQRZ():
    """ Use qrz.com to lookup details about a particular callsign. """

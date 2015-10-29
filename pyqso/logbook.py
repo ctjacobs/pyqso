@@ -24,7 +24,7 @@ from os.path import basename, getmtime, expanduser
 import datetime
 import configparser
 
-from .adif import *
+from adif import *
 from .log import *
 from .log_name_dialog import *
 from .auxiliary_dialogs import *
