@@ -24,10 +24,10 @@ from os.path import basename, getmtime, expanduser
 import datetime
 import configparser
 
-from adif import *
-from log import *
-from log_name_dialog import *
-from auxiliary_dialogs import *
+from pyqso.adif import *
+from pyqso.log import *
+from pyqso.log_name_dialog import *
+from pyqso.auxiliary_dialogs import *
 
 class Logbook(Gtk.Notebook):
    """ A Logbook object can store multiple Log objects. """

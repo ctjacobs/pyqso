@@ -22,8 +22,8 @@ import logging
 import sqlite3 as sqlite
 import unittest
 
-from adif import AVAILABLE_FIELD_NAMES_ORDERED
-from record_dialog import *
+from pyqso.adif import AVAILABLE_FIELD_NAMES_ORDERED
+from pyqso.record_dialog import *
 
 class Log(Gtk.ListStore):
    """ A single log inside of the whole logbook. A Log object can store multiple Record objects. """

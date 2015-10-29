@@ -30,9 +30,9 @@ except ImportError:
    logging.warning("Could not import the Hamlib module!")
    have_hamlib = False
 
-from adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED, MODES, BANDS, BANDS_RANGES
-from callsign_lookup import *
-from auxiliary_dialogs import *
+from pyqso.adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED, MODES, BANDS, BANDS_RANGES
+from pyqso.callsign_lookup import *
+from pyqso.auxiliary_dialogs import *
 
 class RecordDialog(Gtk.Dialog):
    """ A dialog through which users can enter information about a QSO/record. """
