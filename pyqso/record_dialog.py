@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #    Copyright (C) 2013 Christian T. Jacobs.
 
@@ -19,7 +19,7 @@
 
 from gi.repository import Gtk
 import logging
-import ConfigParser
+import configparser
 from datetime import datetime
 from os.path import expanduser
 import base64
@@ -30,9 +30,9 @@ except ImportError:
    logging.warning("Could not import the Hamlib module!")
    have_hamlib = False
 
-from adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED, MODES, BANDS, BANDS_RANGES
-from callsign_lookup import *
-from auxiliary_dialogs import *
+from pyqso.adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED, MODES, BANDS, BANDS_RANGES
+from pyqso.callsign_lookup import *
+from pyqso.auxiliary_dialogs import *
 
 class RecordDialog(Gtk.Dialog):
    """ A dialog through which users can enter information about a QSO/record. """
@@ -54,7 +54,7 @@ class RecordDialog(Gtk.Dialog):
       Gtk.Dialog.__init__(self, title=title, parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
 
       # Check if a configuration file is present, since we might need it to set up the rest of the dialog.
-      config = ConfigParser.ConfigParser()
+      config = configparser.ConfigParser()
       have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
       
       ## QSO DATA FRAME
@@ -476,7 +476,7 @@ class RecordDialog(Gtk.Dialog):
       """ Get the callsign-related data from an online database and store it in the relevant Gtk.Entry boxes, but return None. """
       
       # Get the database name.
-      config = ConfigParser.ConfigParser()
+      config = configparser.ConfigParser()
       have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
       try:
          if(have_config and config.has_option("records", "callsign_database")):
@@ -529,7 +529,7 @@ class RecordDialog(Gtk.Dialog):
             ignore_prefix_suffix = True
             
          fields_and_data = callsign_lookup.lookup(full_callsign, ignore_prefix_suffix=ignore_prefix_suffix)
-         for field_name in fields_and_data.keys():
+         for field_name in list(fields_and_data.keys()):
             self.sources[field_name].set_text(fields_and_data[field_name])
       return
 
@@ -547,7 +547,7 @@ class RecordDialog(Gtk.Dialog):
       """ Insert the current date and time. """
       
       # Check if a configuration file is present.
-      config = ConfigParser.ConfigParser()
+      config = configparser.ConfigParser()
       have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
       
       # Do we want to use UTC or the computer's local time?

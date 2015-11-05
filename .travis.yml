@@ -1,14 +1,17 @@
+sudo: required
+dist: trusty
+
 language: python
 
 python:
-  - "2.7"
-
+  - "3.4"
+  
 virtualenv:
   system_site_packages: true
 
 before_install:
  - sudo apt-get update -qq
- - sudo apt-get install -y python2.7 gir1.2-gtk-3.0 python-gi-cairo python-mpltoolkits.basemap python-numpy python-matplotlib python-libhamlib2 python-sphinx
+ - sudo apt-get install -yq xvfb gir1.2-gtk-3.0 python3-gi-cairo python-mpltoolkits.basemap python3-numpy python3-matplotlib python-libhamlib2 python3-sphinx
  - "export DISPLAY=:99.0"
  - "sh -e /etc/init.d/xvfb start"
 
@@ -17,6 +20,7 @@ install:
 
 before_script:
   - export PYTHONPATH=`pwd`:$PYTHONPATH
+  - echo $PYTHONPATH
   
 script:
   - make unittest

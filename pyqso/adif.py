@@ -1,4 +1,4 @@
-#!/usr/bin/env python 
+#!/usr/bin/env python3 
 
 #    Copyright (C) 2012 Christian T. Jacobs.
 
@@ -22,7 +22,7 @@ import logging
 import unittest
 from datetime import datetime
 import calendar
-import ConfigParser
+import configparser
 from os.path import expanduser
 
 # ADIF field names and their associated data types available in PyQSO.
@@ -143,7 +143,7 @@ class ADIF:
       records = []
 
       # ADIF-related configuration options
-      config = ConfigParser.ConfigParser()
+      config = configparser.ConfigParser()
       have_config = (config.read(expanduser('~/.pyqso.ini')) != [])         
       (section, option) = ("adif", "merge_comment")
       if(have_config and config.has_option(section, option) and config.get(section, option) == "True"):
@@ -214,7 +214,7 @@ class ADIF:
 
             # Merge the COMMENT field with the NOTES field, if desired and applicable.
             if(merge_comment):
-               if("NOTES" in fields_and_data_dictionary.keys() and comment):
+               if("NOTES" in list(fields_and_data_dictionary.keys()) and comment):
                   logging.debug("Merging COMMENT field with NOTES field...")
                   fields_and_data_dictionary["NOTES"] += "\\n" + comment
                   logging.debug("Merged fields.")
@@ -258,7 +258,7 @@ class ADIF:
          # Then write each log to the file.
          for r in records:
             for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
-               if(not(field_name.lower() in r.keys() or field_name.upper() in r.keys())): 
+               if(not(field_name.lower() in list(r.keys()) or field_name.upper() in list(r.keys()))): 
                   # If the field_name does not exist in the record, then skip past it.
                   # Only write out the fields that exist and that have some data in them.
                   continue
@@ -379,7 +379,7 @@ class ADIF:
 
       elif(data_type == "I"):
          # IntlString
-         m = re.match(ur"(.+)", data, re.UNICODE)
+         m = re.match(r"(.+)", data, re.UNICODE)
          if(m is None):
             return False
          else:
@@ -387,7 +387,7 @@ class ADIF:
 
       elif(data_type == "G"):
          # IntlMultilineString
-         m = re.match(ur"(.+(\r\n)*.*)", data, re.UNICODE)
+         m = re.match(r"(.+(\r\n)*.*)", data, re.UNICODE)
          if(m is None):
             return False
          else:
@@ -458,10 +458,10 @@ class TestADIF(unittest.TestCase):
     
       records = self.adif.read("ADIF.test_read.adi")
       expected_records = [{'TIME_ON': '1955', 'BAND': '40m', 'CALL': 'TEST', 'MODE': 'CW', 'QSO_DATE': '20130322'}]
-      print "Imported records: ", records
-      print "Expected records: ", expected_records
+      print("Imported records: ", records)
+      print("Expected records: ", expected_records)
       assert(len(records) == 1)
-      assert(len(records[0].keys()) == len(expected_records[0].keys()))
+      assert(len(list(records[0].keys())) == len(list(expected_records[0].keys())))
       assert(records == expected_records)
 
    def test_adif_read_multiple(self):
@@ -480,11 +480,11 @@ class TestADIF(unittest.TestCase):
     
       records = self.adif.read("ADIF.test_read_multiple.adi")
       expected_records = [{'TIME_ON': '1955', 'BAND': '40m', 'CALL': 'TEST', 'MODE': 'CW', 'QSO_DATE': '20130322'}, {'TIME_ON': '0820', 'BAND': '20m', 'CALL': 'TEST2ABC', 'MODE': 'SSB', 'QSO_DATE': '20150227'}, {'TIME_ON': '0832', 'BAND': '2m', 'CALL': 'HELLO', 'MODE': 'FM', 'QSO_DATE': '20150227'}]
-      print "Imported records: ", records
-      print "Expected records: ", expected_records
+      print("Imported records: ", records)
+      print("Expected records: ", expected_records)
       assert(len(records) == 3)
       for i in range(len(expected_records)):
-         assert(len(records[i].keys()) == len(expected_records[i].keys()))
+         assert(len(list(records[i].keys())) == len(list(expected_records[i].keys())))
       assert(records == expected_records)
 
    def test_adif_read_alphabet(self):
@@ -496,10 +496,10 @@ class TestADIF(unittest.TestCase):
     
       records = self.adif.read("ADIF.test_read_alphabet.adi")
       expected_records = [{'CALL': 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'}]
-      print "Imported records: ", records
-      print "Expected records: ", expected_records
+      print("Imported records: ", records)
+      print("Expected records: ", expected_records)
       assert(len(records) == 1)
-      assert(len(records[0].keys()) == len(expected_records[0].keys()))
+      assert(len(list(records[0].keys())) == len(list(expected_records[0].keys())))
       assert(records == expected_records)
 
    def test_adif_read_capitalisation(self):
@@ -511,10 +511,10 @@ class TestADIF(unittest.TestCase):
     
       records = self.adif.read("ADIF.test_read_capitalisation.adi")
       expected_records = [{'CALL': 'TEST'}]
-      print "Imported records: ", records
-      print "Expected records: ", expected_records
+      print("Imported records: ", records)
+      print("Expected records: ", expected_records)
       assert(len(records) == 1)
-      assert(len(records[0].keys()) == len(expected_records[0].keys()))
+      assert(len(list(records[0].keys())) == len(list(expected_records[0].keys())))
       assert(records == expected_records)
       
    def test_adif_read_header_only(self):
@@ -525,8 +525,8 @@ class TestADIF(unittest.TestCase):
     
       records = self.adif.read("ADIF.test_read_header_only.adi")
       expected_records = []
-      print "Imported records: ", records
-      print "Expected records: ", expected_records
+      print("Imported records: ", records)
+      print("Expected records: ", expected_records)
       assert(len(records) == 0)
       assert(records == expected_records)
 
@@ -538,10 +538,10 @@ class TestADIF(unittest.TestCase):
     
       records = self.adif.read("ADIF.test_read_no_header.adi")
       expected_records = [{'TIME_ON': '1955', 'BAND': '40m', 'CALL': 'TEST', 'MODE': 'CW', 'QSO_DATE': '20130322'}]
-      print "Imported records: ", records
-      print "Expected records: ", expected_records
+      print("Imported records: ", records)
+      print("Expected records: ", expected_records)
       assert(len(records) == 1)
-      assert(len(records[0].keys()) == len(expected_records[0].keys()))
+      assert(len(list(records[0].keys())) == len(list(expected_records[0].keys())))
       assert(records == expected_records)
 
    def test_adif_write(self):
@@ -552,7 +552,7 @@ class TestADIF(unittest.TestCase):
 
       f = open("ADIF.test_write.adi", 'r')
       text = f.read()
-      print "File 'ADIF.test_write.adi' contains the following text:", text
+      print("File 'ADIF.test_write.adi' contains the following text:", text)
       assert("""        
 <adif_ver:3>1.0
 <programid:5>PyQSO
@@ -587,13 +587,13 @@ class TestADIF(unittest.TestCase):
       c = self.connection.cursor()
       c.execute("SELECT * FROM test")
       records = c.fetchall()
-      print records
+      print(records)
 
       self.adif.write(records, "ADIF.test_write_sqlite3_Row.adi")
 
       f = open("ADIF.test_write_sqlite3_Row.adi", 'r')
       text = f.read()
-      print "File 'ADIF.test_write_sqlite3_Row.adi' contains the following text:", text
+      print("File 'ADIF.test_write_sqlite3_Row.adi' contains the following text:", text)
       assert("""        
 <adif_ver:3>1.0
 <programid:5>PyQSO
