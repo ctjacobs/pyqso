@@ -85,8 +85,53 @@ AVAILABLE_FIELD_NAMES_FRIENDLY = {"CALL":"Callsign",
 # L: Location
 DATA_TYPES = ["A", "B", "N", "S", "I", "D", "T", "M", "G", "L", "E"]
 
-# All the modes listed in the ADIF specification
-MODES = ["", "AM", "AMTORFEC", "ASCI", "ATV", "CHIP64", "CHIP128", "CLO", "CONTESTI", "CW", "DSTAR", "DOMINO", "DOMINOF", "FAX", "FM", "FMHELL", "FSK31", "FSK441", "GTOR", "HELL", "HELL80", "HFSK", "ISCAT", "JT44", "JT4A", "JT4B", "JT4C", "JT4D", "JT4E", "JT4F", "JT4G", "JT65", "JT65A", "JT65B", "JT65C", "JT6M", "MFSK8", "MFSK16", "MT63", "OLIVIA", "PAC", "PAC2", "PAC3", "PAX", "PAX2", "PCW", "PKT", "PSK10", "PSK31", "PSK63", "PSK63F", "PSK125", "PSKAM10", "PSKAM31", "PSKAM50", "PSKFEC31", "PSKHELL", "Q15", "QPSK31", "QPSK63", "QPSK125", "ROS", "RTTY", "RTTYM", "SSB", "SSTV", "THRB", "THOR", "THRBX", "TOR", "V4", "VOI", "WINMOR", "WSPR"]
+# All the modes listed in the ADIF specification. This is a dictionary with the key-value pairs holding the MODE and SUBMODE(s) respectively.
+MODES = {"":{},
+         "AM":{}, 
+         "ATV":{}, 
+         "CHIP":{"CHIP64", "CHIP128"}, 
+         "CLO":{},
+         "CONTESTI":{},
+         "CW":{"PCW"},
+         "DIGITALVOICE":{},
+         "DOMINO":{"DOMINOEX", "DOMINOF"},
+         "DSTAR":{},
+         "FAX":{},
+         "FM":{},
+         "FSK441":{},
+         "HELL":{"FMHELL", "FSKHELL", "HELL80", "HFSK", "PSKHELL"},
+         "ISCAT":{"ISCAT-A", "ISCAT-B"}, 
+         "JT4":{"JT4A", "JT4B", "JT4C", "JT4D", "JT4E", "JT4F", "JT4G"},
+         "JT6M":{},
+         "JT9":{},
+         "JT44":{},
+         "JT65":{"JT65A", "JT65B", "JT65B2", "JT65C", "JT65C2"},
+         "MFSK":{"MFSK4", "MFSK8", "MFSK11", "MFSK16", "MFSK22", "MFSK31", "MFSK32", "MFSK64", "MFSK128"},
+         "MT63":{},
+         "OLIVIA":{"OLIVIA 4/125", "OLIVIA 4/250", "OLIVIA 8/250", "OLIVIA 8/500", "OLIVIA 16/500", "OLIVIA 16/1000", "OLIVIA 32/1000"},
+         "OPERA":{"OPERA-BEACON", "OPERA-QSO"},
+         "PAC":{"PAC2", "PAC3", "PAC4"},
+         "PAX":{"PAX2"},
+         "PKT":{},
+         "PSK":{"FSK31", "PSK10", "PSK31", "PSK63", "PSK63F", "PSK125", "PSK250", "PSK500", "PSK1000", "PSKAM10", "PSKAM31", "PSKAM50", "PSKFEC31", "QPSK31", "QPSK63", "QPSK125", "QPSK250", "QPSK500"},
+         "PSK2K":{},
+         "Q15":{},
+         "ROS":{"ROS-EME", "ROS-HF", "ROS-MF"},
+         "RTTY":{"ASCI"},
+         "RTTYM":{},
+         "SSB":{"LSB", "USB"},
+         "SSTV":{},
+         "THOR":{},
+         "THRB":{"THRBX"},
+         "TOR":{"AMTORFEC", "GTOR"},
+         "V4":{},
+         "VOI":{},
+         "WINMOR":{},
+         "WSPR":{}
+         }
+
+# A list of all the deprecated MODE values.
+MODES_DEPRECATED = ["AMTORFEC", "ASCI", "CHIP64", "CHIP128", "DOMINOF", "FMHELL", "FSK31", "GTOR", "HELL80", "HFSK", "JT4A", "JT4B", "JT4C", "JT4D", "JT4E", "JT4F", "JT4G", "JT65A", "JT65B", "JT65C", "MFSK8", "MFSK16", "PAC2", "PAC3", "PAX2", "PCW", "PSK10", "PSK31", "PSK63", "PSK63F", "PSK125", "PSKAM10", "PSKAM31", "PSKAM50", "PSKFEC31", "PSKHELL", "QPSK31", "QPSK63", "QPSK125", "THRBX"]
 
 # All the bands listed in the ADIF specification.
 BANDS = ["", "2190m", "560m", "160m", "80m", "60m", "40m", "30m", "20m", "17m", "15m", "12m", "10m", "6m", "4m", "2m", "1.25m", "70cm", "33cm", "23cm", "13cm", "9cm", "6cm", "3cm", "1.25cm", "6mm", "4mm", "2.5mm", "2mm", "1mm"]
