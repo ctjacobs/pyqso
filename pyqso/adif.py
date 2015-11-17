@@ -32,6 +32,7 @@ AVAILABLE_FIELD_NAMES_TYPES = {"CALL": "S",
                               "FREQ": "N",
                               "BAND": "E",
                               "MODE": "E",
+                              "SUBMODE": "E",
                               "TX_PWR": "N",
                               "RST_SENT": "S",
                               "RST_RCVD": "S",
@@ -48,7 +49,7 @@ AVAILABLE_FIELD_NAMES_TYPES = {"CALL": "S",
                               "IOTA": "C"}
 # Note: The logbook uses the ADIF field names for the database column names.
 # This list is used to display the columns in a logical order.
-AVAILABLE_FIELD_NAMES_ORDERED = ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "TX_PWR", 
+AVAILABLE_FIELD_NAMES_ORDERED = ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "SUBMODE", "TX_PWR", 
                                  "RST_SENT", "RST_RCVD", "QSL_SENT", "QSL_RCVD", "NOTES", "NAME",
                                  "ADDRESS", "STATE", "COUNTRY", "DXCC", "CQZ", "ITUZ", "IOTA"]
 # Define the more user-friendly versions of the field names.
@@ -58,6 +59,7 @@ AVAILABLE_FIELD_NAMES_FRIENDLY = {"CALL":"Callsign",
                                   "FREQ":"Frequency (MHz)",
                                   "BAND":"Band",
                                   "MODE":"Mode",
+                                  "SUBMODE":"Submode",
                                   "TX_PWR":"TX Power (W)",
                                   "RST_SENT":"RST Sent",
                                   "RST_RCVD":"RST Received",
@@ -86,48 +88,48 @@ AVAILABLE_FIELD_NAMES_FRIENDLY = {"CALL":"Callsign",
 DATA_TYPES = ["A", "B", "N", "S", "I", "D", "T", "M", "G", "L", "E"]
 
 # All the modes listed in the ADIF specification. This is a dictionary with the key-value pairs holding the MODE and SUBMODE(s) respectively.
-MODES = {"":{},
-         "AM":{}, 
-         "ATV":{}, 
-         "CHIP":{"CHIP64", "CHIP128"}, 
-         "CLO":{},
-         "CONTESTI":{},
-         "CW":{"PCW"},
-         "DIGITALVOICE":{},
-         "DOMINO":{"DOMINOEX", "DOMINOF"},
-         "DSTAR":{},
-         "FAX":{},
-         "FM":{},
-         "FSK441":{},
-         "HELL":{"FMHELL", "FSKHELL", "HELL80", "HFSK", "PSKHELL"},
-         "ISCAT":{"ISCAT-A", "ISCAT-B"}, 
-         "JT4":{"JT4A", "JT4B", "JT4C", "JT4D", "JT4E", "JT4F", "JT4G"},
-         "JT6M":{},
-         "JT9":{},
-         "JT44":{},
-         "JT65":{"JT65A", "JT65B", "JT65B2", "JT65C", "JT65C2"},
-         "MFSK":{"MFSK4", "MFSK8", "MFSK11", "MFSK16", "MFSK22", "MFSK31", "MFSK32", "MFSK64", "MFSK128"},
-         "MT63":{},
-         "OLIVIA":{"OLIVIA 4/125", "OLIVIA 4/250", "OLIVIA 8/250", "OLIVIA 8/500", "OLIVIA 16/500", "OLIVIA 16/1000", "OLIVIA 32/1000"},
-         "OPERA":{"OPERA-BEACON", "OPERA-QSO"},
-         "PAC":{"PAC2", "PAC3", "PAC4"},
-         "PAX":{"PAX2"},
-         "PKT":{},
-         "PSK":{"FSK31", "PSK10", "PSK31", "PSK63", "PSK63F", "PSK125", "PSK250", "PSK500", "PSK1000", "PSKAM10", "PSKAM31", "PSKAM50", "PSKFEC31", "QPSK31", "QPSK63", "QPSK125", "QPSK250", "QPSK500"},
-         "PSK2K":{},
-         "Q15":{},
-         "ROS":{"ROS-EME", "ROS-HF", "ROS-MF"},
-         "RTTY":{"ASCI"},
-         "RTTYM":{},
-         "SSB":{"LSB", "USB"},
-         "SSTV":{},
-         "THOR":{},
-         "THRB":{"THRBX"},
-         "TOR":{"AMTORFEC", "GTOR"},
-         "V4":{},
-         "VOI":{},
-         "WINMOR":{},
-         "WSPR":{}
+MODES = {"":("",),
+         "AM":("",), 
+         "ATV":("",), 
+         "CHIP":("", "CHIP64", "CHIP128"),
+         "CLO":("",),
+         "CONTESTI":("",),
+         "CW":("", "PCW"),
+         "DIGITALVOICE":("",),
+         "DOMINO":("", "DOMINOEX", "DOMINOF"),
+         "DSTAR":("",),
+         "FAX":("",),
+         "FM":("",),
+         "FSK441":("",),
+         "HELL":("", "FMHELL", "FSKHELL", "HELL80", "HFSK", "PSKHELL"),
+         "ISCAT":("", "ISCAT-A", "ISCAT-B"),
+         "JT4":("", "JT4A", "JT4B", "JT4C", "JT4D", "JT4E", "JT4F", "JT4G"),
+         "JT6M":("",),
+         "JT9":("",),
+         "JT44":("",),
+         "JT65":("", "JT65A", "JT65B", "JT65B2", "JT65C", "JT65C2"),
+         "MFSK":("", "MFSK4", "MFSK8", "MFSK11", "MFSK16", "MFSK22", "MFSK31", "MFSK32", "MFSK64", "MFSK128"),
+         "MT63":("",),
+         "OLIVIA":("", "OLIVIA 4/125", "OLIVIA 4/250", "OLIVIA 8/250", "OLIVIA 8/500", "OLIVIA 16/500", "OLIVIA 16/1000", "OLIVIA 32/1000"),
+         "OPERA":("", "OPERA-BEACON", "OPERA-QSO"),
+         "PAC":("", "PAC2", "PAC3", "PAC4"),
+         "PAX":("", "PAX2"),
+         "PKT":("",),
+         "PSK":("", "FSK31", "PSK10", "PSK31", "PSK63", "PSK63F", "PSK125", "PSK250", "PSK500", "PSK1000", "PSKAM10", "PSKAM31", "PSKAM50", "PSKFEC31", "QPSK31", "QPSK63", "QPSK125", "QPSK250", "QPSK500"),
+         "PSK2K":("",),
+         "Q15":("",),
+         "ROS":("", "ROS-EME", "ROS-HF", "ROS-MF"),
+         "RTTY":("", "ASCI"),
+         "RTTYM":("",),
+         "SSB":("", "LSB", "USB"),
+         "SSTV":("",),
+         "THOR":("",),
+         "THRB":("", "THRBX"),
+         "TOR":("", "AMTORFEC", "GTOR"),
+         "V4":("",),
+         "VOI":("",),
+         "WINMOR":("",),
+         "WSPR":("",)
          }
 
 # A list of all the deprecated MODE values.
@@ -147,6 +149,16 @@ class ADIF:
    def __init__(self):
       """ Initialise class for I/O of files using the Amateur Data Interchange Format (ADIF). """
       logging.debug("New ADIF instance created!")
+      
+   def deprecated_mode(self, deprecated):
+      """ Take the value stored in the MODE field and check if it is deprecated.
+      If it is, find and return the corresponding 'new' MODE (and SUBMODE, if applicable). """
+      if deprecated in MODES_DEPRECATED:
+         for mode in list(MODES.keys()):
+            for submode in MODES[mode]:
+               if submode == deprecated:
+                  return (mode, submode)
+      return (deprecated, "")
       
    def read(self, path):
       """ Read an ADIF file and parse it.
@@ -242,11 +254,8 @@ class ADIF:
                # so adjust the field data accordingly.
                if(field_name == "BAND"):
                   field_data = field_data.lower()
-               elif(field_name == "MODE"):
-                  field_data = field_data.upper()
-               elif(field_name == "CALL"):
-                  # Also force all the callsigns to be in upper case.
-                  field_data = field_data.upper()      
+               elif(field_name == "CALL" or field_name == "MODE" or field_name == "SUBMODE"):
+                  field_data = field_data.upper()   
                elif(field_name == "COMMENT"):
                   # Keep a copy of the COMMENT field data, in case we want to merge
                   # it with the NOTES field.
@@ -475,7 +484,7 @@ class ADIF:
       elif(data_type == "E" or data_type == "A"):
          # Enumeration, AwardList.
          if(field_name == "MODE"):
-            return (data in MODES)
+            return (data in list(MODES.keys()) or data in MODES_DEPRECATED)
          elif(field_name == "BAND"):
             return (data in BANDS)
          else:
