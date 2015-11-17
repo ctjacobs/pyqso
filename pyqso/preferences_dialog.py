@@ -29,7 +29,7 @@ except ImportError:
    logging.warning("Could not import the Hamlib module!")
    have_hamlib = False
 
-from pyqso.adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED, MODES
+from pyqso.adif import *
 
 class PreferencesDialog(Gtk.Dialog):
    """ A dialog to specify the PyQSO preferences. """
@@ -80,27 +80,27 @@ class PreferencesDialog(Gtk.Dialog):
       # General
       config.add_section("general")
       for key in list(general_data.keys()):
-         config.set("general", key.lower(), general_data[key])
+         config.set("general", key.lower(), str(general_data[key]))
 
       # View
       config.add_section("view")
       for key in list(view_data.keys()):
-         config.set("view", key.lower(), view_data[key])
+         config.set("view", key.lower(), str(view_data[key]))
 
       # ADIF
       config.add_section("adif")
       for key in list(adif_data.keys()):
-         config.set("adif", key.lower(), adif_data[key])
+         config.set("adif", key.lower(), str(adif_data[key]))
          
       # Hamlib
       config.add_section("hamlib")
       for key in list(hamlib_data.keys()):
-         config.set("hamlib", key.lower(), hamlib_data[key])
+         config.set("hamlib", key.lower(), str(hamlib_data[key]))
       
       # Records
       config.add_section("records")
       for key in list(records_data.keys()):
-         config.set("records", key.lower(), records_data[key])
+         config.set("records", key.lower(), str(records_data[key]))
 
       with open(os.path.expanduser('~/.pyqso.ini'), 'w') as f:
          config.write(f)
@@ -330,16 +330,39 @@ class RecordsPage(Gtk.VBox):
       hbox_temp.pack_start(label, False, False, 2)
       
       self.sources["DEFAULT_MODE"] = Gtk.ComboBoxText()
-      for mode in MODES:
+      for mode in sorted(MODES.keys()):
          self.sources["DEFAULT_MODE"].append_text(mode)
       (section, option) = ("records", "default_mode")
       if(have_config and config.has_option(section, option)):
-         self.sources["DEFAULT_MODE"].set_active(MODES.index(config.get(section, option)))
+         adif = ADIF()
+         mode = config.get(section, option)
+         mode, submode = adif.deprecated_mode(mode)
       else:
-         self.sources["DEFAULT_MODE"].set_active(MODES.index(""))
+         mode = ""
+      self.sources["DEFAULT_MODE"].set_active(sorted(MODES.keys()).index(mode))
+      self.sources["DEFAULT_MODE"].connect("changed", self._on_mode_changed)
       hbox_temp.pack_start(self.sources["DEFAULT_MODE"], False, False, 2)
       vbox.pack_start(hbox_temp, False, False, 2)
 
+      # Submode
+      hbox_temp = Gtk.HBox()
+      label = Gtk.Label("Submode: ")
+      label.set_width_chars(17)
+      label.set_alignment(0, 0.5)
+      hbox_temp.pack_start(label, False, False, 2)
+      
+      self.sources["DEFAULT_SUBMODE"] = Gtk.ComboBoxText()
+      for submode in MODES[mode]:
+         self.sources["DEFAULT_SUBMODE"].append_text(submode)
+      (section, option) = ("records", "default_submode")
+      if(have_config and config.has_option(section, option)):
+         submode = config.get(section, option)
+      else:
+         submode = ""
+      self.sources["DEFAULT_SUBMODE"].set_active(MODES[mode].index(submode))
+      hbox_temp.pack_start(self.sources["DEFAULT_SUBMODE"], False, False, 2)
+      vbox.pack_start(hbox_temp, False, False, 2)
+      
       # Power
       hbox_temp = Gtk.HBox()
       label = Gtk.Label("TX Power (W): ")
@@ -410,7 +433,8 @@ class RecordsPage(Gtk.VBox):
       self.sources["CALLSIGN_DATABASE_PASSWORD"].set_visibility(False) # Mask the password with the "*" character.
       (section, option) = ("records", "callsign_database_password")
       if(have_config and config.has_option(section, option)):
-         self.sources["CALLSIGN_DATABASE_PASSWORD"].set_text(base64.b64decode(config.get(section, option)))
+         password = base64.b64decode(config.get(section, option)).decode("utf-8")
+         self.sources["CALLSIGN_DATABASE_PASSWORD"].set_text(password)
       hbox.pack_start(self.sources["CALLSIGN_DATABASE_PASSWORD"], False, False, 2)
       inner_vbox.pack_start(hbox, False, False, 2)
 
@@ -441,14 +465,24 @@ class RecordsPage(Gtk.VBox):
       data["USE_UTC"] = self.sources["USE_UTC"].get_active()
       
       data["DEFAULT_MODE"] = self.sources["DEFAULT_MODE"].get_active_text()
+      data["DEFAULT_SUBMODE"] = self.sources["DEFAULT_SUBMODE"].get_active_text()
       data["DEFAULT_POWER"] = self.sources["DEFAULT_POWER"].get_text()
       
       data["CALLSIGN_DATABASE"] = self.sources["CALLSIGN_DATABASE"].get_active_text()
       data["CALLSIGN_DATABASE_USERNAME"] = self.sources["CALLSIGN_DATABASE_USERNAME"].get_text()
-      data["CALLSIGN_DATABASE_PASSWORD"] = base64.b64encode(self.sources["CALLSIGN_DATABASE_PASSWORD"].get_text())
+      data["CALLSIGN_DATABASE_PASSWORD"] = base64.b64encode(self.sources["CALLSIGN_DATABASE_PASSWORD"].get_text().encode("utf-8")).decode('utf-8') # Need to convert from bytes to str here.
       data["IGNORE_PREFIX_SUFFIX"] = self.sources["IGNORE_PREFIX_SUFFIX"].get_active()
       return data
 
+   def _on_mode_changed(self, combo):
+      """ If the MODE field has changed its value, then fill the SUBMODE field with all the available SUBMODE options for that new MODE. """
+      self.sources["DEFAULT_SUBMODE"].get_model().clear()
+      text = combo.get_active_text()
+      print(text)
+      for submode in MODES[text]:
+         self.sources["DEFAULT_SUBMODE"].append_text(submode)
+      return
+      
 class ADIFPage(Gtk.VBox):
    """ The section of the preferences dialog containing ADIF-related preferences. """
    
