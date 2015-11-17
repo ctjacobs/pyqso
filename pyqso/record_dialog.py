@@ -30,7 +30,7 @@ except ImportError:
    logging.warning("Could not import the Hamlib module!")
    have_hamlib = False
 
-from pyqso.adif import AVAILABLE_FIELD_NAMES_FRIENDLY, AVAILABLE_FIELD_NAMES_ORDERED, MODES, BANDS, BANDS_RANGES
+from pyqso.adif import *
 from pyqso.callsign_lookup import *
 from pyqso.auxiliary_dialogs import *
 
@@ -157,12 +157,26 @@ class RecordDialog(Gtk.Dialog):
       hbox_temp.pack_start(label, False, False, 2)
 
       self.sources["MODE"] = Gtk.ComboBoxText()
-      for mode in MODES:
+      for mode in sorted(MODES.keys()):
          self.sources["MODE"].append_text(mode)
       self.sources["MODE"].set_active(0) # Set an empty string as the default option.
+      self.sources["MODE"].connect("changed", self._on_mode_changed)
       hbox_temp.pack_start(self.sources["MODE"], False, False, 2)
       vbox_inner.pack_start(hbox_temp, False, False, 2)
 
+      # SUBMODE
+      hbox_temp = Gtk.HBox(spacing=0)
+      label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["SUBMODE"])
+      label.set_alignment(0, 0.5)
+      label.set_width_chars(15)
+      hbox_temp.pack_start(label, False, False, 2)
+
+      self.sources["SUBMODE"] = Gtk.ComboBoxText()
+      self.sources["SUBMODE"].append_text("")
+      self.sources["SUBMODE"].set_active(0) # Set an empty string initially. As soon as the user selects a particular MODE, the available SUBMODES will appear.
+      hbox_temp.pack_start(self.sources["SUBMODE"], False, False, 2)
+      vbox_inner.pack_start(hbox_temp, False, False, 2)
+      
       # POWER
       hbox_temp = Gtk.HBox(spacing=0)
       label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["TX_PWR"], halign=Gtk.Align.START)
@@ -362,7 +376,12 @@ class RecordDialog(Gtk.Dialog):
             if(field_names[i] == "BAND"):
                self.sources[field_names[i]].set_active(BANDS.index(data))
             elif(field_names[i] == "MODE"):
-               self.sources[field_names[i]].set_active(MODES.index(data))
+               adif = ADIF()
+               mode, submode = adif.deprecated_mode(data)
+               self.sources[field_names[i]].set_active(sorted(MODES.keys()).index(mode))
+            elif(field_names[i] == "SUBMODE"):
+               # NOTE: This assumes that the MODE field has already been set.
+               self.sources[field_names[i]].set_active(MODES[self.sources["MODE"].get_active_text()].index(data))
             elif(field_names[i] == "QSL_SENT" or field_names[i] == "QSL_RCVD"):
                self.sources[field_names[i]].set_active(qsl_options.index(data))
             elif(field_names[i] == "NOTES"):
@@ -382,8 +401,16 @@ class RecordDialog(Gtk.Dialog):
             mode = config.get(section, option)
          else:
             mode = ""
-         self.sources["MODE"].set_active(MODES.index(mode))
+         self.sources["MODE"].set_active(sorted(MODES.keys()).index(mode))
 
+         # Submode
+         (section, option) = ("records", "default_submode")
+         if(have_config and config.has_option(section, option)):
+            submode = config.get(section, option)
+         else:
+            submode = ""
+         self.sources["SUBMODE"].set_active(MODES[mode].index(submode))
+         
          # Power
          (section, option) = ("records", "default_power")
          if(have_config and config.has_option(section, option)):
@@ -438,7 +465,11 @@ class RecordDialog(Gtk.Dialog):
       if(field_name == "CALL"):
          # Always show the callsigns in upper case.
          return self.sources[field_name].get_text().upper()
-      elif(field_name == "BAND" or field_name == "MODE" or field_name == "QSL_SENT" or field_name == "QSL_RCVD"):
+      elif(field_name == "MODE"):
+         return self.sources["MODE"].get_active_text()
+      elif(field_name == "SUBMODE"):
+         return self.sources["SUBMODE"].get_active_text()
+      elif(field_name == "BAND" or field_name == "QSL_SENT" or field_name == "QSL_RCVD"):
          return self.sources[field_name].get_active_text()
       elif(field_name == "NOTES"):
          (start, end) = self.sources[field_name].get_bounds()
@@ -450,7 +481,14 @@ class RecordDialog(Gtk.Dialog):
       else:
          return self.sources[field_name].get_text()
 
-
+   def _on_mode_changed(self, combo):
+      """ If the MODE field has changed its value, then fill the SUBMODE field with all the available SUBMODE options for that new MODE. """
+      self.sources["SUBMODE"].get_model().clear()
+      text = combo.get_active_text()
+      for submode in MODES[text]:
+         self.sources["SUBMODE"].append_text(submode)
+      return
+            
    def _autocomplete_band(self, widget=None):
       """ If a value for the Frequency is entered, this function autocompletes the Band field. """
 
@@ -506,7 +544,7 @@ class RecordDialog(Gtk.Dialog):
       # Get username and password from configuration file
       if(have_config and config.has_option("records", "callsign_database_username") and config.has_option("records", "callsign_database_password")):
          username = config.get("records", "callsign_database_username")
-         password = base64.b64decode(config.get("records", "callsign_database_password"))
+         password = base64.b64decode(config.get("records", "callsign_database_password")).decode("utf-8")
          if(username == "" or password == ""):
             details_given = False
          else:
