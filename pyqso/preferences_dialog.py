@@ -475,9 +475,8 @@ class RecordsPage(Gtk.VBox):
    def _on_mode_changed(self, combo):
       """ If the MODE field has changed its value, then fill the SUBMODE field with all the available SUBMODE options for that new MODE. """
       self.sources["DEFAULT_SUBMODE"].get_model().clear()
-      text = combo.get_active_text()
-      print(text)
-      for submode in MODES[text]:
+      mode = combo.get_active_text()
+      for submode in MODES[mode]:
          self.sources["DEFAULT_SUBMODE"].append_text(submode)
       return
       
