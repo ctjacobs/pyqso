@@ -193,16 +193,6 @@ class ADIF:
       """ Initialise class for I/O of files using the Amateur Data Interchange Format (ADIF). """
       logging.debug("New ADIF instance created!")
       
-   def deprecated_mode(self, deprecated):
-      """ Take the value stored in the MODE field and check if it is deprecated.
-      If it is, find and return the corresponding 'new' MODE (and SUBMODE, if applicable). """
-      if deprecated in MODES_DEPRECATED:
-         for mode in list(MODES.keys()):
-            for submode in MODES[mode]:
-               if submode == deprecated:
-                  return (mode, submode)
-      return (deprecated, "")
-      
    def read(self, path):
       """ Read an ADIF file and parse it.
       
