@@ -316,25 +316,32 @@ class TestCallsignLookup(unittest.TestCase):
       self.hamqth = CallsignLookupHamQTH(parent=None)
 
    def tearDown(self):
+      """ Destroy any unit test resources. """
       pass
 
    def test_strip(self):
+      """ Check that a callsign with a prefix and a suffix is stripped correctly. """
       callsign = "EA3/MYCALL/MM"
       assert strip(callsign) == "MYCALL"
       
    def test_strip_prefix_only(self):
+      """ Check that a callsign with only a prefix is stripped correctly. """
       callsign = "EA3/MYCALL"
       assert strip(callsign) == "MYCALL"
       
    def test_strip_suffix_only(self):
+      """ Check that a callsign with only a suffix is stripped correctly. """
       callsign = "MYCALL/M"
       assert strip(callsign) == "MYCALL"
 
    def test_strip_no_prefix_or_suffix(self):
+      """ Check that a callsign with no prefix or suffix remains unmodified. """
       callsign = "MYCALL"
       assert strip(callsign) == "MYCALL"
 
    def test_qrz_connect(self):
+      """ Check the example response from the qrz.com server, and make sure the session key has been correctly extracted. """
+
       http.client.HTTPConnection = unittest.mock.Mock(spec=http.client.HTTPConnection)
       http.client.HTTPResponse = unittest.mock.Mock(spec=http.client.HTTPResponse)
       connection = http.client.HTTPConnection()
@@ -348,6 +355,8 @@ class TestCallsignLookup(unittest.TestCase):
       assert(self.qrz.session_key == "3b1fd1d3ba495189984f93ff67bd45b6")
 
    def test_qrz_lookup(self):
+      """ Check the example callsign lookup response from the qrz.com server, and make sure the callsign information has been correctly extracted. """
+
       http.client.HTTPConnection = unittest.mock.Mock(spec=http.client.HTTPConnection)
       http.client.HTTPResponse = unittest.mock.Mock(spec=http.client.HTTPResponse)
       connection = http.client.HTTPConnection()
@@ -364,6 +373,8 @@ class TestCallsignLookup(unittest.TestCase):
       assert(fields_and_data["COUNTRY"] == "COUNTRY")
 
    def test_hamqth_connect(self):
+      """ Check the example response from the hamqth.com server, and make sure the session ID has been correctly extracted. """
+
       http.client.HTTPConnection = unittest.mock.Mock(spec=http.client.HTTPConnection)
       http.client.HTTPResponse = unittest.mock.Mock(spec=http.client.HTTPResponse)
       connection = http.client.HTTPConnection()
@@ -377,6 +388,8 @@ class TestCallsignLookup(unittest.TestCase):
       assert(self.hamqth.session_id == "09b0ae90050be03c452ad235a1f2915ad684393c")
 
    def test_hamqth_lookup(self):
+      """ Check the example callsign lookup response from the hamqth.com server, and make sure the callsign information has been correctly extracted. """
+
       http.client.HTTPConnection = unittest.mock.Mock(spec=http.client.HTTPConnection)
       http.client.HTTPResponse = unittest.mock.Mock(spec=http.client.HTTPResponse)
       connection = http.client.HTTPConnection()
