@@ -19,6 +19,7 @@
 
 import logging
 import unittest
+import unittest.mock
 import http.client
 from xml.dom import minidom
 
@@ -54,7 +55,7 @@ class CallsignLookupQRZ():
       except:
          error(parent=self.parent, message="Could not connect to the qrz.com server. Check connection to the internets?")
          return False
-     
+
       xml_data = minidom.parseString(response.read())
       session_node = xml_data.getElementsByTagName('Session')[0] # There should only be one Session element
       session_key_node = session_node.getElementsByTagName('Key')
@@ -179,7 +180,7 @@ class CallsignLookupHamQTH():
       except:
          error(parent=self.parent, message="Could not connect to the hamqth.com server. Check connection to the internets?")
          return False
-      
+
       xml_data = minidom.parseString(response.read())
       session_node = xml_data.getElementsByTagName('session')[0] # There should only be one Session element
       session_id_node = session_node.getElementsByTagName('session_id')
@@ -229,10 +230,10 @@ class CallsignLookupHamQTH():
 
             search_name_node = search_node.getElementsByTagName('nick')
             if(len(search_name_node) > 0):
-               fields_and_data["NAME"] = fields_and_data["NAME"] + " " + search_name_node[0].firstChild.nodeValue
+               fields_and_data["NAME"] = search_name_node[0].firstChild.nodeValue
 
-            search_addr1_node = search_node.getElementsByTagName('addr_street1')
-            search_addr2_node = search_node.getElementsByTagName('addr_street2')
+            search_addr1_node = search_node.getElementsByTagName('adr_street1')
+            search_addr2_node = search_node.getElementsByTagName('adr_street2')
             if(len(search_addr1_node) > 0):
                fields_and_data["ADDRESS"] = search_addr1_node[0].firstChild.nodeValue
             if(len(search_addr2_node) > 0): # Add the second line of the address, if present
@@ -246,7 +247,7 @@ class CallsignLookupHamQTH():
             if(len(search_country_node) > 0):
                fields_and_data["COUNTRY"] = search_country_node[0].firstChild.nodeValue
 
-            search_cqzone_node = search_node.getElementsByTagName('CQ')
+            search_cqzone_node = search_node.getElementsByTagName('cq')
             if(len(search_cqzone_node) > 0):
                fields_and_data["CQZ"] = search_cqzone_node[0].firstChild.nodeValue
 
@@ -310,7 +311,11 @@ class TestCallsignLookup(unittest.TestCase):
    """ The unit tests for the CallsignLookup class. """
 
    def setUp(self):
-      """ Set up the CallsignLookup object needed for the unit tests. """
+      """ Set up the objects needed for the unit tests. """
+      self.qrz = CallsignLookupQRZ(parent=None)
+      self.hamqth = CallsignLookupHamQTH(parent=None)
+
+   def tearDown(self):
       pass
 
    def test_strip(self):
@@ -329,5 +334,66 @@ class TestCallsignLookup(unittest.TestCase):
       callsign = "MYCALL"
       assert strip(callsign) == "MYCALL"
 
+   def test_qrz_connect(self):
+      http.client.HTTPConnection = unittest.mock.Mock(spec=http.client.HTTPConnection)
+      http.client.HTTPResponse = unittest.mock.Mock(spec=http.client.HTTPResponse)
+      connection = http.client.HTTPConnection()
+      response = http.client.HTTPResponse()
+
+      response.read.return_value = b'<?xml version="1.0" encoding="utf-8" ?>\n<QRZDatabase version="1.33" xmlns="http://xmldata.qrz.com">\n<Session>\n<Key>3b1fd1d3ba495189984f93ff67bd45b6</Key>\n<Count>61</Count>\n<SubExp>non-subscriber</SubExp>\n<GMTime>Sun Nov 22 21:25:34 2015</GMTime>\n<Remark>cpu: 0.147s</Remark>\n</Session>\n</QRZDatabase>\n'
+      connection.getresponse.return_value = response
+
+      result = self.qrz.connect("hello", "world")
+      assert(result)
+      assert(self.qrz.session_key == "3b1fd1d3ba495189984f93ff67bd45b6")
+
+   def test_qrz_lookup(self):
+      http.client.HTTPConnection = unittest.mock.Mock(spec=http.client.HTTPConnection)
+      http.client.HTTPResponse = unittest.mock.Mock(spec=http.client.HTTPResponse)
+      connection = http.client.HTTPConnection()
+      response = http.client.HTTPResponse()
+
+      response.read.return_value = b'<?xml version="1.0" encoding="utf-8" ?>\n<QRZDatabase version="1.33" xmlns="http://xmldata.qrz.com">\n<Callsign>\n<call>MYCALL</call>\n<fname>FIRSTNAME</fname>\n<name>LASTNAME</name>\n<addr2>ADDRESS2</addr2>\n<country>COUNTRY</country>\n</Callsign>\n<Session>\n<Key>3b1fd1d3ba495189984f93ff67bd45b6</Key>\n<Count>61</Count>\n<SubExp>non-subscriber</SubExp>\n<Message>A subscription is required to access the complete record.</Message>\n<GMTime>Sun Nov 22 21:34:46 2015</GMTime>\n<Remark>cpu: 0.026s</Remark>\n</Session>\n</QRZDatabase>\n'
+      connection.getresponse.return_value = response
+
+      self.qrz.connection = connection
+      self.qrz.session_key = "3b1fd1d3ba495189984f93ff67bd45b6"
+      fields_and_data = self.qrz.lookup("MYCALL")
+      assert(fields_and_data["NAME"] == "FIRSTNAME LASTNAME")
+      assert(fields_and_data["ADDRESS"] == "ADDRESS2")
+      assert(fields_and_data["COUNTRY"] == "COUNTRY")
+
+   def test_hamqth_connect(self):
+      http.client.HTTPConnection = unittest.mock.Mock(spec=http.client.HTTPConnection)
+      http.client.HTTPResponse = unittest.mock.Mock(spec=http.client.HTTPResponse)
+      connection = http.client.HTTPConnection()
+      response = http.client.HTTPResponse()
+
+      response.read.return_value = b'<?xml version="1.0"?>\n<HamQTH version="2.6" xmlns="https://www.hamqth.com">\n<session>\n<session_id>09b0ae90050be03c452ad235a1f2915ad684393c</session_id>\n</session>\n</HamQTH>\n'
+      connection.getresponse.return_value = response
+
+      result = self.hamqth.connect("hello", "world")
+      assert(result)
+      assert(self.hamqth.session_id == "09b0ae90050be03c452ad235a1f2915ad684393c")
+
+   def test_hamqth_lookup(self):
+      http.client.HTTPConnection = unittest.mock.Mock(spec=http.client.HTTPConnection)
+      http.client.HTTPResponse = unittest.mock.Mock(spec=http.client.HTTPResponse)
+      connection = http.client.HTTPConnection()
+      response = http.client.HTTPResponse()
+
+      response.read.return_value = b'<?xml version="1.0"?>\n<HamQTH version="2.6" xmlns="https://www.hamqth.com">\n<search>\n<callsign>MYCALL</callsign>\n<nick>NAME</nick>\n<country>COUNTRY</country>\n<itu>ITU</itu>\n<cq>CQ</cq>\n<grid>GRID</grid>\n<adr_street1>ADDRESS</adr_street1>\n</search>\n</HamQTH>\n'
+      connection.getresponse.return_value = response
+
+      self.hamqth.connection = connection
+      self.hamqth.session_id = "09b0ae90050be03c452ad235a1f2915ad684393c"
+      fields_and_data = self.hamqth.lookup("MYCALL")
+      assert(fields_and_data["NAME"] == "NAME")
+      assert(fields_and_data["ADDRESS"] == "ADDRESS")
+      assert(fields_and_data["COUNTRY"] == "COUNTRY")
+      assert(fields_and_data["CQZ"] == "CQ")
+      assert(fields_and_data["ITUZ"] == "ITU")
+      assert(fields_and_data["IOTA"] == "GRID")
+      
 if(__name__ == '__main__'):
    unittest.main()
