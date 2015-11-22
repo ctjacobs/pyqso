@@ -87,7 +87,7 @@ AVAILABLE_FIELD_NAMES_FRIENDLY = {"CALL":"Callsign",
 # L: Location
 DATA_TYPES = ["A", "B", "N", "S", "I", "D", "T", "M", "G", "L", "E"]
 
-# All the modes listed in the ADIF specification. This is a dictionary with the key-value pairs holding the MODE and SUBMODE(s) respectively.
+# All the valid modes listed in the ADIF specification. This is a dictionary with the key-value pairs holding the MODE and SUBMODE(s) respectively.
 MODES = {"":("",),
          "AM":("",), 
          "ATV":("",), 
@@ -132,7 +132,7 @@ MODES = {"":("",),
          "WSPR":("",)
          }
 
-# A list of all the deprecated MODE values.
+# A dictionary of all the deprecated MODE values.
 MODES_DEPRECATED = {"AMTORFEC":("",),
                     "ASCI":("",),
                     "CHIP64":("",),
@@ -175,7 +175,7 @@ MODES_DEPRECATED = {"AMTORFEC":("",),
                     "THRBX":("",)
                     }
                     
-# Include all deprecated MODES.
+# Include all deprecated modes.
 MODES.update(MODES_DEPRECATED)
 
 # All the bands listed in the ADIF specification.
