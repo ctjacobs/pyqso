@@ -116,11 +116,11 @@ class DXCluster(Gtk.VBox):
          self.connection = telnetlib.Telnet(host, port)
 
          if(username):
-            self.connection.read_until("login: ")
-            self.connection.write(username + "\n")
+            self.connection.read_until("login: ".encode())
+            self.connection.write((username + "\n").encode())
          if(password):
-            self.connection.read_until("password: ")
-            self.connection.write(password + "\n")
+            self.connection.read_until("password: ".encode())
+            self.connection.write((password + "\n").encode())
       except:
          logging.exception("Could not create a connection to the Telnet server")
          self.connection = None
@@ -145,7 +145,7 @@ class DXCluster(Gtk.VBox):
    def telnet_send_command(self, widget=None):
       """ Send the user-specified command in the Gtk.Entry box to the Telnet server (if PyQSO is connected to one). """
       if(self.connection):
-         self.connection.write(self.command.get_text() + "\n")
+         self.connection.write((self.command.get_text() + "\n").encode())
          self.command.set_text("")
       return
 
@@ -156,7 +156,7 @@ class DXCluster(Gtk.VBox):
       :rtype: bool
       """
       if(self.connection):
-         text = self.connection.read_very_eager()
+         text = self.connection.read_very_eager().decode()
          try:
             text = text.replace("\u0007", "") # Remove the BEL Unicode character from the end of the line
          except UnicodeDecodeError:
