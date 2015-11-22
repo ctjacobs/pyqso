@@ -20,6 +20,8 @@
 from gi.repository import Gtk, GObject
 import logging
 import telnetlib
+import unittest
+import unittest.mock
 
 from pyqso.telnet_connection_dialog import *
 
@@ -64,7 +66,7 @@ class DXCluster(Gtk.VBox):
 
       self.command = Gtk.Entry()
       self.toolbar.pack_start(self.command, False, False, 0)
-      self.send = Gtk.Button("Send Command")
+      self.send = Gtk.Button(label="Send Command")
       self.send.connect("clicked", self.telnet_send_command)
       self.toolbar.pack_start(self.send, False, False, 0)
 
@@ -187,3 +189,26 @@ class DXCluster(Gtk.VBox):
       self.send.set_sensitive(not sensitive)
       return
 
+class TestDXCluster(unittest.TestCase):
+   """ The unit tests for the DXCluster class. """
+
+   def setUp(self):
+      """ Set up the objects needed for the unit tests. """
+      self.dxcluster = DXCluster(parent=None)
+
+   def tearDown(self):
+      """ Destroy any unit test resources. """
+      pass
+
+   def test_on_telnet_io(self):
+      """ Check that the response from the Telnet server can be correctly decoded. """
+
+      telnetlib.Telnet = unittest.mock.Mock(spec=telnetlib.Telnet)
+      connection = telnetlib.Telnet("hello", "world")
+      connection.read_very_eager.return_value = b"Test message from the Telnet server."
+      self.dxcluster.connection = connection
+      result = self.dxcluster._on_telnet_io()
+      assert(result)
+      
+if(__name__ == '__main__'):
+   unittest.main()

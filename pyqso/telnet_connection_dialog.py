@@ -87,4 +87,3 @@ class TelnetConnectionDialog(Gtk.Dialog):
       logging.debug("Returning Telnet connection information...") 
       return self.sources
 
-
