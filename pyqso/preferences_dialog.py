@@ -334,9 +334,7 @@ class RecordsPage(Gtk.VBox):
          self.sources["DEFAULT_MODE"].append_text(mode)
       (section, option) = ("records", "default_mode")
       if(have_config and config.has_option(section, option)):
-         adif = ADIF()
          mode = config.get(section, option)
-         mode, submode = adif.deprecated_mode(mode)
       else:
          mode = ""
       self.sources["DEFAULT_MODE"].set_active(sorted(MODES.keys()).index(mode))

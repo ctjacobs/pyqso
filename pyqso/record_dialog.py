@@ -376,12 +376,14 @@ class RecordDialog(Gtk.Dialog):
             if(field_names[i] == "BAND"):
                self.sources[field_names[i]].set_active(BANDS.index(data))
             elif(field_names[i] == "MODE"):
-               adif = ADIF()
-               mode, submode = adif.deprecated_mode(data)
-               self.sources[field_names[i]].set_active(sorted(MODES.keys()).index(mode))
+               self.sources[field_names[i]].set_active(sorted(MODES.keys()).index(data))
+               
+               submode_data = record["submode"]
+               if(submode_data is None):
+                  submode_data = ""
+               self.sources["SUBMODE"].set_active(MODES[data].index(submode_data))
             elif(field_names[i] == "SUBMODE"):
-               # NOTE: This assumes that the MODE field has already been set.
-               self.sources[field_names[i]].set_active(MODES[self.sources["MODE"].get_active_text()].index(data))
+               continue
             elif(field_names[i] == "QSL_SENT" or field_names[i] == "QSL_RCVD"):
                self.sources[field_names[i]].set_active(qsl_options.index(data))
             elif(field_names[i] == "NOTES"):
