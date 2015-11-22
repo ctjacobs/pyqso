@@ -8,9 +8,12 @@
 - Added the option of merging the COMMENT field with the NOTES field when importing records from an ADIF file.
 
 ### Changed
+- Ported the codebase over to Python 3 using 2to3 (thanks to Neil Johnson).
 - The Summary page now also contains the total number of QSOs in the logbook.
 - Improvements to docstrings.
 - Various code cleanups (thanks to András Veres-Szentkirályi).
+- Brought the list of valid modes up-to-date.
+- Updated the list of bands and their frequency ranges.
 
 ## [0.2] - 2015-03-07
 ### Added
