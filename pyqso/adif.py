@@ -205,19 +205,20 @@ class ADIF:
 
       text = ""      
       try:
-         f = open(path, 'r')
+         f = open(path, mode='r', errors="replace")
          text = f.read()
          f.close() # Close the file, otherwise "bad things" might happen!
       except IOError as e:
          logging.error("I/O error %d: %s" % (e.errno, e.strerror))
-      except:
-         logging.error("Unknown error occurred when reading the ADIF file.")
+      except Exception as e:
+         logging.error("An error occurred when reading the ADIF file.")
+         logging.exception(e)
 
       records = self._parse_adi(text)
-         
+
       if(records == []):
          logging.warning("No records found in the file. Empty file or wrong file type?")
-         
+
       return records
       
    def _parse_adi(self, text):
@@ -330,7 +331,7 @@ class ADIF:
    
       logging.debug("Writing records to an ADIF file...")
       try:
-         f = open(path, 'w') # Open file for writing
+         f = open(path, mode='w', errors="replace") # Open file for writing
          
          # First write a header containing program version, number of records, etc.
          dt = datetime.now()
@@ -359,8 +360,9 @@ class ADIF:
 
       except IOError as e:
          logging.error("I/O error %d: %s" % (e.errno, e.strerror))
-      except:
-         logging.error("Unknown error occurred when writing the ADIF file.")
+      except Exception as e: # All other exceptions.
+         logging.error("An error occurred when writing the ADIF file.")
+         logging.exception(e)
 
       return
 
