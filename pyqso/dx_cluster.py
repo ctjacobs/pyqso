@@ -39,38 +39,36 @@ class DXCluster(Gtk.VBox):
       self.connection = None
       self.parent = parent
 
-      # Set up the toolbar
-      self.toolbar = Gtk.HBox(spacing=2)
-      self.buttons = {}
+      # Set up the menubar
+      self.menubar = Gtk.MenuBar()
+      
+      self.items = {}
+      
+      ###### CONNECTION ######
+      mitem_connection = Gtk.MenuItem("Connection")
+      self.menubar.append(mitem_connection)  
+      subm_connection = Gtk.Menu()
+      mitem_connection.set_submenu(subm_connection)
+
       # Connect
+      mitem_connect = Gtk.ImageMenuItem("Connect to Telnet Server...")
       icon = Gtk.Image()
-      icon.set_from_stock(Gtk.STOCK_CONNECT, Gtk.IconSize.BUTTON)
-      button = Gtk.Button()
-      button.add(icon)
-      button.set_tooltip_text('Connect to Telnet Server')
-      button.connect("clicked", self.telnet_connect)
-      self.toolbar.pack_start(button, False, False, 0)
-      self.buttons["CONNECT"] = button
+      icon.set_from_stock(Gtk.STOCK_CONNECT, Gtk.IconSize.MENU)
+      mitem_connect.set_image(icon)
+      mitem_connect.connect("activate", self.telnet_connect)
+      subm_connection.append(mitem_connect)
+      self.items["CONNECT"] = mitem_connect
 
       # Disconnect
+      mitem_disconnect = Gtk.ImageMenuItem("Disconnect from Telnet Server")
       icon = Gtk.Image()
-      icon.set_from_stock(Gtk.STOCK_DISCONNECT, Gtk.IconSize.BUTTON)
-      button = Gtk.Button()
-      button.add(icon)
-      button.set_tooltip_text('Disconnect from Telnet Server')
-      button.connect("clicked", self.telnet_disconnect)
-      self.toolbar.pack_start(button, False, False, 0)
-      self.buttons["DISCONNECT"] = button
-
-      self.toolbar.pack_start(Gtk.SeparatorToolItem(), False, False, 0)
-
-      self.command = Gtk.Entry()
-      self.toolbar.pack_start(self.command, False, False, 0)
-      self.send = Gtk.Button(label="Send Command")
-      self.send.connect("clicked", self.telnet_send_command)
-      self.toolbar.pack_start(self.send, False, False, 0)
-
-      self.pack_start(self.toolbar, False, False, 0)
+      icon.set_from_stock(Gtk.STOCK_DISCONNECT, Gtk.IconSize.MENU)
+      mitem_disconnect.set_image(icon)
+      mitem_disconnect.connect("activate", self.telnet_disconnect)
+      subm_connection.append(mitem_disconnect)
+      self.items["DISCONNECT"] = mitem_disconnect
+      
+      self.pack_start(self.menubar, False, False, 0)
 
       # A TextView object to display the output from the Telnet server.
       self.renderer = Gtk.TextView()
@@ -83,8 +81,19 @@ class DXCluster(Gtk.VBox):
       self.buffer = self.renderer.get_buffer()
       self.pack_start(sw, True, True, 0)
 
-      self.set_connect_button_sensitive(True)
+      # Set up the toolbar
+      self.toolbar = Gtk.HBox(spacing=2)
+      
+      self.command = Gtk.Entry()
+      self.toolbar.pack_start(self.command, True, True, 0)
+      self.send = Gtk.Button(label="Send Command")
+      self.send.connect("clicked", self.telnet_send_command)
+      self.toolbar.pack_start(self.send, False, False, 0)
 
+      self.pack_start(self.toolbar, False, False, 0)
+      
+      self.set_items_sensitive(True)
+            
       self.show_all()
 
       logging.debug("DX cluster ready!") 
@@ -128,7 +137,7 @@ class DXCluster(Gtk.VBox):
          self.connection = None
          return
 
-      self.set_connect_button_sensitive(False)
+      self.set_items_sensitive(False)
 
       self.check_io_event = GObject.timeout_add(1000, self._on_telnet_io)
 
@@ -140,8 +149,15 @@ class DXCluster(Gtk.VBox):
          self.connection.close()
       self.buffer.set_text("")
       self.connection = None
-      self.set_connect_button_sensitive(True)
-      GObject.source_remove(self.check_io_event)
+      self.set_items_sensitive(True)
+      
+      # Stop checking for server output once disconnected.
+      try:
+         GObject.source_remove(self.check_io_event)
+      except AttributeError:
+         # This may happen if a connection hasn't yet been established.
+         pass
+
       return
 
    def telnet_send_command(self, widget=None):
@@ -179,13 +195,13 @@ class DXCluster(Gtk.VBox):
 
       return True
 
-   def set_connect_button_sensitive(self, sensitive):
+   def set_items_sensitive(self, sensitive):
       """ Enable/disable the relevant buttons for connecting/disconnecting from a DX cluster, so that users cannot click the connect button if PyQSO is already connected.
       
       :arg bool sensitive: If True, enable the Connect button and disable the Disconnect button. If False, vice versa.
       """
-      self.buttons["CONNECT"].set_sensitive(sensitive)
-      self.buttons["DISCONNECT"].set_sensitive(not sensitive)
+      self.items["CONNECT"].set_sensitive(sensitive)
+      self.items["DISCONNECT"].set_sensitive(not sensitive)
       self.send.set_sensitive(not sensitive)
       return
 
