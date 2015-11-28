@@ -47,13 +47,13 @@ class DXCluster(Gtk.VBox):
       self.items = {}
       
       ###### CONNECTION ######
-      mitem_connection = Gtk.MenuItem("Connection")
+      mitem_connection = Gtk.MenuItem(label="Connection")
       self.menubar.append(mitem_connection)  
       subm_connection = Gtk.Menu()
       mitem_connection.set_submenu(subm_connection)
 
       # Connect
-      mitem_connect = Gtk.ImageMenuItem("Connect to Telnet Server")
+      mitem_connect = Gtk.ImageMenuItem(label="Connect to Telnet Server")
       icon = Gtk.Image()
       icon.set_from_stock(Gtk.STOCK_CONNECT, Gtk.IconSize.MENU)
       mitem_connect.set_image(icon)
@@ -63,12 +63,12 @@ class DXCluster(Gtk.VBox):
       subm_connect = Gtk.Menu()
       
       ## New
-      mitem_new = Gtk.MenuItem("New...")
+      mitem_new = Gtk.MenuItem(label="New...")
       mitem_new.connect("activate", self.new_server)
       subm_connect.append(mitem_new)
 
       ## From Bookmark
-      mitem_bookmark = Gtk.MenuItem("From Bookmark")
+      mitem_bookmark = Gtk.MenuItem(label="From Bookmark")
       self.subm_bookmarks = Gtk.Menu()
       mitem_bookmark.set_submenu(self.subm_bookmarks)
       self._populate_bookmarks()
@@ -77,7 +77,7 @@ class DXCluster(Gtk.VBox):
       mitem_connect.set_submenu(subm_connect)
 
       # Disconnect
-      mitem_disconnect = Gtk.ImageMenuItem("Disconnect from Telnet Server")
+      mitem_disconnect = Gtk.ImageMenuItem(label="Disconnect from Telnet Server")
       icon = Gtk.Image()
       icon.set_from_stock(Gtk.STOCK_DISCONNECT, Gtk.IconSize.MENU)
       mitem_disconnect.set_image(icon)
@@ -181,7 +181,7 @@ class DXCluster(Gtk.VBox):
 
             # Add all bookmarks in the config file.
             for bookmark in config.sections():
-               mitem = Gtk.MenuItem(bookmark)
+               mitem = Gtk.MenuItem(label=bookmark)
                mitem.connect("activate", self.bookmarked_server, bookmark)
                self.subm_bookmarks.append(mitem)
 
