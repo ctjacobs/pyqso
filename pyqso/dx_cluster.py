@@ -22,6 +22,8 @@ import logging
 import telnetlib
 import unittest
 import unittest.mock
+import configparser
+import os.path
 
 from pyqso.telnet_connection_dialog import *
 
@@ -62,13 +64,14 @@ class DXCluster(Gtk.VBox):
       
       ## New
       mitem_new = Gtk.MenuItem("New...")
-      mitem_new.connect("activate", self.telnet_connect)
+      mitem_new.connect("activate", self.new_server)
       subm_connect.append(mitem_new)
 
       ## From Bookmark
       mitem_bookmark = Gtk.MenuItem("From Bookmark")
-      subm_bookmarks = Gtk.Menu()
-      mitem_bookmark.set_submenu(subm_bookmarks)
+      self.subm_bookmarks = Gtk.Menu()
+      mitem_bookmark.set_submenu(self.subm_bookmarks)
+      self._populate_bookmarks()
       subm_connect.append(mitem_bookmark)
       
       mitem_connect.set_submenu(subm_connect)
@@ -82,8 +85,6 @@ class DXCluster(Gtk.VBox):
       subm_connection.append(mitem_disconnect)
       self.items["DISCONNECT"] = mitem_disconnect
 
-
-      
       self.pack_start(self.menubar, False, False, 0)
 
       # A TextView object to display the output from the Telnet server.
@@ -114,28 +115,127 @@ class DXCluster(Gtk.VBox):
 
       return
 
-   def telnet_connect(self, widget=None):
-      """ Connect to a user-specified Telnet server, with the host and login details specified in the Gtk.Entry boxes in the TelnetConnectionDialog. """
+   def new_server(self, widget=None):
+      """ Get Telnet server host and login details specified in the Gtk.Entry boxes in the TelnetConnectionDialog and attempt a connection. """
       dialog = TelnetConnectionDialog(self.parent)
       response = dialog.run()
+      
       if(response == Gtk.ResponseType.OK):
          connection_info = dialog.get_connection_info()
          host = connection_info["HOST"].get_text()
          port = connection_info["PORT"].get_text()
          username = connection_info["USERNAME"].get_text()
          password = connection_info["PASSWORD"].get_text()
+         
+         # Save the server details in a new bookmark, if desired.
+         if(connection_info["BOOKMARK"].get_active()):
+            try:
+               config = configparser.ConfigParser()
+               config.read(os.path.expanduser('~/.pyqso_bookmarks.ini'))
+               
+               # Use the host name as the bookmark's identifier.
+               try:
+                  config.add_section(host)
+               except configparser.DuplicateSectionError:
+                  # If the hostname already exists, assume the user wants to update the port number, username and/or password.
+                  logging.warning("A server with hostname '%s' already exists. Over-writing existing details..." % (host))
+               config.set(host, "host", host)
+               config.set(host, "port", port)
+               config.set(host, "username", username)
+               config.set(host, "password", password)
+
+               with open(os.path.expanduser('~/.pyqso_bookmarks.ini'), 'w') as f:
+                  config.write(f)
+                  
+               self._populate_bookmarks()
+
+            except IOError:
+               # Maybe the bookmarks file could not be written to?
+               logging.error("Bookmark could not be saved. Check bookmarks file permissions? Going ahead with the server connection anyway...")
+         
          dialog.destroy()
+         
+         try:
+            # Convert port (currently of type str) into an int.
+            port = int(port) 
+            # Attempt a connection with the server.
+            self.telnet_connect(host, port, username, password)
+         except ValueError as e:
+            logging.error("Could not convert the server's port information to an integer.")
+            logging.exception(e)
+
       else:
          dialog.destroy()
-         return
+      return
 
-      if(host == ""):
+   def _populate_bookmarks(self):
+      """ Populate the list of bookmarked Telnet servers in the menu. """
+      config = configparser.ConfigParser()
+      have_config = (config.read(os.path.expanduser('~/.pyqso_bookmarks.ini')) != [])
+
+      if(have_config):
+         try:
+            # Clear the menu of all current bookmarks.
+            for i in self.subm_bookmarks.get_children():
+               self.subm_bookmarks.remove(i)
+
+            # Add all bookmarks in the config file.
+            for bookmark in config.sections():
+               mitem = Gtk.MenuItem(bookmark)
+               mitem.connect("activate", self.bookmarked_server, bookmark)
+               self.subm_bookmarks.append(mitem)
+
+         except Exception as e:
+            logging.error("An error occurred whilst populating the DX cluster bookmarks menu.")
+            logging.exception(e)
+
+         self.show_all() # Need to do this to update the bookmarks list in the menu.
+
+      return
+
+   def bookmarked_server(self, widget, name):
+      """ Get Telnet server host and login details from an existing bookmark and attempt a connection. 
+      
+      :arg str name: The name of the bookmark. This is the same as the server's hostname.
+      """
+      
+      config = configparser.ConfigParser()
+      have_config = (config.read(os.path.expanduser('~/.pyqso_bookmarks.ini')) != [])
+      try:
+         if(not have_config):
+            raise IOError("The bookmark's details could not be loaded.")
+         
+         host = config.get(name, "host")
+         port = int(config.get(name, "port"))
+         username = config.get(name, "username")
+         password = config.get(name, "password")
+         self.telnet_connect(host, port, username, password)        
+         
+      except ValueError as e:
+         # This exception may occur when casting the port (which is a str) to an int.
+         logging.exception(e)
+      except IOError as e:
+         logging.exception(e)
+      except Exception as e:
+         logging.error("Could not connect to Telnet server '%s'" % name)
+         logging.exception(e)
+
+      return
+      
+   def telnet_connect(self, host, port=23, username=None, password=None):
+      """ Connect to a user-specified Telnet server. 
+      
+      :arg str host: The Telnet server's hostname.
+      :arg int port: The Telnet server's port number. If no port is specified, the default Telnet server port of 23 will be used.
+      :arg str username: The user's username. This is an optional argument.
+      :arg str password: The user's password. This is an optional argument.
+      """
+
+      if(host == "" or host is None):
          logging.error("No Telnet server specified.")
          return
-      if(port == ""):
-         port = 23 # The default Telnet port
-      else:
-         port = int(port)
+      if(port == "" or port is None):
+         port = 23 # Use the default Telnet port
 
       try:
          self.connection = telnetlib.Telnet(host, port)
@@ -146,8 +246,9 @@ class DXCluster(Gtk.VBox):
          if(password):
             self.connection.read_until("password: ".encode())
             self.connection.write((password + "\n").encode())
-      except:
-         logging.exception("Could not create a connection to the Telnet server")
+      except Exception as e:
+         logging.error("Could not create a connection to the Telnet server")
+         logging.exception(e)
          self.connection = None
          return
 

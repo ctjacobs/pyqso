@@ -72,6 +72,9 @@ class TelnetConnectionDialog(Gtk.Dialog):
       self.sources["PASSWORD"].set_visibility(False) # Mask the password with the "*" character.
       hbox_temp.pack_start(self.sources["PASSWORD"], True, True, 6)
       self.vbox.pack_start(hbox_temp, False, False, 6)
+      
+      self.sources["BOOKMARK"] = Gtk.CheckButton("Bookmark server details for next time")
+      self.vbox.pack_start(self.sources["BOOKMARK"], False, False, 6)
 
       logging.debug("Telnet connection dialog ready!") 
 
