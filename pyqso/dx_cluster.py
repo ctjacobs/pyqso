@@ -51,13 +51,27 @@ class DXCluster(Gtk.VBox):
       mitem_connection.set_submenu(subm_connection)
 
       # Connect
-      mitem_connect = Gtk.ImageMenuItem("Connect to Telnet Server...")
+      mitem_connect = Gtk.ImageMenuItem("Connect to Telnet Server")
       icon = Gtk.Image()
       icon.set_from_stock(Gtk.STOCK_CONNECT, Gtk.IconSize.MENU)
       mitem_connect.set_image(icon)
-      mitem_connect.connect("activate", self.telnet_connect)
       subm_connection.append(mitem_connect)
       self.items["CONNECT"] = mitem_connect
+
+      subm_connect = Gtk.Menu()
+      
+      ## New
+      mitem_new = Gtk.MenuItem("New...")
+      mitem_new.connect("activate", self.telnet_connect)
+      subm_connect.append(mitem_new)
+
+      ## From Bookmark
+      mitem_bookmark = Gtk.MenuItem("From Bookmark")
+      subm_bookmarks = Gtk.Menu()
+      mitem_bookmark.set_submenu(subm_bookmarks)
+      subm_connect.append(mitem_bookmark)
+      
+      mitem_connect.set_submenu(subm_connect)
 
       # Disconnect
       mitem_disconnect = Gtk.ImageMenuItem("Disconnect from Telnet Server")
@@ -67,6 +81,8 @@ class DXCluster(Gtk.VBox):
       mitem_disconnect.connect("activate", self.telnet_disconnect)
       subm_connection.append(mitem_disconnect)
       self.items["DISCONNECT"] = mitem_disconnect
+
+
       
       self.pack_start(self.menubar, False, False, 0)
 
