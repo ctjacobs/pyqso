@@ -81,16 +81,14 @@ class DXCluster(Gtk.VBox):
       self.buffer = self.renderer.get_buffer()
       self.pack_start(sw, True, True, 0)
 
-      # Set up the toolbar
-      self.toolbar = Gtk.HBox(spacing=2)
-      
+      # Set up the command box.
+      self.commandbox = Gtk.HBox(spacing=2)
       self.command = Gtk.Entry()
-      self.toolbar.pack_start(self.command, True, True, 0)
+      self.commandbox.pack_start(self.command, True, True, 0)
       self.send = Gtk.Button(label="Send Command")
       self.send.connect("clicked", self.telnet_send_command)
-      self.toolbar.pack_start(self.send, False, False, 0)
-
-      self.pack_start(self.toolbar, False, False, 0)
+      self.commandbox.pack_start(self.send, False, False, 0)
+      self.pack_start(self.commandbox, False, False, 0)
       
       self.set_items_sensitive(True)
             
