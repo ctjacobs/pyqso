@@ -22,8 +22,12 @@ import logging
 import telnetlib
 import unittest
 import unittest.mock
+import configparser
+import os.path
 
 from pyqso.telnet_connection_dialog import *
+
+BOOKMARKS_FILE = os.path.expanduser('~/.pyqso_bookmarks.ini')
 
 class DXCluster(Gtk.VBox):
    """ A tool for connecting to a DX cluster (specifically Telnet-based DX clusters). """
@@ -39,38 +43,51 @@ class DXCluster(Gtk.VBox):
       self.connection = None
       self.parent = parent
 
-      # Set up the toolbar
-      self.toolbar = Gtk.HBox(spacing=2)
-      self.buttons = {}
+      # Set up the menubar
+      self.menubar = Gtk.MenuBar()
+      
+      self.items = {}
+      
+      ###### CONNECTION ######
+      mitem_connection = Gtk.MenuItem(label="Connection")
+      self.menubar.append(mitem_connection)  
+      subm_connection = Gtk.Menu()
+      mitem_connection.set_submenu(subm_connection)
+
       # Connect
+      mitem_connect = Gtk.ImageMenuItem(label="Connect to Telnet Server")
       icon = Gtk.Image()
-      icon.set_from_stock(Gtk.STOCK_CONNECT, Gtk.IconSize.BUTTON)
-      button = Gtk.Button()
-      button.add(icon)
-      button.set_tooltip_text('Connect to Telnet Server')
-      button.connect("clicked", self.telnet_connect)
-      self.toolbar.pack_start(button, False, False, 0)
-      self.buttons["CONNECT"] = button
+      icon.set_from_stock(Gtk.STOCK_CONNECT, Gtk.IconSize.MENU)
+      mitem_connect.set_image(icon)
+      subm_connection.append(mitem_connect)
+      self.items["CONNECT"] = mitem_connect
+
+      subm_connect = Gtk.Menu()
+      
+      ## New
+      mitem_new = Gtk.MenuItem(label="New...")
+      mitem_new.connect("activate", self.new_server)
+      subm_connect.append(mitem_new)
+
+      ## From Bookmark
+      mitem_bookmark = Gtk.MenuItem(label="From Bookmark")
+      self.subm_bookmarks = Gtk.Menu()
+      mitem_bookmark.set_submenu(self.subm_bookmarks)
+      self._populate_bookmarks()
+      subm_connect.append(mitem_bookmark)
+      
+      mitem_connect.set_submenu(subm_connect)
 
       # Disconnect
+      mitem_disconnect = Gtk.ImageMenuItem(label="Disconnect from Telnet Server")
       icon = Gtk.Image()
-      icon.set_from_stock(Gtk.STOCK_DISCONNECT, Gtk.IconSize.BUTTON)
-      button = Gtk.Button()
-      button.add(icon)
-      button.set_tooltip_text('Disconnect from Telnet Server')
-      button.connect("clicked", self.telnet_disconnect)
-      self.toolbar.pack_start(button, False, False, 0)
-      self.buttons["DISCONNECT"] = button
+      icon.set_from_stock(Gtk.STOCK_DISCONNECT, Gtk.IconSize.MENU)
+      mitem_disconnect.set_image(icon)
+      mitem_disconnect.connect("activate", self.telnet_disconnect)
+      subm_connection.append(mitem_disconnect)
+      self.items["DISCONNECT"] = mitem_disconnect
 
-      self.toolbar.pack_start(Gtk.SeparatorToolItem(), False, False, 0)
-
-      self.command = Gtk.Entry()
-      self.toolbar.pack_start(self.command, False, False, 0)
-      self.send = Gtk.Button(label="Send Command")
-      self.send.connect("clicked", self.telnet_send_command)
-      self.toolbar.pack_start(self.send, False, False, 0)
-
-      self.pack_start(self.toolbar, False, False, 0)
+      self.pack_start(self.menubar, False, False, 0)
 
       # A TextView object to display the output from the Telnet server.
       self.renderer = Gtk.TextView()
@@ -83,36 +100,144 @@ class DXCluster(Gtk.VBox):
       self.buffer = self.renderer.get_buffer()
       self.pack_start(sw, True, True, 0)
 
-      self.set_connect_button_sensitive(True)
-
+      # Set up the command box.
+      self.commandbox = Gtk.HBox(spacing=2)
+      self.command = Gtk.Entry()
+      self.commandbox.pack_start(self.command, True, True, 0)
+      self.send = Gtk.Button(label="Send Command")
+      self.send.connect("clicked", self.telnet_send_command)
+      self.commandbox.pack_start(self.send, False, False, 0)
+      self.pack_start(self.commandbox, False, False, 0)
+      
+      self.set_items_sensitive(True)
+            
       self.show_all()
 
       logging.debug("DX cluster ready!") 
 
       return
 
-   def telnet_connect(self, widget=None):
-      """ Connect to a user-specified Telnet server, with the host and login details specified in the Gtk.Entry boxes in the TelnetConnectionDialog. """
+   def new_server(self, widget=None):
+      """ Get Telnet server host and login details specified in the Gtk.Entry boxes in the TelnetConnectionDialog and attempt a connection. """
       dialog = TelnetConnectionDialog(self.parent)
       response = dialog.run()
+      
       if(response == Gtk.ResponseType.OK):
          connection_info = dialog.get_connection_info()
          host = connection_info["HOST"].get_text()
          port = connection_info["PORT"].get_text()
          username = connection_info["USERNAME"].get_text()
          password = connection_info["PASSWORD"].get_text()
+         
+         # Save the server details in a new bookmark, if desired.
+         if(connection_info["BOOKMARK"].get_active()):
+            try:
+               config = configparser.ConfigParser()
+               config.read(BOOKMARKS_FILE)
+               
+               # Use the host name as the bookmark's identifier.
+               try:
+                  config.add_section(host)
+               except configparser.DuplicateSectionError:
+                  # If the hostname already exists, assume the user wants to update the port number, username and/or password.
+                  logging.warning("A server with hostname '%s' already exists. Over-writing existing details..." % (host))
+               config.set(host, "host", host)
+               config.set(host, "port", port)
+               config.set(host, "username", username)
+               config.set(host, "password", password)
+
+               with open(BOOKMARKS_FILE, 'w') as f:
+                  config.write(f)
+                  
+               self._populate_bookmarks()
+
+            except IOError:
+               # Maybe the bookmarks file could not be written to?
+               logging.error("Bookmark could not be saved. Check bookmarks file permissions? Going ahead with the server connection anyway...")
+         
          dialog.destroy()
+         
+         try:
+            # Convert port (currently of type str) into an int.
+            port = int(port) 
+            # Attempt a connection with the server.
+            self.telnet_connect(host, port, username, password)
+         except ValueError as e:
+            logging.error("Could not convert the server's port information to an integer.")
+            logging.exception(e)
+
       else:
          dialog.destroy()
-         return
+      return
 
-      if(host == ""):
+   def _populate_bookmarks(self):
+      """ Populate the list of bookmarked Telnet servers in the menu. """
+      config = configparser.ConfigParser()
+      have_config = (config.read(BOOKMARKS_FILE) != [])
+
+      if(have_config):
+         try:
+            # Clear the menu of all current bookmarks.
+            for i in self.subm_bookmarks.get_children():
+               self.subm_bookmarks.remove(i)
+
+            # Add all bookmarks in the config file.
+            for bookmark in config.sections():
+               mitem = Gtk.MenuItem(label=bookmark)
+               mitem.connect("activate", self.bookmarked_server, bookmark)
+               self.subm_bookmarks.append(mitem)
+
+         except Exception as e:
+            logging.error("An error occurred whilst populating the DX cluster bookmarks menu.")
+            logging.exception(e)
+
+         self.show_all() # Need to do this to update the bookmarks list in the menu.
+
+      return
+
+   def bookmarked_server(self, widget, name):
+      """ Get Telnet server host and login details from an existing bookmark and attempt a connection. 
+      
+      :arg str name: The name of the bookmark. This is the same as the server's hostname.
+      """
+      
+      config = configparser.ConfigParser()
+      have_config = (config.read(BOOKMARKS_FILE) != [])
+      try:
+         if(not have_config):
+            raise IOError("The bookmark's details could not be loaded.")
+         
+         host = config.get(name, "host")
+         port = int(config.get(name, "port"))
+         username = config.get(name, "username")
+         password = config.get(name, "password")
+         self.telnet_connect(host, port, username, password)        
+         
+      except ValueError as e:
+         # This exception may occur when casting the port (which is a str) to an int.
+         logging.exception(e)
+      except IOError as e:
+         logging.exception(e)
+      except Exception as e:
+         logging.error("Could not connect to Telnet server '%s'" % name)
+         logging.exception(e)
+
+      return
+      
+   def telnet_connect(self, host, port=23, username=None, password=None):
+      """ Connect to a user-specified Telnet server. 
+      
+      :arg str host: The Telnet server's hostname.
+      :arg int port: The Telnet server's port number. If no port is specified, the default Telnet server port of 23 will be used.
+      :arg str username: The user's username. This is an optional argument.
+      :arg str password: The user's password. This is an optional argument.
+      """
+
+      if(host == "" or host is None):
          logging.error("No Telnet server specified.")
          return
-      if(port == ""):
-         port = 23 # The default Telnet port
-      else:
-         port = int(port)
+      if(port == "" or port is None):
+         port = 23 # Use the default Telnet port
 
       try:
          self.connection = telnetlib.Telnet(host, port)
@@ -123,12 +248,13 @@ class DXCluster(Gtk.VBox):
          if(password):
             self.connection.read_until("password: ".encode())
             self.connection.write((password + "\n").encode())
-      except:
-         logging.exception("Could not create a connection to the Telnet server")
+      except Exception as e:
+         logging.error("Could not create a connection to the Telnet server")
+         logging.exception(e)
          self.connection = None
          return
 
-      self.set_connect_button_sensitive(False)
+      self.set_items_sensitive(False)
 
       self.check_io_event = GObject.timeout_add(1000, self._on_telnet_io)
 
@@ -140,8 +266,15 @@ class DXCluster(Gtk.VBox):
          self.connection.close()
       self.buffer.set_text("")
       self.connection = None
-      self.set_connect_button_sensitive(True)
-      GObject.source_remove(self.check_io_event)
+      self.set_items_sensitive(True)
+      
+      # Stop checking for server output once disconnected.
+      try:
+         GObject.source_remove(self.check_io_event)
+      except AttributeError:
+         # This may happen if a connection hasn't yet been established.
+         pass
+
       return
 
    def telnet_send_command(self, widget=None):
@@ -179,13 +312,13 @@ class DXCluster(Gtk.VBox):
 
       return True
 
-   def set_connect_button_sensitive(self, sensitive):
+   def set_items_sensitive(self, sensitive):
       """ Enable/disable the relevant buttons for connecting/disconnecting from a DX cluster, so that users cannot click the connect button if PyQSO is already connected.
       
       :arg bool sensitive: If True, enable the Connect button and disable the Disconnect button. If False, vice versa.
       """
-      self.buttons["CONNECT"].set_sensitive(sensitive)
-      self.buttons["DISCONNECT"].set_sensitive(not sensitive)
+      self.items["CONNECT"].set_sensitive(sensitive)
+      self.items["DISCONNECT"].set_sensitive(not sensitive)
       self.send.set_sensitive(not sensitive)
       return
 

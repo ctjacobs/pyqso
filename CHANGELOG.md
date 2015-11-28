@@ -6,6 +6,7 @@
 - Added a table of keyboard shortcuts to the documentation.
 - More helpful messages regarding missing dependencies.
 - Added the option of merging the COMMENT field with the NOTES field when importing records from an ADIF file.
+- Bookmarking of Telnet-based DX cluster servers.
 
 ### Changed
 - Ported the codebase over to Python 3 using 2to3 (thanks to Neil Johnson).
