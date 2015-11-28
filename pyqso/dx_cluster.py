@@ -27,6 +27,8 @@ import os.path
 
 from pyqso.telnet_connection_dialog import *
 
+BOOKMARKS_FILE = os.path.expanduser('~/.pyqso_bookmarks.ini')
+
 class DXCluster(Gtk.VBox):
    """ A tool for connecting to a DX cluster (specifically Telnet-based DX clusters). """
    
@@ -131,7 +133,7 @@ class DXCluster(Gtk.VBox):
          if(connection_info["BOOKMARK"].get_active()):
             try:
                config = configparser.ConfigParser()
-               config.read(os.path.expanduser('~/.pyqso_bookmarks.ini'))
+               config.read(BOOKMARKS_FILE)
                
                # Use the host name as the bookmark's identifier.
                try:
@@ -144,7 +146,7 @@ class DXCluster(Gtk.VBox):
                config.set(host, "username", username)
                config.set(host, "password", password)
 
-               with open(os.path.expanduser('~/.pyqso_bookmarks.ini'), 'w') as f:
+               with open(BOOKMARKS_FILE, 'w') as f:
                   config.write(f)
                   
                self._populate_bookmarks()
@@ -171,7 +173,7 @@ class DXCluster(Gtk.VBox):
    def _populate_bookmarks(self):
       """ Populate the list of bookmarked Telnet servers in the menu. """
       config = configparser.ConfigParser()
-      have_config = (config.read(os.path.expanduser('~/.pyqso_bookmarks.ini')) != [])
+      have_config = (config.read(BOOKMARKS_FILE) != [])
 
       if(have_config):
          try:
@@ -200,7 +202,7 @@ class DXCluster(Gtk.VBox):
       """
       
       config = configparser.ConfigParser()
-      have_config = (config.read(os.path.expanduser('~/.pyqso_bookmarks.ini')) != [])
+      have_config = (config.read(BOOKMARKS_FILE) != [])
       try:
          if(not have_config):
             raise IOError("The bookmark's details could not be loaded.")
