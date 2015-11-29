@@ -54,8 +54,11 @@ class PyQSO(Gtk.Window):
       Gtk.Window.__init__(self, title="PyQSO")
 
       # Check that the directory for holding PyQSO configuration files exists. If it doesn't, create it now.
-      if not os.path.exists(os.path.expanduser('~/.config/pyqso')):
-         os.makedirs(os.path.expanduser('~/.config/pyqso'))
+      try:
+         os.makedirs(os.path.expanduser('~/.config/pyqso'), exist_ok=True)
+      except Exception as e:
+         logging.error("An error occurred whilst creating a directory for PyQSO configuration files. Try creating the directory '~/.config/pyqso' manually.")
+         logging.exception(e)
 
       # Get any application-specific preferences from the configuration file
       config = configparser.ConfigParser()
