@@ -31,6 +31,8 @@ except ImportError:
 
 from pyqso.adif import *
 
+PREFERENCES_FILE = os.path.expanduser("~/.config/pyqso/preferences.ini")
+
 class PreferencesDialog(Gtk.Dialog):
    """ A dialog to specify the PyQSO preferences. """
 
@@ -102,7 +104,8 @@ class PreferencesDialog(Gtk.Dialog):
       for key in list(records_data.keys()):
          config.set("records", key.lower(), str(records_data[key]))
 
-      with open(os.path.expanduser('~/.pyqso.ini'), 'w') as f:
+      # Write the preferences to file.
+      with open(os.path.expanduser(PREFERENCES_FILE), 'w') as f:
          config.write(f)
 
       return
@@ -118,7 +121,7 @@ class GeneralPage(Gtk.VBox):
       # Remember that the have_config conditional in the PyQSO class may be out-of-date the next time the user opens up the preferences dialog
       # because a configuration file may have been created after launching the application. Let's check to see if one exists again...
       config = configparser.ConfigParser()
-      have_config = (config.read(os.path.expanduser('~/.pyqso.ini')) != [])
+      have_config = (config.read(PREFERENCES_FILE) != [])
 
       self.sources = {}
 
@@ -153,7 +156,7 @@ class ViewPage(Gtk.VBox):
       Gtk.VBox.__init__(self, spacing=2)
 
       config = configparser.ConfigParser()
-      have_config = (config.read(os.path.expanduser('~/.pyqso.ini')) != [])
+      have_config = (config.read(PREFERENCES_FILE) != [])
 
       self.sources = {}
 
@@ -205,7 +208,7 @@ class HamlibPage(Gtk.VBox):
       Gtk.VBox.__init__(self, spacing=2)
 
       config = configparser.ConfigParser()
-      have_config = (config.read(os.path.expanduser('~/.pyqso.ini')) != [])
+      have_config = (config.read(PREFERENCES_FILE) != [])
 
       self.sources = {}
 
@@ -289,7 +292,7 @@ class RecordsPage(Gtk.VBox):
       # Remember that the have_config conditional in the PyQSO class may be out-of-date the next time the user opens up the preferences dialog
       # because a configuration file may have been created after launching the application. Let's check to see if one exists again...
       config = configparser.ConfigParser()
-      have_config = (config.read(os.path.expanduser('~/.pyqso.ini')) != [])
+      have_config = (config.read(PREFERENCES_FILE) != [])
 
       self.sources = {}
 
@@ -491,7 +494,7 @@ class ADIFPage(Gtk.VBox):
       # Remember that the have_config conditional in the PyQSO class may be out-of-date the next time the user opens up the preferences dialog
       # because a configuration file may have been created after launching the application. Let's check to see if one exists again...
       config = configparser.ConfigParser()
-      have_config = (config.read(os.path.expanduser('~/.pyqso.ini')) != [])
+      have_config = (config.read(PREFERENCES_FILE) != [])
 
       self.sources = {}
 

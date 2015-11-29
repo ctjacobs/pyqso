@@ -15,6 +15,7 @@
 - Various code cleanups (thanks to András Veres-Szentkirályi).
 - Brought the list of valid modes up-to-date.
 - Updated the list of bands and their frequency ranges.
+- Configuration files are now written to ~/.config to keep the user's home directory uncluttered.
 
 ## [0.2] - 2015-03-07
 ### Added

@@ -55,7 +55,7 @@ class RecordDialog(Gtk.Dialog):
 
       # Check if a configuration file is present, since we might need it to set up the rest of the dialog.
       config = configparser.ConfigParser()
-      have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
+      have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
       
       ## QSO DATA FRAME
       qso_frame = Gtk.Frame()
@@ -517,7 +517,7 @@ class RecordDialog(Gtk.Dialog):
       
       # Get the database name.
       config = configparser.ConfigParser()
-      have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
+      have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
       try:
          if(have_config and config.has_option("records", "callsign_database")):
             database = config.get("records", "callsign_database")
@@ -588,7 +588,7 @@ class RecordDialog(Gtk.Dialog):
       
       # Check if a configuration file is present.
       config = configparser.ConfigParser()
-      have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
+      have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
       
       # Do we want to use UTC or the computer's local time?
       (section, option) = ("records", "use_utc")

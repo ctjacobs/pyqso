@@ -53,11 +53,16 @@ class PyQSO(Gtk.Window):
       # Call the constructor of the super class (Gtk.Window)
       Gtk.Window.__init__(self, title="PyQSO")
 
-      # Get any application-specific preferences from the configuration file      
+      # Check that the directory for holding PyQSO configuration files exists. If it doesn't, create it now.
+      if not os.path.exists(os.path.expanduser('~/.config/pyqso')):
+         os.makedirs(os.path.expanduser('~/.config/pyqso'))
+
+      # Get any application-specific preferences from the configuration file
       config = configparser.ConfigParser()
+
       # Check that the configuration file actually exists (and is readable)
       # otherwise, we will resort to the defaults.
-      have_config = (config.read(os.path.expanduser("~/.pyqso.ini")) != [])
+      have_config = (config.read(os.path.expanduser("~/.config/pyqso/preferences.ini")) != [])
 
       self.set_size_request(800, 600) # Default to an 800 x 600 resolution.
       self.set_position(Gtk.WindowPosition.CENTER)

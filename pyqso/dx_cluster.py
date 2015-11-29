@@ -27,7 +27,7 @@ import os.path
 
 from pyqso.telnet_connection_dialog import *
 
-BOOKMARKS_FILE = os.path.expanduser('~/.pyqso_bookmarks.ini')
+BOOKMARKS_FILE = os.path.expanduser('~/.config/pyqso/bookmarks.ini')
 
 class DXCluster(Gtk.VBox):
    """ A tool for connecting to a DX cluster (specifically Telnet-based DX clusters). """
@@ -146,6 +146,9 @@ class DXCluster(Gtk.VBox):
                config.set(host, "username", username)
                config.set(host, "password", password)
 
+               # Write the bookmarks to file.
+               if not os.path.exists(os.path.expanduser('~/.config/pyqso')):
+                  os.makedirs(os.path.expanduser('~/.config/pyqso'))
                with open(BOOKMARKS_FILE, 'w') as f:
                   config.write(f)
                   

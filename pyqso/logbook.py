@@ -499,7 +499,7 @@ class Logbook(Gtk.Notebook):
          column.connect("clicked", self.sort_log, i+1)
 
          config = configparser.ConfigParser()
-         have_config = (config.read(expanduser('~/.pyqso.ini')) != [])
+         have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
          (section, option) = ("view", AVAILABLE_FIELD_NAMES_ORDERED[i].lower())
          if(have_config and config.has_option(section, option)):
             column.set_visible(config.get(section, option) == "True")

@@ -210,7 +210,7 @@ class Menu(Gtk.MenuBar):
 
       mitem_toolbox = Gtk.CheckMenuItem("Toolbox")
       config = configparser.ConfigParser()
-      have_config = (config.read(os.path.expanduser('~/.pyqso.ini')) != [])
+      have_config = (config.read(os.path.expanduser('~/.config/pyqso/preferences.ini')) != [])
       (section, option) = ("general", "show_toolbox")
       if(have_config and config.has_option(section, option)):
          mitem_toolbox.set_active(config.get(section, option) == "True")

@@ -235,7 +235,7 @@ class ADIF:
 
       # ADIF-related configuration options
       config = configparser.ConfigParser()
-      have_config = (config.read(expanduser('~/.pyqso.ini')) != [])         
+      have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])         
       (section, option) = ("adif", "merge_comment")
       if(have_config and config.has_option(section, option) and config.get(section, option) == "True"):
          merge_comment = True
