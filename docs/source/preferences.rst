@@ -2,7 +2,7 @@ Preferences
 ===========
 
 PyQSO user preferences are stored in a configuration file located at
-``~/.pyqso.ini``, where ``~`` denotes the user's home directory.
+``~/.config/pyqso/preferences.ini``, where ``~`` denotes the user's home directory.
 
 General
 -------
