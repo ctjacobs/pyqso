@@ -21,8 +21,12 @@ from gi.repository import Gtk, Pango, PangoCairo
 import logging
 import sqlite3 as sqlite
 from os.path import basename, getmtime, expanduser
-import datetime
+from datetime import datetime, date, timedelta
 import configparser
+import numpy
+
+from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
+from matplotlib.figure import Figure
 
 from pyqso.adif import *
 from pyqso.log import *
@@ -283,11 +287,77 @@ class Logbook(Gtk.Notebook):
       hbox.pack_start(label, False, False, 0)
       hbox.pack_start(icon, False, False, 0)
       hbox.show_all()
+      
+      # Number of contacts made each month
+      fig = Figure(figsize=(5,5), dpi=100)
+      ax = fig.add_subplot(121)
+      contact_count = self._get_contact_count()
+      ax.bar(contact_count.keys(), list(contact_count.values()))
+      
+      # Set x-axis limits based on the current month.
+      year = datetime.now().year
+      month = datetime.now().month
+      months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
+      months_str = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+      ax.set_xticks([int("%s%s01" % (year, month)) for month in months[0:month+1]])
+      ax.set_xticklabels(months_str[0:month+1])
+      
+      
+      ax2 = fig.add_subplot(122)
+      mode_count = self._get_mode_count()
+      ax2.pie(list(mode_count.values()), labels=mode_count.keys(), autopct='%1.1f%%', shadow=True)
+      
+      canvas = FigureCanvas(fig)
+      canvas.set_size_request(400,400)
+      vbox.pack_start(canvas, True, True, 0)
 
       self.insert_page(vbox, hbox, 0) # Append the new log as a new tab
       self.show_all()
 
       return
+
+   def _get_contact_count(self):
+      
+      contact_count = {}
+      year = datetime.now().year
+      
+      for log in self.logs:
+      
+         query = "SELECT QSO_DATE, count(QSO_DATE) FROM %s WHERE QSO_DATE >= %d0101 GROUP by QSO_DATE" % (log.name, year)
+         c = self.connection.cursor()
+         c.execute(query)
+         xy = c.fetchall()
+
+         for i in range(len(xy)):
+            date = int(xy[i][0])
+            if date in contact_count.keys():
+               contact_count[date] += xy[i][1]
+            else:
+               contact_count[date] = xy[i][1]
+
+      return contact_count
+
+
+   def _get_mode_count(self):
+      
+      mode_count = {}
+      year = datetime.now().year
+      
+      for log in self.logs:
+         query = "SELECT MODE, count(MODE) FROM %s WHERE QSO_DATE >= %d0101 GROUP by MODE" % (log.name, year)
+         c = self.connection.cursor()
+         c.execute(query)
+         xy = c.fetchall()
+
+         for i in range(len(xy)):
+            mode = xy[i][0]
+            if mode in mode_count.keys():
+               mode_count[mode] += xy[i][1]
+            else:
+               mode_count[mode] = xy[i][1]
+
+      return mode_count
+      
 
    def update_summary(self):
       """ Update the information presented on the summary page. """
