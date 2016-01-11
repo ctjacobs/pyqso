@@ -29,7 +29,7 @@ try:
    matplotlib.rcParams['font.size'] = 10.0
    import mpl_toolkits.basemap
    logging.info("Using version %s of mpl_toolkits.basemap." % (mpl_toolkits.basemap.__version__))
-   from matplotlib.backends.backend_gtk3agg import FigureCanvasGTK3Agg as FigureCanvas
+   from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
    have_necessary_modules = True
 except ImportError as e:
    logging.warning(e)
