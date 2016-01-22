@@ -27,6 +27,7 @@ import numpy
 
 from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
 from matplotlib.figure import Figure
+from matplotlib.dates import DateFormatter, MonthLocator, DayLocator
 
 from pyqso.adif import *
 from pyqso.log import *
@@ -292,17 +293,23 @@ class Logbook(Gtk.Notebook):
       fig = Figure(figsize=(5,5), dpi=100)
       ax = fig.add_subplot(121)
       contact_count = self._get_contact_count()
-      ax.bar(contact_count.keys(), list(contact_count.values()))
       
-      # Set x-axis limits based on the current month.
+      # x-axis formatting based on the date
+      ax.bar(contact_count.keys(), list(contact_count.values()))
+      formatter = DateFormatter("%b")
+      ax.xaxis.set_major_formatter(formatter)
+      month_locator = MonthLocator()
+      day_locator = DayLocator() 
+      ax.xaxis.set_major_locator(month_locator)
+      ax.xaxis.set_minor_locator(day_locator)   
+      
+      # Set x-axis upper limit based on the current month.
       year = datetime.now().year
       month = datetime.now().month
-      months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
-      months_str = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-      ax.set_xticks([int("%s%s01" % (year, month)) for month in months[0:month+1]])
-      ax.set_xticklabels(months_str[0:month+1])
+      ax.xaxis_date()
+      ax.set_xlim([date(year, 1, 1), date(year, month+1, 1)])
       
-      
+      # Pie chart of all the modes used.
       ax2 = fig.add_subplot(122)
       mode_count = self._get_mode_count()
       ax2.pie(list(mode_count.values()), labels=mode_count.keys(), autopct='%1.1f%%', shadow=True)
@@ -318,23 +325,28 @@ class Logbook(Gtk.Notebook):
 
    def _get_contact_count(self):
       
+      current_year = datetime.now().year
+      
       contact_count = {}
-      year = datetime.now().year
       
       for log in self.logs:
       
-         query = "SELECT QSO_DATE, count(QSO_DATE) FROM %s WHERE QSO_DATE >= %d0101 GROUP by QSO_DATE" % (log.name, year)
+         query = "SELECT QSO_DATE, count(QSO_DATE) FROM %s WHERE QSO_DATE >= %d0101 GROUP by QSO_DATE" % (log.name, current_year)
          c = self.connection.cursor()
          c.execute(query)
          xy = c.fetchall()
 
          for i in range(len(xy)):
-            date = int(xy[i][0])
+            date_str = xy[i][0]
+            y = int(date_str[0:4])
+            m = int(date_str[4:6])
+            d = int(date_str[6:8])
+            date = datetime(y, m, d)
             if date in contact_count.keys():
                contact_count[date] += xy[i][1]
             else:
                contact_count[date] = xy[i][1]
-
+            
       return contact_count
 
 
