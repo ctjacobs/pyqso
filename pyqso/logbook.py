@@ -312,7 +312,10 @@ class Logbook(Gtk.Notebook):
       # Pie chart of all the modes used.
       ax2 = fig.add_subplot(122)
       mode_count = self._get_mode_count()
-      ax2.pie(list(mode_count.values()), labels=mode_count.keys(), autopct='%1.1f%%', shadow=True)
+      (patches, texts, autotexts) = ax2.pie(list(mode_count.values()), labels=mode_count.keys(), autopct='%1.1f%%', shadow=False)
+      for p in patches:
+        # Make the patches partially transparent.
+        p.set_alpha(0.75)
       
       canvas = FigureCanvas(fig)
       canvas.set_size_request(400,400)
