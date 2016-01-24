@@ -289,13 +289,14 @@ class Logbook(Gtk.Notebook):
       hbox = Gtk.HBox()
       label = Gtk.Label("Display statistics for year: ", halign=Gtk.Align.START)
       hbox.pack_start(label, False, False, 6)
-      year_select = Gtk.ComboBoxText()
+      self.summary["YEAR_SELECT"] = Gtk.ComboBoxText()
       min_year, max_year = self._find_year_bounds()
-      for year in range(max_year, min_year-1, -1):
-         year_select.append_text(str(year))
-      year_select.append_text("")
-      year_select.connect("changed", self._on_year_changed)
-      hbox.pack_start(year_select, False, False, 6)
+      if min_year and max_year:
+         for year in range(max_year, min_year-1, -1):
+            self.summary["YEAR_SELECT"].append_text(str(year))
+      self.summary["YEAR_SELECT"].append_text("")
+      self.summary["YEAR_SELECT"].connect("changed", self._on_year_changed)
+      hbox.pack_start(self.summary["YEAR_SELECT"], False, False, 6)
       vbox.pack_start(hbox, False, False, 4)
       
       self.summary["YEARLY_STATISTICS"] = Figure()
@@ -337,7 +338,7 @@ class Logbook(Gtk.Notebook):
       contact_count = self._get_annual_contact_count(year)
       
       # x-axis formatting based on the date
-      contact_count_plot.bar(contact_count.keys(), list(contact_count.values()))
+      contact_count_plot.bar(contact_count.keys(), list(contact_count.values()), color="k")
       formatter = DateFormatter("%b")
       contact_count_plot.xaxis.set_major_formatter(formatter)
       month_locator = MonthLocator()
@@ -348,7 +349,11 @@ class Logbook(Gtk.Notebook):
       # Set x-axis upper limit based on the current month.
       month = datetime.now().month
       contact_count_plot.xaxis_date()
-      contact_count_plot.set_xlim([date(year, 1, 1), date(year, 12, 31)])
+      if(year == datetime.now().year and datetime.now().month < 12):
+         # Only show the progress up to the end of the current month.
+         contact_count_plot.set_xlim([date(year, 1, 1), date(year, month+1, 1)])
+      else:
+         contact_count_plot.set_xlim([date(year, 1, 1), date(year, 12, 31)])
       
       # Pie chart of all the modes used.
       mode_count_plot = self.summary["YEARLY_STATISTICS"].add_subplot(122)
@@ -372,22 +377,24 @@ class Logbook(Gtk.Notebook):
       for log in self.logs:
          query = "SELECT min(QSO_DATE), max(QSO_DATE) FROM %s" % (log.name)
          c.execute(query)
-         years = c.fetchall()
-         min_years.append(int(years[0][0][:4]))
-         max_years.append(int(years[0][1][:4]))
+         years = c.fetchone()
+         min_years.append(int(years[0][:4]))
+         max_years.append(int(years[1][:4]))
       
-      # Return the min and max across all logs.
-      return min(min_years), max(max_years)
+      if len(min_years) == 0 or max_years == 0:
+         return None, None
+      else:
+         # Return the min and max across all logs.
+         return min(min_years), max(max_years)
 
    def _get_annual_contact_count(self, year):
       """ Find the total number of contacts made in each date in a specified year. """
       
       contact_count = {}
+      c = self.connection.cursor()
       
       for log in self.logs:
-      
          query = "SELECT QSO_DATE, count(QSO_DATE) FROM %s WHERE QSO_DATE >= %d0101 AND QSO_DATE < %d0101 GROUP by QSO_DATE" % (log.name, year, year+1)
-         c = self.connection.cursor()
          c.execute(query)
          xy = c.fetchall()
 
@@ -403,7 +410,6 @@ class Logbook(Gtk.Notebook):
                contact_count[date] = xy[i][1]
             
       return contact_count
-
 
    def _get_annual_mode_count(self, year):
       """ Find the total number of contacts made with each mode in a specified year. """
