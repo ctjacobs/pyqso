@@ -282,15 +282,22 @@ class Logbook(Gtk.Notebook):
       hbox.pack_start(self.summary["DATE_MODIFIED"], False, False, 4)
       vbox.pack_start(hbox, False, False, 4)
 
-      hbox = Gtk.HBox(False, 0)
-      label = Gtk.Label("Summary  ")
-      icon = Gtk.Image.new_from_stock(Gtk.STOCK_INDEX, Gtk.IconSize.MENU)
-      hbox.pack_start(label, False, False, 0)
-      hbox.pack_start(icon, False, False, 0)
-      hbox.show_all()
+      hseparator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+      vbox.pack_start(hseparator, False, False, 4)
+      
+      # Statistics
+      hbox = Gtk.HBox()
+      label = Gtk.Label("Display statistics for year: ", halign=Gtk.Align.START)
+      hbox.pack_start(label, False, False, 6)
+      year_select = Gtk.ComboBoxText()
+      min_year, max_year = self._find_year_bounds()
+      for year in range(max_year, min_year-1, -1):
+         year_select.append_text(str(year))
+      hbox.pack_start(year_select, False, False, 6)
+      vbox.pack_start(hbox, False, False, 4)
       
       # Number of contacts made each month
-      fig = Figure(figsize=(5,5), dpi=100)
+      fig = Figure()
       ax = fig.add_subplot(121)
       contact_count = self._get_contact_count()
       
@@ -302,6 +309,7 @@ class Logbook(Gtk.Notebook):
       day_locator = DayLocator() 
       ax.xaxis.set_major_locator(month_locator)
       ax.xaxis.set_minor_locator(day_locator)   
+      ax.set_ylabel("Number of QSOs")
       
       # Set x-axis upper limit based on the current month.
       year = datetime.now().year
@@ -316,15 +324,39 @@ class Logbook(Gtk.Notebook):
       for p in patches:
         # Make the patches partially transparent.
         p.set_alpha(0.75)
+        
+      ax2.set_title("Mode usage")
       
       canvas = FigureCanvas(fig)
       canvas.set_size_request(400,400)
-      vbox.pack_start(canvas, True, True, 0)
+      #vbox.pack_start(canvas, True, True, 4)
 
+      hbox = Gtk.HBox(False, 0)
+      label = Gtk.Label("Summary  ")
+      icon = Gtk.Image.new_from_stock(Gtk.STOCK_INDEX, Gtk.IconSize.MENU)
+      hbox.pack_start(label, False, False, 0)
+      hbox.pack_start(icon, False, False, 0)
+      hbox.show_all()
+      
       self.insert_page(vbox, hbox, 0) # Append the new log as a new tab
       self.show_all()
 
       return
+
+
+   def _find_year_bounds(self):
+      c = self.connection.cursor()
+      max_years = []
+      min_years = []
+      for log in self.logs:
+         query = "SELECT min(QSO_DATE) FROM %s" % (log.name)
+         c.execute(query)
+         min_years.append(int(c.fetchone()[0][:4]))
+         query = "SELECT max(QSO_DATE) FROM %s" % (log.name)
+         c.execute(query)
+         max_years.append(int(c.fetchone()[0][:4]))
+      
+      return min(min_years), max(max_years)
 
    def _get_contact_count(self):
       
