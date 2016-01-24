@@ -430,6 +430,10 @@ class Logbook(Gtk.Notebook):
 
          for i in range(len(xy)):
             mode = xy[i][0]
+            if mode == "":
+               mode = "Unspecified"
+            
+            # Add to running total
             if mode in mode_count.keys():
                mode_count[mode] += xy[i][1]
             else:
