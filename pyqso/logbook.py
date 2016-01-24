@@ -21,9 +21,20 @@ from gi.repository import Gtk, Pango, PangoCairo
 import logging
 import sqlite3 as sqlite
 from os.path import basename, getmtime, expanduser
-import datetime
+from datetime import datetime, date, timedelta
 import configparser
+import numpy
 
+try:
+   from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
+   from matplotlib.figure import Figure
+   from matplotlib.dates import DateFormatter, MonthLocator, DayLocator
+   have_matplotlib = True
+except ImportError as e:
+   logging.warning(e)
+   logging.warning("Could not import matplotlib, so you will not be able to plot annual logbook statistics. Check that all the PyQSO dependencies are satisfied.")
+   have_matplotlib = False
+   
 from pyqso.adif import *
 from pyqso.log import *
 from pyqso.log_name_dialog import *
@@ -277,17 +288,158 @@ class Logbook(Gtk.Notebook):
       hbox.pack_start(self.summary["DATE_MODIFIED"], False, False, 4)
       vbox.pack_start(hbox, False, False, 4)
 
+      hseparator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+      vbox.pack_start(hseparator, False, False, 4)
+      
+      # Yearly statistics
+      config = configparser.ConfigParser()
+      have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
+      (section, option) = ("general", "show_yearly_statistics")
+      if(have_config and config.has_option(section, option)):
+         if(config.get("general", "show_yearly_statistics") == "True" and have_matplotlib):
+            hbox = Gtk.HBox()
+            label = Gtk.Label("Display statistics for year: ", halign=Gtk.Align.START)
+            hbox.pack_start(label, False, False, 6)
+            self.summary["YEAR_SELECT"] = Gtk.ComboBoxText()
+            min_year, max_year = self._find_year_bounds()
+            if min_year and max_year:
+               for year in range(max_year, min_year-1, -1):
+                  self.summary["YEAR_SELECT"].append_text(str(year))
+            self.summary["YEAR_SELECT"].append_text("")
+            self.summary["YEAR_SELECT"].connect("changed", self._on_year_changed)
+            hbox.pack_start(self.summary["YEAR_SELECT"], False, False, 6)
+            vbox.pack_start(hbox, False, False, 4)
+            
+            self.summary["YEARLY_STATISTICS"] = Figure()
+            canvas = FigureCanvas(self.summary["YEARLY_STATISTICS"])
+            canvas.set_size_request(400,400)
+            canvas.show()
+            vbox.pack_start(canvas, True, True, 4)
+
+      # Summary tab label and icon.
       hbox = Gtk.HBox(False, 0)
       label = Gtk.Label("Summary  ")
       icon = Gtk.Image.new_from_stock(Gtk.STOCK_INDEX, Gtk.IconSize.MENU)
       hbox.pack_start(label, False, False, 0)
       hbox.pack_start(icon, False, False, 0)
       hbox.show_all()
-
-      self.insert_page(vbox, hbox, 0) # Append the new log as a new tab
+      
+      self.insert_page(vbox, hbox, 0) # Append as a new tab
       self.show_all()
 
       return
+
+   def _on_year_changed(self, combo):
+      """ Re-plot the statistics for the year selected by the user. """
+      
+      # Clear figure
+      self.summary["YEARLY_STATISTICS"].clf()
+      self.summary["YEARLY_STATISTICS"].canvas.draw() 
+      
+      # Get year to show statistics for.
+      year = combo.get_active_text()
+      try:
+         year = int(year)
+      except ValueError:
+         # Empty year string.
+         return
+
+      # Number of contacts made each month
+      contact_count_plot = self.summary["YEARLY_STATISTICS"].add_subplot(121)
+      contact_count = self._get_annual_contact_count(year)
+      
+      # x-axis formatting based on the date
+      contact_count_plot.bar(contact_count.keys(), list(contact_count.values()), color="k", width=15, align="center")
+      formatter = DateFormatter("%b")
+      contact_count_plot.xaxis.set_major_formatter(formatter)
+      month_locator = MonthLocator()
+      contact_count_plot.xaxis.set_major_locator(month_locator)
+      contact_count_plot.set_ylabel("Number of QSOs")
+      
+      # Set x-axis upper limit based on the current month.
+      month = datetime.now().month
+      contact_count_plot.xaxis_date()
+      contact_count_plot.set_xlim([date(year-1, 12, 16), date(year, 12, 15)]) # Make a bit of space either side of January and December of the selected year.
+      
+      # Pie chart of all the modes used.
+      mode_count_plot = self.summary["YEARLY_STATISTICS"].add_subplot(122)
+      mode_count = self._get_annual_mode_count(year)
+      (patches, texts, autotexts) = mode_count_plot.pie(list(mode_count.values()), labels=mode_count.keys(), autopct='%1.1f%%', shadow=False)
+      for p in patches:
+         # Make the patches partially transparent.
+         p.set_alpha(0.75)
+      mode_count_plot.set_title("Modes used")
+      
+      self.summary["YEARLY_STATISTICS"].canvas.draw() 
+      
+      return
+
+   def _find_year_bounds(self):
+      """ Find the years of the oldest and newest QSOs across all logs in the logbook. """
+
+      c = self.connection.cursor()
+      max_years = []
+      min_years = []
+      for log in self.logs:
+         query = "SELECT min(QSO_DATE), max(QSO_DATE) FROM %s" % (log.name)
+         c.execute(query)
+         years = c.fetchone()
+         if years[0] and years[1]:
+            min_years.append(int(years[0][:4]))
+            max_years.append(int(years[1][:4]))
+      
+      if len(min_years) == 0 or max_years == 0:
+         return None, None
+      else:
+         # Return the min and max across all logs.
+         return min(min_years), max(max_years)
+
+   def _get_annual_contact_count(self, year):
+      """ Find the total number of contacts made in each month in the specified year. """
+      
+      contact_count = {}
+      c = self.connection.cursor()
+      
+      for log in self.logs:
+         query = "SELECT QSO_DATE, count(QSO_DATE) FROM %s WHERE QSO_DATE >= %d0101 AND QSO_DATE < %d0101 GROUP by QSO_DATE" % (log.name, year, year+1)
+         c.execute(query)
+         xy = c.fetchall()
+
+         for i in range(len(xy)):
+            date_str = xy[i][0]
+            y = int(date_str[0:4])
+            m = int(date_str[4:6])
+            date = datetime(y, m, 1) # Collect all contacts together by month.
+            if date in contact_count.keys():
+               contact_count[date] += xy[i][1]
+            else:
+               contact_count[date] = xy[i][1]
+            
+      return contact_count
+
+   def _get_annual_mode_count(self, year):
+      """ Find the total number of contacts made with each mode in a specified year. """
+      
+      mode_count = {}
+      
+      for log in self.logs:
+         query = "SELECT MODE, count(MODE) FROM %s WHERE QSO_DATE >= %d0101 GROUP by MODE" % (log.name, year)
+         c = self.connection.cursor()
+         c.execute(query)
+         xy = c.fetchall()
+
+         for i in range(len(xy)):
+            mode = xy[i][0]
+            if mode == "":
+               mode = "Unspecified"
+            
+            # Add to running total
+            if mode in mode_count.keys():
+               mode_count[mode] += xy[i][1]
+            else:
+               mode_count[mode] = xy[i][1]
+
+      return mode_count
 
    def update_summary(self):
       """ Update the information presented on the summary page. """
