@@ -349,22 +349,17 @@ class Logbook(Gtk.Notebook):
       contact_count = self._get_annual_contact_count(year)
       
       # x-axis formatting based on the date
-      contact_count_plot.bar(contact_count.keys(), list(contact_count.values()), color="k")
+      contact_count_plot.bar(contact_count.keys(), list(contact_count.values()), color="k", width=15, align="center")
       formatter = DateFormatter("%b")
       contact_count_plot.xaxis.set_major_formatter(formatter)
       month_locator = MonthLocator()
-      day_locator = DayLocator() 
       contact_count_plot.xaxis.set_major_locator(month_locator)
       contact_count_plot.set_ylabel("Number of QSOs")
       
       # Set x-axis upper limit based on the current month.
       month = datetime.now().month
       contact_count_plot.xaxis_date()
-      if(year == datetime.now().year and datetime.now().month < 12):
-         # Only show the progress up to the end of the current month.
-         contact_count_plot.set_xlim([date(year, 1, 1), date(year, month+1, 1)])
-      else:
-         contact_count_plot.set_xlim([date(year, 1, 1), date(year, 12, 31)])
+      contact_count_plot.set_xlim([date(year-1, 12, 16), date(year, 12, 15)]) # Make a bit of space either side of January and December of the selected year.
       
       # Pie chart of all the modes used.
       mode_count_plot = self.summary["YEARLY_STATISTICS"].add_subplot(122)
@@ -400,7 +395,7 @@ class Logbook(Gtk.Notebook):
          return min(min_years), max(max_years)
 
    def _get_annual_contact_count(self, year):
-      """ Find the total number of contacts made in each date in a specified year. """
+      """ Find the total number of contacts made in each month in the specified year. """
       
       contact_count = {}
       c = self.connection.cursor()
@@ -414,8 +409,7 @@ class Logbook(Gtk.Notebook):
             date_str = xy[i][0]
             y = int(date_str[0:4])
             m = int(date_str[4:6])
-            d = int(date_str[6:8])
-            date = datetime(y, m, d)
+            date = datetime(y, m, 1) # Collect all contacts together by month.
             if date in contact_count.keys():
                contact_count[date] += xy[i][1]
             else:
