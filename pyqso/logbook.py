@@ -25,10 +25,16 @@ from datetime import datetime, date, timedelta
 import configparser
 import numpy
 
-from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
-from matplotlib.figure import Figure
-from matplotlib.dates import DateFormatter, MonthLocator, DayLocator
-
+try:
+   from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
+   from matplotlib.figure import Figure
+   from matplotlib.dates import DateFormatter, MonthLocator, DayLocator
+   have_necessary_modules = True
+except ImportError as e:
+   logging.warning(e)
+   logging.warning("Could not import matplotlib, so you will not be able to plot annual logbook statistics. Check that all the PyQSO dependencies are satisfied.")
+   have_necessary_modules = False
+   
 from pyqso.adif import *
 from pyqso.log import *
 from pyqso.log_name_dialog import *
@@ -290,7 +296,7 @@ class Logbook(Gtk.Notebook):
       have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
       (section, option) = ("general", "show_yearly_statistics")
       if(have_config and config.has_option(section, option)):
-         if config.get("general", "show_yearly_statistics") == "True":
+         if(config.get("general", "show_yearly_statistics") == "True" and have_necessary_modules):
             hbox = Gtk.HBox()
             label = Gtk.Label("Display statistics for year: ", halign=Gtk.Align.START)
             hbox.pack_start(label, False, False, 6)
