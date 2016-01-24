@@ -285,7 +285,7 @@ class Logbook(Gtk.Notebook):
       hseparator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
       vbox.pack_start(hseparator, False, False, 4)
       
-      # Statistics
+      # Yearly statistics
       hbox = Gtk.HBox()
       label = Gtk.Label("Display statistics for year: ", halign=Gtk.Align.START)
       hbox.pack_start(label, False, False, 6)
@@ -293,44 +293,18 @@ class Logbook(Gtk.Notebook):
       min_year, max_year = self._find_year_bounds()
       for year in range(max_year, min_year-1, -1):
          year_select.append_text(str(year))
+      year_select.append_text("")
+      year_select.connect("changed", self._on_year_changed)
       hbox.pack_start(year_select, False, False, 6)
       vbox.pack_start(hbox, False, False, 4)
       
-      # Number of contacts made each month
-      fig = Figure()
-      ax = fig.add_subplot(121)
-      contact_count = self._get_contact_count()
-      
-      # x-axis formatting based on the date
-      ax.bar(contact_count.keys(), list(contact_count.values()))
-      formatter = DateFormatter("%b")
-      ax.xaxis.set_major_formatter(formatter)
-      month_locator = MonthLocator()
-      day_locator = DayLocator() 
-      ax.xaxis.set_major_locator(month_locator)
-      ax.xaxis.set_minor_locator(day_locator)   
-      ax.set_ylabel("Number of QSOs")
-      
-      # Set x-axis upper limit based on the current month.
-      year = datetime.now().year
-      month = datetime.now().month
-      ax.xaxis_date()
-      ax.set_xlim([date(year, 1, 1), date(year, month+1, 1)])
-      
-      # Pie chart of all the modes used.
-      ax2 = fig.add_subplot(122)
-      mode_count = self._get_mode_count()
-      (patches, texts, autotexts) = ax2.pie(list(mode_count.values()), labels=mode_count.keys(), autopct='%1.1f%%', shadow=False)
-      for p in patches:
-        # Make the patches partially transparent.
-        p.set_alpha(0.75)
-        
-      ax2.set_title("Mode usage")
-      
-      canvas = FigureCanvas(fig)
+      self.summary["YEARLY_STATISTICS"] = Figure()
+      canvas = FigureCanvas(self.summary["YEARLY_STATISTICS"])
       canvas.set_size_request(400,400)
-      #vbox.pack_start(canvas, True, True, 4)
+      canvas.show()
+      vbox.pack_start(canvas, True, True, 4)
 
+      # Summary tab label and icon.
       hbox = Gtk.HBox(False, 0)
       label = Gtk.Label("Summary  ")
       icon = Gtk.Image.new_from_stock(Gtk.STOCK_INDEX, Gtk.IconSize.MENU)
@@ -338,13 +312,60 @@ class Logbook(Gtk.Notebook):
       hbox.pack_start(icon, False, False, 0)
       hbox.show_all()
       
-      self.insert_page(vbox, hbox, 0) # Append the new log as a new tab
+      self.insert_page(vbox, hbox, 0) # Append as a new tab
       self.show_all()
 
       return
 
+   def _on_year_changed(self, combo):
+      """ Re-plot the statistics for the year selected by the user. """
+      
+      # Clear figure
+      self.summary["YEARLY_STATISTICS"].clf()
+      self.summary["YEARLY_STATISTICS"].canvas.draw() 
+      
+      # Get year to show statistics for.
+      year = combo.get_active_text()
+      try:
+         year = int(year)
+      except ValueError:
+         # Empty year string.
+         return
+
+      # Number of contacts made each month
+      contact_count_plot = self.summary["YEARLY_STATISTICS"].add_subplot(121)
+      contact_count = self._get_annual_contact_count(year)
+      
+      # x-axis formatting based on the date
+      contact_count_plot.bar(contact_count.keys(), list(contact_count.values()))
+      formatter = DateFormatter("%b")
+      contact_count_plot.xaxis.set_major_formatter(formatter)
+      month_locator = MonthLocator()
+      day_locator = DayLocator() 
+      contact_count_plot.xaxis.set_major_locator(month_locator)
+      contact_count_plot.set_ylabel("Number of QSOs")
+      
+      # Set x-axis upper limit based on the current month.
+      month = datetime.now().month
+      contact_count_plot.xaxis_date()
+      contact_count_plot.set_xlim([date(year, 1, 1), date(year, 12, 31)])
+      
+      # Pie chart of all the modes used.
+      mode_count_plot = self.summary["YEARLY_STATISTICS"].add_subplot(122)
+      mode_count = self._get_annual_mode_count(year)
+      (patches, texts, autotexts) = mode_count_plot.pie(list(mode_count.values()), labels=mode_count.keys(), autopct='%1.1f%%', shadow=False)
+      for p in patches:
+         # Make the patches partially transparent.
+         p.set_alpha(0.75)
+      mode_count_plot.set_title("Mode usage")
+      
+      self.summary["YEARLY_STATISTICS"].canvas.draw() 
+      
+      return
 
    def _find_year_bounds(self):
+      """ Find the years of the oldest and newest QSOs across all logs in the logbook. """
+
       c = self.connection.cursor()
       max_years = []
       min_years = []
@@ -358,15 +379,14 @@ class Logbook(Gtk.Notebook):
       # Return the min and max across all logs.
       return min(min_years), max(max_years)
 
-   def _get_contact_count(self):
-      
-      current_year = datetime.now().year
+   def _get_annual_contact_count(self, year):
+      """ Find the total number of contacts made in each date in a specified year. """
       
       contact_count = {}
       
       for log in self.logs:
       
-         query = "SELECT QSO_DATE, count(QSO_DATE) FROM %s WHERE QSO_DATE >= %d0101 GROUP by QSO_DATE" % (log.name, current_year)
+         query = "SELECT QSO_DATE, count(QSO_DATE) FROM %s WHERE QSO_DATE >= %d0101 AND QSO_DATE < %d0101 GROUP by QSO_DATE" % (log.name, year, year+1)
          c = self.connection.cursor()
          c.execute(query)
          xy = c.fetchall()
@@ -385,10 +405,10 @@ class Logbook(Gtk.Notebook):
       return contact_count
 
 
-   def _get_mode_count(self):
+   def _get_annual_mode_count(self, year):
+      """ Find the total number of contacts made with each mode in a specified year. """
       
       mode_count = {}
-      year = datetime.now().year
       
       for log in self.logs:
          query = "SELECT MODE, count(MODE) FROM %s WHERE QSO_DATE >= %d0101 GROUP by MODE" % (log.name, year)
@@ -404,7 +424,6 @@ class Logbook(Gtk.Notebook):
                mode_count[mode] = xy[i][1]
 
       return mode_count
-      
 
    def update_summary(self):
       """ Update the information presented on the summary page. """
