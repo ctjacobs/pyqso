@@ -286,24 +286,29 @@ class Logbook(Gtk.Notebook):
       vbox.pack_start(hseparator, False, False, 4)
       
       # Yearly statistics
-      hbox = Gtk.HBox()
-      label = Gtk.Label("Display statistics for year: ", halign=Gtk.Align.START)
-      hbox.pack_start(label, False, False, 6)
-      self.summary["YEAR_SELECT"] = Gtk.ComboBoxText()
-      min_year, max_year = self._find_year_bounds()
-      if min_year and max_year:
-         for year in range(max_year, min_year-1, -1):
-            self.summary["YEAR_SELECT"].append_text(str(year))
-      self.summary["YEAR_SELECT"].append_text("")
-      self.summary["YEAR_SELECT"].connect("changed", self._on_year_changed)
-      hbox.pack_start(self.summary["YEAR_SELECT"], False, False, 6)
-      vbox.pack_start(hbox, False, False, 4)
-      
-      self.summary["YEARLY_STATISTICS"] = Figure()
-      canvas = FigureCanvas(self.summary["YEARLY_STATISTICS"])
-      canvas.set_size_request(400,400)
-      canvas.show()
-      vbox.pack_start(canvas, True, True, 4)
+      config = configparser.ConfigParser()
+      have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
+      (section, option) = ("general", "show_yearly_statistics")
+      if(have_config and config.has_option(section, option)):
+         if config.get("general", "show_yearly_statistics") == "True":
+            hbox = Gtk.HBox()
+            label = Gtk.Label("Display statistics for year: ", halign=Gtk.Align.START)
+            hbox.pack_start(label, False, False, 6)
+            self.summary["YEAR_SELECT"] = Gtk.ComboBoxText()
+            min_year, max_year = self._find_year_bounds()
+            if min_year and max_year:
+               for year in range(max_year, min_year-1, -1):
+                  self.summary["YEAR_SELECT"].append_text(str(year))
+            self.summary["YEAR_SELECT"].append_text("")
+            self.summary["YEAR_SELECT"].connect("changed", self._on_year_changed)
+            hbox.pack_start(self.summary["YEAR_SELECT"], False, False, 6)
+            vbox.pack_start(hbox, False, False, 4)
+            
+            self.summary["YEARLY_STATISTICS"] = Figure()
+            canvas = FigureCanvas(self.summary["YEARLY_STATISTICS"])
+            canvas.set_size_request(400,400)
+            canvas.show()
+            vbox.pack_start(canvas, True, True, 4)
 
       # Summary tab label and icon.
       hbox = Gtk.HBox(False, 0)

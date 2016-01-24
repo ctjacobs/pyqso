@@ -144,13 +144,13 @@ class GeneralPage(Gtk.VBox):
       
       # Show statistics
       hbox = Gtk.HBox()
-      self.sources["SHOW_STATS"] = Gtk.CheckButton("Show logbook statistics on the Summary tab.")
-      (section, option) = ("general", "show_stats")
+      self.sources["SHOW_YEARLY_STATISTICS"] = Gtk.CheckButton("Show yearly logbook statistics on the Summary page.")
+      (section, option) = ("general", "show_yearly_statistics")
       if(have_config and config.has_option(section, option)):
-         self.sources["SHOW_STATS"].set_active(config.get(section, option) == "True")
+         self.sources["SHOW_YEARLY_STATISTICS"].set_active(config.get(section, option) == "True")
       else:
-         self.sources["SHOW_STATS"].set_active(False)
-      hbox.pack_start(self.sources["SHOW_STATS"], False, False, 2)
+         self.sources["SHOW_YEARLY_STATISTICS"].set_active(False)
+      hbox.pack_start(self.sources["SHOW_YEARLY_STATISTICS"], False, False, 2)
       vbox.pack_start(hbox, False, False, 2)
       
       frame.add(vbox)
@@ -164,7 +164,7 @@ class GeneralPage(Gtk.VBox):
       logging.debug("Retrieving data from the General page of the preferences dialog...")
       data = {}
       data["SHOW_TOOLBOX"] = self.sources["SHOW_TOOLBOX"].get_active()
-      data["SHOW_STATS"] = self.sources["SHOW_STATS"].get_active()
+      data["SHOW_YEARLY_STATISTICS"] = self.sources["SHOW_YEARLY_STATISTICS"].get_active()
       return data
 
 class ViewPage(Gtk.VBox):
