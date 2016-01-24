@@ -367,7 +367,7 @@ class Logbook(Gtk.Notebook):
       for p in patches:
          # Make the patches partially transparent.
          p.set_alpha(0.75)
-      mode_count_plot.set_title("Mode usage")
+      mode_count_plot.set_title("Modes used")
       
       self.summary["YEARLY_STATISTICS"].canvas.draw() 
       
@@ -383,8 +383,9 @@ class Logbook(Gtk.Notebook):
          query = "SELECT min(QSO_DATE), max(QSO_DATE) FROM %s" % (log.name)
          c.execute(query)
          years = c.fetchone()
-         min_years.append(int(years[0][:4]))
-         max_years.append(int(years[1][:4]))
+         if years[0] and years[1]:
+            min_years.append(int(years[0][:4]))
+            max_years.append(int(years[1][:4]))
       
       if len(min_years) == 0 or max_years == 0:
          return None, None
