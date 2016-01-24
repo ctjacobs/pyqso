@@ -125,7 +125,7 @@ class GeneralPage(Gtk.VBox):
 
       self.sources = {}
 
-      
+      # Startup
       frame = Gtk.Frame()
       frame.set_label("Startup")
       
@@ -144,7 +144,7 @@ class GeneralPage(Gtk.VBox):
       
       # Show statistics
       hbox = Gtk.HBox()
-      self.sources["SHOW_YEARLY_STATISTICS"] = Gtk.CheckButton("Show yearly logbook statistics on the Summary page.")
+      self.sources["SHOW_YEARLY_STATISTICS"] = Gtk.CheckButton("Show yearly logbook statistics on the Summary page")
       (section, option) = ("general", "show_yearly_statistics")
       if(have_config and config.has_option(section, option)):
          self.sources["SHOW_YEARLY_STATISTICS"].set_active(config.get(section, option) == "True")
@@ -154,7 +154,26 @@ class GeneralPage(Gtk.VBox):
       vbox.pack_start(hbox, False, False, 2)
       
       frame.add(vbox)
+      self.pack_start(frame, False, False, 2)
       
+      # Dialogs
+      frame = Gtk.Frame()
+      frame.set_label("Dialogs")
+      
+      vbox = Gtk.VBox()
+      
+      # Keep 'Add Record' dialog open
+      hbox = Gtk.HBox()
+      self.sources["KEEP_OPEN"] = Gtk.CheckButton("Keep the Add Record dialog open")
+      (section, option) = ("general", "keep_open")
+      if(have_config and config.has_option(section, option)):
+         self.sources["KEEP_OPEN"].set_active(config.get(section, option) == "True")
+      else:
+         self.sources["KEEP_OPEN"].set_active(False)
+      hbox.pack_start(self.sources["KEEP_OPEN"], False, False, 2)
+      vbox.pack_start(hbox, False, False, 2)
+      
+      frame.add(vbox)
       self.pack_start(frame, False, False, 2)
 
       logging.debug("General page of the preferences dialog ready!")
@@ -165,6 +184,7 @@ class GeneralPage(Gtk.VBox):
       data = {}
       data["SHOW_TOOLBOX"] = self.sources["SHOW_TOOLBOX"].get_active()
       data["SHOW_YEARLY_STATISTICS"] = self.sources["SHOW_YEARLY_STATISTICS"].get_active()
+      data["KEEP_OPEN"] = self.sources["KEEP_OPEN"].get_active()
       return data
 
 class ViewPage(Gtk.VBox):
