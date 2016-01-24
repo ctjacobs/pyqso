@@ -1025,39 +1025,59 @@ class Logbook(Gtk.Notebook):
          return
       log = self.logs[log_index]
       
-      dialog = RecordDialog(parent=self.parent, log=log, index=None)
-      all_valid = False # Are all the field entries valid?
-
+      # Keep the dialog open after adding a record?
+      config = configparser.ConfigParser()
+      have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
+      (section, option) = ("general", "keep_open")
+      if(have_config and config.has_option(section, option)):
+         keep_open = config.get("general", "keep_open") == "True"
+      else:
+         keep_open = False
       adif = ADIF()
-      while(not all_valid): 
-         # This while loop gives the user infinite attempts at giving valid data.
-         # The add/edit record window will stay open until the user gives valid data,
-         # or until the Cancel button is clicked.
-         all_valid = True
-         response = dialog.run()
-         if(response == Gtk.ResponseType.OK):
-            fields_and_data = {}
-            field_names = AVAILABLE_FIELD_NAMES_ORDERED
-            for i in range(0, len(field_names)):
-               # Validate user input.
-               fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
-               if(not(adif.is_valid(field_names[i], fields_and_data[field_names[i]], AVAILABLE_FIELD_NAMES_TYPES[field_names[i]]))):
-                  # Data is not valid - inform the user.
-                  error(parent=self.parent, message="The data in field \"%s\" is not valid!" % field_names[i])
-                  all_valid = False
-                  break # Don't check the other data until the user has fixed the current one.
 
-            if(all_valid):
-               # All data has been validated, so we can go ahead and add the new record.
-               log.add_record(fields_and_data)
-               self.update_summary()
-               self.parent.toolbox.awards.count()
-               # Select the new Record's row in the treeview.
-               number_of_records = log.get_number_of_records()
-               if(number_of_records is not None):
-                  self.treeselection[log_index].select_path(number_of_records)
+      exit = False
+      while not exit:
+         dialog = RecordDialog(parent=self.parent, log=log, index=None)
+         
+         all_valid = False # Are all the field entries valid?
+         
+         # Shall we exit the while loop (and therefore close the Add Record dialog)?
+         if keep_open:
+            exit = False
+         else:
+            exit = True
+            
+         while not all_valid: 
+            # This while loop gives the user infinite attempts at giving valid data.
+            # The add/edit record window will stay open until the user gives valid data,
+            # or until the Cancel button is clicked.
+            all_valid = True
+            response = dialog.run()
+            if(response == Gtk.ResponseType.OK):
+               fields_and_data = {}
+               field_names = AVAILABLE_FIELD_NAMES_ORDERED
+               for i in range(0, len(field_names)):
+                  # Validate user input.
+                  fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
+                  if(not(adif.is_valid(field_names[i], fields_and_data[field_names[i]], AVAILABLE_FIELD_NAMES_TYPES[field_names[i]]))):
+                     # Data is not valid - inform the user.
+                     error(parent=self.parent, message="The data in field \"%s\" is not valid!" % field_names[i])
+                     all_valid = False
+                     break # Don't check the other data until the user has fixed the current one.
 
-      dialog.destroy()
+               if(all_valid):
+                  # All data has been validated, so we can go ahead and add the new record.
+                  log.add_record(fields_and_data)
+                  self.update_summary()
+                  self.parent.toolbox.awards.count()
+                  # Select the new Record's row in the treeview.
+                  number_of_records = log.get_number_of_records()
+                  if(number_of_records is not None):
+                     self.treeselection[log_index].select_path(number_of_records)
+            else:
+               exit = True
+               break
+         dialog.destroy()
       return
       
    def delete_record_callback(self, widget):
