@@ -349,13 +349,13 @@ class Logbook(Gtk.Notebook):
       max_years = []
       min_years = []
       for log in self.logs:
-         query = "SELECT min(QSO_DATE) FROM %s" % (log.name)
+         query = "SELECT min(QSO_DATE), max(QSO_DATE) FROM %s" % (log.name)
          c.execute(query)
-         min_years.append(int(c.fetchone()[0][:4]))
-         query = "SELECT max(QSO_DATE) FROM %s" % (log.name)
-         c.execute(query)
-         max_years.append(int(c.fetchone()[0][:4]))
+         years = c.fetchall()
+         min_years.append(int(years[0][0][:4]))
+         max_years.append(int(years[0][1][:4]))
       
+      # Return the min and max across all logs.
       return min(min_years), max(max_years)
 
    def _get_contact_count(self):
