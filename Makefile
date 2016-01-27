@@ -30,9 +30,6 @@ docs:
 	cd docs; make html; cd ..
 
 test:
-	echo "*** Running flake8"
-	flake8 pyqso
-	flake8 bin
 	echo "*** Running the unit tests"
 	python3 -m unittest discover --start-directory=pyqso --pattern=*.py --verbose
 
