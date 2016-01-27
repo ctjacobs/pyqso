@@ -22,24 +22,24 @@
 input: 	clean install docs
 
 install:
-	@echo "*** Installing PyQSO"
+	echo "*** Installing PyQSO"
 	python3 setup.py install
 
 docs:
-	@echo "*** Building the documentation"
+	echo "*** Building the documentation"
 	cd docs; make html; cd ..
 
 test:
-	@echo "*** Running flake8"
+	echo "*** Running flake8"
 	flake8 pyqso
 	flake8 bin
-	@echo "*** Running the unit tests"
+	echo "*** Running the unit tests"
 	python3 -m unittest discover --start-directory=pyqso --pattern=*.py --verbose
 
 clean:
-	@echo "*** Cleaning docs directory"
+	echo "*** Cleaning docs directory"
 	cd docs; make clean; cd ..
-	@echo "*** Cleaning pyqso directory"
+	echo "*** Cleaning pyqso directory"
 	rm -f ADIF.test_*.adi; cd pyqso; rm -f *.pyc ADIF.test_*.adi; cd ..
-	@echo "*** Removing build directory"
+	echo "*** Removing build directory"
 	rm -rf build
