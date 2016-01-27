@@ -20,49 +20,53 @@
 from gi.repository import Gtk
 import logging
 
+
 def error(parent, message):
-   """ Display an error message.
-   
-   :arg parent: The Gtk parent window/dialog.
-   :arg str message: The message to display to the user.
-   """
-   logging.error(message)
-   _handle_gtk_dialog(parent, Gtk.MessageType.ERROR, message, "Error")
+    """ Display an error message.
+
+    :arg parent: The Gtk parent window/dialog.
+    :arg str message: The message to display to the user.
+    """
+    logging.error(message)
+    _handle_gtk_dialog(parent, Gtk.MessageType.ERROR, message, "Error")
+
 
 def info(parent, message):
-   """ Display some information.
-    
-   :arg parent: The Gtk parent window/dialog.
-   :arg str message: The message to display to the user.
-   """
-   logging.debug(message)
-   _handle_gtk_dialog(parent, Gtk.MessageType.INFO, message, "Information")
-   
+    """ Display some information.
+
+    :arg parent: The Gtk parent window/dialog.
+    :arg str message: The message to display to the user.
+    """
+    logging.debug(message)
+    _handle_gtk_dialog(parent, Gtk.MessageType.INFO, message, "Information")
+
+
 def question(parent, message):
-   """ Ask the user a question. The dialog comes with 'Yes' and 'No' response buttons.
-      
-   :arg parent: The Gtk parent window/dialog.
-   :arg str message: The message to display to the user.
-   :returns: The 'yes'/'no' response from the user.
-   :rtype: Gtk.ResponseType
-   """
-   return _handle_gtk_dialog(parent, Gtk.MessageType.QUESTION, message, "Question")
+    """ Ask the user a question. The dialog comes with 'Yes' and 'No' response buttons.
+
+    :arg parent: The Gtk parent window/dialog.
+    :arg str message: The message to display to the user.
+    :returns: The 'yes'/'no' response from the user.
+    :rtype: Gtk.ResponseType
+    """
+    return _handle_gtk_dialog(parent, Gtk.MessageType.QUESTION, message, "Question")
+
 
 def _handle_gtk_dialog(parent, msgtype, message, title):
-   """ 
-   Instantiate and present a dialog to the user.
-   
-   :arg parent: The Gtk parent window/dialog.
-   :arg Gtk.MessageType msgtype: The type of message to present to the user (e.g. a question, or error message).
-   :arg str message: The message to display in the dialog.
-   :arg str title: The title to display at the top of the dialog.
-   :returns: The response from the user, based on which button they pushed.
-   :rtype: Gtk.ResponseType
-   """
-   bt = Gtk.ButtonsType
-   buttons = bt.YES_NO if msgtype == Gtk.MessageType.QUESTION else bt.OK
-   dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-         msgtype, buttons, message, title=title)
-   response = dialog.run()
-   dialog.destroy()
-   return response
+    """
+    Instantiate and present a dialog to the user.
+
+    :arg parent: The Gtk parent window/dialog.
+    :arg Gtk.MessageType msgtype: The type of message to present to the user (e.g. a question, or error message).
+    :arg str message: The message to display in the dialog.
+    :arg str title: The title to display at the top of the dialog.
+    :returns: The response from the user, based on which button they pushed.
+    :rtype: Gtk.ResponseType
+    """
+    bt = Gtk.ButtonsType
+    buttons = bt.YES_NO if msgtype == Gtk.MessageType.QUESTION else bt.OK
+    dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                               msgtype, buttons, message, title=title)
+    response = dialog.run()
+    dialog.destroy()
+    return response

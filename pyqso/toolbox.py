@@ -24,42 +24,43 @@ from pyqso.dx_cluster import *
 from pyqso.grey_line import *
 from pyqso.awards import *
 
+
 class Toolbox(Gtk.Frame):
-   """ Contains a Gtk.Notebook full of amateur radio-related tools. """   
 
-   def __init__(self, parent):
-      """ Instantiate and insert the various tools into the toolbox. """
+    """ Contains a Gtk.Notebook full of amateur radio-related tools. """
 
-      logging.debug("Setting up the toolbox...")
-         
-      Gtk.Frame.__init__(self)
-      self.set_label("Toolbox")
-      self.parent = parent
+    def __init__(self, parent):
+        """ Instantiate and insert the various tools into the toolbox. """
 
-      self.tools = Gtk.Notebook()
+        logging.debug("Setting up the toolbox...")
 
-      self.dx_cluster = DXCluster(self.parent)
-      self.tools.insert_page(self.dx_cluster, Gtk.Label("DX Cluster"), 0)
-      self.grey_line = GreyLine(self.parent)
-      self.tools.insert_page(self.grey_line, Gtk.Label("Grey Line"), 1)
-      self.awards = Awards(self.parent)
-      self.tools.insert_page(self.awards, Gtk.Label("Awards"), 2)
+        Gtk.Frame.__init__(self)
+        self.set_label("Toolbox")
+        self.parent = parent
 
-      self.add(self.tools)
-      self.tools.connect_after("switch-page", self._on_switch_page)
+        self.tools = Gtk.Notebook()
 
-      logging.debug("Toolbox ready!")
+        self.dx_cluster = DXCluster(self.parent)
+        self.tools.insert_page(self.dx_cluster, Gtk.Label("DX Cluster"), 0)
+        self.grey_line = GreyLine(self.parent)
+        self.tools.insert_page(self.grey_line, Gtk.Label("Grey Line"), 1)
+        self.awards = Awards(self.parent)
+        self.tools.insert_page(self.awards, Gtk.Label("Awards"), 2)
 
-      return
+        self.add(self.tools)
+        self.tools.connect_after("switch-page", self._on_switch_page)
 
-   def toggle_visible_callback(self, widget=None):
-      """ Show/hide the toolbox. """
-      self.set_visible(not self.get_visible())
-      return
+        logging.debug("Toolbox ready!")
 
-   def _on_switch_page(self, widget, label, new_page):
-      """ Re-draw the Grey Line if the user switches to the grey line tab. """
-      if(type(label) == GreyLine):
-         label.draw() # Note that 'label' is actually a GreyLine object.
-      return
+        return
 
+    def toggle_visible_callback(self, widget=None):
+        """ Show/hide the toolbox. """
+        self.set_visible(not self.get_visible())
+        return
+
+    def _on_switch_page(self, widget, label, new_page):
+        """ Re-draw the Grey Line if the user switches to the grey line tab. """
+        if(isinstance(label, GreyLine)):
+            label.draw()  # Note that 'label' is actually a GreyLine object.
+        return

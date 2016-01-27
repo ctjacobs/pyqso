@@ -41,93 +41,95 @@ from pyqso.toolbar import *
 from pyqso.toolbox import *
 from pyqso.preferences_dialog import *
 
+
 class PyQSO(Gtk.Window):
-   """ The PyQSO application class. """
-   
-   def __init__(self, logbook_path=None):
-      """ Set up the main (root) window, start the event loop, and open a logbook (if the logbook's path is specified by the user in the command line).
-      
-      :arg str logbook_path: An optional argument containing the path of the logbook file to open. If no value is provided, this defaults to None and no logbook is opened.
-      """
 
-      # Call the constructor of the super class (Gtk.Window)
-      Gtk.Window.__init__(self, title="PyQSO")
+    """ The PyQSO application class. """
 
-      # Check that the directory for holding PyQSO configuration files exists. If it doesn't, create it now.
-      try:
-         os.makedirs(os.path.expanduser('~/.config/pyqso'), exist_ok=True)
-      except Exception as e:
-         logging.error("An error occurred whilst creating a directory for PyQSO configuration files. Try creating the directory '~/.config/pyqso' manually.")
-         logging.exception(e)
+    def __init__(self, logbook_path=None):
+        """ Set up the main (root) window, start the event loop, and open a logbook (if the logbook's path is specified by the user in the command line).
 
-      # Get any application-specific preferences from the configuration file
-      config = configparser.ConfigParser()
+        :arg str logbook_path: An optional argument containing the path of the logbook file to open. If no value is provided, this defaults to None and no logbook is opened.
+        """
 
-      # Check that the configuration file actually exists (and is readable)
-      # otherwise, we will resort to the defaults.
-      have_config = (config.read(os.path.expanduser("~/.config/pyqso/preferences.ini")) != [])
+        # Call the constructor of the super class (Gtk.Window)
+        Gtk.Window.__init__(self, title="PyQSO")
 
-      self.set_size_request(800, 600) # Default to an 800 x 600 resolution.
-      self.set_position(Gtk.WindowPosition.CENTER)
-      possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
-      for icon_path in possible_icon_paths:
-         try:
-            self.set_icon_from_file(icon_path)
-         except Exception as error:
-            print(error.message)
+        # Check that the directory for holding PyQSO configuration files exists. If it doesn't, create it now.
+        try:
+            os.makedirs(os.path.expanduser('~/.config/pyqso'), exist_ok=True)
+        except Exception as e:
+            logging.error("An error occurred whilst creating a directory for PyQSO configuration files. Try creating the directory '~/.config/pyqso' manually.")
+            logging.exception(e)
 
-      # Kills the application if the close button is clicked on the main window itself. 
-      self.connect("delete-event", Gtk.main_quit)
-      
-      vbox_outer = Gtk.VBox()
-      self.add(vbox_outer)
+        # Get any application-specific preferences from the configuration file
+        config = configparser.ConfigParser()
 
-      self.statusbar = Gtk.Statusbar()
-      context_id = self.statusbar.get_context_id("Status")
-      self.statusbar.push(context_id, "No logbook is currently open.")
-      
-      # Create a Logbook so we can add/remove/edit logs and records,
-      # once connected to the SQLite database.
-      self.logbook = Logbook(self)
-      self.logbook.set_scrollable(True)
+        # Check that the configuration file actually exists (and is readable)
+        # otherwise, we will resort to the defaults.
+        have_config = (config.read(os.path.expanduser("~/.config/pyqso/preferences.ini")) != [])
 
-      self.toolbox = Toolbox(self)
+        self.set_size_request(800, 600)  # Default to an 800 x 600 resolution.
+        self.set_position(Gtk.WindowPosition.CENTER)
+        possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
+        for icon_path in possible_icon_paths:
+            try:
+                self.set_icon_from_file(icon_path)
+            except Exception as error:
+                print(error.message)
 
-      # Set up menu and tool bars
-      # These classes depend on the Logbook and Toolbox class,
-      # so pack the logbook and toolbox after the menu and toolbar.
-      self.menu = Menu(self)
-      self.toolbar = Toolbar(self)
+        # Kills the application if the close button is clicked on the main window itself.
+        self.connect("delete-event", Gtk.main_quit)
 
-      vbox_outer.pack_start(self.menu, False, False, 0)
-      vbox_outer.pack_start(self.toolbar, False, False, 0)
-      vbox_outer.pack_start(self.logbook, True, True, 0)
-      vbox_outer.pack_start(self.toolbox, True, True, 0)
-      vbox_outer.pack_start(self.statusbar, False, False, 0)
+        vbox_outer = Gtk.VBox()
+        self.add(vbox_outer)
 
-      self.show_all()
+        self.statusbar = Gtk.Statusbar()
+        context_id = self.statusbar.get_context_id("Status")
+        self.statusbar.push(context_id, "No logbook is currently open.")
 
-      if(have_config):
-         if(config.get("general", "show_toolbox") == "False"):
+        # Create a Logbook so we can add/remove/edit logs and records,
+        # once connected to the SQLite database.
+        self.logbook = Logbook(self)
+        self.logbook.set_scrollable(True)
+
+        self.toolbox = Toolbox(self)
+
+        # Set up menu and tool bars
+        # These classes depend on the Logbook and Toolbox class,
+        # so pack the logbook and toolbox after the menu and toolbar.
+        self.menu = Menu(self)
+        self.toolbar = Toolbar(self)
+
+        vbox_outer.pack_start(self.menu, False, False, 0)
+        vbox_outer.pack_start(self.toolbar, False, False, 0)
+        vbox_outer.pack_start(self.logbook, True, True, 0)
+        vbox_outer.pack_start(self.toolbox, True, True, 0)
+        vbox_outer.pack_start(self.statusbar, False, False, 0)
+
+        self.show_all()
+
+        if(have_config):
+            if(config.get("general", "show_toolbox") == "False"):
+                self.toolbox.toggle_visible_callback()
+        else:
+            # Hide the Toolbox by default
             self.toolbox.toggle_visible_callback()
-      else:            
-         # Hide the Toolbox by default
-         self.toolbox.toggle_visible_callback()
 
-      if(logbook_path is not None):
-         self.logbook.open(widget=None, path=logbook_path)
+        if(logbook_path is not None):
+            self.logbook.open(widget=None, path=logbook_path)
 
-      return
+        return
 
-   def show_about(self, widget):
-      """ Show the About dialog, which includes license information. """
-      about = Gtk.AboutDialog()
-      about.set_modal(True)
-      about.set_transient_for(parent=self)
-      about.set_program_name("PyQSO")
-      about.set_version("0.3")
-      about.set_authors(["Christian T. Jacobs (2E0ICL)"])
-      about.set_license("""This program is free software: you can redistribute it and/or modify
+    def show_about(self, widget):
+        """ Show the About dialog, which includes license information. """
+        about = Gtk.AboutDialog()
+        about.set_modal(True)
+        about.set_transient_for(parent=self)
+        about.set_program_name("PyQSO")
+        about.set_version("0.3")
+        about.set_authors(["Christian T. Jacobs (2E0ICL)"])
+        about.set_license("""This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
@@ -139,45 +141,44 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.""")
-      about.set_comments("PyQSO: A contact logging tool for amateur radio operators.")
-      possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
-      for icon_path in possible_icon_paths:
-         try:
-            about.set_logo(GdkPixbuf.Pixbuf.new_from_file_at_scale(icon_path, 64, 64, False))
-         except Exception as error:
-            print(error.message)
-      about.run()
-      about.destroy()
-      return      
+        about.set_comments("PyQSO: A contact logging tool for amateur radio operators.")
+        possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
+        for icon_path in possible_icon_paths:
+            try:
+                about.set_logo(GdkPixbuf.Pixbuf.new_from_file_at_scale(icon_path, 64, 64, False))
+            except Exception as error:
+                print(error.message)
+        about.run()
+        about.destroy()
+        return
 
-   def show_preferences(self, widget):
-      """ Show the Preferences dialog. Any changes made by the user after clicking the 'Ok' button are saved in the .cfg file. """
-      preferences = PreferencesDialog(self)
-      response = preferences.run()
-      if(response == Gtk.ResponseType.OK):
-         preferences.commit()
-      preferences.destroy()
-      return
+    def show_preferences(self, widget):
+        """ Show the Preferences dialog. Any changes made by the user after clicking the 'Ok' button are saved in the .cfg file. """
+        preferences = PreferencesDialog(self)
+        response = preferences.run()
+        if(response == Gtk.ResponseType.OK):
+            preferences.commit()
+        preferences.destroy()
+        return
 
 if(__name__ == "__main__"):
-   # Get any command line arguments
-   parser = argparse.ArgumentParser(prog="pyqso")
-   parser.add_argument("-d", "--debug", action="store_true", default=False, help="Enable debugging. All debugging messages will be written to pyqso.debug.")
-   parser.add_argument("-l", "--logbook", action="store", type=str, metavar="/path/to/my_logbook_file.db", default=None, help="Path to a Logbook file. If this file does not already exist, then it will be created.")
-   args = parser.parse_args()
+    # Get any command line arguments
+    parser = argparse.ArgumentParser(prog="pyqso")
+    parser.add_argument("-d", "--debug", action="store_true", default=False, help="Enable debugging. All debugging messages will be written to pyqso.debug.")
+    parser.add_argument("-l", "--logbook", action="store", type=str, metavar="/path/to/my_logbook_file.db", default=None, help="Path to a Logbook file. If this file does not already exist, then it will be created.")
+    args = parser.parse_args()
 
-   # Output debugging messages to a file
-   if(args.debug):
-      # Get the root logger
-      logger = logging.getLogger()
-      logger.setLevel(logging.DEBUG)
-      # Add a file handler
-      handler = logging.FileHandler("pyqso.debug", mode="w")
-      formatter = logging.Formatter(fmt="%(asctime)s %(levelname)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-      handler.setFormatter(formatter)
-      logger.addHandler(handler)
-      
-   signal.signal(signal.SIGINT, signal.SIG_DFL) # Exit PyQSO if a SIGINT signal is captured.
-   application = PyQSO(args.logbook) # Populate the main window and show it
-   Gtk.main() # Start up the event loop!
+    # Output debugging messages to a file
+    if(args.debug):
+        # Get the root logger
+        logger = logging.getLogger()
+        logger.setLevel(logging.DEBUG)
+        # Add a file handler
+        handler = logging.FileHandler("pyqso.debug", mode="w")
+        formatter = logging.Formatter(fmt="%(asctime)s %(levelname)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
 
+    signal.signal(signal.SIGINT, signal.SIG_DFL)  # Exit PyQSO if a SIGINT signal is captured.
+    application = PyQSO(args.logbook)  # Populate the main window and show it
+    Gtk.main()  # Start up the event loop!

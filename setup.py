@@ -26,16 +26,15 @@ setup(name='PyQSO',
       author_email='c.jacobs10@imperial.ac.uk',
       url='https://github.com/ctjacobs/pyqso',
       packages=['pyqso'],
-      package_dir = {'pyqso': 'pyqso'},
+      package_dir={'pyqso': 'pyqso'},
       scripts=["bin/pyqso"],
       data_files=[("icons", ["icons/log_64x64.png"])],
       classifiers=[
-         'Development Status :: 3 - Alpha',
-         'Intended Audience :: End Users/Desktop',
-         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-         'Natural Language :: English',
-         'Programming Language :: Python :: 3',
-         'Topic :: Communications :: Ham Radio',
-         ]
-     )
-
+      'Development Status :: 3 - Alpha',
+      'Intended Audience :: End Users/Desktop',
+      'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+      'Natural Language :: English',
+      'Programming Language :: Python :: 3',
+      'Topic :: Communications :: Ham Radio',
+      ]
+      )
