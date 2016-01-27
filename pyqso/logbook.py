@@ -21,14 +21,13 @@ from gi.repository import Gtk, Pango, PangoCairo
 import logging
 import sqlite3 as sqlite
 from os.path import basename, getmtime, expanduser
-from datetime import datetime, date, timedelta
+from datetime import datetime, date
 import configparser
-import numpy
 
 try:
     from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
     from matplotlib.figure import Figure
-    from matplotlib.dates import DateFormatter, MonthLocator, DayLocator
+    from matplotlib.dates import DateFormatter, MonthLocator
     have_matplotlib = True
 except ImportError as e:
     logging.warning(e)
@@ -359,7 +358,6 @@ class Logbook(Gtk.Notebook):
         contact_count_plot.set_ylabel("Number of QSOs")
 
         # Set x-axis upper limit based on the current month.
-        month = datetime.now().month
         contact_count_plot.xaxis_date()
         contact_count_plot.set_xlim([date(year-1, 12, 16), date(year, 12, 15)])  # Make a bit of space either side of January and December of the selected year.
 
@@ -983,7 +981,6 @@ class Logbook(Gtk.Notebook):
         for line in range(0, layout.get_line_count()):
             layout_line = layout.get_line(line)
             ink_rectangle, logical_rectangle = layout_line.get_extents()
-            x_bearing, y_bearing, logical_rectangle_width, logical_rectangle_height = logical_rectangle.x, logical_rectangle.y, logical_rectangle.width, logical_rectangle.height
             self.line_height = logical_rectangle.height/1024.0 + 3
             page_height += self.line_height
             if(page_height + self.line_height > height):

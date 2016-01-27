@@ -712,10 +712,10 @@ class TestADIF(unittest.TestCase):
 
     def test_adif_is_valid(self):
         """ Check that ADIF field validation is working correctly for different data types. """
-        assert(self.adif.is_valid("CALL", "TEST123", "S") == True)
-        assert(self.adif.is_valid("QSO_DATE", "20120402", "D") == True)
-        assert(self.adif.is_valid("TIME_ON", "1230", "T") == True)
-        assert(self.adif.is_valid("TX_PWR", "5", "N") == True)
+        assert(self.adif.is_valid("CALL", "TEST123", "S"))
+        assert(self.adif.is_valid("QSO_DATE", "20120402", "D"))
+        assert(self.adif.is_valid("TIME_ON", "1230", "T"))
+        assert(self.adif.is_valid("TX_PWR", "5", "N"))
 
 if(__name__ == '__main__'):
     unittest.main()
