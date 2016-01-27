@@ -21,6 +21,8 @@ install:
 before_script:
   - export PYTHONPATH=`pwd`:$PYTHONPATH
   - echo $PYTHONPATH
+  - flake8 pyqso
+  - flake8 bin
   
 script:
   - make test
