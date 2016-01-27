@@ -23,6 +23,6 @@ before_script:
   - echo $PYTHONPATH
   
 script:
-  - make unittest
+  - make test
   - make docs
   - sudo make clean

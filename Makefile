@@ -17,7 +17,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-.PHONY: input clean install docs unittest
+.PHONY: input clean install docs test
 
 input: 	clean install docs
 
@@ -29,7 +29,10 @@ docs:
 	@echo "*** Building the documentation"
 	cd docs; make html; cd ..
 
-unittest:
+test:
+	@echo "*** Running flake8"
+	flake8 pyqso
+	flake8 bin
 	@echo "*** Running the unit tests"
 	python3 -m unittest discover --start-directory=pyqso --pattern=*.py --verbose
 
