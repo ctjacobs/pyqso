@@ -77,4 +77,4 @@ There currently does not exist a Python 3-compatible Debian package for [Hamlib]
 Contact
 -------
 
-If you have any comments or questions about PyQSO, please send them via email to Christian Jacobs (2E0ICL) at <c.jacobs10@imperial.ac.uk>.
+If you have any comments or questions about PyQSO, please send them via email to Christian Jacobs (2E0ICL) at <christian@christianjacobs.uk>.
