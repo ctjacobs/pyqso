@@ -168,7 +168,7 @@ class GeneralPage(Gtk.VBox):
 
         # Keep 'Add Record' dialog open
         hbox = Gtk.HBox()
-        self.sources["KEEP_OPEN"] = Gtk.CheckButton("Keep the Add Record dialog open")
+        self.sources["KEEP_OPEN"] = Gtk.CheckButton("Keep the Add Record dialog open after a QSO is added")
         (section, option) = ("general", "keep_open")
         if(have_config and config.has_option(section, option)):
             self.sources["KEEP_OPEN"].set_active(config.get(section, option) == "True")
