@@ -65,6 +65,7 @@
 - QSO filtering and sorting.
 - Duplicate record removal.
 
-[Unreleased]: https://github.com/ctjacobs/pyqso/compare/v0.2...master
+[Unreleased]: https://github.com/ctjacobs/pyqso/compare/v0.3...master
+[0.3]: https://github.com/ctjacobs/pyqso/compare/v0.2...v0.3
 [0.2]: https://github.com/ctjacobs/pyqso/compare/v0.1...v0.2
 [0.1]: https://github.com/ctjacobs/pyqso/compare/v0.1b...v0.1
