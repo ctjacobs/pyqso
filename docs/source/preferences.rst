@@ -19,7 +19,7 @@ Under the ``General`` tab, the user can choose to:
    .. figure::  images/summary.png
       :align:   center
       
-      The Summary page which appears after a logbook is opened. This presents some basic log statistics.
+      The Summary page which appears after a logbook is opened. This presents some basic logbook statistics.
       
 View
 ----
