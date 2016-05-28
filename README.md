@@ -60,7 +60,7 @@ PyQSO depends on the following Debian packages:
 * python3
 * python3-gi-cairo (for log printing purposes)
 
-The following extra packages are necessary to enable the grey line tool, the plotting of logbook statistics, and log printing:
+The following extra packages are necessary to enable the grey line tool and the plotting of logbook statistics:
 
 * python3-matplotlib (version 1.3.0 or later)
 * python3-mpltoolkits.basemap
