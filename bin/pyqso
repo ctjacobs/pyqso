@@ -31,7 +31,7 @@ sys.path.insert(0, pyqso_path)
 
 import logging
 logging.basicConfig(level=logging.INFO)
-logging.info("PyQSO development version.")
+logging.info("PyQSO version 0.3")
 
 # PyQSO modules
 from pyqso.adif import *
