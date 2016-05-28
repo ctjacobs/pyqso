@@ -11,10 +11,16 @@ Under the ``General`` tab, the user can choose to:
 
 -  always show the toolbox (see the `Toolbox <toolbox.html>`_ section) when PyQSO is started
 
--  display yearly logbook statistics on the Summary page when a logbook is opened
+-  display yearly logbook statistics on the Summary page when a logbook is opened (see figure:summary_)
 
 -  keep the ``Add Record`` dialog window open after a new QSO is added, in preparation for the next QSO
 
+   .. _figure:summary:
+   .. figure::  images/summary.png
+      :align:   center
+      
+      The Summary page which appears after a logbook is opened. This presents some basic log statistics.
+      
 View
 ----
 
