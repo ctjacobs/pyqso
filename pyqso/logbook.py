@@ -423,7 +423,7 @@ class Logbook(Gtk.Notebook):
         mode_count = {}
 
         for log in self.logs:
-            query = "SELECT MODE, count(MODE) FROM %s WHERE QSO_DATE >= %d0101 GROUP by MODE" % (log.name, year)
+            query = "SELECT MODE, count(MODE) FROM %s WHERE QSO_DATE >= %d0101 AND QSO_DATE < %d0101 GROUP by MODE" % (log.name, year, year+1)
             c = self.connection.cursor()
             c.execute(query)
             xy = c.fetchall()
