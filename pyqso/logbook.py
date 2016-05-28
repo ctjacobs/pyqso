@@ -350,7 +350,7 @@ class Logbook(Gtk.Notebook):
         contact_count = self._get_annual_contact_count(year)
 
         # x-axis formatting based on the date
-        contact_count_plot.bar(contact_count.keys(), list(contact_count.values()), color="k", width=15, align="center")
+        contact_count_plot.bar(list(contact_count.keys()), list(contact_count.values()), color="k", width=15, align="center")
         formatter = DateFormatter("%b")
         contact_count_plot.xaxis.set_major_formatter(formatter)
         month_locator = MonthLocator()
