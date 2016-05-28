@@ -1,4 +1,4 @@
-    Copyright (C) 2013 Christian T. Jacobs.
+    Copyright (C) 2013-2016 Christian T. Jacobs.
 
     This file is part of PyQSO.
 

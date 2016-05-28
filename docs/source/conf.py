@@ -51,7 +51,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'PyQSO'
-copyright = u'2015, Christian T. Jacobs (2E0ICL)'
+copyright = u'2015-2016, Christian T. Jacobs (2E0ICL)'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

@@ -57,7 +57,7 @@ log.
 Licensing
 ---------
 
-PyQSO is free software, released under the `GNU General Public License <http://www.gnu.org/licenses/gpl-3.0.en.html>`_. Please see the file called ``COPYING`` for more information.
+PyQSO is free software, released under the `GNU General Public License <http://www.gnu.org/licenses/gpl-3.0.en.html>`_. Please see the file called ``COPYING`` for more information. A copyright year range of the form YYYY-ZZZZ specifies every single year from YYYY to ZZZZ inclusive (for example, 2012-2016 means 2012, 2013, 2014, 2015, 2016).
 
 Contact
 -------
