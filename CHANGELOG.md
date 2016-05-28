@@ -1,6 +1,6 @@
 # Change Log
 
-## [Unreleased]
+## [0.3] - 2016-05-28
 ### Added
 - Support for callsign lookups using the HamQTH.com database.
 - Added a table of keyboard shortcuts to the documentation.
