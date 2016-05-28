@@ -7,21 +7,28 @@ PyQSO user preferences are stored in a configuration file located at
 General
 -------
 
-Under the ``General`` tab, the user can choose to show the toolbox (see
-the `Toolbox <toolbox.html>`_ section) when PyQSO is started.
+Under the ``General`` tab, the user can choose to:
+
+-  always show the toolbox (see the `Toolbox <toolbox.html>`_ section) when PyQSO is started
+
+-  display yearly logbook statistics on the Summary page when a logbook is opened
+
+-  keep the ``Add Record`` dialog window open after a new QSO is added, in preparation for the next QSO
 
 View
 ----
 
-Not all the available fields have to be displayed in the logbook. The
-user can choose to hide a subset of them by unchecking them in the
-``View`` tab. PyQSO must be restarted in order for any changes to take
-effect.
+Not all the available fields have to be displayed in the logbook. The user can choose to hide a subset of them by unchecking them in the ``View`` tab. PyQSO must be restarted in order for any changes to take effect.
+
+ADIF
+----
+
+PyQSO currently supports the ``NOTES`` field in the ADIF specification, but not the ``COMMENTS`` field. When a user imports a log in ADIF format, they can choose to merge any existing text in the ``COMMENTS`` field with the ``NOTES`` field by checking the 'merge' checkbox. This way, no information in the ``COMMENTS`` field is discarded during the import process.
 
 Records
 -------
 
-The records tab allows users to choose if the UTC timezone is used when autocompleting the date and time fields, and whether the band should be automatically determined from the frequency field. Default values for the Power and Mode fields can also be specified here.
+The records tab allows users to choose if the UTC timezone is used when autocompleting the date and time fields, and whether the band should be automatically determined from the frequency field. Default values for the Power, Mode, and Submode fields can also be specified here.
 
 Callsign lookup
 ~~~~~~~~~~~~~~~

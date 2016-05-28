@@ -15,12 +15,14 @@ result of the many different Telnet-based software products that DX
 clusters run, PyQSO currently outputs the raw data received from the DX
 cluster rather than trying to parse it in some way.
 
-Click on the ``Connect to Telnet Server`` button and enter the DX server
+Click on ``Connect to Telnet Server`` then ``New...`` in the ``Connection`` menu, and enter the DX server
 details in the dialog that appears. If no port is specified, PyQSO will
 use the default value of 23. A username and password may also need to be
-supplied. Once connected, the server output will appear in the DX
+supplied. Frequently used servers can be bookmarked for next time.
+
+Once connected, the server output will appear in the DX
 cluster frame (see figure:dx_cluster_). A command can also
-be sent to the server by typing it into the entry box and clicking the
+be sent to the server by typing it into the entry box beneath the server output, and clicking the
 adjacent ``Send Command`` button.
 
    .. _figure:dx_cluster:

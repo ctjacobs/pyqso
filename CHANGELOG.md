@@ -17,6 +17,7 @@
 - Updated the list of bands and their frequency ranges.
 - Configuration files are now written to ~/.config to keep the user's home directory uncluttered.
 - The codebase is now compliant with the PEP 8 Python coding conventions (except for E501,F403,E226,E402,W503).
+- Updated the documentation.
 
 ## [0.2] - 2015-03-07
 ### Added
