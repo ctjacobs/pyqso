@@ -313,7 +313,7 @@ class Logbook(Gtk.Notebook):
 
                 self.summary["YEARLY_STATISTICS"] = Figure()
                 canvas = FigureCanvas(self.summary["YEARLY_STATISTICS"])
-                canvas.set_size_request(400, 400)
+                canvas.set_size_request(800, 250)
                 canvas.show()
                 vbox.pack_start(canvas, True, True, 4)
 
