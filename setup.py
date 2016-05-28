@@ -30,11 +30,11 @@ setup(name='PyQSO',
       scripts=["bin/pyqso"],
       data_files=[("icons", ["icons/log_64x64.png"])],
       classifiers=[
-      'Development Status :: 3 - Alpha',
-      'Intended Audience :: End Users/Desktop',
-      'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-      'Natural Language :: English',
-      'Programming Language :: Python :: 3',
-      'Topic :: Communications :: Ham Radio',
+          'Development Status :: 5 - Production/Stable',
+          'Intended Audience :: End Users/Desktop',
+          'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+          'Natural Language :: English',
+          'Programming Language :: Python :: 3',
+          'Topic :: Communications :: Ham Radio',
       ]
       )
