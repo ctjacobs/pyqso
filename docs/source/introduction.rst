@@ -59,6 +59,11 @@ Licensing
 
 PyQSO is free software, released under the `GNU General Public License <http://www.gnu.org/licenses/gpl-3.0.en.html>`_. Please see the file called ``COPYING`` for more information.
 
+Contact
+-------
+
+If you have any comments or questions about PyQSO, please send them via email to Christian Jacobs (2E0ICL) at christian@christianjacobs.uk. Bug reports and feature requests can be made via the `issue tracker <https://github.com/ctjacobs/pyqso/issues>`_.
+
 Structure of this documentation
 -------------------------------
 
