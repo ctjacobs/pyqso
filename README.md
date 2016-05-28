@@ -36,7 +36,7 @@ Note: 'sudo' may be needed for this. Once installed, the following command will 
 
 Alternatively, PyQSO can be run (without installing) with:
 
-   `python bin/pyqso`
+   `python3 bin/pyqso`
 
 from PyQSO's base directory.
 
@@ -49,7 +49,7 @@ The PyQSO documentation is stored in the `docs` directory. It can be built with 
 
 which will produce an HTML version of the documentation in `docs/build/html` that can be opened in a web browser.
 
-Alternatively, a ready-built version of the PyQSO documentation can be found on [Read the Docs](http://pyqso.readthedocs.org/en/latest/).
+Alternatively, a ready-built version of the PyQSO documentation can be found on [Read the Docs](http://pyqso.readthedocs.io/).
 
 Dependencies
 ------------

@@ -57,7 +57,7 @@ log.
 Licensing
 ---------
 
-PyQSO is free software, released under the GNU General Public License. Please see the file called ``COPYING`` for more information.
+PyQSO is free software, released under the `GNU General Public License <http://www.gnu.org/licenses/gpl-3.0.en.html>`_. Please see the file called ``COPYING`` for more information.
 
 Structure of this documentation
 -------------------------------

@@ -38,7 +38,7 @@ Alternatively, PyQSO can be run (without installing) with:
 
 .. code-block:: bash
 
-   python bin/pyqso
+   python3 bin/pyqso
 
 from PyQSO's base directory.
 
