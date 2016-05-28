@@ -64,7 +64,7 @@ class Logbook(Gtk.Notebook):
 
         # Get the new file's path from a dialog.
         dialog = Gtk.FileChooserDialog("Create a New SQLite Database File",
-                                       None,
+                                       self.parent,
                                        Gtk.FileChooserAction.SAVE,
                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                        Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
@@ -96,7 +96,7 @@ class Logbook(Gtk.Notebook):
         if(path is None):
             # If no path has been provided, get one from a "File Open" dialog.
             dialog = Gtk.FileChooserDialog("Open SQLite Database File",
-                                           None,
+                                           self.parent,
                                            Gtk.FileChooserAction.OPEN,
                                           (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                            Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
@@ -808,7 +808,7 @@ class Logbook(Gtk.Notebook):
     def import_log(self, widget=None):
         """ Import a log from an ADIF file. """
         dialog = Gtk.FileChooserDialog("Import ADIF Log File",
-                                       None,
+                                       self.parent,
                                        Gtk.FileChooserAction.OPEN,
                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                        Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
@@ -900,7 +900,7 @@ class Logbook(Gtk.Notebook):
         log = self.logs[log_index]
 
         dialog = Gtk.FileChooserDialog("Export Log to File",
-                                       None,
+                                       self.parent,
                                        Gtk.FileChooserAction.SAVE,
                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                        Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
