@@ -228,6 +228,7 @@ class GeneralPage(Gtk.VBox):
             self.sources["DEFAULT_LOGBOOK_PATH"].set_sensitive(False)
         return
 
+
 class ViewPage(Gtk.VBox):
 
     """ The section of the preferences dialog containing view-related preferences. """
