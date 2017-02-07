@@ -19,7 +19,10 @@
 
 from gi.repository import Gtk
 import logging
-import configparser
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
 from datetime import datetime
 from os.path import expanduser
 import base64

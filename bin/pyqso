@@ -19,7 +19,10 @@
 
 from gi.repository import Gtk, GdkPixbuf
 import argparse
-import configparser
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
 import os
 import os.path
 import sys
@@ -56,11 +59,13 @@ class PyQSO(Gtk.Window):
         Gtk.Window.__init__(self, title="PyQSO")
 
         # Check that the directory for holding PyQSO configuration files exists. If it doesn't, create it now.
-        try:
-            os.makedirs(os.path.expanduser('~/.config/pyqso'), exist_ok=True)
-        except Exception as e:
-            logging.error("An error occurred whilst creating a directory for PyQSO configuration files. Try creating the directory '~/.config/pyqso' manually.")
-            logging.exception(e)
+        config_directory = os.path.expanduser('~/.config/pyqso')
+        if not os.path.exists(config_directory):
+            try:
+                os.makedirs(config_directory)
+            except Exception as e:
+                logging.error("An error occurred whilst creating a directory for PyQSO configuration files. Try creating the directory '~/.config/pyqso' manually.")
+                logging.exception(e)
 
         # Get any application-specific preferences from the configuration file
         config = configparser.ConfigParser()
