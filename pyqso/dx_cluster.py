@@ -17,7 +17,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, GObject
+from gi.repository import Gtk, GObject, Gdk
 import logging
 import telnetlib
 import unittest
@@ -56,7 +56,7 @@ class DXCluster(Gtk.VBox):
 
         self.items = {}
 
-        # CONNECTION ######
+        # CONNECTION
         mitem_connection = Gtk.MenuItem(label="Connection")
         self.menubar.append(mitem_connection)
         subm_connection = Gtk.Menu()
@@ -111,6 +111,7 @@ class DXCluster(Gtk.VBox):
         # Set up the command box.
         self.commandbox = Gtk.HBox(spacing=2)
         self.command = Gtk.Entry()
+        self.command.connect("key-release-event", self._on_command_key_press)
         self.commandbox.pack_start(self.command, True, True, 0)
         self.send = Gtk.Button(label="Send Command")
         self.send.connect("clicked", self.telnet_send_command)
@@ -123,6 +124,12 @@ class DXCluster(Gtk.VBox):
 
         logging.debug("DX cluster ready!")
 
+        return
+
+    def _on_command_key_press(self, widget, ev, data=None):
+        """ If the Return key is pressed when the focus is on the command box, then send whatever command the user has entered. """
+        if(ev.keyval == Gdk.KEY_Return):
+            self.telnet_send_command()
         return
 
     def new_server(self, widget=None):
