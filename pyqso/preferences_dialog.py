@@ -160,6 +160,31 @@ class GeneralPage(Gtk.VBox):
         hbox.pack_start(self.sources["SHOW_YEARLY_STATISTICS"], False, False, 2)
         vbox.pack_start(hbox, False, False, 2)
 
+        # Default logbook
+        hbox = Gtk.HBox()
+        self.sources["DEFAULT_LOGBOOK"] = Gtk.CheckButton("Open a default logbook: ")
+
+        (section, option) = ("general", "default_logbook")
+        if(have_config and config.has_option(section, option)):
+            self.sources["DEFAULT_LOGBOOK"].set_active(config.get(section, option) == "True")
+        else:
+            self.sources["DEFAULT_LOGBOOK"].set_active(False)
+        self.sources["DEFAULT_LOGBOOK"].connect("toggled", self._on_default_logbook_toggled)
+        hbox.pack_start(self.sources["DEFAULT_LOGBOOK"], False, False, 2)
+        vbox.pack_start(hbox, False, False, 2)
+
+        self.sources["DEFAULT_LOGBOOK_PATH"] = Gtk.Entry()
+        (section, option) = ("general", "default_logbook")
+        # Disable the text entry box if the default logbook checkbox is not checked.
+        if(have_config and config.has_option(section, option)):
+            self.sources["DEFAULT_LOGBOOK_PATH"].set_sensitive(self.sources["DEFAULT_LOGBOOK"].get_active())
+        else:
+            self.sources["DEFAULT_LOGBOOK_PATH"].set_sensitive(False)
+        (section, option) = ("general", "default_logbook_path")
+        if(have_config and config.has_option(section, option)):
+            self.sources["DEFAULT_LOGBOOK_PATH"].set_text(config.get(section, option))
+        hbox.pack_start(self.sources["DEFAULT_LOGBOOK_PATH"], False, False, 2)
+
         frame.add(vbox)
         self.pack_start(frame, False, False, 2)
 
@@ -191,9 +216,17 @@ class GeneralPage(Gtk.VBox):
         data = {}
         data["SHOW_TOOLBOX"] = self.sources["SHOW_TOOLBOX"].get_active()
         data["SHOW_YEARLY_STATISTICS"] = self.sources["SHOW_YEARLY_STATISTICS"].get_active()
+        data["DEFAULT_LOGBOOK"] = self.sources["DEFAULT_LOGBOOK"].get_active()
+        data["DEFAULT_LOGBOOK_PATH"] = os.path.expanduser(self.sources["DEFAULT_LOGBOOK_PATH"].get_text())
         data["KEEP_OPEN"] = self.sources["KEEP_OPEN"].get_active()
         return data
 
+    def _on_default_logbook_toggled(self, widget, data=None):
+        if(widget.get_active()):
+            self.sources["DEFAULT_LOGBOOK_PATH"].set_sensitive(True)
+        else:
+            self.sources["DEFAULT_LOGBOOK_PATH"].set_sensitive(False)
+        return
 
 class ViewPage(Gtk.VBox):
 

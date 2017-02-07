@@ -122,7 +122,20 @@ class PyQSO(Gtk.Window):
             self.toolbox.toggle_visible_callback()
 
         if(logbook_path is not None):
+            logging.info("Opening logbook: %s" % logbook_path)
             self.logbook.open(widget=None, path=logbook_path)
+        else:
+            # If no logbook path is specified at the command line,
+            # then check if the user wants to open a default logbook.
+            (section, option) = ("general", "default_logbook")
+            if(have_config and config.has_option(section, option)):
+                open_default_logbook = (config.get(section, option) == "True")
+                (section, option) = ("general", "default_logbook_path")
+                if(open_default_logbook and config.has_option(section, option)):
+                    logbook_path = config.get(section, option)
+                    if(logbook_path is not None and logbook_path != ""):
+                        logging.info("Opening the default logbook: %s" % logbook_path)
+                        self.logbook.open(widget=None, path=logbook_path)
 
         return
 
