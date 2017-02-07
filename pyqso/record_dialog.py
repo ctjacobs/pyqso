@@ -425,14 +425,14 @@ class RecordDialog(Gtk.Dialog):
                 power = ""
             self.sources["TX_PWR"].set_text(power)
 
+            # If the Hamlib module is present, then use it to fill in various fields if desired.
             if(have_hamlib):
-                # If the Hamlib module is present, then use it to fill in the Frequency field if desired.
                 if(have_config and config.has_option("hamlib", "autofill") and config.has_option("hamlib", "rig_model") and config.has_option("hamlib", "rig_pathname")):
                     autofill = (config.get("hamlib", "autofill") == "True")
                     rig_model = config.get("hamlib", "rig_model")
                     rig_pathname = config.get("hamlib", "rig_pathname")
                     if(autofill):
-                        # Use Hamlib (if available) to get the frequency
+                        # Frequency
                         try:
                             Hamlib.rig_set_debug(Hamlib.RIG_DEBUG_NONE)
                             rig = Hamlib.Rig(Hamlib.__dict__[rig_model])  # Look up the model's numerical index in Hamlib's symbol dictionary
@@ -442,7 +442,27 @@ class RecordDialog(Gtk.Dialog):
                             self.sources["FREQ"].set_text(frequency)
                             rig.close()
                         except:
-                            logging.error("Could not obtain Frequency data via Hamlib!")
+                            logging.error("Could not obtain the current frequency via Hamlib!")
+
+                        # Mode
+                        try:
+                            Hamlib.rig_set_debug(Hamlib.RIG_DEBUG_NONE)
+                            rig = Hamlib.Rig(Hamlib.__dict__[rig_model])  # Look up the model's numerical index in Hamlib's symbol dictionary
+                            rig.set_conf("rig_pathname", rig_pathname)
+                            rig.open()
+                            (mode, width) = rig.get_mode()
+                            mode = mode.upper()
+                            # Handle USB and LSB as special cases.
+                            if(mode == "USB" or mode == "LSB"):
+                                submode = mode
+                                mode = "SSB"
+                                self.sources["MODE"].set_active(sorted(MODES.keys()).index(mode))
+                                self.sources["SUBMODE"].set_active(MODES[mode].index(submode))
+                            else:
+                                self.sources["MODE"].set_active(sorted(MODES.keys()).index(mode))
+                            rig.close()
+                        except:
+                            logging.error("Could not obtain the current mode (e.g. FM, AM, CW) via Hamlib!")
 
         # Do we want PyQSO to autocomplete the Band field based on the Frequency field?
         (section, option) = ("records", "autocomplete_band")

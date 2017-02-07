@@ -268,7 +268,7 @@ class HamlibPage(Gtk.VBox):
 
         vbox_inner = Gtk.VBox(spacing=2)
 
-        self.sources["AUTOFILL"] = Gtk.CheckButton("Auto-fill Frequency field")
+        self.sources["AUTOFILL"] = Gtk.CheckButton("Auto-fill Frequency and Mode fields")
         (section, option) = ("hamlib", "autofill")
         if(have_config and config.has_option(section, option)):
             self.sources["AUTOFILL"].set_active(config.get(section, option) == "True")
