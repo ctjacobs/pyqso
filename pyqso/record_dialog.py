@@ -436,7 +436,7 @@ class RecordDialog(Gtk.Dialog):
 
         # Do we want PyQSO to autocomplete the Band field based on the Frequency field?
         (section, option) = ("records", "autocomplete_band")
-        if(have_config and config.get(section, option)):
+        if(have_config and config.has_option(section, option)):
             autocomplete_band = (config.get(section, option) == "True")
             if(autocomplete_band):
                 self.sources["FREQ"].connect("changed", self._autocomplete_band)
