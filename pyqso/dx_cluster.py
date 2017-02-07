@@ -309,7 +309,8 @@ class DXCluster(Gtk.VBox):
         :rtype: bool
         """
         if(self.connection):
-            text = self.connection.read_very_eager().decode()
+            text = self.connection.read_very_eager()
+            text = text.decode("ascii", "replace")  # Replace any characters that cannot be decoded with a replacement marker.
             try:
                 text = text.replace("\u0007", "")  # Remove the BEL Unicode character from the end of the line
             except UnicodeDecodeError:
