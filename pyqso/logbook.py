@@ -22,8 +22,10 @@ import logging
 import sqlite3 as sqlite
 from os.path import basename, getmtime, expanduser
 from datetime import datetime, date
-import configparser
-
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
 try:
     from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
     from matplotlib.figure import Figure

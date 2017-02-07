@@ -21,8 +21,14 @@ from gi.repository import Gtk, GObject
 import logging
 import telnetlib
 import unittest
-import unittest.mock
-import configparser
+try:
+    import unittest.mock as mock
+except ImportError:
+    import mock
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
 import os.path
 
 from pyqso.telnet_connection_dialog import *
@@ -343,7 +349,7 @@ class TestDXCluster(unittest.TestCase):
     def test_on_telnet_io(self):
         """ Check that the response from the Telnet server can be correctly decoded. """
 
-        telnetlib.Telnet = unittest.mock.Mock(spec=telnetlib.Telnet)
+        telnetlib.Telnet = mock.Mock(spec=telnetlib.Telnet)
         connection = telnetlib.Telnet("hello", "world")
         connection.read_very_eager.return_value = b"Test message from the Telnet server."
         self.dxcluster.connection = connection

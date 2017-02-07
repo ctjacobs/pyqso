@@ -22,7 +22,10 @@ import logging
 import unittest
 from datetime import datetime
 import calendar
-import configparser
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
 from os.path import expanduser
 
 # ADIF field names and their associated data types available in PyQSO.

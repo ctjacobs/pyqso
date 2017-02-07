@@ -19,8 +19,14 @@
 
 import logging
 import unittest
-import unittest.mock
-import http.client
+try:
+    import unittest.mock as mock
+except ImportError:
+    import mock
+try:
+    import http.client as http_client
+except ImportError:
+    import httplib as http_client
 from xml.dom import minidom
 
 from pyqso.auxiliary_dialogs import *
@@ -50,7 +56,7 @@ class CallsignLookupQRZ():
         """
         logging.debug("Connecting to the qrz.com server...")
         try:
-            self.connection = http.client.HTTPConnection('xmldata.qrz.com')
+            self.connection = http_client.HTTPConnection('xmldata.qrz.com')
             request = '/xml/current/?username=%s;password=%s;agent=pyqso' % (username, password)
             self.connection.request('GET', request)
             response = self.connection.getresponse()
@@ -176,7 +182,7 @@ class CallsignLookupHamQTH():
 
         logging.debug("Connecting to the hamqth.com server...")
         try:
-            self.connection = http.client.HTTPConnection('www.hamqth.com')
+            self.connection = http_client.HTTPConnection('www.hamqth.com')
             request = '/xml.php?u=%s&p=%s' % (username, password)
             self.connection.request('GET', request)
             response = self.connection.getresponse()
@@ -347,10 +353,10 @@ class TestCallsignLookup(unittest.TestCase):
     def test_qrz_connect(self):
         """ Check the example response from the qrz.com server, and make sure the session key has been correctly extracted. """
 
-        http.client.HTTPConnection = unittest.mock.Mock(spec=http.client.HTTPConnection)
-        http.client.HTTPResponse = unittest.mock.Mock(spec=http.client.HTTPResponse)
-        connection = http.client.HTTPConnection()
-        response = http.client.HTTPResponse()
+        http_client.HTTPConnection = mock.Mock(spec=http_client.HTTPConnection)
+        http_client.HTTPResponse = mock.Mock(spec=http_client.HTTPResponse)
+        connection = http_client.HTTPConnection()
+        response = http_client.HTTPResponse()
 
         response.read.return_value = b'<?xml version="1.0" encoding="utf-8" ?>\n<QRZDatabase version="1.33" xmlns="http://xmldata.qrz.com">\n<Session>\n<Key>3b1fd1d3ba495189984f93ff67bd45b6</Key>\n<Count>61</Count>\n<SubExp>non-subscriber</SubExp>\n<GMTime>Sun Nov 22 21:25:34 2015</GMTime>\n<Remark>cpu: 0.147s</Remark>\n</Session>\n</QRZDatabase>\n'
         connection.getresponse.return_value = response
@@ -362,10 +368,10 @@ class TestCallsignLookup(unittest.TestCase):
     def test_qrz_lookup(self):
         """ Check the example callsign lookup response from the qrz.com server, and make sure the callsign information has been correctly extracted. """
 
-        http.client.HTTPConnection = unittest.mock.Mock(spec=http.client.HTTPConnection)
-        http.client.HTTPResponse = unittest.mock.Mock(spec=http.client.HTTPResponse)
-        connection = http.client.HTTPConnection()
-        response = http.client.HTTPResponse()
+        http_client.HTTPConnection = mock.Mock(spec=http_client.HTTPConnection)
+        http_client.HTTPResponse = mock.Mock(spec=http_client.HTTPResponse)
+        connection = http_client.HTTPConnection()
+        response = http_client.HTTPResponse()
 
         response.read.return_value = b'<?xml version="1.0" encoding="utf-8" ?>\n<QRZDatabase version="1.33" xmlns="http://xmldata.qrz.com">\n<Callsign>\n<call>MYCALL</call>\n<fname>FIRSTNAME</fname>\n<name>LASTNAME</name>\n<addr2>ADDRESS2</addr2>\n<country>COUNTRY</country>\n</Callsign>\n<Session>\n<Key>3b1fd1d3ba495189984f93ff67bd45b6</Key>\n<Count>61</Count>\n<SubExp>non-subscriber</SubExp>\n<Message>A subscription is required to access the complete record.</Message>\n<GMTime>Sun Nov 22 21:34:46 2015</GMTime>\n<Remark>cpu: 0.026s</Remark>\n</Session>\n</QRZDatabase>\n'
         connection.getresponse.return_value = response
@@ -380,10 +386,10 @@ class TestCallsignLookup(unittest.TestCase):
     def test_hamqth_connect(self):
         """ Check the example response from the hamqth.com server, and make sure the session ID has been correctly extracted. """
 
-        http.client.HTTPConnection = unittest.mock.Mock(spec=http.client.HTTPConnection)
-        http.client.HTTPResponse = unittest.mock.Mock(spec=http.client.HTTPResponse)
-        connection = http.client.HTTPConnection()
-        response = http.client.HTTPResponse()
+        http_client.HTTPConnection = mock.Mock(spec=http_client.HTTPConnection)
+        http_client.HTTPResponse = mock.Mock(spec=http_client.HTTPResponse)
+        connection = http_client.HTTPConnection()
+        response = http_client.HTTPResponse()
 
         response.read.return_value = b'<?xml version="1.0"?>\n<HamQTH version="2.6" xmlns="https://www.hamqth.com">\n<session>\n<session_id>09b0ae90050be03c452ad235a1f2915ad684393c</session_id>\n</session>\n</HamQTH>\n'
         connection.getresponse.return_value = response
@@ -395,10 +401,10 @@ class TestCallsignLookup(unittest.TestCase):
     def test_hamqth_lookup(self):
         """ Check the example callsign lookup response from the hamqth.com server, and make sure the callsign information has been correctly extracted. """
 
-        http.client.HTTPConnection = unittest.mock.Mock(spec=http.client.HTTPConnection)
-        http.client.HTTPResponse = unittest.mock.Mock(spec=http.client.HTTPResponse)
-        connection = http.client.HTTPConnection()
-        response = http.client.HTTPResponse()
+        http_client.HTTPConnection = mock.Mock(spec=http_client.HTTPConnection)
+        http_client.HTTPResponse = mock.Mock(spec=http_client.HTTPResponse)
+        connection = http_client.HTTPConnection()
+        response = http_client.HTTPResponse()
 
         response.read.return_value = b'<?xml version="1.0"?>\n<HamQTH version="2.6" xmlns="https://www.hamqth.com">\n<search>\n<callsign>MYCALL</callsign>\n<nick>NAME</nick>\n<country>COUNTRY</country>\n<itu>ITU</itu>\n<cq>CQ</cq>\n<grid>GRID</grid>\n<adr_street1>ADDRESS</adr_street1>\n</search>\n</HamQTH>\n'
         connection.getresponse.return_value = response
