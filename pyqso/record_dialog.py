@@ -432,37 +432,7 @@ class RecordDialog(Gtk.Dialog):
                     rig_model = config.get("hamlib", "rig_model")
                     rig_pathname = config.get("hamlib", "rig_pathname")
                     if(autofill):
-                        # Frequency
-                        try:
-                            Hamlib.rig_set_debug(Hamlib.RIG_DEBUG_NONE)
-                            rig = Hamlib.Rig(Hamlib.__dict__[rig_model])  # Look up the model's numerical index in Hamlib's symbol dictionary
-                            rig.set_conf("rig_pathname", rig_pathname)
-                            rig.open()
-                            frequency = "%.6f" % (rig.get_freq()/1.0e6)  # Converting to MHz here
-                            self.sources["FREQ"].set_text(frequency)
-                            rig.close()
-                        except:
-                            logging.error("Could not obtain the current frequency via Hamlib!")
-
-                        # Mode
-                        try:
-                            Hamlib.rig_set_debug(Hamlib.RIG_DEBUG_NONE)
-                            rig = Hamlib.Rig(Hamlib.__dict__[rig_model])  # Look up the model's numerical index in Hamlib's symbol dictionary
-                            rig.set_conf("rig_pathname", rig_pathname)
-                            rig.open()
-                            (mode, width) = rig.get_mode()
-                            mode = mode.upper()
-                            # Handle USB and LSB as special cases.
-                            if(mode == "USB" or mode == "LSB"):
-                                submode = mode
-                                mode = "SSB"
-                                self.sources["MODE"].set_active(sorted(MODES.keys()).index(mode))
-                                self.sources["SUBMODE"].set_active(MODES[mode].index(submode))
-                            else:
-                                self.sources["MODE"].set_active(sorted(MODES.keys()).index(mode))
-                            rig.close()
-                        except:
-                            logging.error("Could not obtain the current mode (e.g. FM, AM, CW) via Hamlib!")
+                        self._hamlib_autofill(rig_model, rig_pathname)
 
         # Do we want PyQSO to autocomplete the Band field based on the Frequency field?
         (section, option) = ("records", "autocomplete_band")
@@ -534,6 +504,52 @@ class RecordDialog(Gtk.Dialog):
 
         self.sources["BAND"].set_active(0)  # If we've reached this, then the frequency does not lie in any of the specified bands.
         return
+
+    def _hamlib_autofill(self, rig_model, rig_pathname):
+        """ Set the various fields using data from the radio via Hamlib.
+
+        :arg str rig_model: The model of the radio/rig.
+        :arg str rig_pathname: The path to the rig (or rig control device).
+        """
+
+        # Open a communication channel to the radio.
+        try:
+            Hamlib.rig_set_debug(Hamlib.RIG_DEBUG_NONE)
+            rig = Hamlib.Rig(Hamlib.__dict__[rig_model])  # Look up the model's numerical index in Hamlib's symbol dictionary
+            rig.set_conf("rig_pathname", rig_pathname)
+            rig.open()
+        except:
+            logging.error("Could not open a communication channel to the rig via Hamlib!")
+            return
+
+        # Frequency
+        try:
+            frequency = "%.6f" % (rig.get_freq()/1.0e6)  # Converting to MHz here
+            self.sources["FREQ"].set_text(frequency)
+        except:
+            logging.error("Could not obtain the current frequency via Hamlib!")
+
+        # Mode
+        try:
+            (mode, width) = rig.get_mode()
+            mode = mode.upper()
+            # Handle USB and LSB as special cases.
+            if(mode == "USB" or mode == "LSB"):
+                submode = mode
+                mode = "SSB"
+                self.sources["MODE"].set_active(sorted(MODES.keys()).index(mode))
+                self.sources["SUBMODE"].set_active(MODES[mode].index(submode))
+            else:
+                self.sources["MODE"].set_active(sorted(MODES.keys()).index(mode))
+        except:
+            logging.error("Could not obtain the current mode (e.g. FM, AM, CW) via Hamlib!")
+
+        # Close communication channel.
+        try:
+            rig.close()
+        except:
+            logging.error("Could not close the communication channel to the rig via Hamlib!")
+            return
 
     def lookup_callback(self, widget=None):
         """ Get the callsign-related data from an online database and store it in the relevant Gtk.Entry boxes, but return None. """
