@@ -20,7 +20,7 @@
 from distutils.core import setup
 
 setup(name='PyQSO',
-      version='0.3',
+      version='0.4-dev',
       description='A contact logging tool for amateur radio operators.',
       author='Christian T. Jacobs (2E0ICL)',
       author_email='christian@christianjacobs.uk',

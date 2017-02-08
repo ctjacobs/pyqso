@@ -34,7 +34,7 @@ sys.path.insert(0, pyqso_path)
 
 import logging
 logging.basicConfig(level=logging.INFO)
-logging.info("PyQSO version 0.3")
+logging.info("PyQSO version 0.4")
 
 # PyQSO modules
 from pyqso.adif import *
@@ -145,7 +145,7 @@ class PyQSO(Gtk.Window):
         about.set_modal(True)
         about.set_transient_for(parent=self)
         about.set_program_name("PyQSO")
-        about.set_version("0.3")
+        about.set_version("0.4")
         about.set_authors(["Christian T. Jacobs (2E0ICL)"])
         about.set_license("""This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
