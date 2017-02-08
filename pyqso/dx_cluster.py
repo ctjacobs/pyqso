@@ -144,6 +144,26 @@ class DXCluster(Gtk.VBox):
             username = connection_info["USERNAME"].get_text()
             password = connection_info["PASSWORD"].get_text()
 
+            # Handle empty hostname.
+            if(host == ""):
+                logging.error("No hostname specified.")
+                dialog.destroy()
+                return
+
+            # Handle empty port number.
+            if(port == ""):
+                logging.warning("No port specified. Assuming default port 23...")
+                port = 23
+            else:
+                try:
+                    # Cast port into an int.
+                    port = int(port)
+                except ValueError as e:
+                    logging.error("Could not cast the DX cluster's port information to an integer.")
+                    logging.exception(e)
+                    dialog.destroy()
+                    return
+
             # Save the server details in a new bookmark, if desired.
             if(connection_info["BOOKMARK"].get_active()):
                 try:
@@ -151,15 +171,22 @@ class DXCluster(Gtk.VBox):
                     config.read(BOOKMARKS_FILE)
 
                     # Use the host name as the bookmark's identifier.
+                    if(username != ""):
+                        bookmark_identifier = "%s@%s:%d" % (username, host, port)
+                    else:
+                        bookmark_identifier = "%s:%d" % (host, port)
+                    logging.debug("Using %s as the bookmark identifier." % bookmark_identifier)
+
+                    # Add bookmark.
                     try:
-                        config.add_section(host)
+                        config.add_section(bookmark_identifier)
                     except configparser.DuplicateSectionError:
                         # If the hostname already exists, assume the user wants to update the port number, username and/or password.
-                        logging.warning("A server with hostname '%s' already exists. Over-writing existing details..." % (host))
-                    config.set(host, "host", host)
-                    config.set(host, "port", port)
-                    config.set(host, "username", username)
-                    config.set(host, "password", password)
+                        logging.warning("Bookmark '%s' already exists. Over-writing existing details..." % (bookmark_identifier))
+                    config.set(bookmark_identifier, "host", host)
+                    config.set(bookmark_identifier, "port", str(port))
+                    config.set(bookmark_identifier, "username", username)
+                    config.set(bookmark_identifier, "password", password)
 
                     # Write the bookmarks to file.
                     if not os.path.exists(os.path.expanduser('~/.config/pyqso')):
@@ -175,14 +202,8 @@ class DXCluster(Gtk.VBox):
 
             dialog.destroy()
 
-            try:
-                # Convert port (currently of type str) into an int.
-                port = int(port)
-                # Attempt a connection with the server.
-                self.telnet_connect(host, port, username, password)
-            except ValueError as e:
-                logging.error("Could not convert the server's port information to an integer.")
-                logging.exception(e)
+            # Attempt a connection with the server.
+            self.telnet_connect(host, port, username, password)
 
         else:
             dialog.destroy()
@@ -237,7 +258,7 @@ class DXCluster(Gtk.VBox):
         except IOError as e:
             logging.exception(e)
         except Exception as e:
-            logging.error("Could not connect to Telnet server '%s'" % name)
+            logging.error("Could not connect to Telnet server '%s'." % name)
             logging.exception(e)
 
         return
@@ -252,12 +273,14 @@ class DXCluster(Gtk.VBox):
         """
 
         if(host == "" or host is None):
-            logging.error("No Telnet server specified.")
+            logging.error("No hostname specified.")
             return
         if(port == "" or port is None):
+            logging.warning("No port specified. Assuming default port 23...")
             port = 23  # Use the default Telnet port
 
         try:
+            logging.debug("Attempting connection to Telnet server %s:%d" % (host, port))
             self.connection = telnetlib.Telnet(host, port)
 
             if(username):
@@ -267,7 +290,7 @@ class DXCluster(Gtk.VBox):
                 self.connection.read_until("password: ".encode())
                 self.connection.write((password + "\n").encode())
         except Exception as e:
-            logging.error("Could not create a connection to the Telnet server")
+            logging.error("Could not create a connection to the Telnet server.")
             logging.exception(e)
             self.connection = None
             return
