@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#    Copyright (C) 2013-2016 Christian T. Jacobs.
+#    Copyright (C) 2013-2017 Christian T. Jacobs.
 
 #    This file is part of PyQSO.
 
