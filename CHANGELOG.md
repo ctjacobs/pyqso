@@ -1,5 +1,19 @@
 # Change Log
 
+## [Unreleased]
+### Added
+- Pin-pointing of QTH on grey line map.
+- Default logbook.
+- Continued support for Python 2.x modules. Thanks to @gaionim (IU2HDS) for this patch.
+- Auto-filling of the Mode field using Hamlib.
+
+### Changed
+- Using username and port information (in addition to hostname) when creating an identifier for a DX cluster bookmark.
+- Pressing the Return key after entering a DX cluster command will send the command to the Telnet server.
+
+### Fixed
+- Replace any characters that cannot be decoded with a replacement marker in the DX cluster frame.
+
 ## [0.3] - 2016-05-28
 ### Added
 - Support for callsign lookups using the HamQTH.com database.
