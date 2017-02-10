@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#    Copyright (C) 2013-2016 Christian T. Jacobs.
+#    Copyright (C) 2013-2017 Christian T. Jacobs.
 
 #    This file is part of PyQSO.
 
@@ -20,6 +20,11 @@
 from gi.repository import Gtk, GObject
 import logging
 from datetime import datetime
+from os.path import expanduser
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
 try:
     import numpy
     logging.info("Using version %s of numpy." % (numpy.__version__))
@@ -49,6 +54,22 @@ class GreyLine(Gtk.VBox):
         logging.debug("Setting up the grey line...")
         Gtk.VBox.__init__(self, spacing=2)
         self.parent = parent
+
+        # Get the QTH coordinates, if available.
+        config = configparser.ConfigParser()
+        have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
+        (section, option) = ("general", "show_qth")
+        self.show_qth = False
+        if(have_config and config.has_option(section, option)):
+            if(config.get("general", "show_qth") == "True"):
+                self.show_qth = True
+                try:
+                    self.qth_name = config.get("general", "qth_name")
+                    self.qth_latitude = float(config.get("general", "qth_latitude"))
+                    self.qth_longitude = float(config.get("general", "qth_longitude"))
+                except ValueError as e:
+                    logging.exception(e)
+                    self.show_qth = False
 
         if(have_necessary_modules):
             self.fig = matplotlib.figure.Figure()
@@ -90,6 +111,13 @@ class GreyLine(Gtk.VBox):
                 m.fillcontinents(color='darkgreen', lake_color='lightblue')
                 m.nightshade(datetime.utcnow())  # Add in the grey line using UTC time. Note that this requires NetCDF.
                 logging.debug("Grey line drawn.")
+
+                # Pin-point QTH on the map.
+                if(self.show_qth):
+                    qth_x, qth_y = m(self.qth_longitude, self.qth_latitude)
+                    m.plot(qth_x, qth_y, "yo")
+                    sub.text(qth_x, qth_y, self.qth_name, color='yellow')
+
                 return True
         else:
             return False  # Don't try to re-draw the canvas if the necessary modules to do so could not be imported.

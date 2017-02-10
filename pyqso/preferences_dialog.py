@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#    Copyright (C) 2013-2016 Christian T. Jacobs.
+#    Copyright (C) 2013-2017 Christian T. Jacobs.
 
 #    This file is part of PyQSO.
 
@@ -31,6 +31,12 @@ try:
 except ImportError:
     logging.warning("Could not import the Hamlib module!")
     have_hamlib = False
+try:
+    import geocoder
+    have_geocoder = True
+except ImportError:
+    logging.warning("Could not import the geocoder module!")
+    have_geocoder = False
 
 from pyqso.adif import *
 
@@ -208,6 +214,76 @@ class GeneralPage(Gtk.VBox):
         frame.add(vbox)
         self.pack_start(frame, False, False, 2)
 
+        # QTH
+        frame = Gtk.Frame()
+        frame.set_label("QTH")
+
+        vbox = Gtk.VBox()
+
+        # Pin-point QTH on grey line map.
+        self.sources["SHOW_QTH"] = Gtk.CheckButton("Pin-point QTH on grey line map")
+        (section, option) = ("general", "show_qth")
+        if(have_config and config.has_option(section, option)):
+            self.sources["SHOW_QTH"].set_active(config.get(section, option) == "True")
+        else:
+            self.sources["SHOW_QTH"].set_active(False)
+        self.sources["SHOW_QTH"].connect("toggled", self._on_show_qth_toggled)
+        vbox.pack_start(self.sources["SHOW_QTH"], False, False, 2)
+
+        hbox = Gtk.HBox()
+        label = Gtk.Label("Name:")
+        label.set_width_chars(10)
+        label.set_alignment(0, 0.5)
+        self.sources["QTH_NAME"] = Gtk.Entry()
+        hbox.pack_start(label, False, False, 2)
+        hbox.pack_start(self.sources["QTH_NAME"], False, False, 2)
+        icon = Gtk.Image()
+        icon.set_from_stock(Gtk.STOCK_INFO, Gtk.IconSize.MENU)
+        button = Gtk.Button()
+        button.add(icon)
+        button.connect("clicked", self._lookup_callback)  # Uses geocoding to find the latitude-longitude coordinates.
+        button.set_tooltip_text("Lookup QTH coordinates")
+        hbox.pack_start(button, False, False, 2)
+        vbox.pack_start(hbox, False, False, 2)
+
+        hbox = Gtk.HBox()
+        label = Gtk.Label("Latitude:")
+        label.set_width_chars(10)
+        label.set_alignment(0, 0.5)
+        self.sources["QTH_LATITUDE"] = Gtk.Entry()
+        hbox.pack_start(label, False, False, 2)
+        hbox.pack_start(self.sources["QTH_LATITUDE"], False, False, 2)
+        label = Gtk.Label("Longitude:")
+        label.set_width_chars(10)
+        label.set_alignment(0, 0.5)
+        self.sources["QTH_LONGITUDE"] = Gtk.Entry()
+        hbox.pack_start(label, False, False, 2)
+        hbox.pack_start(self.sources["QTH_LONGITUDE"], False, False, 2)
+        vbox.pack_start(hbox, False, False, 2)
+
+        (section, option) = ("general", "show_qth")
+        # Disable the text entry boxes if the SHOW_QTH checkbox is not checked.
+        if(have_config and config.has_option(section, option)):
+            self.sources["QTH_NAME"].set_sensitive(self.sources["SHOW_QTH"].get_active())
+            self.sources["QTH_LATITUDE"].set_sensitive(self.sources["SHOW_QTH"].get_active())
+            self.sources["QTH_LONGITUDE"].set_sensitive(self.sources["SHOW_QTH"].get_active())
+        else:
+            self.sources["QTH_NAME"].set_sensitive(False)
+            self.sources["QTH_LATITUDE"].set_sensitive(False)
+            self.sources["QTH_LONGITUDE"].set_sensitive(False)
+        (section, option) = ("general", "qth_name")
+        if(have_config and config.has_option(section, option)):
+            self.sources["QTH_NAME"].set_text(config.get(section, option))
+        (section, option) = ("general", "qth_latitude")
+        if(have_config and config.has_option(section, option)):
+            self.sources["QTH_LATITUDE"].set_text(config.get(section, option))
+        (section, option) = ("general", "qth_longitude")
+        if(have_config and config.has_option(section, option)):
+            self.sources["QTH_LONGITUDE"].set_text(config.get(section, option))
+
+        frame.add(vbox)
+        self.pack_start(frame, False, False, 2)
+
         logging.debug("General page of the preferences dialog ready!")
         return
 
@@ -219,6 +295,10 @@ class GeneralPage(Gtk.VBox):
         data["DEFAULT_LOGBOOK"] = self.sources["DEFAULT_LOGBOOK"].get_active()
         data["DEFAULT_LOGBOOK_PATH"] = os.path.expanduser(self.sources["DEFAULT_LOGBOOK_PATH"].get_text())
         data["KEEP_OPEN"] = self.sources["KEEP_OPEN"].get_active()
+        data["SHOW_QTH"] = self.sources["SHOW_QTH"].get_active()
+        data["QTH_NAME"] = self.sources["QTH_NAME"].get_text()
+        data["QTH_LATITUDE"] = self.sources["QTH_LATITUDE"].get_text()
+        data["QTH_LONGITUDE"] = self.sources["QTH_LONGITUDE"].get_text()
         return data
 
     def _on_default_logbook_toggled(self, widget, data=None):
@@ -228,6 +308,33 @@ class GeneralPage(Gtk.VBox):
             self.sources["DEFAULT_LOGBOOK_PATH"].set_sensitive(False)
         return
 
+    def _on_show_qth_toggled(self, widget, data=None):
+        if(widget.get_active()):
+            self.sources["QTH_NAME"].set_sensitive(True)
+            self.sources["QTH_LATITUDE"].set_sensitive(True)
+            self.sources["QTH_LONGITUDE"].set_sensitive(True)
+        else:
+            self.sources["QTH_NAME"].set_sensitive(False)
+            self.sources["QTH_LATITUDE"].set_sensitive(False)
+            self.sources["QTH_LONGITUDE"].set_sensitive(False)
+        return
+
+    def _lookup_callback(self, widget=None):
+        """ Performs geocoding of the QTH location to obtain latitude-longitude coordinates. """
+        if(not have_geocoder):
+            logging.warning("Geocoder module could not be imported. Geocoding aborted.")
+            return
+        logging.debug("Geocoding QTH location...")
+        name = self.sources["QTH_NAME"].get_text()
+        try:
+            g = geocoder.google(name)
+            latitude, longitude = g.latlng
+            self.sources["QTH_LATITUDE"].set_text(str(latitude))
+            self.sources["QTH_LONGITUDE"].set_text(str(longitude))
+            logging.debug("Latitude-longitude coordinates found: (%s, %s)", str(latitude), str(longitude))
+        except Exception as e:
+            logging.exception(e)
+        return
 
 class ViewPage(Gtk.VBox):
 
@@ -500,7 +607,7 @@ class RecordsPage(Gtk.VBox):
 
         hbox = Gtk.HBox()
         label = Gtk.Label("Username: ")
-        label.set_width_chars(9)
+        label.set_width_chars(15)
         label.set_alignment(0, 0.5)
         hbox.pack_start(label, False, False, 2)
         self.sources["CALLSIGN_DATABASE_USERNAME"] = Gtk.Entry()
@@ -512,7 +619,7 @@ class RecordsPage(Gtk.VBox):
 
         hbox = Gtk.HBox()
         label = Gtk.Label("Password: ")
-        label.set_width_chars(9)
+        label.set_width_chars(15)
         label.set_alignment(0, 0.5)
         hbox.pack_start(label, False, False, 2)
         self.sources["CALLSIGN_DATABASE_PASSWORD"] = Gtk.Entry()
