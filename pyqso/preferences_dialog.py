@@ -336,6 +336,7 @@ class GeneralPage(Gtk.VBox):
             logging.exception(e)
         return
 
+
 class ViewPage(Gtk.VBox):
 
     """ The section of the preferences dialog containing view-related preferences. """
