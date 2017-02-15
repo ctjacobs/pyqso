@@ -138,11 +138,11 @@ class DXCluster(Gtk.VBox):
         builder = Gtk.Builder()
         builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/glade/telnet_connection.glade")
         dialog = builder.get_object("telnet_connection_dialog")
-        connection_info = {"HOST":builder.get_object("host_entry"),
-                           "PORT":builder.get_object("port_entry"),
-                           "USERNAME":builder.get_object("username_entry"),
-                           "PASSWORD":builder.get_object("password_entry"),
-                           "BOOKMARK":builder.get_object("bookmark_checkbox")}
+        connection_info = {"HOST": builder.get_object("host_entry"),
+                           "PORT": builder.get_object("port_entry"),
+                           "USERNAME": builder.get_object("username_entry"),
+                           "PASSWORD": builder.get_object("password_entry"),
+                           "BOOKMARK": builder.get_object("bookmark_checkbox")}
 
         response = dialog.run()
         if(response == Gtk.ResponseType.OK):
