@@ -31,8 +31,6 @@ except ImportError:
     import ConfigParser as configparser
 import os.path
 
-from pyqso.telnet_connection_dialog import *
-
 BOOKMARKS_FILE = os.path.expanduser('~/.config/pyqso/bookmarks.ini')
 
 
@@ -133,12 +131,21 @@ class DXCluster(Gtk.VBox):
         return
 
     def new_server(self, widget=None):
-        """ Get Telnet server host and login details specified in the Gtk.Entry boxes in the TelnetConnectionDialog and attempt a connection. """
-        dialog = TelnetConnectionDialog(self.parent)
-        response = dialog.run()
+        """ Get Telnet server host and login details specified in the Gtk.Entry boxes in the Telnet connection dialog and attempt a connection. """
 
+        # Build connection dialog
+        logging.debug("Setting up the Telnet connection dialog...")
+        builder = Gtk.Builder()
+        builder.add_from_file("glade/telnet_connection.glade")
+        dialog = builder.get_object("telnet_connection_dialog")
+        connection_info = {"HOST":builder.get_object("host_entry"),
+                        "PORT":builder.get_object("port_entry"),
+                        "USERNAME":builder.get_object("username_entry"),
+                        "PASSWORD":builder.get_object("password_entry"),
+                        "BOOKMARK":builder.get_object("bookmark_checkbox")}
+
+        response = dialog.run()
         if(response == Gtk.ResponseType.OK):
-            connection_info = dialog.get_connection_info()
             host = connection_info["HOST"].get_text()
             port = connection_info["PORT"].get_text()
             username = connection_info["USERNAME"].get_text()
