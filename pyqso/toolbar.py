@@ -21,7 +21,7 @@ from gi.repository import Gtk
 import logging
 
 
-class Toolbar(Gtk.HBox):
+class Toolbar:
 
     """ The toolbar underneath the menu bar. """
 
@@ -29,8 +29,6 @@ class Toolbar(Gtk.HBox):
         """ Set up the various buttons in the toolbar, and connect to their corresponding functions. """
 
         logging.debug("Setting up the toolbar...")
-
-        Gtk.HBox.__init__(self, spacing=2)
 
         self.buttons = {}
 

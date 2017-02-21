@@ -66,7 +66,7 @@ class Logbook(Gtk.Notebook):
 
         # Get the new file's path from a dialog.
         dialog = Gtk.FileChooserDialog("Create a New SQLite Database File",
-                                       self.parent,
+                                       self.parent.window,
                                        Gtk.FileChooserAction.SAVE,
                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                        Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
@@ -98,7 +98,7 @@ class Logbook(Gtk.Notebook):
         if(path is None):
             # If no path has been provided, get one from a "File Open" dialog.
             dialog = Gtk.FileChooserDialog("Open SQLite Database File",
-                                           self.parent,
+                                           self.parent.window,
                                            Gtk.FileChooserAction.OPEN,
                                           (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                            Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
@@ -130,7 +130,7 @@ class Logbook(Gtk.Notebook):
                         self.logs.append(l)
             except (sqlite.Error, IndexError) as e:
                 logging.exception(e)
-                error(parent=self.parent, message="Oops! Something went wrong when trying to retrieve the logs from the logbook. Perhaps the logbook file is encrypted, corrupted, or in the wrong format?")
+                error(parent=self.parent.window, message="Oops! Something went wrong when trying to retrieve the logs from the logbook. Perhaps the logbook file is encrypted, corrupted, or in the wrong format?")
                 return
 
             logging.debug("All logs retrieved successfully. Now attempting to render them all in the Gtk.Notebook...")
