@@ -93,10 +93,12 @@ class PyQSO:
         # once connected to the SQLite database.
         self.logbook = Logbook(self)
         self.toolbox = Toolbox(self, self.builder)
-        
+
         # Set up menu and tool bars. These classes depend on the Logbook and Toolbox class.
         self.menu = Menu(self, self.builder)
         #self.toolbar = Toolbar(self)
+
+        self.window.show_all()
 
         if(have_config):
             if(config.get("general", "show_toolbox") == "False"):
@@ -120,8 +122,6 @@ class PyQSO:
                     if(logbook_path is not None and logbook_path != ""):
                         logging.info("Opening the default logbook: %s" % logbook_path)
                         self.logbook.open(widget=None, path=logbook_path)
-
-        self.window.show_all()
 
         return
 

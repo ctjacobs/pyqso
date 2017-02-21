@@ -151,7 +151,7 @@ class Logbook(Gtk.Notebook):
             logging.debug("All logs rendered successfully.")
 
             self.update_summary()
-            self.parent.toolbox.awards.count()
+            self.parent.toolbox.awards.count(self)
 
             context_id = self.parent.statusbar.get_context_id("Status")
             self.parent.statusbar.push(context_id, "Logbook: %s" % self.path)
@@ -560,7 +560,7 @@ class Logbook(Gtk.Notebook):
             self.remove_page(page_index)
 
         self.update_summary()
-        self.parent.toolbox.awards.count()
+        self.parent.toolbox.awards.count(self)
         return
 
     def filter_logs(self, widget=None):
@@ -887,7 +887,7 @@ class Logbook(Gtk.Notebook):
             self.logs.append(l)
             self._render_log(self.get_number_of_logs()-1)
         self.update_summary()
-        self.parent.toolbox.awards.count()
+        self.parent.toolbox.awards.count(self)
 
         return
 
@@ -1072,7 +1072,7 @@ class Logbook(Gtk.Notebook):
                         # All data has been validated, so we can go ahead and add the new record.
                         log.add_record(fields_and_data)
                         self.update_summary()
-                        self.parent.toolbox.awards.count()
+                        self.parent.toolbox.awards.count(self)
                         # Select the new Record's row in the treeview.
                         number_of_records = log.get_number_of_records()
                         if(number_of_records is not None):
@@ -1113,7 +1113,7 @@ class Logbook(Gtk.Notebook):
             # 'iter' is needed to remove the record from the ListStore itself.
             log.delete_record(row_index, iter=child_iter)
             self.update_summary()
-            self.parent.toolbox.awards.count()
+            self.parent.toolbox.awards.count(self)
         return
 
     def edit_record_callback(self, widget, path, view_column):
@@ -1180,7 +1180,7 @@ class Logbook(Gtk.Notebook):
                                 # We add 1 onto the column_index here because we don't want to consider the index column.
                                 log.edit_record(row_index, field_names[i], fields_and_data[field_names[i]], iter=child_iter, column_index=i+1)
                         self.update_summary()
-                        self.parent.toolbox.awards.count()
+                        self.parent.toolbox.awards.count(self)
 
         dialog.destroy()
         return

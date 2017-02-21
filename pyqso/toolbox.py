@@ -41,9 +41,9 @@ class Toolbox:
 
         self.tools = self.builder.get_object("tools")
 
-        self.dx_cluster = DXCluster(self.parent, self.builder)
-        self.grey_line = GreyLine(self.parent, self.builder)
-        #self.awards = Awards(self.parent, self.builder)
+        self.dx_cluster = DXCluster(self.builder)
+        self.grey_line = GreyLine(self.builder)
+        self.awards = Awards(self.builder)
 
         self.tools.connect_after("switch-page", self._on_switch_page)
 
@@ -53,7 +53,8 @@ class Toolbox:
 
     def toggle_visible_callback(self, widget=None):
         """ Show/hide the toolbox. """
-        self.tools.set_visible(not self.tools.get_visible())
+        toolbox_frame = self.builder.get_object("toolbox")
+        toolbox_frame.set_visible(not toolbox_frame.get_visible())
         return
 
     def _on_switch_page(self, widget, label, new_page):

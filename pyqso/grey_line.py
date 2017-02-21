@@ -46,15 +46,13 @@ class GreyLine:
 
     """ A tool for visualising the grey line. """
 
-    def __init__(self, parent, builder):
+    def __init__(self, builder):
         """ Set up the drawing canvas and the timer which will re-plot the grey line every 30 minutes.
 
-        :arg parent: The parent Gtk window.
         :arg builder: The Gtk builder.
         """
         logging.debug("Setting up the grey line...")
 
-        self.parent = parent
         self.builder = builder
 
         # Get the QTH coordinates, if available.
@@ -93,7 +91,9 @@ class GreyLine:
         """
 
         if(have_necessary_modules):
-            if(self.parent.toolbox.tools.get_current_page() != 1 or not self.parent.toolbox.get_visible()):
+            toolbox = self.builder.get_object("toolbox")
+            tools = self.builder.get_object("tools")
+            if(tools.get_current_page() != 1 or not toolbox.get_visible()):
                 # Don't re-draw if the grey line is not visible.
                 return True  # We need to return True in case this is method was called by a timer event.
             else:

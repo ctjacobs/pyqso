@@ -38,17 +38,15 @@ class DXCluster:
 
     """ A tool for connecting to a DX cluster (specifically Telnet-based DX clusters). """
 
-    def __init__(self, parent, builder):
+    def __init__(self, builder):
         """ Set up the DX cluster's Gtk.VBox, and set up a timer so that PyQSO can retrieve new data from the Telnet server every few seconds.
 
-        :arg parent: The parent Gtk window.
         :arg builder: The Gtk builder.
         """
 
         logging.debug("Setting up the DX cluster...")
 
         self.connection = None
-        self.parent = parent
         self.builder = builder
 
         # Connect signals.
@@ -332,7 +330,7 @@ class TestDXCluster(unittest.TestCase):
     def setUp(self):
         """ Set up the objects needed for the unit tests. """
         Gtk.Builder = mock.MagicMock(spec=Gtk.Builder)
-        self.dxcluster = DXCluster(parent=None, builder=Gtk.Builder())
+        self.dxcluster = DXCluster(builder=Gtk.Builder())
 
     def tearDown(self):
         """ Destroy any unit test resources. """

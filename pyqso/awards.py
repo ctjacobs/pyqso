@@ -26,16 +26,14 @@ class Awards:
     """ A tool for tracking progress towards an award. Currently this only supports the DXCC award.
     For more information visit http://www.arrl.org/dxcc """
 
-    def __init__(self, parent, builder):
+    def __init__(self, builder):
         """ Set up a table for progress tracking purposes.
 
-        :arg parent: The parent Gtk window.
         :arg builder: The Gtk builder.
         """
         # TODO: This only considers the DXCC award for now.
         logging.debug("Setting up awards table...")
 
-        self.parent = parent
         self.builder = builder
 
         self.bands = ["70cm", "2m", "6m", "10m", "12m", "15m", "17m", "20m", "30m", "40m", "80m", "160m"]
@@ -66,11 +64,9 @@ class Awards:
 
         logging.debug("Awards table set up successfully.")
 
-        self.count()
-
         return
 
-    def count(self):
+    def count(self, logbook):
         """ Update the table for progress tracking. """
 
         logging.debug("Counting the band/mode combinations for the awards table...")
@@ -81,7 +77,7 @@ class Awards:
         for i in range(0, len(self.bands)):
             count.append([0]*len(self.bands))
 
-        for log in self.parent.logbook.logs:
+        for log in logbook.logs:
             records = log.get_all_records()
             if(records is not None):
                 for r in records:
