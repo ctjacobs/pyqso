@@ -91,7 +91,7 @@ class PyQSO:
 
         # Create a Logbook so we can add/remove/edit logs and records,
         # once connected to the SQLite database.
-        self.logbook = Logbook(self)
+        self.logbook = Logbook(self, self.builder)
         self.toolbox = Toolbox(self, self.builder)
 
         # Set up menu and tool bars. These classes depend on the Logbook and Toolbox class.
