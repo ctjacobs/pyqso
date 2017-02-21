@@ -54,11 +54,11 @@ class Toolbox:
 
     def toggle_visible_callback(self, widget=None):
         """ Show/hide the toolbox. """
-        self.set_visible(not self.get_visible())
+        self.tools.set_visible(not self.tools.get_visible())
         return
 
     def _on_switch_page(self, widget, label, new_page):
         """ Re-draw the Grey Line if the user switches to the grey line tab. """
-        if(isinstance(label, GreyLine)):
+        if(label.get_text() == "Grey Line"):
             label.draw()  # Note that 'label' is actually a GreyLine object.
         return

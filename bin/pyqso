@@ -91,15 +91,15 @@ class PyQSO:
 
         # Create a Logbook so we can add/remove/edit logs and records,
         # once connected to the SQLite database.
-        #self.logbook = Logbook(self)
-        #self.logbook.set_scrollable(True)
-
-        #self.toolbox = Toolbox(self)
+        self.logbook = Logbook(self)
+        self.toolbox = Toolbox(self, self.builder)
+        self.menu = Menu(self, self.builder)
+        
 
         # Set up menu and tool bars
         # These classes depend on the Logbook and Toolbox class,
         # so pack the logbook and toolbox after the menu and toolbar.
-        #self.menu = Menu(self)
+        
         #self.toolbar = Toolbar(self)
 
         #vbox_outer.pack_start(self.menu, False, False, 0)
@@ -108,7 +108,28 @@ class PyQSO:
         #vbox_outer.pack_start(self.toolbox, True, True, 0)
         #vbox_outer.pack_start(self.statusbar, False, False, 0)
 
-        self.toolbox = Toolbox(self.window, self.builder)
+        if(have_config):
+            if(config.get("general", "show_toolbox") == "False"):
+                self.toolbox.toggle_visible_callback()
+        else:
+            # Hide the Toolbox by default
+            self.toolbox.toggle_visible_callback()
+
+        if(logbook_path is not None):
+            logging.info("Opening logbook: %s" % logbook_path)
+            self.logbook.open(widget=None, path=logbook_path)
+        else:
+            # If no logbook path is specified at the command line,
+            # then check if the user wants to open a default logbook.
+            (section, option) = ("general", "default_logbook")
+            if(have_config and config.has_option(section, option)):
+                open_default_logbook = (config.get(section, option) == "True")
+                (section, option) = ("general", "default_logbook_path")
+                if(open_default_logbook and config.has_option(section, option)):
+                    logbook_path = config.get(section, option)
+                    if(logbook_path is not None and logbook_path != ""):
+                        logging.info("Opening the default logbook: %s" % logbook_path)
+                        self.logbook.open(widget=None, path=logbook_path)
 
         self.window.show_all()
 
@@ -118,7 +139,7 @@ class PyQSO:
         """ Show the About dialog, which includes license information. """
         about = Gtk.AboutDialog()
         about.set_modal(True)
-        about.set_transient_for(parent=self)
+        about.set_transient_for(parent=self.window)
         about.set_program_name("PyQSO")
         about.set_version("1.0.0")
         about.set_authors(["Christian T. Jacobs (2E0ICL)"])
