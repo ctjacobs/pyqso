@@ -25,84 +25,46 @@ class Toolbar:
 
     """ The toolbar underneath the menu bar. """
 
-    def __init__(self, parent):
+    def __init__(self, parent, builder):
         """ Set up the various buttons in the toolbar, and connect to their corresponding functions. """
 
         logging.debug("Setting up the toolbar...")
 
+        self.parent = parent
+        self.builder = builder
+
         self.buttons = {}
 
         # Create logbook
-        icon = Gtk.Image()
-        icon.set_from_stock(Gtk.STOCK_NEW, Gtk.IconSize.BUTTON)
-        button = Gtk.Button()
-        button.add(icon)
-        button.set_tooltip_text('Create a New Logbook')
-        button.connect("clicked", parent.logbook.new)
-        self.pack_start(button, False, False, 0)
-        self.buttons["NEW_LOGBOOK"] = button
+        self.buttons["NEW_LOGBOOK"] = self.builder.get_object("toolbar_new_logbook")
+        self.buttons["NEW_LOGBOOK"].connect("clicked", parent.logbook.new)
 
         # Open logbook
-        icon = Gtk.Image()
-        icon.set_from_stock(Gtk.STOCK_OPEN, Gtk.IconSize.BUTTON)
-        button = Gtk.Button()
-        button.add(icon)
-        button.set_tooltip_text('Open an Existing Logbook')
-        button.connect("clicked", parent.logbook.open)
-        self.pack_start(button, False, False, 0)
-        self.buttons["OPEN_LOGBOOK"] = button
+        self.buttons["OPEN_LOGBOOK"] = self.builder.get_object("toolbar_open_logbook")
+        self.buttons["OPEN_LOGBOOK"].connect("clicked", parent.logbook.open)
 
         # Close logbook
-        icon = Gtk.Image()
-        icon.set_from_stock(Gtk.STOCK_CLOSE, Gtk.IconSize.BUTTON)
-        button = Gtk.Button()
-        button.add(icon)
-        button.set_tooltip_text('Close Logbook')
-        button.connect("clicked", parent.logbook.close)
-        self.pack_start(button, False, False, 0)
-        self.buttons["CLOSE_LOGBOOK"] = button
-
-        self.pack_start(Gtk.SeparatorToolItem(), False, False, 0)
+        self.buttons["CLOSE_LOGBOOK"] = self.builder.get_object("toolbar_close_logbook")
+        self.buttons["CLOSE_LOGBOOK"].connect("clicked", parent.logbook.close)
 
         # Add record
-        icon = Gtk.Image()
-        icon.set_from_stock(Gtk.STOCK_ADD, Gtk.IconSize.BUTTON)
-        button = Gtk.Button()
-        button.add(icon)
-        button.set_tooltip_text('Add Record')
-        button.connect("clicked", parent.logbook.add_record_callback)
-        self.pack_start(button, False, False, 0)
-        self.buttons["ADD_RECORD"] = button
+        self.buttons["ADD_RECORD"] = self.builder.get_object("toolbar_add_record")
+        self.buttons["ADD_RECORD"].connect("clicked", parent.logbook.add_record_callback)
 
         # Edit record
-        icon = Gtk.Image()
-        icon.set_from_stock(Gtk.STOCK_EDIT, Gtk.IconSize.BUTTON)
-        button = Gtk.Button()
-        button.add(icon)
-        button.set_tooltip_text('Edit Record')
-        button.connect("clicked", parent.logbook.edit_record_callback, None, None)
-        self.pack_start(button, False, False, 0)
-        self.buttons["EDIT_RECORD"] = button
+        self.buttons["EDIT_RECORD"] = self.builder.get_object("toolbar_edit_record")
+        self.buttons["EDIT_RECORD"].connect("clicked", parent.logbook.edit_record_callback, None, None)
 
         # Delete record
-        icon = Gtk.Image()
-        icon.set_from_stock(Gtk.STOCK_DELETE, Gtk.IconSize.BUTTON)
-        button = Gtk.Button()
-        button.add(icon)
-        button.set_tooltip_text('Delete Record')
-        button.connect("clicked", parent.logbook.delete_record_callback)
-        self.pack_start(button, False, False, 0)
-        self.buttons["DELETE_RECORD"] = button
-
-        self.pack_start(Gtk.SeparatorToolItem(), False, False, 0)
+        self.buttons["DELETE_RECORD"] = self.builder.get_object("toolbar_delete_record")
+        self.buttons["DELETE_RECORD"].connect("clicked", parent.logbook.delete_record_callback)
 
         # Filter log
-        label = Gtk.Label("Filter by callsign: ")
-        self.pack_start(label, False, False, 0)
-        self.filter_source = Gtk.Entry()
-        self.filter_source.set_width_chars(11)
+        self.buttons["DELETE_RECORD"] = self.builder.get_object("toolbar_delete_record")
+        self.buttons["DELETE_RECORD"].connect("clicked", parent.logbook.delete_record_callback)        
+
+        self.filter_source = self.builder.get_object("filter_source")
         self.filter_source.connect_after("changed", parent.logbook.filter_logs)
-        self.pack_start(self.filter_source, False, False, 0)
 
         self.set_logbook_button_sensitive(True)
         self.set_record_buttons_sensitive(False)

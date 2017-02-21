@@ -379,7 +379,7 @@
             <property name="can_focus">False</property>
             <property name="spacing">2</property>
             <child>
-              <object class="GtkButton" id="toolbar_button_new_logbook">
+              <object class="GtkButton" id="toolbar_new_logbook">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -400,7 +400,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="toolbar_button_open_logbook">
+              <object class="GtkButton" id="toolbar_open_logbook">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -421,7 +421,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="toolbar_button_close_logbook">
+              <object class="GtkButton" id="toolbar_close_logbook">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -454,7 +454,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="toolbar_button_add_record">
+              <object class="GtkButton" id="toolbar_add_record">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -475,7 +475,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="toolbar_button_edit_record">
+              <object class="GtkButton" id="toolbar_edit_record">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -496,7 +496,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="toolbar_button_delete_record">
+              <object class="GtkButton" id="toolbar_delete_record">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -529,7 +529,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="label_filter">
+              <object class="GtkLabel" id="filter_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Filter by callsign: </property>
@@ -844,6 +844,9 @@
             <property name="fill">False</property>
             <property name="position">4</property>
           </packing>
+        </child>
+        <child>
+          <placeholder/>
         </child>
       </object>
     </child>

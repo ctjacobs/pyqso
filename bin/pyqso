@@ -96,7 +96,7 @@ class PyQSO:
 
         # Set up menu and tool bars. These classes depend on the Logbook and Toolbox class.
         self.menu = Menu(self, self.builder)
-        #self.toolbar = Toolbar(self)
+        self.toolbar = Toolbar(self, self.builder)
 
         self.window.show_all()
 
