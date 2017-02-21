@@ -59,15 +59,12 @@ class Toolbar:
         self.buttons["DELETE_RECORD"].connect("clicked", parent.logbook.delete_record_callback)
 
         # Filter log
-        self.buttons["DELETE_RECORD"] = self.builder.get_object("toolbar_delete_record")
-        self.buttons["DELETE_RECORD"].connect("clicked", parent.logbook.delete_record_callback)
-
         self.filter_source = self.builder.get_object("filter_source")
         self.filter_source.connect_after("changed", parent.logbook.filter_logs)
 
+        # Set sensitivities.
         self.set_logbook_button_sensitive(True)
         self.set_record_buttons_sensitive(False)
-
         self.filter_source.set_sensitive(False)
 
         logging.debug("Toolbar ready!")
