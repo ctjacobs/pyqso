@@ -17,7 +17,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, GObject
+from gi.repository import GObject
 import logging
 from datetime import datetime
 from os.path import expanduser
@@ -53,7 +53,7 @@ class GreyLine:
         :arg builder: The Gtk builder.
         """
         logging.debug("Setting up the grey line...")
-        
+
         self.parent = parent
         self.builder = builder
 

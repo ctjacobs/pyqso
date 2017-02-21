@@ -17,7 +17,6 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk
 import logging
 
 from pyqso.dx_cluster import *
@@ -45,7 +44,7 @@ class Toolbox:
         self.dx_cluster = DXCluster(self.parent, self.builder)
         self.grey_line = GreyLine(self.parent, self.builder)
         #self.awards = Awards(self.parent, self.builder)
-                      
+
         self.tools.connect_after("switch-page", self._on_switch_page)
 
         logging.debug("Toolbox ready!")
