@@ -34,91 +34,41 @@ import os.path
 BOOKMARKS_FILE = os.path.expanduser('~/.config/pyqso/bookmarks.ini')
 
 
-class DXCluster(Gtk.VBox):
+class DXCluster:
 
     """ A tool for connecting to a DX cluster (specifically Telnet-based DX clusters). """
 
-    def __init__(self, parent):
+    def __init__(self, parent, builder):
         """ Set up the DX cluster's Gtk.VBox, and set up a timer so that PyQSO can retrieve new data from the Telnet server every few seconds.
 
         :arg parent: The parent Gtk window.
+        :arg builder: The Gtk builder.
         """
+
         logging.debug("Setting up the DX cluster...")
-        Gtk.VBox.__init__(self, spacing=2)
 
         self.connection = None
         self.parent = parent
+        self.builder = builder
 
-        # Set up the menubar
-        self.menubar = Gtk.MenuBar()
+        # Connect signals.
+        self.builder.get_object("mitem_new").connect("activate", self.new_server)
+        self.builder.get_object("mitem_disconnect").connect("activate", self.telnet_disconnect)
+        self.builder.get_object("send").connect("clicked", self.telnet_send_command)
+        self.builder.get_object("command").connect("key-release-event", self._on_command_key_press)
 
-        self.items = {}
-
-        # CONNECTION
-        mitem_connection = Gtk.MenuItem(label="Connection")
-        self.menubar.append(mitem_connection)
-        subm_connection = Gtk.Menu()
-        mitem_connection.set_submenu(subm_connection)
-
-        # Connect
-        mitem_connect = Gtk.ImageMenuItem(label="Connect to Telnet Server")
-        icon = Gtk.Image()
-        icon.set_from_stock(Gtk.STOCK_CONNECT, Gtk.IconSize.MENU)
-        mitem_connect.set_image(icon)
-        subm_connection.append(mitem_connect)
-        self.items["CONNECT"] = mitem_connect
-
-        subm_connect = Gtk.Menu()
-
-        # New
-        mitem_new = Gtk.MenuItem(label="New...")
-        mitem_new.connect("activate", self.new_server)
-        subm_connect.append(mitem_new)
-
-        # From Bookmark
-        mitem_bookmark = Gtk.MenuItem(label="From Bookmark")
-        self.subm_bookmarks = Gtk.Menu()
-        mitem_bookmark.set_submenu(self.subm_bookmarks)
-        self._populate_bookmarks()
-        subm_connect.append(mitem_bookmark)
-
-        mitem_connect.set_submenu(subm_connect)
-
-        # Disconnect
-        mitem_disconnect = Gtk.ImageMenuItem(label="Disconnect from Telnet Server")
-        icon = Gtk.Image()
-        icon.set_from_stock(Gtk.STOCK_DISCONNECT, Gtk.IconSize.MENU)
-        mitem_disconnect.set_image(icon)
-        mitem_disconnect.connect("activate", self.telnet_disconnect)
-        subm_connection.append(mitem_disconnect)
-        self.items["DISCONNECT"] = mitem_disconnect
-
-        self.pack_start(self.menubar, False, False, 0)
-
-        # A TextView object to display the output from the Telnet server.
-        self.renderer = Gtk.TextView()
-        self.renderer.set_editable(False)
-        self.renderer.set_cursor_visible(False)
-        sw = Gtk.ScrolledWindow()
-        sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
-        sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        sw.add(self.renderer)
+        # Get the text renderer and its buffer.
+        self.renderer = self.builder.get_object("renderer")
         self.buffer = self.renderer.get_buffer()
-        self.pack_start(sw, True, True, 0)
 
-        # Set up the command box.
-        self.commandbox = Gtk.HBox(spacing=2)
-        self.command = Gtk.Entry()
-        self.command.connect("key-release-event", self._on_command_key_press)
-        self.commandbox.pack_start(self.command, True, True, 0)
-        self.send = Gtk.Button(label="Send Command")
-        self.send.connect("clicked", self.telnet_send_command)
-        self.commandbox.pack_start(self.send, False, False, 0)
-        self.pack_start(self.commandbox, False, False, 0)
-
+        # Items whose sensitivity may change.
+        self.items = {}
+        self.items["CONNECT"] = self.builder.get_object("mitem_connect")
+        self.items["DISCONNECT"] = self.builder.get_object("mitem_disconnect")
+        self.items["SEND"] = self.builder.get_object("send")
         self.set_items_sensitive(True)
 
-        self.show_all()
+        self._populate_bookmarks()
 
         logging.debug("DX cluster ready!")
 
@@ -135,14 +85,12 @@ class DXCluster(Gtk.VBox):
 
         # Build connection dialog
         logging.debug("Setting up the Telnet connection dialog...")
-        builder = Gtk.Builder()
-        builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/glade/telnet_connection.glade")
-        dialog = builder.get_object("telnet_connection_dialog")
-        connection_info = {"HOST": builder.get_object("host_entry"),
-                           "PORT": builder.get_object("port_entry"),
-                           "USERNAME": builder.get_object("username_entry"),
-                           "PASSWORD": builder.get_object("password_entry"),
-                           "BOOKMARK": builder.get_object("bookmark_checkbox")}
+        dialog = self.builder.get_object("telnet_connection_dialog")
+        connection_info = {"HOST": self.builder.get_object("host_entry"),
+                           "PORT": self.builder.get_object("port_entry"),
+                           "USERNAME": self.builder.get_object("username_entry"),
+                           "PASSWORD": self.builder.get_object("password_entry"),
+                           "BOOKMARK": self.builder.get_object("bookmark_checkbox")}
 
         response = dialog.run()
         if(response == Gtk.ResponseType.OK):
@@ -218,26 +166,30 @@ class DXCluster(Gtk.VBox):
 
     def _populate_bookmarks(self):
         """ Populate the list of bookmarked Telnet servers in the menu. """
+
+        # Get the bookmarks submenu.
+        subm_bookmarks = self.builder.get_object("subm_bookmarks")
+
         config = configparser.ConfigParser()
         have_config = (config.read(BOOKMARKS_FILE) != [])
 
         if(have_config):
             try:
                 # Clear the menu of all current bookmarks.
-                for i in self.subm_bookmarks.get_children():
-                    self.subm_bookmarks.remove(i)
+                for i in subm_bookmarks.get_children():
+                    subm_bookmarks.remove(i)
 
                 # Add all bookmarks in the config file.
                 for bookmark in config.sections():
                     mitem = Gtk.MenuItem(label=bookmark)
                     mitem.connect("activate", self.bookmarked_server, bookmark)
-                    self.subm_bookmarks.append(mitem)
+                    subm_bookmarks.append(mitem)
 
             except Exception as e:
                 logging.error("An error occurred whilst populating the DX cluster bookmarks menu.")
                 logging.exception(e)
 
-            self.show_all()  # Need to do this to update the bookmarks list in the menu.
+            self.builder.get_object("dx_cluster").show_all()  # Need to do this to update the bookmarks list in the menu.
 
         return
 
@@ -328,8 +280,9 @@ class DXCluster(Gtk.VBox):
     def telnet_send_command(self, widget=None):
         """ Send the user-specified command in the Gtk.Entry box to the Telnet server (if PyQSO is connected to one). """
         if(self.connection):
-            self.connection.write((self.command.get_text() + "\n").encode())
-            self.command.set_text("")
+            command = self.builder.get_object("command")
+            self.connection.write((command.get_text() + "\n").encode())
+            command.set_text("")
         return
 
     def _on_telnet_io(self):
@@ -368,7 +321,7 @@ class DXCluster(Gtk.VBox):
         """
         self.items["CONNECT"].set_sensitive(sensitive)
         self.items["DISCONNECT"].set_sensitive(not sensitive)
-        self.send.set_sensitive(not sensitive)
+        self.items["SEND"].set_sensitive(not sensitive)
         return
 
 

@@ -42,18 +42,20 @@ except ImportError as e:
     have_necessary_modules = False
 
 
-class GreyLine(Gtk.VBox):
+class GreyLine:
 
     """ A tool for visualising the grey line. """
 
-    def __init__(self, parent):
+    def __init__(self, parent, builder):
         """ Set up the drawing canvas and the timer which will re-plot the grey line every 30 minutes.
 
         :arg parent: The parent Gtk window.
+        :arg builder: The Gtk builder.
         """
         logging.debug("Setting up the grey line...")
-        Gtk.VBox.__init__(self, spacing=2)
+        
         self.parent = parent
+        self.builder = builder
 
         # Get the QTH coordinates, if available.
         config = configparser.ConfigParser()
@@ -74,10 +76,10 @@ class GreyLine(Gtk.VBox):
         if(have_necessary_modules):
             self.fig = matplotlib.figure.Figure()
             self.canvas = FigureCanvas(self.fig)  # For embedding in the Gtk application
-            self.pack_start(self.canvas, True, True, 0)
+            self.builder.get_object("greyline").add(self.canvas)
             self.refresh_event = GObject.timeout_add(1800000, self.draw)  # Re-draw the grey line automatically after 30 minutes (if the grey line tool is visible).
 
-        self.show_all()
+        self.builder.get_object("greyline").show_all()
 
         logging.debug("Grey line ready!")
 

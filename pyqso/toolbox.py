@@ -30,21 +30,22 @@ class Toolbox:
     """ Contains a Gtk.Notebook full of amateur radio-related tools. """
 
     def __init__(self, parent, builder):
-        """ Instantiate and insert the various tools into the toolbox. """
+        """ Instantiate and insert the various tools into the toolbox.
+
+        :arg parent: The parent Gtk window.
+        :arg builder: The Gtk builder."""
 
         logging.debug("Setting up the toolbox...")
 
         self.parent = parent
+        self.builder = builder
 
-        self.tools = builder.get_object("tools")
+        self.tools = self.builder.get_object("tools")
 
-        self.dx_cluster = DXCluster(self.parent)
-        self.tools.insert_page(self.dx_cluster, Gtk.Label("DX Cluster"), 0)
-        self.grey_line = GreyLine(self.parent)
-        self.tools.insert_page(self.grey_line, Gtk.Label("Grey Line"), 1)
-        #self.awards = Awards(self.parent)
-        #self.tools.insert_page(self.awards, Gtk.Label("Awards"), 2)
-
+        self.dx_cluster = DXCluster(self.parent, self.builder)
+        self.grey_line = GreyLine(self.parent, self.builder)
+        #self.awards = Awards(self.parent, self.builder)
+                      
         self.tools.connect_after("switch-page", self._on_switch_page)
 
         logging.debug("Toolbox ready!")

@@ -78,7 +78,7 @@ class PyQSO:
         possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
         for icon_path in possible_icon_paths:
             try:
-                window.set_icon_from_file(icon_path)
+                self.window.set_icon_from_file(icon_path)
             except Exception as e:
                 logging.error(e)
 

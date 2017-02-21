@@ -32,7 +32,7 @@ from xml.dom import minidom
 from pyqso.auxiliary_dialogs import *
 
 
-class CallsignLookupQRZ():
+class CallsignLookupQRZ:
 
     """ Use qrz.com to lookup details about a particular callsign. """
 
@@ -161,7 +161,7 @@ class CallsignLookupQRZ():
         return fields_and_data
 
 
-class CallsignLookupHamQTH():
+class CallsignLookupHamQTH:
 
     """ Use hamqth.com to lookup details about a particular callsign. """
 
