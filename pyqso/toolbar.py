@@ -17,7 +17,6 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk
 import logging
 
 
@@ -61,7 +60,7 @@ class Toolbar:
 
         # Filter log
         self.buttons["DELETE_RECORD"] = self.builder.get_object("toolbar_delete_record")
-        self.buttons["DELETE_RECORD"].connect("clicked", parent.logbook.delete_record_callback)        
+        self.buttons["DELETE_RECORD"].connect("clicked", parent.logbook.delete_record_callback)
 
         self.filter_source = self.builder.get_object("filter_source")
         self.filter_source.connect_after("changed", parent.logbook.filter_logs)
