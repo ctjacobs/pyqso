@@ -1268,7 +1268,8 @@ class TestLogbook(unittest.TestCase):
     def setUp(self):
         """ Set up the Logbook object and connection to the test database needed for the unit tests. """
         import os
-        self.logbook = Logbook(parent=None)
+        Gtk.Builder = mock.MagicMock(spec=Gtk.Builder)
+        self.logbook = Logbook(parent=None, builder=Gtk.Builder)
         success = self.logbook.db_connect(os.path.dirname(os.path.realpath(__file__))+"/unittest_resources/test.db")
         assert success
 
