@@ -77,7 +77,7 @@ class Logbook:
             path = dialog.get_filename()
         else:
             path = None
-        dialog.destroy()
+        dialog.hide()
 
         if(path is None):  # If the Cancel button has been clicked, path will still be None
             logging.debug("No file path specified.")
@@ -106,7 +106,7 @@ class Logbook:
             response = dialog.run()
             if(response == Gtk.ResponseType.OK):
                 path = dialog.get_filename()
-            dialog.destroy()
+            dialog.hide()
 
             if(path is None):  # If the Cancel button has been clicked, path will still be None
                 logging.debug("No file path specified.")
@@ -476,11 +476,12 @@ class Logbook:
         if(self.connection is None):
             return
         exists = True
-        dialog = LogNameDialog(self.parent)
+        dialog = self.builder.get_object("log_name_dialog")
+        dialog.set_title("New Log")
         while(exists):
             response = dialog.run()
             if(response == Gtk.ResponseType.OK):
-                log_name = dialog.get_log_name()
+                log_name = self.builder.get_object("log_name_entry").get_text()
                 try:
                     with self.connection:
                         c = self.connection.cursor()
@@ -494,13 +495,13 @@ class Logbook:
                 except sqlite.Error as e:
                     logging.exception(e)
                     # Data is not valid - inform the user.
-                    error(parent=self.parent, message="Database error. Try another log name.")
+                    error(parent=self.parent.window, message="Database error. Try another log name.")
                     exists = True
             else:
-                dialog.destroy()
+                dialog.hide()
                 return
 
-        dialog.destroy()
+        dialog.hide()
 
         l = Log(self.connection, log_name)  # Empty log
         l.populate()
@@ -539,7 +540,7 @@ class Logbook:
             logging.debug("No logs to delete!")
             return
 
-        response = question(parent=self.parent, message="Are you sure you want to delete log %s?" % log.name)
+        response = question(parent=self.parent.window, message="Are you sure you want to delete log %s?" % log.name)
         if(response == Gtk.ResponseType.YES):
             try:
                 with self.connection:
@@ -547,7 +548,7 @@ class Logbook:
                     c.execute("DROP TABLE %s" % log.name)
             except sqlite.Error as e:
                 logging.exception(e)
-                error(parent=self.parent, message="Database error. Could not delete the log.")
+                error(parent=self.parent.window, message="Database error. Could not delete the log.")
                 return
 
             self.logs.pop(log_index)
@@ -766,11 +767,13 @@ class Logbook:
         log_index = self._get_log_index(name=old_log_name)
 
         exists = True
-        dialog = LogNameDialog(self.parent, title="Rename Log", name=old_log_name)
+        dialog = self.builder.get_object("log_name_dialog")
+        dialog.set_title("Rename Log")
+        self.builder.get_object("log_name_entry").set_text(old_log_name)
         while(exists):
             response = dialog.run()
             if(response == Gtk.ResponseType.OK):
-                new_log_name = dialog.get_log_name()
+                new_log_name = self.builder.get_object("log_name_entry").get_text()
                 try:
                     with self.connection:
                         c = self.connection.cursor()
@@ -783,10 +786,10 @@ class Logbook:
                     error(parent=self.parent.window, message="Database error. Try another log name.")
                     exists = True
             else:
-                dialog.destroy()
+                dialog.hide()
                 return
 
-        dialog.destroy()
+        dialog.hide()
 
         # Remember to change the Log object's name...
         self.logs[log_index].name = new_log_name
@@ -830,17 +833,18 @@ class Logbook:
             path = dialog.get_filename()
         else:
             path = None
-        dialog.destroy()
+        dialog.hide()
 
         if(path is None):
             logging.debug("No file path specified.")
             return
 
-        dialog = LogNameDialog(self.parent, title="Import Log")
+        dialog = self.builder.get_object("log_name_dialog")
+        dialog.set_title("Import Log")
         while(True):
             response = dialog.run()
             if(response == Gtk.ResponseType.OK):
-                log_name = dialog.get_log_name()
+                log_name = self.builder.get_object("log_name_entry").get_text()
                 if(self.log_name_exists(log_name)):
                     # Import into existing log
                     exists = True
@@ -850,8 +854,8 @@ class Logbook:
                         break
                 elif(self.log_name_exists(log_name) is None):
                     # Could not determine if the log name exists. It's safer to stop here than to try to add a new log.
-                    error(parent=self.parent, message="Database error. Could not check if the log name exists.")
-                    dialog.destroy()
+                    error(parent=self.parent.window, message="Database error. Could not check if the log name exists.")
+                    dialog.hide()
                     return
                 else:
                     # Create a new log with the name the user supplies
@@ -872,10 +876,10 @@ class Logbook:
                         # Data is not valid - inform the user.
                         error(parent=self.parent.window, message="Database error. Try another log name.")
             else:
-                dialog.destroy()
+                dialog.hide()
                 return
 
-        dialog.destroy()
+        dialog.hide()
 
         adif = ADIF()
         logging.debug("Importing records from the ADIF file with path: %s" % path)
@@ -924,7 +928,7 @@ class Logbook:
             path = dialog.get_filename()
         else:
             path = None
-        dialog.destroy()
+        dialog.hide()
 
         if(path is None):
             logging.debug("No file path specified.")
@@ -1080,7 +1084,7 @@ class Logbook:
                 else:
                     exit = True
                     break
-            dialog.destroy()
+            dialog.hide()
         return
 
     def delete_record_callback(self, widget):
@@ -1107,7 +1111,7 @@ class Logbook:
             logging.debug("Trying to delete a record, but there are no records in the log!")
             return
 
-        response = question(parent=self.parent, message="Are you sure you want to delete record %d?" % row_index)
+        response = question(parent=self.parent.window, message="Are you sure you want to delete record %d?" % row_index)
         if(response == Gtk.ResponseType.YES):
             # Deletes the record with index 'row_index' from the Records list.
             # 'iter' is needed to remove the record from the ListStore itself.
@@ -1182,7 +1186,7 @@ class Logbook:
                         self.update_summary()
                         self.parent.toolbox.awards.count(self)
 
-        dialog.destroy()
+        dialog.hide()
         return
 
     def remove_duplicates_callback(self, widget=None):
