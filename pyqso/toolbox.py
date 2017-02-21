@@ -58,6 +58,6 @@ class Toolbox:
 
     def _on_switch_page(self, widget, label, new_page):
         """ Re-draw the Grey Line if the user switches to the grey line tab. """
-        if(label.get_text() == "Grey Line"):
-            label.draw()  # Note that 'label' is actually a GreyLine object.
+        if(widget.get_tab_label(label).get_text() == "Grey Line"):
+            self.grey_line.draw()
         return

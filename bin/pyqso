@@ -93,20 +93,10 @@ class PyQSO:
         # once connected to the SQLite database.
         self.logbook = Logbook(self)
         self.toolbox = Toolbox(self, self.builder)
+        
+        # Set up menu and tool bars. These classes depend on the Logbook and Toolbox class.
         self.menu = Menu(self, self.builder)
-        
-
-        # Set up menu and tool bars
-        # These classes depend on the Logbook and Toolbox class,
-        # so pack the logbook and toolbox after the menu and toolbar.
-        
         #self.toolbar = Toolbar(self)
-
-        #vbox_outer.pack_start(self.menu, False, False, 0)
-        #vbox_outer.pack_start(self.toolbar, False, False, 0)
-        #vbox_outer.pack_start(self.logbook, True, True, 0)
-        #vbox_outer.pack_start(self.toolbox, True, True, 0)
-        #vbox_outer.pack_start(self.statusbar, False, False, 0)
 
         if(have_config):
             if(config.get("general", "show_toolbox") == "False"):
