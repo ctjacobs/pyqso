@@ -38,7 +38,6 @@ except ImportError as e:
 
 from pyqso.adif import *
 from pyqso.log import *
-from pyqso.log_name_dialog import *
 from pyqso.auxiliary_dialogs import *
 
 
@@ -476,7 +475,7 @@ class Logbook:
         if(self.connection is None):
             return
         exists = True
-        ln = LogName(self.parent)
+        ln = LogName(self.builder)
         while(exists):
             response = ln.dialog.run()
             if(response == Gtk.ResponseType.OK):
@@ -766,13 +765,11 @@ class Logbook:
         log_index = self._get_log_index(name=old_log_name)
 
         exists = True
-        dialog = self.builder.get_object("log_name_dialog")
-        dialog.set_title("Rename Log")
-        self.builder.get_object("log_name_entry").set_text(old_log_name)
+        ln = LogName(self.builder, title="Rename Log", name=old_log_name)
         while(exists):
-            response = dialog.run()
+            response = ln.dialog.run()
             if(response == Gtk.ResponseType.OK):
-                new_log_name = self.builder.get_object("log_name_entry").get_text()
+                new_log_name = ln.name
                 try:
                     with self.connection:
                         c = self.connection.cursor()
@@ -785,10 +782,10 @@ class Logbook:
                     error(parent=self.parent.window, message="Database error. Try another log name.")
                     exists = True
             else:
-                dialog.hide()
+                ln.dialog.destroy()
                 return
 
-        dialog.hide()
+        ln.dialog.destroy()
 
         # Remember to change the Log object's name...
         self.logs[log_index].name = new_log_name
@@ -832,18 +829,17 @@ class Logbook:
             path = dialog.get_filename()
         else:
             path = None
-        dialog.hide()
+        dialog.destroy()
 
         if(path is None):
             logging.debug("No file path specified.")
             return
 
-        dialog = self.builder.get_object("log_name_dialog")
-        dialog.set_title("Import Log")
+        ln = LogName(self.builder, title="Import Log")
         while(True):
-            response = dialog.run()
+            response = ln.dialog.run()
             if(response == Gtk.ResponseType.OK):
-                log_name = self.builder.get_object("log_name_entry").get_text()
+                log_name = ln.name
                 if(self.log_name_exists(log_name)):
                     # Import into existing log
                     exists = True
@@ -854,7 +850,7 @@ class Logbook:
                 elif(self.log_name_exists(log_name) is None):
                     # Could not determine if the log name exists. It's safer to stop here than to try to add a new log.
                     error(parent=self.parent.window, message="Database error. Could not check if the log name exists.")
-                    dialog.hide()
+                    ln.dialog.destroy()
                     return
                 else:
                     # Create a new log with the name the user supplies
@@ -875,10 +871,10 @@ class Logbook:
                         # Data is not valid - inform the user.
                         error(parent=self.parent.window, message="Database error. Try another log name.")
             else:
-                dialog.hide()
+                ln.dialog.destroy()
                 return
 
-        dialog.hide()
+        ln.dialog.destroy()
 
         adif = ADIF()
         logging.debug("Importing records from the ADIF file with path: %s" % path)
@@ -927,7 +923,7 @@ class Logbook:
             path = dialog.get_filename()
         else:
             path = None
-        dialog.hide()
+        dialog.destroy()
 
         if(path is None):
             logging.debug("No file path specified.")
