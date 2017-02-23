@@ -77,7 +77,7 @@ class Logbook:
             path = dialog.get_filename()
         else:
             path = None
-        dialog.hide()
+        dialog.destroy()
 
         if(path is None):  # If the Cancel button has been clicked, path will still be None
             logging.debug("No file path specified.")
@@ -106,7 +106,7 @@ class Logbook:
             response = dialog.run()
             if(response == Gtk.ResponseType.OK):
                 path = dialog.get_filename()
-            dialog.hide()
+            dialog.destroy()
 
             if(path is None):  # If the Cancel button has been clicked, path will still be None
                 logging.debug("No file path specified.")
@@ -476,12 +476,11 @@ class Logbook:
         if(self.connection is None):
             return
         exists = True
-        dialog = self.builder.get_object("log_name_dialog")
-        dialog.set_title("New Log")
+        ln = LogName(self.parent)
         while(exists):
-            response = dialog.run()
+            response = ln.dialog.run()
             if(response == Gtk.ResponseType.OK):
-                log_name = self.builder.get_object("log_name_entry").get_text()
+                log_name = ln.name
                 try:
                     with self.connection:
                         c = self.connection.cursor()
@@ -498,10 +497,10 @@ class Logbook:
                     error(parent=self.parent.window, message="Database error. Try another log name.")
                     exists = True
             else:
-                dialog.hide()
+                ln.dialog.destroy()
                 return
 
-        dialog.hide()
+        ln.dialog.destroy()
 
         l = Log(self.connection, log_name)  # Empty log
         l.populate()
@@ -1084,7 +1083,7 @@ class Logbook:
                 else:
                     exit = True
                     break
-            dialog.hide()
+            dialog.destroy()
         return
 
     def delete_record_callback(self, widget):
@@ -1186,7 +1185,7 @@ class Logbook:
                         self.update_summary()
                         self.parent.toolbox.awards.count(self)
 
-        dialog.hide()
+        dialog.destroy()
         return
 
     def remove_duplicates_callback(self, widget=None):
