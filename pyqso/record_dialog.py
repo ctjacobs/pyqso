@@ -36,7 +36,7 @@ except ImportError:
 from pyqso.adif import *
 from pyqso.callsign_lookup import *
 from pyqso.auxiliary_dialogs import *
-
+from pyqso.calendar import Calendar
 
 class RecordDialog(Gtk.Dialog):
 
@@ -52,11 +52,13 @@ class RecordDialog(Gtk.Dialog):
 
         logging.debug("Setting up the record dialog...")
 
+        self.parent = parent
+
         if(index is not None):
             title = "Edit Record %d" % index
         else:
             title = "Add Record"
-        Gtk.Dialog.__init__(self, title=title, parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        Gtk.Dialog.__init__(self, title=title, parent=parent.window, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
 
         # Check if a configuration file is present, since we might need it to set up the rest of the dialog.
         config = configparser.ConfigParser()
@@ -614,12 +616,11 @@ class RecordDialog(Gtk.Dialog):
 
     def calendar_callback(self, widget):
         """ Open up a calendar widget for easy QSO_DATE selection. Return None after the user destroys the dialog. """
-        calendar = CalendarDialog(parent=self)
-        response = calendar.run()
+        c = Calendar(self.parent.builder)
+        response = c.dialog.run()
         if(response == Gtk.ResponseType.OK):
-            date = calendar.get_date()
-            self.sources["QSO_DATE"].set_text(date)
-        calendar.destroy()
+            self.sources["QSO_DATE"].set_text(c.date)
+        c.dialog.destroy()
         return
 
     def set_current_datetime_callback(self, widget=None):
@@ -644,39 +645,3 @@ class RecordDialog(Gtk.Dialog):
         self.sources["TIME_ON"].set_text(dt.strftime("%H%M"))
 
         return
-
-
-class CalendarDialog(Gtk.Dialog):
-
-    """ A simple dialog containing a Gtk.Calendar widget. Using this ensures the date is in the correct YYYYMMDD format required by ADIF. """
-
-    def __init__(self, parent):
-        """ Set up the calendar widget and show it to the user.
-
-        :arg parent: The parent Gtk window/dialog.
-        """
-        logging.debug("Setting up a calendar dialog...")
-        Gtk.Dialog.__init__(self, title="Select Date", parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
-        self.calendar = Gtk.Calendar()
-        self.vbox.add(self.calendar)
-        self.show_all()
-        logging.debug("Calendar dialog ready!")
-        return
-
-    def get_date(self):
-        """ Return the date from the Gtk.Calendar widget in YYYYMMDD format.
-
-        :returns: The date from the calendar in YYYYMMDD format.
-        :rtype: str
-        """
-        logging.debug("Retrieving the date from the calendar widget...")
-        (year, month, day) = self.calendar.get_date()
-        # If necessary, add on leading zeros so the YYYYMMDD format is followed.
-        if(month + 1 < 10):
-            month = "0" + str(month + 1)  # Note: the months start from an index of 0 when retrieved from the calendar widget.
-        else:
-            month += 1
-        if(day < 10):
-            day = "0" + str(day)
-        date = str(year) + str(month) + str(day)
-        return date

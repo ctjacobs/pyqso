@@ -1039,7 +1039,7 @@ class Logbook:
 
         exit = False
         while not exit:
-            dialog = RecordDialog(parent=self.parent.window, log=log, index=None)
+            dialog = RecordDialog(parent=self.parent, log=log, index=None)
 
             all_valid = False  # Are all the field entries valid?
 
@@ -1142,7 +1142,7 @@ class Logbook:
             logging.debug("Could not find the selected row's index!")
             return
 
-        dialog = RecordDialog(parent=self.parent.window, log=self.logs[log_index], index=row_index)
+        dialog = RecordDialog(parent=self.parent, log=self.logs[log_index], index=row_index)
         all_valid = False  # Are all the field entries valid?
 
         adif = ADIF()
