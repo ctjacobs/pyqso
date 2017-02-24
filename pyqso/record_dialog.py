@@ -38,6 +38,7 @@ from pyqso.callsign_lookup import *
 from pyqso.auxiliary_dialogs import *
 from pyqso.calendar import Calendar
 
+
 class RecordDialog(Gtk.Dialog):
 
     """ A dialog through which users can enter information about a QSO/record. """

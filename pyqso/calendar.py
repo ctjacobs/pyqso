@@ -21,6 +21,7 @@ from gi.repository import Gtk
 import logging
 import os.path
 
+
 class Calendar:
 
     """ Handler for a simple dialog containing a Gtk.Calendar widget. Using this ensures the date is in the correct YYYYMMDD format required by ADIF. """
