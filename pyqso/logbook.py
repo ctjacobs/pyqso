@@ -69,7 +69,7 @@ class Logbook:
                                        self.parent.window,
                                        Gtk.FileChooserAction.SAVE,
                                        (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                                       Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+                                        Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
         dialog.set_do_overwrite_confirmation(True)
 
         response = dialog.run()
@@ -101,7 +101,7 @@ class Logbook:
                                            self.parent.window,
                                            Gtk.FileChooserAction.OPEN,
                                            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                                           Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+                                            Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
 
             response = dialog.run()
             if(response == Gtk.ResponseType.OK):
