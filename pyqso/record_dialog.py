@@ -36,7 +36,7 @@ except ImportError:
 from pyqso.adif import *
 from pyqso.callsign_lookup import *
 from pyqso.auxiliary_dialogs import *
-from pyqso.calendar import Calendar
+from pyqso.calendar_dialog import CalendarDialog
 
 
 class RecordDialog(Gtk.Dialog):
@@ -617,7 +617,7 @@ class RecordDialog(Gtk.Dialog):
 
     def calendar_callback(self, widget):
         """ Open up a calendar widget for easy QSO_DATE selection. Return None after the user destroys the dialog. """
-        c = Calendar(self.parent.builder)
+        c = CalendarDialog(self.parent.builder)
         response = c.dialog.run()
         if(response == Gtk.ResponseType.OK):
             self.sources["QSO_DATE"].set_text(c.date)

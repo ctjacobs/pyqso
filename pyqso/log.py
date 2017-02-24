@@ -19,12 +19,10 @@
 
 from gi.repository import Gtk
 import logging
-import os.path
 import sqlite3 as sqlite
 import unittest
 
 from pyqso.adif import AVAILABLE_FIELD_NAMES_ORDERED
-from pyqso.record_dialog import *
 
 
 class Log(Gtk.ListStore):
@@ -311,48 +309,6 @@ class Log(Gtk.ListStore):
         except (sqlite.Error, IndexError) as e:
             logging.exception(e)
             return None
-
-
-class LogName:
-
-    """ A handler for the Gtk.Dialog through which a user can specify the name of a Log object. """
-
-    def __init__(self, builder, title=None, name=None):
-        """ Create and show the log name dialog to the user.
-
-        :arg title: The title of the dialog. If this is None, it is assumed that a new log is going to be created.
-        :arg name: The existing name of the Log object. Defaults to None if not specified (because the Log does not yet exist).
-        """
-
-        logging.debug("Building new log name dialog...")
-
-        self.builder = builder
-        self.builder.add_objects_from_file(os.path.abspath(os.path.dirname(__file__)) + "/glade/pyqso.glade", ("log_name_dialog",))
-        self.dialog = self.builder.get_object("log_name_dialog")
-
-        if(title is None):
-            self.dialog.set_title("New Log")
-        else:
-            self.dialog.set_title(title)
-
-        self.entry = self.builder.get_object("log_name_entry")
-        if(name is not None):
-            self.entry.set_text(name)
-
-        self.dialog.show_all()
-
-        logging.debug("Log name dialog built.")
-
-        return
-
-    @property
-    def name(self):
-        """ Return the log name specified in the Gtk.Entry box by the user.
-
-        :returns: The log's name.
-        :rtype: str
-        """
-        return self.entry.get_text()
 
 
 class TestLog(unittest.TestCase):

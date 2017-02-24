@@ -39,6 +39,7 @@ except ImportError as e:
 from pyqso.adif import *
 from pyqso.log import *
 from pyqso.auxiliary_dialogs import *
+from pyqso.log_name_dialog import LogNameDialog
 
 
 class Logbook:
@@ -67,7 +68,7 @@ class Logbook:
         dialog = Gtk.FileChooserDialog("Create a New SQLite Database File",
                                        self.parent.window,
                                        Gtk.FileChooserAction.SAVE,
-                                      (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                        Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
         dialog.set_do_overwrite_confirmation(True)
 
@@ -99,7 +100,7 @@ class Logbook:
             dialog = Gtk.FileChooserDialog("Open SQLite Database File",
                                            self.parent.window,
                                            Gtk.FileChooserAction.OPEN,
-                                          (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                           (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                            Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
 
             response = dialog.run()
@@ -475,7 +476,7 @@ class Logbook:
         if(self.connection is None):
             return
         exists = True
-        ln = LogName(self.builder)
+        ln = LogNameDialog(self.builder)
         while(exists):
             response = ln.dialog.run()
             if(response == Gtk.ResponseType.OK):
@@ -765,7 +766,7 @@ class Logbook:
         log_index = self._get_log_index(name=old_log_name)
 
         exists = True
-        ln = LogName(self.builder, title="Rename Log", name=old_log_name)
+        ln = LogNameDialog(self.builder, title="Rename Log", name=old_log_name)
         while(exists):
             response = ln.dialog.run()
             if(response == Gtk.ResponseType.OK):
@@ -835,7 +836,7 @@ class Logbook:
             logging.debug("No file path specified.")
             return
 
-        ln = LogName(self.builder, title="Import Log")
+        ln = LogNameDialog(self.builder, title="Import Log")
         while(True):
             response = ln.dialog.run()
             if(response == Gtk.ResponseType.OK):
