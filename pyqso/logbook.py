@@ -20,8 +20,13 @@
 from gi.repository import Gtk, Pango, PangoCairo
 import logging
 import sqlite3 as sqlite
+import os
 from os.path import basename, getmtime, expanduser
 from datetime import datetime, date
+try:
+    import unittest.mock as mock
+except ImportError:
+    import mock
 try:
     import configparser
 except ImportError:
@@ -1267,7 +1272,6 @@ class TestLogbook(unittest.TestCase):
 
     def setUp(self):
         """ Set up the Logbook object and connection to the test database needed for the unit tests. """
-        import os
         Gtk.Builder = mock.MagicMock(spec=Gtk.Builder)
         self.logbook = Logbook(parent=None, builder=Gtk.Builder)
         success = self.logbook.db_connect(os.path.dirname(os.path.realpath(__file__))+"/unittest_resources/test.db")
