@@ -127,31 +127,14 @@ class PyQSO:
 
     def show_about(self, widget):
         """ Show the About dialog, which includes license information. """
-        about = Gtk.AboutDialog()
-        about.set_modal(True)
-        about.set_transient_for(parent=self.window)
-        about.set_program_name("PyQSO")
-        about.set_version("1.0.0")
-        about.set_authors(["Christian T. Jacobs (2E0ICL)"])
-        about.set_license("""This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.""")
-        about.set_comments("PyQSO: A contact logging tool for amateur radio operators.")
+        self.builder.add_objects_from_file(os.path.abspath(os.path.dirname(__file__)) + "/../pyqso/glade/pyqso.glade", ("about_dialog",))
+        about = self.builder.get_object("about_dialog")
         possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
         for icon_path in possible_icon_paths:
             try:
                 about.set_logo(GdkPixbuf.Pixbuf.new_from_file_at_scale(icon_path, 64, 64, False))
-            except Exception as error:
-                print(error.message)
+            except Exception as e:
+                logging.exception(e)
         about.run()
         about.destroy()
         return
