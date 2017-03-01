@@ -28,7 +28,7 @@ class Toolbox:
 
     """ Contains a Gtk.Notebook full of amateur radio-related tools. """
 
-    def __init__(self, parent, builder):
+    def __init__(self, parent):
         """ Instantiate and insert the various tools into the toolbox.
 
         :arg parent: The parent Gtk window.
@@ -37,7 +37,7 @@ class Toolbox:
         logging.debug("Setting up the toolbox...")
 
         self.parent = parent
-        self.builder = builder
+        self.builder = parent.builder
 
         self.tools = self.builder.get_object("tools")
 

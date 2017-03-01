@@ -32,6 +32,9 @@ try:
 except ImportError:
     import ConfigParser as configparser
 try:
+    import matplotlib
+    matplotlib.use('Agg')
+    matplotlib.rcParams['font.size'] = 10.0
     from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
     from matplotlib.figure import Figure
     from matplotlib.dates import DateFormatter, MonthLocator
@@ -45,20 +48,20 @@ from pyqso.adif import *
 from pyqso.log import *
 from pyqso.auxiliary_dialogs import *
 from pyqso.log_name_dialog import LogNameDialog
-
+from pyqso.record_dialog import RecordDialog
 
 class Logbook:
 
     """ A Logbook object can store multiple Log objects. """
 
-    def __init__(self, parent, builder):
+    def __init__(self, parent):
         """ Create a new Logbook object and initialise the list of Logs.
 
         :arg parent: The parent Gtk window.
         """
 
         self.parent = parent
-        self.builder = builder
+        self.builder = parent.builder
         self.notebook = self.builder.get_object("logbook")
         self.connection = None
         self.summary = {}
@@ -1045,7 +1048,7 @@ class Logbook:
 
         exit = False
         while not exit:
-            dialog = RecordDialog(parent=self.parent, log=log, index=None)
+            rd = RecordDialog(parent=self.parent, log=log, index=None)
 
             all_valid = False  # Are all the field entries valid?
 
@@ -1060,13 +1063,13 @@ class Logbook:
                 # The add/edit record window will stay open until the user gives valid data,
                 # or until the Cancel button is clicked.
                 all_valid = True
-                response = dialog.run()
+                response = rd.dialog.run()
                 if(response == Gtk.ResponseType.OK):
                     fields_and_data = {}
                     field_names = AVAILABLE_FIELD_NAMES_ORDERED
                     for i in range(0, len(field_names)):
                         # Validate user input.
-                        fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
+                        fields_and_data[field_names[i]] = rd.get_data(field_names[i])
                         if(not(adif.is_valid(field_names[i], fields_and_data[field_names[i]], AVAILABLE_FIELD_NAMES_TYPES[field_names[i]]))):
                             # Data is not valid - inform the user.
                             error(parent=self.parent.window, message="The data in field \"%s\" is not valid!" % field_names[i])
@@ -1085,7 +1088,7 @@ class Logbook:
                 else:
                     exit = True
                     break
-            dialog.destroy()
+            rd.dialog.destroy()
         return
 
     def delete_record_callback(self, widget):
@@ -1148,7 +1151,7 @@ class Logbook:
             logging.debug("Could not find the selected row's index!")
             return
 
-        dialog = RecordDialog(parent=self.parent, log=self.logs[log_index], index=row_index)
+        rd = RecordDialog(parent=self.parent, log=self.logs[log_index], index=row_index)
         all_valid = False  # Are all the field entries valid?
 
         adif = ADIF()
@@ -1157,13 +1160,13 @@ class Logbook:
             # The add/edit record window will stay open until the user gives valid data,
             # or until the Cancel button is clicked.
             all_valid = True
-            response = dialog.run()
+            response = rd.dialog.run()
             if(response == Gtk.ResponseType.OK):
                 fields_and_data = {}
                 field_names = AVAILABLE_FIELD_NAMES_ORDERED
                 for i in range(0, len(field_names)):
                     # Validate user input.
-                    fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
+                    fields_and_data[field_names[i]] = rd.get_data(field_names[i])
                     if(not(adif.is_valid(field_names[i], fields_and_data[field_names[i]], AVAILABLE_FIELD_NAMES_TYPES[field_names[i]]))):
                         # Data is not valid - inform the user.
                         error(parent=self.parent.window, message="The data in field \"%s\" is not valid!" % field_names[i])
@@ -1187,7 +1190,7 @@ class Logbook:
                         self.update_summary()
                         self.parent.toolbox.awards.count(self)
 
-        dialog.destroy()
+        rd.dialog.destroy()
         return
 
     def remove_duplicates_callback(self, widget=None):

@@ -30,7 +30,7 @@ class Menu:
 
     """ The PyQSO menu bar along the top of the main window. """
 
-    def __init__(self, parent, builder):
+    def __init__(self, parent):
         """ Set up all menu items and connect to the various functions.
 
         :arg parent: The parent Gtk window.
@@ -40,7 +40,7 @@ class Menu:
         logging.debug("Setting up the menu bar...")
 
         self.parent = parent
-        self.builder = builder
+        self.builder = parent.builder
 
         # Collect Gtk menu items and connect signals.
         self.items = {}

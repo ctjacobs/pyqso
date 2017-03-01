@@ -24,13 +24,13 @@ class Toolbar:
 
     """ The toolbar underneath the menu bar. """
 
-    def __init__(self, parent, builder):
+    def __init__(self, parent):
         """ Set up the various buttons in the toolbar, and connect to their corresponding functions. """
 
         logging.debug("Setting up the toolbar...")
 
         self.parent = parent
-        self.builder = builder
+        self.builder = parent.builder
 
         self.buttons = {}
 

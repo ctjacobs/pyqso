@@ -30,8 +30,6 @@ try:
     logging.info("Using version %s of numpy." % (numpy.__version__))
     import matplotlib
     logging.info("Using version %s of matplotlib." % (matplotlib.__version__))
-    matplotlib.use('Agg')
-    matplotlib.rcParams['font.size'] = 10.0
     import mpl_toolkits.basemap
     logging.info("Using version %s of mpl_toolkits.basemap." % (mpl_toolkits.basemap.__version__))
     from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
@@ -74,7 +72,7 @@ class GreyLine:
         if(have_necessary_modules):
             self.fig = matplotlib.figure.Figure()
             self.canvas = FigureCanvas(self.fig)  # For embedding in the Gtk application
-            self.builder.get_object("greyline").add(self.canvas)
+            self.builder.get_object("greyline").pack_start(self.canvas, True, True, 0)
             self.refresh_event = GObject.timeout_add(1800000, self.draw)  # Re-draw the grey line automatically after 30 minutes (if the grey line tool is visible).
 
         self.builder.get_object("greyline").show_all()
