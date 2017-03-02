@@ -64,7 +64,7 @@ class RecordDialog:
         if(index is not None):
             self.dialog.set_title("Edit Record %d" % index)
         else:
-            self.dialog.set_title("Add Record") 
+            self.dialog.set_title("Add Record")
 
         # Check if a configuration file is present, since we might need it to set up the rest of the dialog.
         config = configparser.ConfigParser()

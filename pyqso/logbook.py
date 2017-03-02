@@ -50,6 +50,7 @@ from pyqso.auxiliary_dialogs import *
 from pyqso.log_name_dialog import LogNameDialog
 from pyqso.record_dialog import RecordDialog
 
+
 class Logbook:
 
     """ A Logbook object can store multiple Log objects. """
@@ -1275,8 +1276,7 @@ class TestLogbook(unittest.TestCase):
 
     def setUp(self):
         """ Set up the Logbook object and connection to the test database needed for the unit tests. """
-        Gtk.Builder = mock.MagicMock(spec=Gtk.Builder)
-        self.logbook = Logbook(parent=None, builder=Gtk.Builder)
+        self.logbook = Logbook(parent=mock.MagicMock())
         success = self.logbook.db_connect(os.path.dirname(os.path.realpath(__file__))+"/unittest_resources/test.db")
         assert success
 
