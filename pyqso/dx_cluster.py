@@ -72,9 +72,9 @@ class DXCluster:
 
         return
 
-    def _on_command_key_press(self, widget, ev, data=None):
+    def _on_command_key_press(self, widget, event, data=None):
         """ If the Return key is pressed when the focus is on the command box, then send whatever command the user has entered. """
-        if(ev.keyval == Gdk.KEY_Return):
+        if(event.keyval == Gdk.KEY_Return):
             self.telnet_send_command()
         return
 

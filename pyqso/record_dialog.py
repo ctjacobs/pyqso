@@ -17,7 +17,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 import logging
 import os
 try:
@@ -59,6 +59,7 @@ class RecordDialog:
 
         self.builder.add_objects_from_file(os.path.abspath(os.path.dirname(__file__)) + "/glade/pyqso.glade", ("record_dialog",))
         self.dialog = self.builder.get_object("record_dialog")
+        self.builder.get_object("record_dialog").connect("key-release-event", self._on_key_release)
 
         # Set dialog title
         if(index is not None):
@@ -275,6 +276,13 @@ class RecordDialog:
         text = combo.get_active_text()
         for submode in MODES[text]:
             self.sources["SUBMODE"].append_text(submode)
+        return
+
+    def _on_key_release(self, widget, event):
+        """ If the Return key is pressed, emit the "OK" response to record the QSO. """
+        child = widget.get_focus()
+        if(not(isinstance(child, Gtk.ToggleButton) or isinstance(child, Gtk.Button) or isinstance(child, Gtk.TextView)) and event.keyval == Gdk.KEY_Return):
+            self.dialog.emit('response', Gtk.ResponseType.OK)
         return
 
     def _autocomplete_band(self, widget=None):
