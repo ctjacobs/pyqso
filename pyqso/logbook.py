@@ -503,7 +503,7 @@ class Logbook:
                 except sqlite.Error as e:
                     logging.exception(e)
                     # Data is not valid - inform the user.
-                    error(parent=self.parent.window, message="Database error. Try another log name.")
+                    error(parent=ln.dialog, message="Database error. Try another log name.")
                     exists = True
             else:
                 ln.dialog.destroy()
@@ -789,7 +789,7 @@ class Logbook:
                 except sqlite.Error as e:
                     logging.exception(e)
                     # Data is not valid - inform the user.
-                    error(parent=self.parent.window, message="Database error. Try another log name.")
+                    error(parent=ln.dialog, message="Database error. Try another log name.")
                     exists = True
             else:
                 ln.dialog.destroy()
@@ -854,12 +854,12 @@ class Logbook:
                     # Import into existing log
                     exists = True
                     l = self.logs[self._get_log_index(name=log_name)]
-                    response = question(parent=self.parent.window, message="Are you sure you want to import into an existing log?")
+                    response = question(parent=ln.dialog, message="Are you sure you want to import into an existing log?")
                     if(response == Gtk.ResponseType.YES):
                         break
                 elif(self.log_name_exists(log_name) is None):
                     # Could not determine if the log name exists. It's safer to stop here than to try to add a new log.
-                    error(parent=self.parent.window, message="Database error. Could not check if the log name exists.")
+                    error(parent=ln.dialog, message="Database error. Could not check if the log name exists.")
                     ln.dialog.destroy()
                     return
                 else:
@@ -879,7 +879,7 @@ class Logbook:
                     except sqlite.Error as e:
                         logging.exception(e)
                         # Data is not valid - inform the user.
-                        error(parent=self.parent.window, message="Database error. Try another log name.")
+                        error(parent=ln.dialog, message="Database error. Try another log name.")
             else:
                 ln.dialog.destroy()
                 return
@@ -969,7 +969,7 @@ class Logbook:
 
             operation.connect("begin_print", self._begin_print)
             operation.connect("draw_page", self._draw_page)
-            operation.run(action, parent=self.parent)
+            operation.run(action, parent=self.parent.window)
         else:
             error(self.parent.window, "Could not retrieve the records from the SQL database. No records have been printed.")
         return
@@ -1073,7 +1073,7 @@ class Logbook:
                         fields_and_data[field_names[i]] = rd.get_data(field_names[i])
                         if(not(adif.is_valid(field_names[i], fields_and_data[field_names[i]], AVAILABLE_FIELD_NAMES_TYPES[field_names[i]]))):
                             # Data is not valid - inform the user.
-                            error(parent=self.parent.window, message="The data in field \"%s\" is not valid!" % field_names[i])
+                            error(parent=rd.dialog, message="The data in field \"%s\" is not valid!" % field_names[i])
                             all_valid = False
                             break  # Don't check the other data until the user has fixed the current one.
 
@@ -1170,7 +1170,7 @@ class Logbook:
                     fields_and_data[field_names[i]] = rd.get_data(field_names[i])
                     if(not(adif.is_valid(field_names[i], fields_and_data[field_names[i]], AVAILABLE_FIELD_NAMES_TYPES[field_names[i]]))):
                         # Data is not valid - inform the user.
-                        error(parent=self.parent.window, message="The data in field \"%s\" is not valid!" % field_names[i])
+                        error(parent=rd.dialog, message="The data in field \"%s\" is not valid!" % field_names[i])
                         all_valid = False
                         break  # Don't check the other fields until the user has fixed the current field's data.
 
@@ -1180,7 +1180,7 @@ class Logbook:
                     if(record is None):
                         message = "Could not retrieve record with row_index %d from the SQL database. The record has not been edited." % row_index
                         logging.error(message)
-                        error(parent=self.parent.window, message=message)
+                        error(parent=rd.dialog, message=message)
                     else:
                         for i in range(0, len(field_names)):
                             # Check whether the data has actually changed. Database updates can be expensive.

@@ -357,7 +357,7 @@ class RecordDialog:
             else:
                 raise ValueError
         except ValueError:
-            error(parent=self, message="To perform a callsign lookup, please specify the name of the callsign database in the Preferences.")
+            error(parent=self.dialog, message="To perform a callsign lookup, please specify the name of the callsign database in the Preferences.")
             return
 
         try:
@@ -385,7 +385,7 @@ class RecordDialog:
         else:
             details_given = False
         if(not details_given):
-            error(parent=self, message="To perform a callsign lookup, please specify your username and password in the Preferences.")
+            error(parent=self.dialog, message="To perform a callsign lookup, please specify your username and password in the Preferences.")
             return
 
         # Connect and look up
