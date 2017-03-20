@@ -859,8 +859,8 @@
     <property name="transient_for">pyqso</property>
     <property name="program_name">PyQSO</property>
     <property name="version">1.0.0</property>
-    <property name="copyright" translatable="yes">Copyright (C) 2012-2017 Christian T. Jacobs</property>
-    <property name="comments" translatable="yes">PyQSO: A contact logging tool for amateur radio operators.</property>
+    <property name="copyright" translatable="yes">Copyright (C) 2012-2017 Christian Thomas Jacobs</property>
+    <property name="comments" translatable="yes">A contact logging tool for amateur radio operators.</property>
     <property name="website">http://christianjacobs.uk/pyqso</property>
     <property name="license" translatable="yes">This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -874,7 +874,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</property>
-    <property name="authors">Christian T. Jacobs (2E0ICL)</property>
+    <property name="authors">Christian Thomas Jacobs (M0UOS)</property>
     <property name="logo_icon_name"/>
     <property name="license_type">custom</property>
     <child internal-child="vbox">

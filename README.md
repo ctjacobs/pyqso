@@ -1,4 +1,4 @@
-    Copyright (C) 2013-2017 Christian T. Jacobs.
+    Copyright (C) 2013-2017 Christian Thomas Jacobs.
 
     This file is part of PyQSO.
 
@@ -78,4 +78,4 @@ There currently does not exist a Python 3-compatible Debian package for [Hamlib]
 Contact
 -------
 
-If you have any comments or questions about PyQSO, please send them via email to Christian Jacobs (2E0ICL) at <christian@christianjacobs.uk>.
+If you have any comments or questions about PyQSO, please send them via email to Christian Jacobs (M0UOS) at <christian@christianjacobs.uk>.

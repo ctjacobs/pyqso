@@ -62,7 +62,7 @@ PyQSO is free software, released under the `GNU General Public License <http://w
 Contact
 -------
 
-If you have any comments or questions about PyQSO, please send them via email to Christian Jacobs (2E0ICL) at christian@christianjacobs.uk. Bug reports and feature requests can be made via the `issue tracker <https://github.com/ctjacobs/pyqso/issues>`_.
+If you have any comments or questions about PyQSO, please send them via email to Christian Jacobs (M0UOS) at christian@christianjacobs.uk. Bug reports and feature requests can be made via the `issue tracker <https://github.com/ctjacobs/pyqso/issues>`_.
 
 Structure of this documentation
 -------------------------------

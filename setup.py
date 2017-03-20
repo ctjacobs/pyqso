@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#    Copyright (C) 2013-2017 Christian T. Jacobs.
+#    Copyright (C) 2013-2017 Christian Thomas Jacobs.
 
 #    This file is part of PyQSO.
 
@@ -22,7 +22,7 @@ from distutils.core import setup
 setup(name='PyQSO',
       version='0.4-dev',
       description='A contact logging tool for amateur radio operators.',
-      author='Christian T. Jacobs (2E0ICL)',
+      author='Christian Thomas Jacobs',
       author_email='christian@christianjacobs.uk',
       url='https://github.com/ctjacobs/pyqso',
       packages=['pyqso'],
