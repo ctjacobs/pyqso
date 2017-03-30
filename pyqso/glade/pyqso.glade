@@ -1437,16 +1437,72 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
               </packing>
             </child>
             <child>
-              <placeholder/>
-            </child>
-            <child type="tab">
-              <object class="GtkLabel" id="preferences_hamlib_label">
+              <object class="GtkBox" id="preferences_adif_vbox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Hamlib</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">2</property>
+                <child>
+                  <object class="GtkFrame" id="preferences_adif_import">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label_xalign">0</property>
+                    <child>
+                      <object class="GtkAlignment" id="preferences_adif_import_alignment">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkBox" id="preferences_adif_import_vbox">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">2</property>
+                            <child>
+                              <object class="GtkCheckButton" id="adif_import_merge_comment_checkbutton">
+                                <property name="label" translatable="yes">Merge any text in the COMMENT field with the NOTES field</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">False</property>
+                                <property name="xalign">0</property>
+                                <property name="draw_indicator">True</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child type="label">
+                      <object class="GtkLabel" id="preferences_adif_import_label">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Import</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="position">2</property>
+              </packing>
+            </child>
+            <child type="tab">
+              <object class="GtkLabel" id="preferences_adif_label">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">ADIF</property>
+              </object>
+              <packing>
+                <property name="position">4</property>
                 <property name="tab_fill">False</property>
               </packing>
             </child>
@@ -1914,29 +1970,29 @@ Base64-encoded plain text in the configuration file.</property>
               </packing>
             </child>
             <child>
-              <object class="GtkBox" id="preferences_adif_vbox">
+              <object class="GtkBox" id="preferences_hamlib_vbox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
                 <property name="spacing">2</property>
                 <child>
-                  <object class="GtkFrame" id="preferences_adif_import">
+                  <object class="GtkFrame" id="preferences_hamlib_support">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label_xalign">0</property>
                     <child>
-                      <object class="GtkAlignment" id="preferences_adif_import_alignment">
+                      <object class="GtkAlignment" id="preferences_hamlib_support_alignment">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkBox" id="preferences_adif_import_vbox">
+                          <object class="GtkBox" id="preferences_hamlib_support_vbox">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="orientation">vertical</property>
                             <property name="spacing">2</property>
                             <child>
-                              <object class="GtkCheckButton" id="adif_import_merge_comment_checkbutton">
-                                <property name="label" translatable="yes">Merge any text in the COMMENT field with the NOTES field</property>
+                              <object class="GtkCheckButton" id="hamlib_support_checkbutton">
+                                <property name="label" translatable="yes">Auto-fill Frequency and Mode fields</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
@@ -1949,15 +2005,94 @@ Base64-encoded plain text in the configuration file.</property>
                                 <property name="position">0</property>
                               </packing>
                             </child>
+                            <child>
+                              <object class="GtkBox" id="hamlib_support_model_hbox">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <child>
+                                  <object class="GtkLabel" id="hamlib_support_model_label">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">Model</property>
+                                    <property name="width_chars">18</property>
+                                    <property name="xalign">0</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="padding">2</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkComboBoxText" id="hamlib_support_model_combo">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="padding">2</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="padding">2</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkBox" id="hamlib_support_path_hbox">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <child>
+                                  <object class="GtkLabel" id="hamlib_support_path_label">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">Path to radio device</property>
+                                    <property name="width_chars">18</property>
+                                    <property name="xalign">0</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="padding">2</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkEntry" id="hamlib_support_path_entry">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="width_chars">15</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="padding">2</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="padding">2</property>
+                                <property name="position">2</property>
+                              </packing>
+                            </child>
                           </object>
                         </child>
                       </object>
                     </child>
                     <child type="label">
-                      <object class="GtkLabel" id="preferences_adif_import_label">
+                      <object class="GtkLabel" id="preferences_hamlib_support_label">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Import</property>
+                        <property name="label" translatable="yes">Hamlib support</property>
                       </object>
                     </child>
                   </object>
@@ -1973,10 +2108,10 @@ Base64-encoded plain text in the configuration file.</property>
               </packing>
             </child>
             <child type="tab">
-              <object class="GtkLabel" id="preferences_adif_label">
+              <object class="GtkLabel" id="preferences_hamlib_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">ADIF</property>
+                <property name="label" translatable="yes">Hamlib</property>
               </object>
               <packing>
                 <property name="position">4</property>
