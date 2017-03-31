@@ -25,13 +25,13 @@ class CalendarDialog:
 
     """ Handler for a simple dialog containing a Gtk.Calendar widget. Using this ensures the date is in the correct YYYYMMDD format required by ADIF. """
 
-    def __init__(self, builder):
+    def __init__(self, application):
         """ Set up the calendar widget and show it to the user.
 
-        :arg builder: The Gtk.Builder object.
+        :arg application: The PyQSO application containing the main Gtk window, etc.
         """
         logging.debug("Setting up the calendar dialog...")
-        self.builder = builder
+        self.builder = application.builder
         self.builder.add_objects_from_file(os.path.abspath(os.path.dirname(__file__)) + "/glade/pyqso.glade", ("calendar_dialog",))
         self.dialog = self.builder.get_object("calendar_dialog")
         # TODO: Make the dialog a parent of the RecordDialog.

@@ -24,43 +24,46 @@ class Toolbar:
 
     """ The toolbar underneath the menu bar. """
 
-    def __init__(self, parent):
-        """ Set up the various buttons in the toolbar, and connect to their corresponding functions. """
+    def __init__(self, application):
+        """ Set up the various buttons in the toolbar, and connect to their corresponding functions.
+
+        :arg application: The PyQSO application containing the main Gtk window, etc.
+        """
 
         logging.debug("Setting up the toolbar...")
 
-        self.parent = parent
-        self.builder = parent.builder
+        self.application = application
+        self.builder = self.application.builder
 
         self.buttons = {}
 
         # Create logbook
         self.buttons["NEW_LOGBOOK"] = self.builder.get_object("toolbar_new_logbook")
-        self.buttons["NEW_LOGBOOK"].connect("clicked", parent.logbook.new)
+        self.buttons["NEW_LOGBOOK"].connect("clicked", self.application.logbook.new)
 
         # Open logbook
         self.buttons["OPEN_LOGBOOK"] = self.builder.get_object("toolbar_open_logbook")
-        self.buttons["OPEN_LOGBOOK"].connect("clicked", parent.logbook.open)
+        self.buttons["OPEN_LOGBOOK"].connect("clicked", self.application.logbook.open)
 
         # Close logbook
         self.buttons["CLOSE_LOGBOOK"] = self.builder.get_object("toolbar_close_logbook")
-        self.buttons["CLOSE_LOGBOOK"].connect("clicked", parent.logbook.close)
+        self.buttons["CLOSE_LOGBOOK"].connect("clicked", self.application.logbook.close)
 
         # Add record
         self.buttons["ADD_RECORD"] = self.builder.get_object("toolbar_add_record")
-        self.buttons["ADD_RECORD"].connect("clicked", parent.logbook.add_record_callback)
+        self.buttons["ADD_RECORD"].connect("clicked", self.application.logbook.add_record_callback)
 
         # Edit record
         self.buttons["EDIT_RECORD"] = self.builder.get_object("toolbar_edit_record")
-        self.buttons["EDIT_RECORD"].connect("clicked", parent.logbook.edit_record_callback, None, None)
+        self.buttons["EDIT_RECORD"].connect("clicked", self.application.logbook.edit_record_callback, None, None)
 
         # Delete record
         self.buttons["DELETE_RECORD"] = self.builder.get_object("toolbar_delete_record")
-        self.buttons["DELETE_RECORD"].connect("clicked", parent.logbook.delete_record_callback)
+        self.buttons["DELETE_RECORD"].connect("clicked", self.application.logbook.delete_record_callback)
 
         # Filter log
         self.filter_source = self.builder.get_object("filter_source")
-        self.filter_source.connect_after("changed", parent.logbook.filter_logs)
+        self.filter_source.connect_after("changed", self.application.logbook.filter_logs)
 
         # Set sensitivities.
         self.set_logbook_button_sensitive(True)

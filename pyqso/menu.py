@@ -30,56 +30,55 @@ class Menu:
 
     """ The PyQSO menu bar along the top of the main window. """
 
-    def __init__(self, parent):
+    def __init__(self, application):
         """ Set up all menu items and connect to the various functions.
 
-        :arg parent: The parent Gtk window.
-        :arg builder: The Gtk builder.
+        :arg application: The PyQSO application containing the main Gtk window, etc.
         """
 
         logging.debug("Setting up the menu bar...")
 
-        self.parent = parent
-        self.builder = parent.builder
+        self.application = application
+        self.builder = self.application.builder
 
         # Collect Gtk menu items and connect signals.
         self.items = {}
 
         # New logbook
         self.items["NEW_LOGBOOK"] = self.builder.get_object("mitem_new_logbook")
-        self.items["NEW_LOGBOOK"].connect("activate", parent.logbook.new)
+        self.items["NEW_LOGBOOK"].connect("activate", self.application.logbook.new)
 
         # Open logbook
         self.items["OPEN_LOGBOOK"] = self.builder.get_object("mitem_open_logbook")
-        self.items["OPEN_LOGBOOK"].connect("activate", parent.logbook.open)
+        self.items["OPEN_LOGBOOK"].connect("activate", self.application.logbook.open)
 
         # Close logbook
         self.items["CLOSE_LOGBOOK"] = self.builder.get_object("mitem_close_logbook")
-        self.items["CLOSE_LOGBOOK"].connect("activate", parent.logbook.close)
+        self.items["CLOSE_LOGBOOK"].connect("activate", self.application.logbook.close)
 
         # New log
         self.items["NEW_LOG"] = self.builder.get_object("mitem_new_log")
-        self.items["NEW_LOG"].connect("activate", parent.logbook.new_log)
+        self.items["NEW_LOG"].connect("activate", self.application.logbook.new_log)
 
         # Delete the current log
         self.items["DELETE_LOG"] = self.builder.get_object("mitem_delete_log")
-        self.items["DELETE_LOG"].connect("activate", parent.logbook.delete_log)
+        self.items["DELETE_LOG"].connect("activate", self.application.logbook.delete_log)
 
         # Rename the current log
         self.items["RENAME_LOG"] = self.builder.get_object("mitem_rename_log")
-        self.items["RENAME_LOG"].connect("activate", parent.logbook.rename_log)
+        self.items["RENAME_LOG"].connect("activate", self.application.logbook.rename_log)
 
         # Import log
         self.items["IMPORT_LOG"] = self.builder.get_object("mitem_import_log")
-        self.items["IMPORT_LOG"].connect("activate", parent.logbook.import_log)
+        self.items["IMPORT_LOG"].connect("activate", self.application.logbook.import_log)
 
         # Export the current log
         self.items["EXPORT_LOG"] = self.builder.get_object("mitem_export_log")
-        self.items["EXPORT_LOG"].connect("activate", parent.logbook.export_log)
+        self.items["EXPORT_LOG"].connect("activate", self.application.logbook.export_log)
 
         # Print log
         self.items["PRINT_LOG"] = self.builder.get_object("mitem_print_log")
-        self.items["PRINT_LOG"].connect("activate", parent.logbook.print_log)
+        self.items["PRINT_LOG"].connect("activate", self.application.logbook.print_log)
 
         # Quit
         self.items["QUIT"] = self.builder.get_object("mitem_quit")
@@ -87,19 +86,19 @@ class Menu:
 
         # Add record
         self.items["ADD_RECORD"] = self.builder.get_object("mitem_add_record")
-        self.items["ADD_RECORD"].connect("activate", parent.logbook.add_record_callback)
+        self.items["ADD_RECORD"].connect("activate", self.application.logbook.add_record_callback)
 
         # Edit selected record
         self.items["EDIT_RECORD"] = self.builder.get_object("mitem_edit_record")
-        self.items["EDIT_RECORD"].connect("activate", parent.logbook.edit_record_callback)
+        self.items["EDIT_RECORD"].connect("activate", self.application.logbook.edit_record_callback)
 
         # Delete selected record
         self.items["DELETE_RECORD"] = self.builder.get_object("mitem_delete_record")
-        self.items["DELETE_RECORD"].connect("activate", parent.logbook.delete_record_callback)
+        self.items["DELETE_RECORD"].connect("activate", self.application.logbook.delete_record_callback)
 
         # Remove duplicates
         self.items["REMOVE_DUPLICATES"] = self.builder.get_object("mitem_remove_duplicates")
-        self.items["REMOVE_DUPLICATES"].connect("activate", parent.logbook.remove_duplicates_callback)
+        self.items["REMOVE_DUPLICATES"].connect("activate", self.application.logbook.remove_duplicates_callback)
 
         # View toolbox
         self.items["TOOLBOX"] = self.builder.get_object("mitem_toolbox")
@@ -110,15 +109,15 @@ class Menu:
             self.items["TOOLBOX"].set_active(config.get(section, option) == "True")
         else:
             self.items["TOOLBOX"].set_active(False)  # Don't show the toolbox by default
-        self.items["TOOLBOX"].connect("activate", parent.toolbox.toggle_visible_callback)
+        self.items["TOOLBOX"].connect("activate", self.application.toolbox.toggle_visible_callback)
 
         # Preferences
         self.items["PREFERENCES"] = self.builder.get_object("mitem_preferences")
-        self.items["PREFERENCES"].connect("activate", parent.show_preferences)
+        self.items["PREFERENCES"].connect("activate", self.application.show_preferences)
 
         # About
         self.items["ABOUT"] = self.builder.get_object("mitem_about")
-        self.items["ABOUT"].connect("activate", parent.show_about)
+        self.items["ABOUT"].connect("activate", self.application.show_about)
 
         self.set_logbook_item_sensitive(True)
         self.set_log_items_sensitive(False)

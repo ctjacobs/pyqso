@@ -55,14 +55,14 @@ class Logbook:
 
     """ A Logbook object can store multiple Log objects. """
 
-    def __init__(self, parent):
+    def __init__(self, application):
         """ Create a new Logbook object and initialise the list of Logs.
 
-        :arg parent: The parent Gtk window.
+        :arg application: The PyQSO application containing the main Gtk window, etc.
         """
 
-        self.parent = parent
-        self.builder = parent.builder
+        self.application = application
+        self.builder = self.application.builder
         self.notebook = self.builder.get_object("logbook")
         self.connection = None
         self.summary = {}
@@ -75,7 +75,7 @@ class Logbook:
 
         # Get the new file's path from a dialog.
         dialog = Gtk.FileChooserDialog("Create a New SQLite Database File",
-                                       self.parent.window,
+                                       self.application.window,
                                        Gtk.FileChooserAction.SAVE,
                                        (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                         Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
@@ -107,7 +107,7 @@ class Logbook:
         if(path is None):
             # If no path has been provided, get one from a "File Open" dialog.
             dialog = Gtk.FileChooserDialog("Open SQLite Database File",
-                                           self.parent.window,
+                                           self.application.window,
                                            Gtk.FileChooserAction.OPEN,
                                            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                             Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
@@ -139,7 +139,7 @@ class Logbook:
                         self.logs.append(l)
             except (sqlite.Error, IndexError) as e:
                 logging.exception(e)
-                error(parent=self.parent.window, message="Oops! Something went wrong when trying to retrieve the logs from the logbook. Perhaps the logbook file is encrypted, corrupted, or in the wrong format?")
+                error(parent=self.application.window, message="Oops! Something went wrong when trying to retrieve the logs from the logbook. Perhaps the logbook file is encrypted, corrupted, or in the wrong format?")
                 return
 
             logging.debug("All logs retrieved successfully. Now attempting to render them all in the Gtk.Notebook...")
@@ -160,14 +160,14 @@ class Logbook:
             logging.debug("All logs rendered successfully.")
 
             self.update_summary()
-            self.parent.toolbox.awards.count(self)
+            self.application.toolbox.awards.count(self)
 
-            context_id = self.parent.statusbar.get_context_id("Status")
-            self.parent.statusbar.push(context_id, "Logbook: %s" % self.path)
-            self.parent.toolbar.set_logbook_button_sensitive(False)
-            self.parent.menu.set_logbook_item_sensitive(False)
-            self.parent.menu.set_log_items_sensitive(True)
-            self.parent.toolbar.filter_source.set_sensitive(True)
+            context_id = self.application.statusbar.get_context_id("Status")
+            self.application.statusbar.push(context_id, "Logbook: %s" % self.path)
+            self.application.toolbar.set_logbook_button_sensitive(False)
+            self.application.menu.set_logbook_item_sensitive(False)
+            self.application.menu.set_log_items_sensitive(True)
+            self.application.toolbar.filter_source.set_sensitive(True)
 
             self.notebook.show_all()
 
@@ -188,12 +188,12 @@ class Logbook:
                 self.notebook.remove_page(0)
             logging.debug("All logs now closed.")
 
-            context_id = self.parent.statusbar.get_context_id("Status")
-            self.parent.statusbar.push(context_id, "No logbook is currently open.")
-            self.parent.toolbar.set_logbook_button_sensitive(True)
-            self.parent.menu.set_logbook_item_sensitive(True)
-            self.parent.menu.set_log_items_sensitive(False)
-            self.parent.toolbar.filter_source.set_sensitive(False)
+            context_id = self.application.statusbar.get_context_id("Status")
+            self.application.statusbar.push(context_id, "No logbook is currently open.")
+            self.application.toolbar.set_logbook_button_sensitive(True)
+            self.application.menu.set_logbook_item_sensitive(True)
+            self.application.menu.set_log_items_sensitive(False)
+            self.application.toolbar.filter_source.set_sensitive(False)
         else:
             logging.debug("Unable to disconnect from the database. No logs were closed.")
         return
@@ -213,7 +213,7 @@ class Logbook:
         except sqlite.Error as e:
             # PyQSO can't connect to the database.
             logging.exception(e)
-            error(parent=self.parent.window, message="PyQSO cannot connect to the database. Check file permissions?")
+            error(parent=self.application.window, message="PyQSO cannot connect to the database. Check file permissions?")
             return False
 
         logging.debug("Database connection created successfully!")
@@ -472,11 +472,11 @@ class Logbook:
 
         # Disable the record buttons if a log page is not selected.
         if(new_page == 0):
-            self.parent.toolbar.set_record_buttons_sensitive(False)
-            self.parent.menu.set_record_items_sensitive(False)
+            self.application.toolbar.set_record_buttons_sensitive(False)
+            self.application.menu.set_record_items_sensitive(False)
         else:
-            self.parent.toolbar.set_record_buttons_sensitive(True)
-            self.parent.menu.set_record_items_sensitive(True)
+            self.application.toolbar.set_record_buttons_sensitive(True)
+            self.application.menu.set_record_items_sensitive(True)
         return
 
     def new_log(self, widget=None):
@@ -548,7 +548,7 @@ class Logbook:
             logging.debug("No logs to delete!")
             return
 
-        response = question(parent=self.parent.window, message="Are you sure you want to delete log %s?" % log.name)
+        response = question(parent=self.application.window, message="Are you sure you want to delete log %s?" % log.name)
         if(response == Gtk.ResponseType.YES):
             try:
                 with self.connection:
@@ -556,7 +556,7 @@ class Logbook:
                     c.execute("DROP TABLE %s" % log.name)
             except sqlite.Error as e:
                 logging.exception(e)
-                error(parent=self.parent.window, message="Database error. Could not delete the log.")
+                error(parent=self.application.window, message="Database error. Could not delete the log.")
                 return
 
             self.logs.pop(log_index)
@@ -569,7 +569,7 @@ class Logbook:
             self.notebook.remove_page(page_index)
 
         self.update_summary()
-        self.parent.toolbox.awards.count(self)
+        self.application.toolbox.awards.count(self)
         return
 
     def filter_logs(self, widget=None):
@@ -588,7 +588,7 @@ class Logbook:
         :rtype: bool
         """
         value = model.get_value(iter, 1)
-        callsign = self.parent.toolbar.filter_source.get_text()
+        callsign = self.application.toolbar.filter_source.get_text()
 
         if(callsign is None or callsign == ""):
             # If there is nothing to filter with, then show all the records!
@@ -819,7 +819,7 @@ class Logbook:
     def import_log(self, widget=None):
         """ Import a log from an ADIF file. """
         dialog = Gtk.FileChooserDialog("Import ADIF Log File",
-                                       self.parent.window,
+                                       self.application.window,
                                        Gtk.FileChooserAction.OPEN,
                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                        Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
@@ -896,7 +896,7 @@ class Logbook:
             self.logs.append(l)
             self._render_log(self.get_number_of_logs()-1)
         self.update_summary()
-        self.parent.toolbox.awards.count(self)
+        self.application.toolbox.awards.count(self)
 
         return
 
@@ -911,7 +911,7 @@ class Logbook:
         log = self.logs[log_index]
 
         dialog = Gtk.FileChooserDialog("Export Log to File",
-                                       self.parent.window,
+                                       self.application.window,
                                        Gtk.FileChooserAction.SAVE,
                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                        Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
@@ -943,7 +943,7 @@ class Logbook:
             if(records is not None):
                 adif.write(records, path)
             else:
-                error(self.parent.window, "Could not retrieve the records from the SQL database. No records have been exported.")
+                error(self.application.window, "Could not retrieve the records from the SQL database. No records have been exported.")
         return
 
     def print_log(self, widget=None):
@@ -969,9 +969,9 @@ class Logbook:
 
             operation.connect("begin_print", self._begin_print)
             operation.connect("draw_page", self._draw_page)
-            operation.run(action, parent=self.parent.window)
+            operation.run(action, parent=self.application.window)
         else:
-            error(self.parent.window, "Could not retrieve the records from the SQL database. No records have been printed.")
+            error(self.application.window, "Could not retrieve the records from the SQL database. No records have been printed.")
         return
 
     def _begin_print(self, operation, context):
@@ -1033,7 +1033,7 @@ class Logbook:
             if(log_index is None):
                 raise ValueError("The log index could not be determined. Perhaps you tried adding a record when the Summary page was selected?")
         except ValueError as e:
-            error(self.parent.window, e)
+            error(self.application.window, e)
             return
         log = self.logs[log_index]
 
@@ -1049,7 +1049,7 @@ class Logbook:
 
         exit = False
         while not exit:
-            rd = RecordDialog(parent=self.parent, log=log, index=None)
+            rd = RecordDialog(application=self.application, log=log, index=None)
 
             all_valid = False  # Are all the field entries valid?
 
@@ -1081,7 +1081,7 @@ class Logbook:
                         # All data has been validated, so we can go ahead and add the new record.
                         log.add_record(fields_and_data)
                         self.update_summary()
-                        self.parent.toolbox.awards.count(self)
+                        self.application.toolbox.awards.count(self)
                         # Select the new Record's row in the treeview.
                         number_of_records = log.get_number_of_records()
                         if(number_of_records is not None):
@@ -1101,7 +1101,7 @@ class Logbook:
             if(log_index is None):
                 raise ValueError("The log index could not be determined. Perhaps you tried deleting a record when the Summary page was selected?")
         except ValueError as e:
-            error(self.parent, e)
+            error(self.application, e)
             return
         log = self.logs[log_index]
 
@@ -1116,13 +1116,13 @@ class Logbook:
             logging.debug("Trying to delete a record, but there are no records in the log!")
             return
 
-        response = question(parent=self.parent.window, message="Are you sure you want to delete record %d?" % row_index)
+        response = question(parent=self.application.window, message="Are you sure you want to delete record %d?" % row_index)
         if(response == Gtk.ResponseType.YES):
             # Deletes the record with index 'row_index' from the Records list.
             # 'iter' is needed to remove the record from the ListStore itself.
             log.delete_record(row_index, iter=child_iter)
             self.update_summary()
-            self.parent.toolbox.awards.count(self)
+            self.application.toolbox.awards.count(self)
         return
 
     def edit_record_callback(self, widget, path, view_column):
@@ -1137,7 +1137,7 @@ class Logbook:
             if(log_index is None):
                 raise ValueError("The log index could not be determined. Perhaps you tried editing a record when the Summary page was selected?")
         except ValueError as e:
-            error(self.parent, e)
+            error(self.application, e)
             return
         log = self.logs[log_index]
 
@@ -1152,7 +1152,7 @@ class Logbook:
             logging.debug("Could not find the selected row's index!")
             return
 
-        rd = RecordDialog(parent=self.parent, log=self.logs[log_index], index=row_index)
+        rd = RecordDialog(parent=self.application.window, log=self.logs[log_index], index=row_index)
         all_valid = False  # Are all the field entries valid?
 
         adif = ADIF()
@@ -1189,7 +1189,7 @@ class Logbook:
                                 # We add 1 onto the column_index here because we don't want to consider the index column.
                                 log.edit_record(row_index, field_names[i], fields_and_data[field_names[i]], iter=child_iter, column_index=i+1)
                         self.update_summary()
-                        self.parent.toolbox.awards.count(self)
+                        self.application.toolbox.awards.count(self)
 
         rd.dialog.destroy()
         return
@@ -1203,7 +1203,7 @@ class Logbook:
         log = self.logs[log_index]
 
         (number_of_duplicates, number_of_duplicates_removed) = log.remove_duplicates()
-        info(self.parent.window, "Found %d duplicate(s). Successfully removed %d duplicate(s)." % (number_of_duplicates, number_of_duplicates_removed))
+        info(self.application.window, "Found %d duplicate(s). Successfully removed %d duplicate(s)." % (number_of_duplicates, number_of_duplicates_removed))
         return
 
     def get_number_of_logs(self):
@@ -1276,7 +1276,7 @@ class TestLogbook(unittest.TestCase):
 
     def setUp(self):
         """ Set up the Logbook object and connection to the test database needed for the unit tests. """
-        self.logbook = Logbook(parent=mock.MagicMock())
+        self.logbook = Logbook(application=mock.MagicMock())
         success = self.logbook.db_connect(os.path.dirname(os.path.realpath(__file__))+"/unittest_resources/test.db")
         assert success
 

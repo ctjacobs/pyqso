@@ -44,18 +44,18 @@ class RecordDialog:
 
     """ A dialog through which users can enter information about a QSO/record. """
 
-    def __init__(self, parent, log, index=None):
+    def __init__(self, application, log, index=None):
         """ Set up the layout of the record dialog, populate the various fields with the QSO details (if the record already exists), and show the dialog to the user.
 
-        :arg parent: The parent Gtk window.
+        :arg application: The PyQSO application containing the main Gtk window, etc.
         :arg log: The log to which the record belongs (or will belong).
         :arg int index: If specified, then the dialog turns into 'edit record mode' and fills the data sources (e.g. the Gtk.Entry boxes) with the existing data in the log. If not specified (i.e. index is None), then the dialog starts off with nothing in the data sources.
         """
 
         logging.debug("Setting up the record dialog...")
 
-        self.parent = parent
-        self.builder = parent.builder
+        self.application = application
+        self.builder = self.application.builder
 
         self.builder.add_objects_from_file(os.path.abspath(os.path.dirname(__file__)) + "/glade/pyqso.glade", ("record_dialog",))
         self.dialog = self.builder.get_object("record_dialog")
@@ -371,10 +371,10 @@ class RecordDialog:
         try:
             if(database == "qrz.com"):
                 # QRZ.com
-                callsign_lookup = CallsignLookupQRZ(parent=self)
+                callsign_lookup = CallsignLookupQRZ(application=self.application)
             elif(database == "hamqth.com"):
                 # HamQTH
-                callsign_lookup = CallsignLookupHamQTH(parent=self)
+                callsign_lookup = CallsignLookupHamQTH(application=self.application)
             else:
                 raise ValueError("Unknown callsign database: %s" % database)
         except ValueError as e:
@@ -414,7 +414,7 @@ class RecordDialog:
 
     def calendar_callback(self, widget):
         """ Open up a calendar widget for easy QSO_DATE selection. Return None after the user destroys the dialog. """
-        c = CalendarDialog(self.parent.builder)
+        c = CalendarDialog(self.application)
         response = c.dialog.run()
         if(response == Gtk.ResponseType.OK):
             self.sources["QSO_DATE"].set_text(c.date)
