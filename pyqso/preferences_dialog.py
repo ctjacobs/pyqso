@@ -47,12 +47,14 @@ class PreferencesDialog(Gtk.Dialog):
 
     """ A dialog to specify the PyQSO preferences. """
 
-    def __init__(self, parent):
+    def __init__(self, application):
         """ Set up the various pages of the preferences dialog. """
 
         logging.debug("Setting up the preferences dialog...")
 
-        Gtk.Dialog.__init__(self, title="Preferences", parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        self.application = application
+
+        Gtk.Dialog.__init__(self, title="Preferences", parent=self.application.window, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
 
         self.preferences = Gtk.Notebook()
 
