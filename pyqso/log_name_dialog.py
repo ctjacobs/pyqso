@@ -25,16 +25,17 @@ class LogNameDialog:
 
     """ A handler for the Gtk.Dialog through which a user can specify the name of a Log object. """
 
-    def __init__(self, builder, title=None, name=None):
+    def __init__(self, application, title=None, name=None):
         """ Create and show the log name dialog to the user.
 
+        :arg application: The PyQSO application containing the main Gtk window, etc.
         :arg title: The title of the dialog. If this is None, it is assumed that a new log is going to be created.
         :arg name: The existing name of the Log object. Defaults to None if not specified (because the Log does not yet exist).
         """
 
         logging.debug("Building new log name dialog...")
 
-        self.builder = builder
+        self.builder = application.builder
         self.builder.add_objects_from_file(os.path.abspath(os.path.dirname(__file__)) + "/glade/pyqso.glade", ("log_name_dialog",))
         self.dialog = self.builder.get_object("log_name_dialog")
 

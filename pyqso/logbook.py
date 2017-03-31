@@ -485,7 +485,7 @@ class Logbook:
         if(self.connection is None):
             return
         exists = True
-        ln = LogNameDialog(self.builder)
+        ln = LogNameDialog(self.application)
         while(exists):
             response = ln.dialog.run()
             if(response == Gtk.ResponseType.OK):
@@ -775,7 +775,7 @@ class Logbook:
         log_index = self._get_log_index(name=old_log_name)
 
         exists = True
-        ln = LogNameDialog(self.builder, title="Rename Log", name=old_log_name)
+        ln = LogNameDialog(self.application, title="Rename Log", name=old_log_name)
         while(exists):
             response = ln.dialog.run()
             if(response == Gtk.ResponseType.OK):
@@ -845,7 +845,7 @@ class Logbook:
             logging.debug("No file path specified.")
             return
 
-        ln = LogNameDialog(self.builder, title="Import Log")
+        ln = LogNameDialog(self.application, title="Import Log")
         while(True):
             response = ln.dialog.run()
             if(response == Gtk.ResponseType.OK):
