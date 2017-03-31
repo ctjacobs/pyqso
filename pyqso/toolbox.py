@@ -28,16 +28,17 @@ class Toolbox:
 
     """ Contains a Gtk.Notebook full of amateur radio-related tools. """
 
-    def __init__(self, parent):
+    def __init__(self, application):
         """ Instantiate and insert the various tools into the toolbox.
 
-        :arg parent: The parent Gtk window.
-        :arg builder: The Gtk builder."""
+        :arg application: The PyQSO application containing the main Gtk window, etc.
+        :arg builder: The Gtk builder.
+        """
 
         logging.debug("Setting up the toolbox...")
 
-        self.parent = parent
-        self.builder = parent.builder
+        self.application = application
+        self.builder = self.application.builder
 
         self.tools = self.builder.get_object("tools")
 
