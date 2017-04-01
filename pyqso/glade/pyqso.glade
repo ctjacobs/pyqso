@@ -1429,7 +1429,7 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                                 <property name="orientation">vertical</property>
                                 <property name="spacing">2</property>
                                 <child>
-                                  <object class="GtkCheckButton" id="visible_fields_callsign">
+                                  <object class="GtkCheckButton" id="visible_fields_call">
                                     <property name="label" translatable="yes">Callsign</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -1446,7 +1446,7 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkCheckButton" id="visible_fields_date">
+                                  <object class="GtkCheckButton" id="visible_fields_qso_date">
                                     <property name="label" translatable="yes">Date</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -1463,7 +1463,7 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkCheckButton" id="visible_fields_time">
+                                  <object class="GtkCheckButton" id="visible_fields_time_on">
                                     <property name="label" translatable="yes">Time</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -1480,7 +1480,7 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkCheckButton" id="visible_fields_frequency">
+                                  <object class="GtkCheckButton" id="visible_fields_freq">
                                     <property name="label" translatable="yes">Frequency (MHz)</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -1562,7 +1562,7 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkCheckButton" id="visible_fields_tx_power">
+                                  <object class="GtkCheckButton" id="visible_fields_tx_pwr">
                                     <property name="label" translatable="yes">TX Power (W)</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -1596,7 +1596,7 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkCheckButton" id="visible_fields_rst_received">
+                                  <object class="GtkCheckButton" id="visible_fields_rst_rcvd">
                                     <property name="label" translatable="yes">RST Received</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -1630,7 +1630,7 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkCheckButton" id="visible_fields_qsl_received">
+                                  <object class="GtkCheckButton" id="visible_fields_qsl_rcvd">
                                     <property name="label" translatable="yes">QSL Received</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -1777,7 +1777,7 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                                 <property name="orientation">vertical</property>
                                 <property name="spacing">2</property>
                                 <child>
-                                  <object class="GtkCheckButton" id="visible_fields_cq_zone">
+                                  <object class="GtkCheckButton" id="visible_fields_cqz">
                                     <property name="label" translatable="yes">CQ Zone</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -1794,7 +1794,7 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkCheckButton" id="visible_fields_itu_zone">
+                                  <object class="GtkCheckButton" id="visible_fields_ituz">
                                     <property name="label" translatable="yes">ITU Zone</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -1811,7 +1811,7 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkCheckButton" id="visible_fields_iota_designator">
+                                  <object class="GtkCheckButton" id="visible_fields_iota">
                                     <property name="label" translatable="yes">IOTA Designator</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
@@ -1875,76 +1875,6 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
               </object>
               <packing>
                 <property name="position">1</property>
-                <property name="tab_fill">False</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkBox" id="preferences_adif_vbox">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="orientation">vertical</property>
-                <property name="spacing">2</property>
-                <child>
-                  <object class="GtkFrame" id="preferences_adif_import">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="label_xalign">0</property>
-                    <child>
-                      <object class="GtkAlignment" id="preferences_adif_import_alignment">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <child>
-                          <object class="GtkBox" id="preferences_adif_import_vbox">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="orientation">vertical</property>
-                            <property name="spacing">2</property>
-                            <child>
-                              <object class="GtkCheckButton" id="adif_import_merge_comment_checkbutton">
-                                <property name="label" translatable="yes">Merge any text in the COMMENT field with the NOTES field</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="receives_default">False</property>
-                                <property name="xalign">0</property>
-                                <property name="draw_indicator">True</property>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                    <child type="label">
-                      <object class="GtkLabel" id="preferences_adif_import_label">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Import</property>
-                      </object>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-              </object>
-              <packing>
-                <property name="position">2</property>
-              </packing>
-            </child>
-            <child type="tab">
-              <object class="GtkLabel" id="preferences_hamlib_label">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Hamlib</property>
-              </object>
-              <packing>
-                <property name="position">4</property>
                 <property name="tab_fill">False</property>
               </packing>
             </child>
@@ -2208,10 +2138,6 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                                   <object class="GtkComboBoxText" id="callsign_lookup_database_combo">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
-                                    <items>
-                                      <item translatable="yes">qrz.com</item>
-                                      <item translatable="yes">hamqth.com</item>
-                                    </items>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
@@ -2397,7 +2323,7 @@ Base64-encoded plain text in the configuration file.</property>
                 </child>
               </object>
               <packing>
-                <property name="position">3</property>
+                <property name="position">2</property>
               </packing>
             </child>
             <child type="tab">
@@ -2405,6 +2331,76 @@ Base64-encoded plain text in the configuration file.</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Records</property>
+              </object>
+              <packing>
+                <property name="position">2</property>
+                <property name="tab_fill">False</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox" id="preferences_adif_vbox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">2</property>
+                <child>
+                  <object class="GtkFrame" id="preferences_adif_import">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label_xalign">0</property>
+                    <child>
+                      <object class="GtkAlignment" id="preferences_adif_import_alignment">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkBox" id="preferences_adif_import_vbox">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">2</property>
+                            <child>
+                              <object class="GtkCheckButton" id="adif_import_merge_comment_checkbutton">
+                                <property name="label" translatable="yes">Merge any text in the COMMENT field with the NOTES field</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">False</property>
+                                <property name="xalign">0</property>
+                                <property name="draw_indicator">True</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child type="label">
+                      <object class="GtkLabel" id="preferences_adif_import_label">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Import</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="position">3</property>
+              </packing>
+            </child>
+            <child type="tab">
+              <object class="GtkLabel" id="preferences_adif_label">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">ADIF</property>
               </object>
               <packing>
                 <property name="position">3</property>
@@ -2550,10 +2546,10 @@ Base64-encoded plain text in the configuration file.</property>
               </packing>
             </child>
             <child type="tab">
-              <object class="GtkLabel" id="preferences_adif_label">
+              <object class="GtkLabel" id="preferences_hamlib_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">ADIF</property>
+                <property name="label" translatable="yes">Hamlib</property>
               </object>
               <packing>
                 <property name="position">4</property>

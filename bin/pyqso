@@ -145,10 +145,10 @@ class PyQSO:
     def show_preferences(self, widget):
         """ Show the Preferences dialog. Any changes made by the user after clicking the 'Ok' button are saved in the .cfg file. """
         preferences = PreferencesDialog(self)
-        response = preferences.run()
+        response = preferences.dialog.run()
         if(response == Gtk.ResponseType.OK):
             preferences.commit()
-        preferences.destroy()
+        preferences.dialog.destroy()
         return
 
 if(__name__ == "__main__"):
