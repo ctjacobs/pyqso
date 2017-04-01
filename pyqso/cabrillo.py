@@ -18,12 +18,6 @@
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import unittest
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
-from os.path import expanduser
 
 
 class Cabrillo:
@@ -33,12 +27,10 @@ class Cabrillo:
 
     def __init__(self):
         """ Initialise class for I/O of files using the Cabrillo format. """
-        
-
         return
-    
+
     def write(self, records, path):
-        
+
         logging.debug("Writing records to an Cabrillo file...")
         try:
             f = open(path, mode='w', errors="replace")  # Open file for writing
@@ -49,7 +41,10 @@ class Cabrillo:
 
             # Write each record to the file.
             for r in records:
-                
+
+                # Frequency
+                freq = r["FREQ"]
+
                 # Mode
                 if(r["MODE"] == "SSB"):
                     mo = "PH"
@@ -62,15 +57,28 @@ class Cabrillo:
                     mo = "RY"
 
                 # Date in yyyy-mm-dd format.
-                date = r["QSO_DATE"][0:4] + "-" + r["QSO_DATE"][4:6] + "-" r["QSO_DATE"][6:8]
+                date = r["QSO_DATE"][0:4] + "-" + r["QSO_DATE"][4:6] + "-" + r["QSO_DATE"][6:8]
 
                 # Time
                 time = r["TIME_ON"]
 
-                # Callsign
-                call = r["CALL"]
+                # The callsign that was used when operating the contest station.
+                call_sent = "TEST"
 
-                f.write("""QSO: %s %s %s %s %s \n""" % (freq, mo, date, time, call, ))
+                # Exchange (the part sent to the distant station)
+                exch_sent = r["RST_SENT"]
+
+                # Callsign
+                call_rcvd = r["CALL"]
+
+                # Exchange (the part received from the distant station)
+                exch_rcvd = r["RST_RCVD"]
+
+                # Transmitter ID (must be 0 or 1, if applicable).
+                # FIXME: For now this has been hard-coded to 0.
+                t = "0"
+
+                f.write("""QSO: %s %s %s %s %s %s %s %s %s\n""" % (freq, mo, date, time, call_sent, exch_sent, call_rcvd, exch_rcvd, t))
 
             # Footer
             f.write("END-OF-LOG:")
