@@ -348,7 +348,7 @@ class ADIF:
 <programversion:5>1.0.0
 <eoh>\n""" % (dt, len(records), len(str(ADIF_VERSION)), ADIF_VERSION))
 
-            # Then write each log to the file.
+            # Then write each record to the file.
             for r in records:
                 for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
                     if(not(field_name.lower() in list(r.keys()) or field_name.upper() in list(r.keys()))):
