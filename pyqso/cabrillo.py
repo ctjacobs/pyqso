@@ -19,6 +19,8 @@
 
 import logging
 
+CABRILLO_VERSION = "3.0"
+
 
 class Cabrillo:
 
@@ -36,7 +38,7 @@ class Cabrillo:
             f = open(path, mode='w', errors="replace")  # Open file for writing
 
             # Header
-            f.write("""START-OF-LOG: %s\n""" % (str("3.0")))
+            f.write("""START-OF-LOG: %s\n""" % (CABRILLO_VERSION))
             f.write("""CREATED-BY: PyQSO v1.0.0\n""")
 
             # Write each record to the file.
