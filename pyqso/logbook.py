@@ -139,7 +139,7 @@ class Logbook:
                         self.logs.append(l)
             except (sqlite.Error, IndexError) as e:
                 logging.exception(e)
-                error(parent=self.application.window, message="Oops! Something went wrong when trying to retrieve the logs from the logbook. Perhaps the logbook file is encrypted, corrupted, or in the wrong format?")
+                error(parent=self.application.window, message="Something went wrong when trying to retrieve the logs from the logbook. Perhaps the logbook file is encrypted, corrupted, or in the wrong format?")
                 return
 
             logging.debug("All logs retrieved successfully. Now attempting to render them all in the Gtk.Notebook...")

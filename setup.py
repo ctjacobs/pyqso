@@ -19,22 +19,22 @@
 
 from distutils.core import setup
 
-setup(name='PyQSO',
-      version='1.0.0',
-      description='A contact logging tool for amateur radio operators.',
-      author='Christian Thomas Jacobs',
-      author_email='christian@christianjacobs.uk',
-      url='https://github.com/ctjacobs/pyqso',
-      packages=['pyqso'],
-      package_dir={'pyqso': 'pyqso'},
+setup(name="PyQSO",
+      version="1.0.0",
+      description="A contact logging tool for amateur radio operators.",
+      author="Christian Thomas Jacobs",
+      author_email="christian@christianjacobs.uk",
+      url="https://github.com/ctjacobs/pyqso",
+      packages=["pyqso"],
+      package_dir={"pyqso": "pyqso"},
       scripts=["bin/pyqso"],
       data_files=[("icons", ["icons/log_64x64.png"])],
       classifiers=[
-          'Development Status :: 5 - Production/Stable',
-          'Intended Audience :: End Users/Desktop',
-          'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-          'Natural Language :: English',
-          'Programming Language :: Python :: 3',
-          'Topic :: Communications :: Ham Radio',
+          "Development Status :: 5 - Production/Stable",
+          "Intended Audience :: End Users/Desktop",
+          "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+          "Natural Language :: English",
+          "Programming Language :: Python :: 3",
+          "Topic :: Communications :: Ham Radio",
       ]
       )
