@@ -331,8 +331,8 @@ class TestDXCluster(unittest.TestCase):
 
     def setUp(self):
         """ Set up the objects needed for the unit tests. """
-        Gtk.Builder = mock.MagicMock(spec=Gtk.Builder)
-        self.dxcluster = DXCluster(builder=Gtk.Builder())
+        PyQSO = mock.MagicMock()
+        self.dxcluster = DXCluster(application=PyQSO())
 
     def tearDown(self):
         """ Destroy any unit test resources. """
