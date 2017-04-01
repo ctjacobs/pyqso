@@ -125,7 +125,7 @@ class GeneralPage:
         # because a configuration file may have been created after launching the application. Let's check to see if one exists again...
         config = configparser.ConfigParser()
         have_config = (config.read(PREFERENCES_FILE) != [])
-        
+
         # Show toolbox
         self.sources["SHOW_TOOLBOX"] = self.builder.get_object("general_show_toolbox_checkbutton")
         (section, option) = ("general", "show_toolbox")
