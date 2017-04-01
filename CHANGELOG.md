@@ -6,6 +6,7 @@
 - Default logbook.
 - Continued support for Python 2.x modules. Thanks to @gaionim (IU2HDS) for this patch.
 - Auto-filling of the Mode field using Hamlib.
+- Glade design of main window and dialogs.
 
 ### Changed
 - Using username and port information (in addition to hostname) when creating an identifier for a DX cluster bookmark.
