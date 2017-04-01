@@ -874,7 +874,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</property>
-    <property name="authors">Christian Thomas Jacobs (M0UOS)</property>
+    <property name="authors">Christian Thomas Jacobs, M0UOS</property>
     <property name="logo_icon_name"/>
     <property name="license_type">custom</property>
     <child internal-child="vbox">
