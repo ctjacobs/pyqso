@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#    Copyright (C) 2013-2017 Christian T. Jacobs.
+#    Copyright (C) 2013-2017 Christian Thomas Jacobs.
 
 #    This file is part of PyQSO.
 
@@ -17,50 +17,48 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk
 import logging
+import os.path
 
 
-class LogNameDialog(Gtk.Dialog):
+class LogNameDialog:
 
-    """ A Gtk.Dialog where a user can specify the name of a Log object. """
+    """ A handler for the Gtk.Dialog through which a user can specify the name of a Log object. """
 
-    def __init__(self, parent, title=None, name=None):
+    def __init__(self, application, title=None, name=None):
         """ Create and show the log name dialog to the user.
 
-        :arg parent: The parent Gtk window.
+        :arg application: The PyQSO application containing the main Gtk window, etc.
         :arg title: The title of the dialog. If this is None, it is assumed that a new log is going to be created.
         :arg name: The existing name of the Log object. Defaults to None if not specified (because the Log does not yet exist).
         """
 
-        if(title is None):
-            title = "New Log"
-        else:
-            title = title
-        Gtk.Dialog.__init__(self, title=title, parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        logging.debug("Building new log name dialog...")
 
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label("Log Name:")
-        label.set_alignment(0, 0.5)
-        hbox_temp.pack_start(label, False, False, 6)
-        self.entry = Gtk.Entry()
+        self.builder = application.builder
+        self.builder.add_objects_from_file(os.path.abspath(os.path.dirname(__file__)) + "/glade/pyqso.glade", ("log_name_dialog",))
+        self.dialog = self.builder.get_object("log_name_dialog")
+
+        if(title is None):
+            self.dialog.set_title("New Log")
+        else:
+            self.dialog.set_title(title)
+
+        self.entry = self.builder.get_object("log_name_entry")
         if(name is not None):
             self.entry.set_text(name)
-        hbox_temp.pack_start(self.entry, False, False, 6)
-        self.vbox.pack_start(hbox_temp, False, False, 6)
 
-        self.show_all()
+        self.dialog.show_all()
 
-        logging.debug("New LogNameDialog instance created!")
+        logging.debug("Log name dialog built.")
 
         return
 
-    def get_log_name(self):
+    @property
+    def name(self):
         """ Return the log name specified in the Gtk.Entry box by the user.
 
         :returns: The log's name.
         :rtype: str
         """
-
-        logging.debug("Retrieving the log name from the LogNameDialog...")
         return self.entry.get_text()

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#    Copyright (C) 2013-2017 Christian T. Jacobs.
+#    Copyright (C) 2013-2017 Christian Thomas Jacobs.
 
 #    This file is part of PyQSO.
 
@@ -21,22 +21,20 @@ from gi.repository import Gtk
 import logging
 
 
-class Awards(Gtk.VBox):
+class Awards:
 
     """ A tool for tracking progress towards an award. Currently this only supports the DXCC award.
     For more information visit http://www.arrl.org/dxcc """
 
-    def __init__(self, parent):
+    def __init__(self, builder):
         """ Set up a table for progress tracking purposes.
 
-        :arg parent: The parent Gtk window.
+        :arg builder: The Gtk builder.
         """
         # TODO: This only considers the DXCC award for now.
-        logging.debug("New Awards instance created!")
+        logging.debug("Setting up awards table...")
 
-        Gtk.VBox.__init__(self, spacing=2)
-
-        self.parent = parent
+        self.builder = builder
 
         self.bands = ["70cm", "2m", "6m", "10m", "12m", "15m", "17m", "20m", "30m", "40m", "80m", "160m"]
         self.modes = ["Phone", "CW", "Digital", "Mixed"]
@@ -60,32 +58,26 @@ class Awards(Gtk.VBox):
             column.set_clickable(False)
             self.treeview.append_column(column)
 
-        # Add a label to inform the user that this only considers the DXCC award for now.
-        label = Gtk.Label(halign=Gtk.Align.START)
-        label.set_markup("<span size=\"x-large\">%s</span>" % "DXCC Award")
-        self.pack_start(label, False, False, 4)
         # Show the table in the Awards tab
-        self.add(self.treeview)
-        self.show_all()
+        self.builder.get_object("awards").add(self.treeview)
+        self.builder.get_object("awards").show_all()
 
         logging.debug("Awards table set up successfully.")
 
-        self.count()
-
         return
 
-    def count(self):
+    def count(self, logbook):
         """ Update the table for progress tracking. """
 
         logging.debug("Counting the band/mode combinations for the awards table...")
-        # Wipe everything and start again
+        # Wipe everything and start again.
         self.awards.clear()
         # For each mode, add a new list for holding the totals, and initialise the values to zero.
         count = []
         for i in range(0, len(self.bands)):
             count.append([0]*len(self.bands))
 
-        for log in self.parent.logbook.logs:
+        for log in logbook.logs:
             records = log.get_all_records()
             if(records is not None):
                 for r in records:
@@ -100,7 +92,7 @@ class Awards(Gtk.VBox):
                             else:
                                 # FIXME: This assumes that all the other modes in the ADIF list are digital modes. Is this the case?
                                 count[2][band] += 1
-                            count[3][band] += 1  # Keep the total of each column in the "Mixed" mode
+                            count[3][band] += 1  # Keep the total of each column in the "Mixed" mode.
             else:
                 logging.error("Could not update the awards table for '%s' because of a database error." % log.name)
         # Insert the rows containing the totals

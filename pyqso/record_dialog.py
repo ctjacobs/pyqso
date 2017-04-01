@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#    Copyright (C) 2013-2017 Christian T. Jacobs.
+#    Copyright (C) 2013-2017 Christian Thomas Jacobs.
 
 #    This file is part of PyQSO.
 
@@ -17,8 +17,9 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 import logging
+import os
 try:
     import configparser
 except ImportError:
@@ -36,337 +37,129 @@ except ImportError:
 from pyqso.adif import *
 from pyqso.callsign_lookup import *
 from pyqso.auxiliary_dialogs import *
+from pyqso.calendar_dialog import CalendarDialog
 
 
-class RecordDialog(Gtk.Dialog):
+class RecordDialog:
 
     """ A dialog through which users can enter information about a QSO/record. """
 
-    def __init__(self, parent, log, index=None):
+    def __init__(self, application, log, index=None):
         """ Set up the layout of the record dialog, populate the various fields with the QSO details (if the record already exists), and show the dialog to the user.
 
-        :arg parent: The parent Gtk window.
+        :arg application: The PyQSO application containing the main Gtk window, etc.
         :arg log: The log to which the record belongs (or will belong).
         :arg int index: If specified, then the dialog turns into 'edit record mode' and fills the data sources (e.g. the Gtk.Entry boxes) with the existing data in the log. If not specified (i.e. index is None), then the dialog starts off with nothing in the data sources.
         """
 
         logging.debug("Setting up the record dialog...")
 
+        self.application = application
+        self.builder = self.application.builder
+
+        self.builder.add_objects_from_file(os.path.abspath(os.path.dirname(__file__)) + "/glade/pyqso.glade", ("record_dialog",))
+        self.dialog = self.builder.get_object("record_dialog")
+        self.builder.get_object("record_dialog").connect("key-release-event", self._on_key_release)
+
+        # Set dialog title
         if(index is not None):
-            title = "Edit Record %d" % index
+            self.dialog.set_title("Edit Record %d" % index)
         else:
-            title = "Add Record"
-        Gtk.Dialog.__init__(self, title=title, parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
+            self.dialog.set_title("Add Record")
 
         # Check if a configuration file is present, since we might need it to set up the rest of the dialog.
         config = configparser.ConfigParser()
         have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
 
-        # QSO DATA FRAME
-        qso_frame = Gtk.Frame()
-        qso_frame.set_label("QSO Information")
-        self.vbox.add(qso_frame)
-
-        hbox_inner = Gtk.HBox(spacing=2)
-
-        vbox_inner = Gtk.VBox(spacing=2)
-        hbox_inner.pack_start(vbox_inner, True, True, 2)
-
         # Create label:entry pairs and store them in a dictionary
         self.sources = {}
 
+        # QSO INFORMATION
+
         # CALL
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["CALL"], halign=Gtk.Align.START)
-        label.set_width_chars(15)
-        label.set_alignment(0, 0.5)
-        hbox_temp.pack_start(label, False, False, 2)
-        self.sources["CALL"] = Gtk.Entry()
-        self.sources["CALL"].set_width_chars(15)
-        hbox_temp.pack_start(self.sources["CALL"], False, False, 2)
-        icon = Gtk.Image()
-        icon.set_from_stock(Gtk.STOCK_INFO, Gtk.IconSize.MENU)
-        button = Gtk.Button()
-        button.add(icon)
-        button.connect("clicked", self.lookup_callback)  # Looks up the callsign using an online database, for callsign and station information.
-        button.set_tooltip_text("Callsign lookup")
-        hbox_temp.pack_start(button, True, True, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
+        self.sources["CALL"] = self.builder.get_object("qso_call_entry")
+        self.builder.get_object("callsign_lookup").connect("clicked", self.callsign_lookup_callback)
 
         # DATE
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["QSO_DATE"], halign=Gtk.Align.START)
-        label.set_width_chars(15)
-        label.set_alignment(0, 0.5)
-        hbox_temp.pack_start(label, False, False, 2)
-        self.sources["QSO_DATE"] = Gtk.Entry()
-        self.sources["QSO_DATE"].set_width_chars(15)
-        hbox_temp.pack_start(self.sources["QSO_DATE"], False, False, 2)
-        icon = Gtk.Image()
-        icon.set_from_stock(Gtk.STOCK_GO_BACK, Gtk.IconSize.MENU)
-        button = Gtk.Button()
-        button.add(icon)
-        button.connect("clicked", self.calendar_callback)
-        button.set_tooltip_text("Select date from calendar")
-        hbox_temp.pack_start(button, True, True, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
+        self.sources["QSO_DATE"] = self.builder.get_object("qso_date_entry")
+        self.builder.get_object("select_date").connect("clicked", self.calendar_callback)
 
         # TIME
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["TIME_ON"], halign=Gtk.Align.START)
-        label.set_alignment(0, 0.5)
-        label.set_width_chars(15)
-        hbox_temp.pack_start(label, False, False, 2)
-        self.sources["TIME_ON"] = Gtk.Entry()
-        self.sources["TIME_ON"].set_width_chars(15)
-        hbox_temp.pack_start(self.sources["TIME_ON"], False, False, 2)
-        icon = Gtk.Image()
-        icon.set_from_stock(Gtk.STOCK_MEDIA_PLAY, Gtk.IconSize.MENU)
-        button = Gtk.Button()
-        button.add(icon)
-        button.connect("clicked", self.set_current_datetime_callback)
-        button.set_tooltip_text("Use the current time and date")
-        hbox_temp.pack_start(button, True, True, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
+        self.sources["TIME_ON"] = self.builder.get_object("qso_time_entry")
+        self.builder.get_object("current_datetime").connect("clicked", self.set_current_datetime_callback)
 
         # FREQ
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["FREQ"], halign=Gtk.Align.START)
-        label.set_alignment(0, 0.5)
-        label.set_width_chars(15)
-        hbox_temp.pack_start(label, False, False, 2)
-        self.sources["FREQ"] = Gtk.Entry()
-        self.sources["FREQ"].set_width_chars(15)
-        hbox_temp.pack_start(self.sources["FREQ"], False, False, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
+        self.sources["FREQ"] = self.builder.get_object("qso_frequency_entry")
 
         # BAND
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["BAND"], halign=Gtk.Align.START)
-        label.set_alignment(0, 0.5)
-        label.set_width_chars(15)
-        hbox_temp.pack_start(label, False, False, 2)
-
-        self.sources["BAND"] = Gtk.ComboBoxText()
+        self.sources["BAND"] = self.builder.get_object("qso_band_combo")
         for band in BANDS:
             self.sources["BAND"].append_text(band)
         self.sources["BAND"].set_active(0)  # Set an empty string as the default option.
-        hbox_temp.pack_start(self.sources["BAND"], False, False, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
 
         # MODE
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["MODE"])
-        label.set_alignment(0, 0.5)
-        label.set_width_chars(15)
-        hbox_temp.pack_start(label, False, False, 2)
-
-        self.sources["MODE"] = Gtk.ComboBoxText()
+        self.sources["MODE"] = self.builder.get_object("qso_mode_combo")
         for mode in sorted(MODES.keys()):
             self.sources["MODE"].append_text(mode)
         self.sources["MODE"].set_active(0)  # Set an empty string as the default option.
         self.sources["MODE"].connect("changed", self._on_mode_changed)
-        hbox_temp.pack_start(self.sources["MODE"], False, False, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
 
         # SUBMODE
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["SUBMODE"])
-        label.set_alignment(0, 0.5)
-        label.set_width_chars(15)
-        hbox_temp.pack_start(label, False, False, 2)
-
-        self.sources["SUBMODE"] = Gtk.ComboBoxText()
+        self.sources["SUBMODE"] = self.builder.get_object("qso_submode_combo")
         self.sources["SUBMODE"].append_text("")
         self.sources["SUBMODE"].set_active(0)  # Set an empty string initially. As soon as the user selects a particular MODE, the available SUBMODES will appear.
-        hbox_temp.pack_start(self.sources["SUBMODE"], False, False, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
 
         # POWER
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["TX_PWR"], halign=Gtk.Align.START)
-        label.set_alignment(0, 0.5)
-        label.set_width_chars(15)
-        hbox_temp.pack_start(label, False, False, 2)
-        self.sources["TX_PWR"] = Gtk.Entry()
-        self.sources["TX_PWR"].set_width_chars(15)
-        hbox_temp.pack_start(self.sources["TX_PWR"], False, False, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
-
-        vbox_inner = Gtk.VBox(spacing=2)
-        hbox_inner.pack_start(Gtk.SeparatorToolItem(), False, False, 0)
-        hbox_inner.pack_start(vbox_inner, True, True, 2)
+        self.sources["TX_PWR"] = self.builder.get_object("qso_power_entry")
 
         # RST_SENT
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["RST_SENT"])
-        label.set_alignment(0, 0.5)
-        label.set_width_chars(15)
-        hbox_temp.pack_start(label, False, False, 2)
-        self.sources["RST_SENT"] = Gtk.Entry()
-        self.sources["RST_SENT"].set_width_chars(15)
-        hbox_temp.pack_start(self.sources["RST_SENT"], False, False, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
+        self.sources["RST_SENT"] = self.builder.get_object("qso_rst_sent_entry")
 
         # RST_RCVD
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["RST_RCVD"])
-        label.set_alignment(0, 0.5)
-        label.set_width_chars(15)
-        hbox_temp.pack_start(label, False, False, 2)
-        self.sources["RST_RCVD"] = Gtk.Entry()
-        self.sources["RST_RCVD"].set_width_chars(15)
-        hbox_temp.pack_start(self.sources["RST_RCVD"], False, False, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
+        self.sources["RST_RCVD"] = self.builder.get_object("qso_rst_received_entry")
 
         # QSL_SENT
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["QSL_SENT"])
-        label.set_alignment(0, 0.5)
-        label.set_width_chars(15)
-        hbox_temp.pack_start(label, False, False, 2)
+        self.sources["QSL_SENT"] = self.builder.get_object("qso_qsl_sent_combo")
         qsl_options = ["", "Y", "N", "R", "I"]
-        self.sources["QSL_SENT"] = Gtk.ComboBoxText()
         for option in qsl_options:
             self.sources["QSL_SENT"].append_text(option)
         self.sources["QSL_SENT"].set_active(0)  # Set an empty string as the default option.
-        hbox_temp.pack_start(self.sources["QSL_SENT"], False, False, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
 
         # QSL_RCVD
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["QSL_RCVD"])
-        label.set_alignment(0, 0.5)
-        label.set_width_chars(15)
-        hbox_temp.pack_start(label, False, False, 2)
+        self.sources["QSL_RCVD"] = self.builder.get_object("qso_qsl_received_combo")
         qsl_options = ["", "Y", "N", "R", "I"]
-        self.sources["QSL_RCVD"] = Gtk.ComboBoxText()
         for option in qsl_options:
             self.sources["QSL_RCVD"].append_text(option)
         self.sources["QSL_RCVD"].set_active(0)  # Set an empty string as the default option.
-        hbox_temp.pack_start(self.sources["QSL_RCVD"], False, False, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
 
         # NOTES
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["NOTES"])
-        label.set_alignment(0, 0.5)
-        label.set_width_chars(15)
-        hbox_temp.pack_start(label, False, False, 2)
-        self.textview = Gtk.TextView()
-        sw = Gtk.ScrolledWindow()
-        sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
-        sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        sw.add(self.textview)
-        self.sources["NOTES"] = self.textview.get_buffer()
-        hbox_temp.pack_start(sw, True, True, 2)
-        vbox_inner.pack_start(hbox_temp, True, True, 2)
+        self.sources["NOTES"] = self.builder.get_object("qso_notes_textview").get_buffer()
 
-        qso_frame.add(hbox_inner)
-
-        # STATION INFORMATION FRAME
-        station_frame = Gtk.Frame()
-        station_frame.set_label("Station Information")
-        self.vbox.add(station_frame)
-
-        hbox_inner = Gtk.HBox(spacing=2)
-
-        vbox_inner = Gtk.VBox(spacing=2)
-        hbox_inner.pack_start(vbox_inner, True, True, 2)
+        # STATION INFORMATION
 
         # NAME
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["NAME"], halign=Gtk.Align.START)
-        label.set_width_chars(15)
-        label.set_alignment(0, 0.5)
-        hbox_temp.pack_start(label, False, False, 2)
-        self.sources["NAME"] = Gtk.Entry()
-        self.sources["NAME"].set_width_chars(15)
-        hbox_temp.pack_start(self.sources["NAME"], False, False, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
+        self.sources["NAME"] = self.builder.get_object("station_name_entry")
 
         # ADDRESS
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["ADDRESS"], halign=Gtk.Align.START)
-        label.set_width_chars(15)
-        label.set_alignment(0, 0.5)
-        hbox_temp.pack_start(label, False, False, 2)
-        self.sources["ADDRESS"] = Gtk.Entry()
-        self.sources["ADDRESS"].set_width_chars(15)
-        hbox_temp.pack_start(self.sources["ADDRESS"], False, False, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
+        self.sources["ADDRESS"] = self.builder.get_object("station_address_entry")
 
         # STATE
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["STATE"], halign=Gtk.Align.START)
-        label.set_width_chars(15)
-        label.set_alignment(0, 0.5)
-        hbox_temp.pack_start(label, False, False, 2)
-        self.sources["STATE"] = Gtk.Entry()
-        self.sources["STATE"].set_width_chars(15)
-        hbox_temp.pack_start(self.sources["STATE"], False, False, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
+        self.sources["STATE"] = self.builder.get_object("station_state_entry")
 
         # COUNTRY
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["COUNTRY"], halign=Gtk.Align.START)
-        label.set_width_chars(15)
-        label.set_alignment(0, 0.5)
-        hbox_temp.pack_start(label, False, False, 2)
-        self.sources["COUNTRY"] = Gtk.Entry()
-        self.sources["COUNTRY"].set_width_chars(15)
-        hbox_temp.pack_start(self.sources["COUNTRY"], False, False, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
-
-        vbox_inner = Gtk.VBox(spacing=2)
-        hbox_inner.pack_start(Gtk.SeparatorToolItem(), False, False, 0)
-        hbox_inner.pack_start(vbox_inner, True, True, 2)
+        self.sources["COUNTRY"] = self.builder.get_object("station_country_entry")
 
         # DXCC
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["DXCC"], halign=Gtk.Align.START)
-        label.set_width_chars(15)
-        label.set_alignment(0, 0.5)
-        hbox_temp.pack_start(label, False, False, 2)
-        self.sources["DXCC"] = Gtk.Entry()
-        self.sources["DXCC"].set_width_chars(15)
-        hbox_temp.pack_start(self.sources["DXCC"], False, False, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
+        self.sources["DXCC"] = self.builder.get_object("station_dxcc_entry")
 
         # CQZ
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["CQZ"], halign=Gtk.Align.START)
-        label.set_width_chars(15)
-        label.set_alignment(0, 0.5)
-        hbox_temp.pack_start(label, False, False, 2)
-        self.sources["CQZ"] = Gtk.Entry()
-        self.sources["CQZ"].set_width_chars(15)
-        hbox_temp.pack_start(self.sources["CQZ"], False, False, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
+        self.sources["CQZ"] = self.builder.get_object("station_cq_entry")
 
         # ITUZ
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["ITUZ"], halign=Gtk.Align.START)
-        label.set_width_chars(15)
-        label.set_alignment(0, 0.5)
-        hbox_temp.pack_start(label, False, False, 2)
-        self.sources["ITUZ"] = Gtk.Entry()
-        self.sources["ITUZ"].set_width_chars(15)
-        hbox_temp.pack_start(self.sources["ITUZ"], False, False, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
+        self.sources["ITUZ"] = self.builder.get_object("station_itu_entry")
 
         # IOTA
-        hbox_temp = Gtk.HBox(spacing=0)
-        label = Gtk.Label(AVAILABLE_FIELD_NAMES_FRIENDLY["IOTA"], halign=Gtk.Align.START)
-        label.set_width_chars(15)
-        label.set_alignment(0, 0.5)
-        hbox_temp.pack_start(label, False, False, 2)
-        self.sources["IOTA"] = Gtk.Entry()
-        self.sources["IOTA"].set_width_chars(15)
-        hbox_temp.pack_start(self.sources["IOTA"], False, False, 2)
-        vbox_inner.pack_start(hbox_temp, False, False, 2)
-
-        station_frame.add(hbox_inner)
+        self.sources["IOTA"] = self.builder.get_object("station_iota_entry")
 
         # Populate various fields, if possible.
         if(index is not None):
@@ -444,7 +237,7 @@ class RecordDialog(Gtk.Dialog):
             # If no configuration file exists, autocomplete the Band field by default.
             self.sources["FREQ"].connect("changed", self._autocomplete_band)
 
-        self.show_all()
+        self.dialog.show_all()
 
         logging.debug("Record dialog ready!")
 
@@ -483,6 +276,13 @@ class RecordDialog(Gtk.Dialog):
         text = combo.get_active_text()
         for submode in MODES[text]:
             self.sources["SUBMODE"].append_text(submode)
+        return
+
+    def _on_key_release(self, widget, event):
+        """ If the Return key is pressed, emit the "OK" response to record the QSO. """
+        child = widget.get_focus()
+        if(not(isinstance(child, Gtk.ToggleButton) or isinstance(child, Gtk.Button) or isinstance(child, Gtk.TextView)) and event.keyval == Gdk.KEY_Return):
+            self.dialog.emit('response', Gtk.ResponseType.OK)
         return
 
     def _autocomplete_band(self, widget=None):
@@ -551,7 +351,7 @@ class RecordDialog(Gtk.Dialog):
             logging.error("Could not close the communication channel to the rig via Hamlib!")
             return
 
-    def lookup_callback(self, widget=None):
+    def callsign_lookup_callback(self, widget=None):
         """ Get the callsign-related data from an online database and store it in the relevant Gtk.Entry boxes, but return None. """
 
         # Get the database name.
@@ -565,16 +365,16 @@ class RecordDialog(Gtk.Dialog):
             else:
                 raise ValueError
         except ValueError:
-            error(parent=self, message="To perform a callsign lookup, please specify the name of the callsign database in the Preferences.")
+            error(parent=self.dialog, message="To perform a callsign lookup, please specify the name of the callsign database in the Preferences.")
             return
 
         try:
             if(database == "qrz.com"):
                 # QRZ.com
-                callsign_lookup = CallsignLookupQRZ(parent=self)
+                callsign_lookup = CallsignLookupQRZ(application=self.application)
             elif(database == "hamqth.com"):
                 # HamQTH
-                callsign_lookup = CallsignLookupHamQTH(parent=self)
+                callsign_lookup = CallsignLookupHamQTH(application=self.application)
             else:
                 raise ValueError("Unknown callsign database: %s" % database)
         except ValueError as e:
@@ -593,7 +393,7 @@ class RecordDialog(Gtk.Dialog):
         else:
             details_given = False
         if(not details_given):
-            error(parent=self, message="To perform a callsign lookup, please specify your username and password in the Preferences.")
+            error(parent=self.dialog, message="To perform a callsign lookup, please specify your username and password in the Preferences.")
             return
 
         # Connect and look up
@@ -614,12 +414,11 @@ class RecordDialog(Gtk.Dialog):
 
     def calendar_callback(self, widget):
         """ Open up a calendar widget for easy QSO_DATE selection. Return None after the user destroys the dialog. """
-        calendar = CalendarDialog(parent=self)
-        response = calendar.run()
+        c = CalendarDialog(self.application)
+        response = c.dialog.run()
         if(response == Gtk.ResponseType.OK):
-            date = calendar.get_date()
-            self.sources["QSO_DATE"].set_text(date)
-        calendar.destroy()
+            self.sources["QSO_DATE"].set_text(c.date)
+        c.dialog.destroy()
         return
 
     def set_current_datetime_callback(self, widget=None):
@@ -644,39 +443,3 @@ class RecordDialog(Gtk.Dialog):
         self.sources["TIME_ON"].set_text(dt.strftime("%H%M"))
 
         return
-
-
-class CalendarDialog(Gtk.Dialog):
-
-    """ A simple dialog containing a Gtk.Calendar widget. Using this ensures the date is in the correct YYYYMMDD format required by ADIF. """
-
-    def __init__(self, parent):
-        """ Set up the calendar widget and show it to the user.
-
-        :arg parent: The parent Gtk window/dialog.
-        """
-        logging.debug("Setting up a calendar dialog...")
-        Gtk.Dialog.__init__(self, title="Select Date", parent=parent, flags=Gtk.DialogFlags.DESTROY_WITH_PARENT, buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
-        self.calendar = Gtk.Calendar()
-        self.vbox.add(self.calendar)
-        self.show_all()
-        logging.debug("Calendar dialog ready!")
-        return
-
-    def get_date(self):
-        """ Return the date from the Gtk.Calendar widget in YYYYMMDD format.
-
-        :returns: The date from the calendar in YYYYMMDD format.
-        :rtype: str
-        """
-        logging.debug("Retrieving the date from the calendar widget...")
-        (year, month, day) = self.calendar.get_date()
-        # If necessary, add on leading zeros so the YYYYMMDD format is followed.
-        if(month + 1 < 10):
-            month = "0" + str(month + 1)  # Note: the months start from an index of 0 when retrieved from the calendar widget.
-        else:
-            month += 1
-        if(day < 10):
-            day = "0" + str(day)
-        date = str(year) + str(month) + str(day)
-        return date

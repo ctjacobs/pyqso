@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#    Copyright (C) 2012-2017 Christian T. Jacobs.
+#    Copyright (C) 2012-2017 Christian Thomas Jacobs.
 
 #    This file is part of PyQSO.
 
@@ -17,6 +17,9 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
+from gi import require_version
+require_version('Gtk', '3.0')
+require_version('PangoCairo', '1.0')
 from gi.repository import Gtk, GdkPixbuf
 import argparse
 try:
@@ -34,7 +37,7 @@ sys.path.insert(0, pyqso_path)
 
 import logging
 logging.basicConfig(level=logging.INFO)
-logging.info("PyQSO version 0.4")
+logging.info("PyQSO version 1.0.0")
 
 # PyQSO modules
 from pyqso.adif import *
@@ -45,7 +48,7 @@ from pyqso.toolbox import *
 from pyqso.preferences_dialog import *
 
 
-class PyQSO(Gtk.Window):
+class PyQSO:
 
     """ The PyQSO application class. """
 
@@ -55,8 +58,9 @@ class PyQSO(Gtk.Window):
         :arg str logbook_path: An optional argument containing the path of the logbook file to open. If no value is provided, this defaults to None and no logbook is opened.
         """
 
-        # Call the constructor of the super class (Gtk.Window)
-        Gtk.Window.__init__(self, title="PyQSO")
+        self.builder = Gtk.Builder()
+        self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/../pyqso/glade/pyqso.glade")
+        self.window = self.builder.get_object("pyqso")
 
         # Check that the directory for holding PyQSO configuration files exists. If it doesn't, create it now.
         config_directory = os.path.expanduser('~/.config/pyqso')
@@ -74,45 +78,30 @@ class PyQSO(Gtk.Window):
         # otherwise, we will resort to the defaults.
         have_config = (config.read(os.path.expanduser("~/.config/pyqso/preferences.ini")) != [])
 
-        self.set_size_request(800, 600)  # Default to an 800 x 600 resolution.
-        self.set_position(Gtk.WindowPosition.CENTER)
         possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
         for icon_path in possible_icon_paths:
             try:
-                self.set_icon_from_file(icon_path)
-            except Exception as error:
-                print(error.message)
+                self.window.set_icon_from_file(icon_path)
+            except Exception as e:
+                logging.error(e)
 
         # Kills the application if the close button is clicked on the main window itself.
-        self.connect("delete-event", Gtk.main_quit)
+        self.window.connect("delete-event", Gtk.main_quit)
 
-        vbox_outer = Gtk.VBox()
-        self.add(vbox_outer)
-
-        self.statusbar = Gtk.Statusbar()
+        self.statusbar = self.builder.get_object("statusbar")
         context_id = self.statusbar.get_context_id("Status")
         self.statusbar.push(context_id, "No logbook is currently open.")
 
         # Create a Logbook so we can add/remove/edit logs and records,
         # once connected to the SQLite database.
         self.logbook = Logbook(self)
-        self.logbook.set_scrollable(True)
-
         self.toolbox = Toolbox(self)
 
-        # Set up menu and tool bars
-        # These classes depend on the Logbook and Toolbox class,
-        # so pack the logbook and toolbox after the menu and toolbar.
+        # Set up menu and tool bars. These classes depend on the Logbook and Toolbox class.
         self.menu = Menu(self)
         self.toolbar = Toolbar(self)
 
-        vbox_outer.pack_start(self.menu, False, False, 0)
-        vbox_outer.pack_start(self.toolbar, False, False, 0)
-        vbox_outer.pack_start(self.logbook, True, True, 0)
-        vbox_outer.pack_start(self.toolbox, True, True, 0)
-        vbox_outer.pack_start(self.statusbar, False, False, 0)
-
-        self.show_all()
+        self.window.show_all()
 
         if(have_config):
             if(config.get("general", "show_toolbox") == "False"):
@@ -141,31 +130,14 @@ class PyQSO(Gtk.Window):
 
     def show_about(self, widget):
         """ Show the About dialog, which includes license information. """
-        about = Gtk.AboutDialog()
-        about.set_modal(True)
-        about.set_transient_for(parent=self)
-        about.set_program_name("PyQSO")
-        about.set_version("0.4")
-        about.set_authors(["Christian T. Jacobs (2E0ICL)"])
-        about.set_license("""This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.""")
-        about.set_comments("PyQSO: A contact logging tool for amateur radio operators.")
+        self.builder.add_objects_from_file(os.path.abspath(os.path.dirname(__file__)) + "/../pyqso/glade/pyqso.glade", ("about_dialog",))
+        about = self.builder.get_object("about_dialog")
         possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
         for icon_path in possible_icon_paths:
             try:
                 about.set_logo(GdkPixbuf.Pixbuf.new_from_file_at_scale(icon_path, 64, 64, False))
-            except Exception as error:
-                print(error.message)
+            except Exception as e:
+                logging.exception(e)
         about.run()
         about.destroy()
         return
@@ -173,10 +145,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.""")
     def show_preferences(self, widget):
         """ Show the Preferences dialog. Any changes made by the user after clicking the 'Ok' button are saved in the .cfg file. """
         preferences = PreferencesDialog(self)
-        response = preferences.run()
+        response = preferences.dialog.run()
         if(response == Gtk.ResponseType.OK):
             preferences.commit()
-        preferences.destroy()
+        preferences.dialog.destroy()
         return
 
 if(__name__ == "__main__"):

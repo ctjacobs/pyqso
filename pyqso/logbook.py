@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#    Copyright (C) 2012-2017 Christian T. Jacobs.
+#    Copyright (C) 2012-2017 Christian Thomas Jacobs.
 
 #    This file is part of PyQSO.
 
@@ -20,13 +20,21 @@
 from gi.repository import Gtk, Pango, PangoCairo
 import logging
 import sqlite3 as sqlite
+import os
 from os.path import basename, getmtime, expanduser
 from datetime import datetime, date
+try:
+    import unittest.mock as mock
+except ImportError:
+    import mock
 try:
     import configparser
 except ImportError:
     import ConfigParser as configparser
 try:
+    import matplotlib
+    matplotlib.use('Agg')
+    matplotlib.rcParams['font.size'] = 10.0
     from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
     from matplotlib.figure import Figure
     from matplotlib.dates import DateFormatter, MonthLocator
@@ -38,23 +46,24 @@ except ImportError as e:
 
 from pyqso.adif import *
 from pyqso.log import *
-from pyqso.log_name_dialog import *
 from pyqso.auxiliary_dialogs import *
+from pyqso.log_name_dialog import LogNameDialog
+from pyqso.record_dialog import RecordDialog
 
 
-class Logbook(Gtk.Notebook):
+class Logbook:
 
     """ A Logbook object can store multiple Log objects. """
 
-    def __init__(self, parent):
+    def __init__(self, application):
         """ Create a new Logbook object and initialise the list of Logs.
 
-        :arg parent: The parent Gtk window.
+        :arg application: The PyQSO application containing the main Gtk window, etc.
         """
 
-        Gtk.Notebook.__init__(self)
-
-        self.parent = parent
+        self.application = application
+        self.builder = self.application.builder
+        self.notebook = self.builder.get_object("logbook")
         self.connection = None
         self.summary = {}
         self.logs = []
@@ -66,10 +75,10 @@ class Logbook(Gtk.Notebook):
 
         # Get the new file's path from a dialog.
         dialog = Gtk.FileChooserDialog("Create a New SQLite Database File",
-                                       self.parent,
+                                       self.application.window,
                                        Gtk.FileChooserAction.SAVE,
-                                      (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                                       Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                        Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
         dialog.set_do_overwrite_confirmation(True)
 
         response = dialog.run()
@@ -98,10 +107,10 @@ class Logbook(Gtk.Notebook):
         if(path is None):
             # If no path has been provided, get one from a "File Open" dialog.
             dialog = Gtk.FileChooserDialog("Open SQLite Database File",
-                                           self.parent,
+                                           self.application.window,
                                            Gtk.FileChooserAction.OPEN,
-                                          (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                                           Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+                                           (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                            Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
 
             response = dialog.run()
             if(response == Gtk.ResponseType.OK):
@@ -130,7 +139,7 @@ class Logbook(Gtk.Notebook):
                         self.logs.append(l)
             except (sqlite.Error, IndexError) as e:
                 logging.exception(e)
-                error(parent=self.parent, message="Oops! Something went wrong when trying to retrieve the logs from the logbook. Perhaps the logbook file is encrypted, corrupted, or in the wrong format?")
+                error(parent=self.application.window, message="Oops! Something went wrong when trying to retrieve the logs from the logbook. Perhaps the logbook file is encrypted, corrupted, or in the wrong format?")
                 return
 
             logging.debug("All logs retrieved successfully. Now attempting to render them all in the Gtk.Notebook...")
@@ -144,23 +153,23 @@ class Logbook(Gtk.Notebook):
 
             # FIXME: This is an unfortunate work-around. If the area around the "+/New Log" button
             # is clicked, PyQSO will change to an empty page. This signal is used to stop this from happening.
-            self.connect("switch-page", self._on_switch_page)
+            self.notebook.connect("switch-page", self._on_switch_page)
 
             for i in range(len(self.logs)):
                 self._render_log(i)
             logging.debug("All logs rendered successfully.")
 
             self.update_summary()
-            self.parent.toolbox.awards.count()
+            self.application.toolbox.awards.count(self)
 
-            context_id = self.parent.statusbar.get_context_id("Status")
-            self.parent.statusbar.push(context_id, "Logbook: %s" % self.path)
-            self.parent.toolbar.set_logbook_button_sensitive(False)
-            self.parent.menu.set_logbook_item_sensitive(False)
-            self.parent.menu.set_log_items_sensitive(True)
-            self.parent.toolbar.filter_source.set_sensitive(True)
+            context_id = self.application.statusbar.get_context_id("Status")
+            self.application.statusbar.push(context_id, "Logbook: %s" % self.path)
+            self.application.toolbar.set_logbook_button_sensitive(False)
+            self.application.menu.set_logbook_item_sensitive(False)
+            self.application.menu.set_log_items_sensitive(True)
+            self.application.toolbar.filter_source.set_sensitive(True)
 
-            self.show_all()
+            self.notebook.show_all()
 
         else:
             logging.debug("Not connected to a logbook. No logs were opened.")
@@ -173,18 +182,18 @@ class Logbook(Gtk.Notebook):
         disconnected = self.db_disconnect()
         if(disconnected):
             logging.debug("Closing all logs in the logbook...")
-            while(self.get_n_pages() > 0):
+            while(self.notebook.get_n_pages() > 0):
                 # Once a page is removed, the other pages get re-numbered,
                 # so a 'for' loop isn't the best option here.
-                self.remove_page(0)
+                self.notebook.remove_page(0)
             logging.debug("All logs now closed.")
 
-            context_id = self.parent.statusbar.get_context_id("Status")
-            self.parent.statusbar.push(context_id, "No logbook is currently open.")
-            self.parent.toolbar.set_logbook_button_sensitive(True)
-            self.parent.menu.set_logbook_item_sensitive(True)
-            self.parent.menu.set_log_items_sensitive(False)
-            self.parent.toolbar.filter_source.set_sensitive(False)
+            context_id = self.application.statusbar.get_context_id("Status")
+            self.application.statusbar.push(context_id, "No logbook is currently open.")
+            self.application.toolbar.set_logbook_button_sensitive(True)
+            self.application.menu.set_logbook_item_sensitive(True)
+            self.application.menu.set_log_items_sensitive(False)
+            self.application.toolbar.filter_source.set_sensitive(False)
         else:
             logging.debug("Unable to disconnect from the database. No logs were closed.")
         return
@@ -204,7 +213,7 @@ class Logbook(Gtk.Notebook):
         except sqlite.Error as e:
             # PyQSO can't connect to the database.
             logging.exception(e)
-            error(parent=self.parent, message="PyQSO cannot connect to the database. Check file permissions?")
+            error(parent=self.application.window, message="PyQSO cannot connect to the database. Check file permissions?")
             return False
 
         logging.debug("Database connection created successfully!")
@@ -253,9 +262,9 @@ class Logbook(Gtk.Notebook):
         hbox.show_all()
         vbox.show_all()
 
-        self.insert_page(vbox, hbox, 1)
-        self.show_all()
-        self.set_current_page(0)
+        self.notebook.insert_page(vbox, hbox, 1)
+        self.notebook.show_all()
+        self.notebook.set_current_page(0)
         return
 
     def _create_summary_page(self):
@@ -327,8 +336,8 @@ class Logbook(Gtk.Notebook):
         hbox.pack_start(icon, False, False, 0)
         hbox.show_all()
 
-        self.insert_page(vbox, hbox, 0)  # Append as a new tab
-        self.show_all()
+        self.notebook.insert_page(vbox, hbox, 0)  # Append as a new tab
+        self.notebook.show_all()
 
         return
 
@@ -458,16 +467,16 @@ class Logbook(Gtk.Notebook):
     def _on_switch_page(self, widget, label, new_page):
         """ Handle a tab/page change, and enable/disable the relevant Record-related buttons. """
 
-        if(new_page == self.get_n_pages()-1):  # The last (right-most) tab is the "New Log" tab.
-            self.stop_emission("switch-page")
+        if(new_page == self.notebook.get_n_pages()-1):  # The last (right-most) tab is the "New Log" tab.
+            self.notebook.stop_emission("switch-page")
 
         # Disable the record buttons if a log page is not selected.
         if(new_page == 0):
-            self.parent.toolbar.set_record_buttons_sensitive(False)
-            self.parent.menu.set_record_items_sensitive(False)
+            self.application.toolbar.set_record_buttons_sensitive(False)
+            self.application.menu.set_record_items_sensitive(False)
         else:
-            self.parent.toolbar.set_record_buttons_sensitive(True)
-            self.parent.menu.set_record_items_sensitive(True)
+            self.application.toolbar.set_record_buttons_sensitive(True)
+            self.application.menu.set_record_items_sensitive(True)
         return
 
     def new_log(self, widget=None):
@@ -476,11 +485,11 @@ class Logbook(Gtk.Notebook):
         if(self.connection is None):
             return
         exists = True
-        dialog = LogNameDialog(self.parent)
+        ln = LogNameDialog(self.application)
         while(exists):
-            response = dialog.run()
+            response = ln.dialog.run()
             if(response == Gtk.ResponseType.OK):
-                log_name = dialog.get_log_name()
+                log_name = ln.name
                 try:
                     with self.connection:
                         c = self.connection.cursor()
@@ -494,13 +503,13 @@ class Logbook(Gtk.Notebook):
                 except sqlite.Error as e:
                     logging.exception(e)
                     # Data is not valid - inform the user.
-                    error(parent=self.parent, message="Database error. Try another log name.")
+                    error(parent=ln.dialog, message="Database error. Try another log name.")
                     exists = True
             else:
-                dialog.destroy()
+                ln.dialog.destroy()
                 return
 
-        dialog.destroy()
+        ln.dialog.destroy()
 
         l = Log(self.connection, log_name)  # Empty log
         l.populate()
@@ -509,7 +518,7 @@ class Logbook(Gtk.Notebook):
         self._render_log(self.get_number_of_logs()-1)
         self.update_summary()
 
-        self.set_current_page(self.get_number_of_logs())
+        self.notebook.set_current_page(self.get_number_of_logs())
         return
 
     def delete_log(self, widget, page=None):
@@ -521,25 +530,25 @@ class Logbook(Gtk.Notebook):
             return
 
         if(page is None):
-            page_index = self.get_current_page()  # Gets the index of the selected tab in the logbook
+            page_index = self.notebook.get_current_page()  # Gets the index of the selected tab in the logbook
             if(page_index == 0):  # If we are on the Summary page...
                 logging.debug("No log currently selected!")
                 return
             else:
-                page = self.get_nth_page(page_index)  # Gets the Gtk.VBox of the selected tab in the logbook
+                page = self.notebook.get_nth_page(page_index)  # Gets the Gtk.VBox of the selected tab in the logbook
 
         log_index = self._get_log_index(name=page.get_name())
         log = self.logs[log_index]
 
         # We also need the page's index in order to remove it using remove_page below.
         # This may not be the same as what self.get_current_page() returns.
-        page_index = self.page_num(page)
+        page_index = self.notebook.page_num(page)
 
-        if(page_index == 0 or page_index == self.get_n_pages()-1):  # Only the "New Log" tab is present (i.e. no actual logs in the logbook)
+        if(page_index == 0 or page_index == self.notebook.get_n_pages()-1):  # Only the "New Log" tab is present (i.e. no actual logs in the logbook)
             logging.debug("No logs to delete!")
             return
 
-        response = question(parent=self.parent, message="Are you sure you want to delete log %s?" % log.name)
+        response = question(parent=self.application.window, message="Are you sure you want to delete log %s?" % log.name)
         if(response == Gtk.ResponseType.YES):
             try:
                 with self.connection:
@@ -547,7 +556,7 @@ class Logbook(Gtk.Notebook):
                     c.execute("DROP TABLE %s" % log.name)
             except sqlite.Error as e:
                 logging.exception(e)
-                error(parent=self.parent, message="Database error. Could not delete the log.")
+                error(parent=self.application.window, message="Database error. Could not delete the log.")
                 return
 
             self.logs.pop(log_index)
@@ -557,10 +566,10 @@ class Logbook(Gtk.Notebook):
             self.sorter.pop(log_index)
             self.filter.pop(log_index)
             # And finally remove the tab in the Logbook
-            self.remove_page(page_index)
+            self.notebook.remove_page(page_index)
 
         self.update_summary()
-        self.parent.toolbox.awards.count()
+        self.application.toolbox.awards.count(self)
         return
 
     def filter_logs(self, widget=None):
@@ -579,7 +588,7 @@ class Logbook(Gtk.Notebook):
         :rtype: bool
         """
         value = model.get_value(iter, 1)
-        callsign = self.parent.toolbar.filter_source.get_text()
+        callsign = self.application.toolbar.filter_source.get_text()
 
         if(callsign is None or callsign == ""):
             # If there is nothing to filter with, then show all the records!
@@ -620,7 +629,7 @@ class Logbook(Gtk.Notebook):
         hbox.pack_start(label, False, False, 0)
         hbox.show_all()
 
-        self.insert_page(vbox, hbox, index+1)  # Append the new log as a new tab
+        self.notebook.insert_page(vbox, hbox, index+1)  # Append the new log as a new tab
 
         # The first column of the logbook will always be the unique record index.
         # Let's append this separately to the field names.
@@ -659,7 +668,7 @@ class Logbook(Gtk.Notebook):
                 column.set_visible(config.get(section, option) == "True")
             self.treeview[index].append_column(column)
 
-        self.show_all()
+        self.notebook.show_all()
         return
 
     def _compare_date_and_time(self, model, row1, row2, user_data):
@@ -756,21 +765,21 @@ class Logbook(Gtk.Notebook):
         """ Rename the log that is currently selected. """
         if(self.connection is None):
             return
-        page_index = self.get_current_page()
+        page_index = self.notebook.get_current_page()
         if(page_index == 0):  # If we are on the Summary page...
             logging.debug("No log currently selected!")
             return
-        page = self.get_nth_page(page_index)  # Gets the Gtk.VBox of the selected tab in the logbook
+        page = self.notebook.get_nth_page(page_index)  # Gets the Gtk.VBox of the selected tab in the logbook
         old_log_name = page.get_name()
 
         log_index = self._get_log_index(name=old_log_name)
 
         exists = True
-        dialog = LogNameDialog(self.parent, title="Rename Log", name=old_log_name)
+        ln = LogNameDialog(self.application, title="Rename Log", name=old_log_name)
         while(exists):
-            response = dialog.run()
+            response = ln.dialog.run()
             if(response == Gtk.ResponseType.OK):
-                new_log_name = dialog.get_log_name()
+                new_log_name = ln.name
                 try:
                     with self.connection:
                         c = self.connection.cursor()
@@ -780,13 +789,13 @@ class Logbook(Gtk.Notebook):
                 except sqlite.Error as e:
                     logging.exception(e)
                     # Data is not valid - inform the user.
-                    error(parent=self.parent, message="Database error. Try another log name.")
+                    error(parent=ln.dialog, message="Database error. Try another log name.")
                     exists = True
             else:
-                dialog.destroy()
+                ln.dialog.destroy()
                 return
 
-        dialog.destroy()
+        ln.dialog.destroy()
 
         # Remember to change the Log object's name...
         self.logs[log_index].name = new_log_name
@@ -799,7 +808,7 @@ class Logbook(Gtk.Notebook):
         label = Gtk.Label(new_log_name)
         hbox.pack_start(label, False, False, 0)
         hbox.show_all()
-        self.set_tab_label(page, hbox)
+        self.notebook.set_tab_label(page, hbox)
 
         # The number of logs will obviously stay the same, but
         # we want to update the logbook's modification date.
@@ -810,7 +819,7 @@ class Logbook(Gtk.Notebook):
     def import_log(self, widget=None):
         """ Import a log from an ADIF file. """
         dialog = Gtk.FileChooserDialog("Import ADIF Log File",
-                                       self.parent,
+                                       self.application.window,
                                        Gtk.FileChooserAction.OPEN,
                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                        Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
@@ -836,22 +845,22 @@ class Logbook(Gtk.Notebook):
             logging.debug("No file path specified.")
             return
 
-        dialog = LogNameDialog(self.parent, title="Import Log")
+        ln = LogNameDialog(self.application, title="Import Log")
         while(True):
-            response = dialog.run()
+            response = ln.dialog.run()
             if(response == Gtk.ResponseType.OK):
-                log_name = dialog.get_log_name()
+                log_name = ln.name
                 if(self.log_name_exists(log_name)):
                     # Import into existing log
                     exists = True
                     l = self.logs[self._get_log_index(name=log_name)]
-                    response = question(parent=self.parent, message="Are you sure you want to import into an existing log?")
+                    response = question(parent=ln.dialog, message="Are you sure you want to import into an existing log?")
                     if(response == Gtk.ResponseType.YES):
                         break
                 elif(self.log_name_exists(log_name) is None):
                     # Could not determine if the log name exists. It's safer to stop here than to try to add a new log.
-                    error(parent=self.parent, message="Database error. Could not check if the log name exists.")
-                    dialog.destroy()
+                    error(parent=ln.dialog, message="Database error. Could not check if the log name exists.")
+                    ln.dialog.destroy()
                     return
                 else:
                     # Create a new log with the name the user supplies
@@ -870,12 +879,12 @@ class Logbook(Gtk.Notebook):
                     except sqlite.Error as e:
                         logging.exception(e)
                         # Data is not valid - inform the user.
-                        error(parent=self.parent, message="Database error. Try another log name.")
+                        error(parent=ln.dialog, message="Database error. Try another log name.")
             else:
-                dialog.destroy()
+                ln.dialog.destroy()
                 return
 
-        dialog.destroy()
+        ln.dialog.destroy()
 
         adif = ADIF()
         logging.debug("Importing records from the ADIF file with path: %s" % path)
@@ -887,7 +896,7 @@ class Logbook(Gtk.Notebook):
             self.logs.append(l)
             self._render_log(self.get_number_of_logs()-1)
         self.update_summary()
-        self.parent.toolbox.awards.count()
+        self.application.toolbox.awards.count(self)
 
         return
 
@@ -902,7 +911,7 @@ class Logbook(Gtk.Notebook):
         log = self.logs[log_index]
 
         dialog = Gtk.FileChooserDialog("Export Log to File",
-                                       self.parent,
+                                       self.application.window,
                                        Gtk.FileChooserAction.SAVE,
                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
                                        Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
@@ -934,13 +943,13 @@ class Logbook(Gtk.Notebook):
             if(records is not None):
                 adif.write(records, path)
             else:
-                error(self.parent, "Could not retrieve the records from the SQL database. No records have been exported.")
+                error(self.application.window, "Could not retrieve the records from the SQL database. No records have been exported.")
         return
 
     def print_log(self, widget=None):
         """ Print all the records in the log (that is currently selected).
         Note that only a few important fields are printed because of the restricted width of the page. """
-        page_index = self.get_current_page()  # Gets the index of the selected tab in the logbook
+        page_index = self.notebook.get_current_page()  # Gets the index of the selected tab in the logbook
         if(page_index == 0):  # If we are on the Summary page...
             logging.debug("No log currently selected!")
             return
@@ -960,9 +969,9 @@ class Logbook(Gtk.Notebook):
 
             operation.connect("begin_print", self._begin_print)
             operation.connect("draw_page", self._draw_page)
-            operation.run(action, parent=self.parent)
+            operation.run(action, parent=self.application.window)
         else:
-            error(self.parent, "Could not retrieve the records from the SQL database. No records have been printed.")
+            error(self.application.window, "Could not retrieve the records from the SQL database. No records have been printed.")
         return
 
     def _begin_print(self, operation, context):
@@ -1024,7 +1033,7 @@ class Logbook(Gtk.Notebook):
             if(log_index is None):
                 raise ValueError("The log index could not be determined. Perhaps you tried adding a record when the Summary page was selected?")
         except ValueError as e:
-            error(self.parent, e)
+            error(self.application.window, e)
             return
         log = self.logs[log_index]
 
@@ -1040,7 +1049,7 @@ class Logbook(Gtk.Notebook):
 
         exit = False
         while not exit:
-            dialog = RecordDialog(parent=self.parent, log=log, index=None)
+            rd = RecordDialog(application=self.application, log=log, index=None)
 
             all_valid = False  # Are all the field entries valid?
 
@@ -1055,16 +1064,16 @@ class Logbook(Gtk.Notebook):
                 # The add/edit record window will stay open until the user gives valid data,
                 # or until the Cancel button is clicked.
                 all_valid = True
-                response = dialog.run()
+                response = rd.dialog.run()
                 if(response == Gtk.ResponseType.OK):
                     fields_and_data = {}
                     field_names = AVAILABLE_FIELD_NAMES_ORDERED
                     for i in range(0, len(field_names)):
                         # Validate user input.
-                        fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
+                        fields_and_data[field_names[i]] = rd.get_data(field_names[i])
                         if(not(adif.is_valid(field_names[i], fields_and_data[field_names[i]], AVAILABLE_FIELD_NAMES_TYPES[field_names[i]]))):
                             # Data is not valid - inform the user.
-                            error(parent=self.parent, message="The data in field \"%s\" is not valid!" % field_names[i])
+                            error(parent=rd.dialog, message="The data in field \"%s\" is not valid!" % field_names[i])
                             all_valid = False
                             break  # Don't check the other data until the user has fixed the current one.
 
@@ -1072,7 +1081,7 @@ class Logbook(Gtk.Notebook):
                         # All data has been validated, so we can go ahead and add the new record.
                         log.add_record(fields_and_data)
                         self.update_summary()
-                        self.parent.toolbox.awards.count()
+                        self.application.toolbox.awards.count(self)
                         # Select the new Record's row in the treeview.
                         number_of_records = log.get_number_of_records()
                         if(number_of_records is not None):
@@ -1080,7 +1089,7 @@ class Logbook(Gtk.Notebook):
                 else:
                     exit = True
                     break
-            dialog.destroy()
+            rd.dialog.destroy()
         return
 
     def delete_record_callback(self, widget):
@@ -1092,7 +1101,7 @@ class Logbook(Gtk.Notebook):
             if(log_index is None):
                 raise ValueError("The log index could not be determined. Perhaps you tried deleting a record when the Summary page was selected?")
         except ValueError as e:
-            error(self.parent, e)
+            error(self.application, e)
             return
         log = self.logs[log_index]
 
@@ -1107,13 +1116,13 @@ class Logbook(Gtk.Notebook):
             logging.debug("Trying to delete a record, but there are no records in the log!")
             return
 
-        response = question(parent=self.parent, message="Are you sure you want to delete record %d?" % row_index)
+        response = question(parent=self.application.window, message="Are you sure you want to delete record %d?" % row_index)
         if(response == Gtk.ResponseType.YES):
             # Deletes the record with index 'row_index' from the Records list.
             # 'iter' is needed to remove the record from the ListStore itself.
             log.delete_record(row_index, iter=child_iter)
             self.update_summary()
-            self.parent.toolbox.awards.count()
+            self.application.toolbox.awards.count(self)
         return
 
     def edit_record_callback(self, widget, path, view_column):
@@ -1128,7 +1137,7 @@ class Logbook(Gtk.Notebook):
             if(log_index is None):
                 raise ValueError("The log index could not be determined. Perhaps you tried editing a record when the Summary page was selected?")
         except ValueError as e:
-            error(self.parent, e)
+            error(self.application, e)
             return
         log = self.logs[log_index]
 
@@ -1143,7 +1152,7 @@ class Logbook(Gtk.Notebook):
             logging.debug("Could not find the selected row's index!")
             return
 
-        dialog = RecordDialog(parent=self.parent, log=self.logs[log_index], index=row_index)
+        rd = RecordDialog(application=self.application, log=self.logs[log_index], index=row_index)
         all_valid = False  # Are all the field entries valid?
 
         adif = ADIF()
@@ -1152,16 +1161,16 @@ class Logbook(Gtk.Notebook):
             # The add/edit record window will stay open until the user gives valid data,
             # or until the Cancel button is clicked.
             all_valid = True
-            response = dialog.run()
+            response = rd.dialog.run()
             if(response == Gtk.ResponseType.OK):
                 fields_and_data = {}
                 field_names = AVAILABLE_FIELD_NAMES_ORDERED
                 for i in range(0, len(field_names)):
                     # Validate user input.
-                    fields_and_data[field_names[i]] = dialog.get_data(field_names[i])
+                    fields_and_data[field_names[i]] = rd.get_data(field_names[i])
                     if(not(adif.is_valid(field_names[i], fields_and_data[field_names[i]], AVAILABLE_FIELD_NAMES_TYPES[field_names[i]]))):
                         # Data is not valid - inform the user.
-                        error(parent=self.parent, message="The data in field \"%s\" is not valid!" % field_names[i])
+                        error(parent=rd.dialog, message="The data in field \"%s\" is not valid!" % field_names[i])
                         all_valid = False
                         break  # Don't check the other fields until the user has fixed the current field's data.
 
@@ -1171,7 +1180,7 @@ class Logbook(Gtk.Notebook):
                     if(record is None):
                         message = "Could not retrieve record with row_index %d from the SQL database. The record has not been edited." % row_index
                         logging.error(message)
-                        error(parent=self.parent, message=message)
+                        error(parent=rd.dialog, message=message)
                     else:
                         for i in range(0, len(field_names)):
                             # Check whether the data has actually changed. Database updates can be expensive.
@@ -1180,9 +1189,9 @@ class Logbook(Gtk.Notebook):
                                 # We add 1 onto the column_index here because we don't want to consider the index column.
                                 log.edit_record(row_index, field_names[i], fields_and_data[field_names[i]], iter=child_iter, column_index=i+1)
                         self.update_summary()
-                        self.parent.toolbox.awards.count()
+                        self.application.toolbox.awards.count(self)
 
-        dialog.destroy()
+        rd.dialog.destroy()
         return
 
     def remove_duplicates_callback(self, widget=None):
@@ -1194,7 +1203,7 @@ class Logbook(Gtk.Notebook):
         log = self.logs[log_index]
 
         (number_of_duplicates, number_of_duplicates_removed) = log.remove_duplicates()
-        info(self.parent, "Found %d duplicate(s). Successfully removed %d duplicate(s)." % (number_of_duplicates, number_of_duplicates_removed))
+        info(self.application.window, "Found %d duplicate(s). Successfully removed %d duplicate(s)." % (number_of_duplicates, number_of_duplicates_removed))
         return
 
     def get_number_of_logs(self):
@@ -1245,12 +1254,12 @@ class Logbook(Gtk.Notebook):
         """
         if(name is None):
             # If no page name is supplied, then just use the currently selected page
-            page_index = self.get_current_page()  # Gets the index of the selected tab in the logbook
-            if(page_index == 0 or page_index == self.get_n_pages()-1):
+            page_index = self.notebook.get_current_page()  # Gets the index of the selected tab in the logbook
+            if(page_index == 0 or page_index == self.notebook.get_n_pages()-1):
                 # We either have the Summary page, or the "+" (add log) dummy page.
                 logging.debug("No log currently selected!")
                 return None
-            name = self.get_nth_page(page_index).get_name()
+            name = self.notebook.get_nth_page(page_index).get_name()
         # If a page of the logbook (and therefore a Log object) gets deleted,
         # then the page_index may not correspond to the index of the log in the self.logs list.
         # Therefore, we have to search for the tab with the same name as the log.
@@ -1267,8 +1276,7 @@ class TestLogbook(unittest.TestCase):
 
     def setUp(self):
         """ Set up the Logbook object and connection to the test database needed for the unit tests. """
-        import os
-        self.logbook = Logbook(parent=None)
+        self.logbook = Logbook(application=mock.MagicMock())
         success = self.logbook.db_connect(os.path.dirname(os.path.realpath(__file__))+"/unittest_resources/test.db")
         assert success
 

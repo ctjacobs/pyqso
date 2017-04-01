@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#    Copyright (C) 2013-2017 Christian T. Jacobs.
+#    Copyright (C) 2013-2017 Christian Thomas Jacobs.
 
 #    This file is part of PyQSO.
 
@@ -17,7 +17,6 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk
 import logging
 
 from pyqso.dx_cluster import *
@@ -25,29 +24,28 @@ from pyqso.grey_line import *
 from pyqso.awards import *
 
 
-class Toolbox(Gtk.Frame):
+class Toolbox:
 
     """ Contains a Gtk.Notebook full of amateur radio-related tools. """
 
-    def __init__(self, parent):
-        """ Instantiate and insert the various tools into the toolbox. """
+    def __init__(self, application):
+        """ Instantiate and insert the various tools into the toolbox.
+
+        :arg application: The PyQSO application containing the main Gtk window, etc.
+        :arg builder: The Gtk builder.
+        """
 
         logging.debug("Setting up the toolbox...")
 
-        Gtk.Frame.__init__(self)
-        self.set_label("Toolbox")
-        self.parent = parent
+        self.application = application
+        self.builder = self.application.builder
 
-        self.tools = Gtk.Notebook()
+        self.tools = self.builder.get_object("tools")
 
-        self.dx_cluster = DXCluster(self.parent)
-        self.tools.insert_page(self.dx_cluster, Gtk.Label("DX Cluster"), 0)
-        self.grey_line = GreyLine(self.parent)
-        self.tools.insert_page(self.grey_line, Gtk.Label("Grey Line"), 1)
-        self.awards = Awards(self.parent)
-        self.tools.insert_page(self.awards, Gtk.Label("Awards"), 2)
+        self.dx_cluster = DXCluster(self.builder)
+        self.grey_line = GreyLine(self.builder)
+        self.awards = Awards(self.builder)
 
-        self.add(self.tools)
         self.tools.connect_after("switch-page", self._on_switch_page)
 
         logging.debug("Toolbox ready!")
@@ -56,11 +54,12 @@ class Toolbox(Gtk.Frame):
 
     def toggle_visible_callback(self, widget=None):
         """ Show/hide the toolbox. """
-        self.set_visible(not self.get_visible())
+        toolbox_frame = self.builder.get_object("toolbox")
+        toolbox_frame.set_visible(not toolbox_frame.get_visible())
         return
 
     def _on_switch_page(self, widget, label, new_page):
         """ Re-draw the Grey Line if the user switches to the grey line tab. """
-        if(isinstance(label, GreyLine)):
-            label.draw()  # Note that 'label' is actually a GreyLine object.
+        if(widget.get_tab_label(label).get_text() == "Grey Line"):
+            self.grey_line.draw()
         return

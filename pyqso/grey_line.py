@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#    Copyright (C) 2013-2017 Christian T. Jacobs.
+#    Copyright (C) 2013-2017 Christian Thomas Jacobs.
 
 #    This file is part of PyQSO.
 
@@ -17,7 +17,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from gi.repository import Gtk, GObject
+from gi.repository import GObject
 import logging
 from datetime import datetime
 from os.path import expanduser
@@ -30,8 +30,6 @@ try:
     logging.info("Using version %s of numpy." % (numpy.__version__))
     import matplotlib
     logging.info("Using version %s of matplotlib." % (matplotlib.__version__))
-    matplotlib.use('Agg')
-    matplotlib.rcParams['font.size'] = 10.0
     import mpl_toolkits.basemap
     logging.info("Using version %s of mpl_toolkits.basemap." % (mpl_toolkits.basemap.__version__))
     from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
@@ -42,18 +40,18 @@ except ImportError as e:
     have_necessary_modules = False
 
 
-class GreyLine(Gtk.VBox):
+class GreyLine:
 
     """ A tool for visualising the grey line. """
 
-    def __init__(self, parent):
+    def __init__(self, builder):
         """ Set up the drawing canvas and the timer which will re-plot the grey line every 30 minutes.
 
-        :arg parent: The parent Gtk window.
+        :arg builder: The Gtk builder.
         """
         logging.debug("Setting up the grey line...")
-        Gtk.VBox.__init__(self, spacing=2)
-        self.parent = parent
+
+        self.builder = builder
 
         # Get the QTH coordinates, if available.
         config = configparser.ConfigParser()
@@ -74,10 +72,10 @@ class GreyLine(Gtk.VBox):
         if(have_necessary_modules):
             self.fig = matplotlib.figure.Figure()
             self.canvas = FigureCanvas(self.fig)  # For embedding in the Gtk application
-            self.pack_start(self.canvas, True, True, 0)
+            self.builder.get_object("greyline").pack_start(self.canvas, True, True, 0)
             self.refresh_event = GObject.timeout_add(1800000, self.draw)  # Re-draw the grey line automatically after 30 minutes (if the grey line tool is visible).
 
-        self.show_all()
+        self.builder.get_object("greyline").show_all()
 
         logging.debug("Grey line ready!")
 
@@ -91,7 +89,9 @@ class GreyLine(Gtk.VBox):
         """
 
         if(have_necessary_modules):
-            if(self.parent.toolbox.tools.get_current_page() != 1 or not self.parent.toolbox.get_visible()):
+            toolbox = self.builder.get_object("toolbox")
+            tools = self.builder.get_object("tools")
+            if(tools.get_current_page() != 1 or not toolbox.get_visible()):
                 # Don't re-draw if the grey line is not visible.
                 return True  # We need to return True in case this is method was called by a timer event.
             else:
