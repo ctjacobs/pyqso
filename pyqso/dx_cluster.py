@@ -38,16 +38,17 @@ class DXCluster:
 
     """ A tool for connecting to a DX cluster (specifically Telnet-based DX clusters). """
 
-    def __init__(self, builder):
+    def __init__(self, application):
         """ Set up the DX cluster, and set up a timer so that PyQSO can retrieve new data from the Telnet server every few seconds.
 
-        :arg builder: The Gtk builder.
+        :arg application: The PyQSO application containing the main Gtk window, etc.
         """
 
         logging.debug("Setting up the DX cluster...")
 
+        self.application = application
+        self.builder = self.application.builder
         self.connection = None
-        self.builder = builder
 
         # Connect signals.
         self.builder.get_object("mitem_new").connect("activate", self.new_server)

@@ -32,7 +32,6 @@ class Toolbox:
         """ Instantiate and insert the various tools into the toolbox.
 
         :arg application: The PyQSO application containing the main Gtk window, etc.
-        :arg builder: The Gtk builder.
         """
 
         logging.debug("Setting up the toolbox...")
@@ -42,9 +41,9 @@ class Toolbox:
 
         self.tools = self.builder.get_object("tools")
 
-        self.dx_cluster = DXCluster(self.builder)
-        self.grey_line = GreyLine(self.builder)
-        self.awards = Awards(self.builder)
+        self.dx_cluster = DXCluster(self.application)
+        self.grey_line = GreyLine(self.application)
+        self.awards = Awards(self.application)
 
         self.tools.connect_after("switch-page", self._on_switch_page)
 

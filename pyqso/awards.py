@@ -26,15 +26,16 @@ class Awards:
     """ A tool for tracking progress towards an award. Currently this only supports the DXCC award.
     For more information visit http://www.arrl.org/dxcc """
 
-    def __init__(self, builder):
+    def __init__(self, application):
         """ Set up a table for progress tracking purposes.
 
-        :arg builder: The Gtk builder.
+        :arg application: The PyQSO application containing the main Gtk window, etc.
         """
         # TODO: This only considers the DXCC award for now.
         logging.debug("Setting up awards table...")
 
-        self.builder = builder
+        self.application = application
+        self.builder = self.application.builder
 
         self.bands = ["70cm", "2m", "6m", "10m", "12m", "15m", "17m", "20m", "30m", "40m", "80m", "160m"]
         self.modes = ["Phone", "CW", "Digital", "Mixed"]
@@ -63,6 +64,8 @@ class Awards:
         self.builder.get_object("awards").show_all()
 
         logging.debug("Awards table set up successfully.")
+
+        self.count(self.application.logbook)
 
         return
 
@@ -95,8 +98,10 @@ class Awards:
                             count[3][band] += 1  # Keep the total of each column in the "Mixed" mode.
             else:
                 logging.error("Could not update the awards table for '%s' because of a database error." % log.name)
+
         # Insert the rows containing the totals
         for i in range(0, len(self.modes)):
             self.awards.append([self.modes[i]] + count[i])
+
         logging.debug("Awards table updated.")
         return

@@ -44,14 +44,15 @@ class GreyLine:
 
     """ A tool for visualising the grey line. """
 
-    def __init__(self, builder):
+    def __init__(self, application):
         """ Set up the drawing canvas and the timer which will re-plot the grey line every 30 minutes.
 
-        :arg builder: The Gtk builder.
+        :arg application: The PyQSO application containing the main Gtk window, etc.
         """
         logging.debug("Setting up the grey line...")
 
-        self.builder = builder
+        self.application = application
+        self.builder = self.application.builder
 
         # Get the QTH coordinates, if available.
         config = configparser.ConfigParser()
