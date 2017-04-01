@@ -1152,7 +1152,7 @@ class Logbook:
             logging.debug("Could not find the selected row's index!")
             return
 
-        rd = RecordDialog(parent=self.application.window, log=self.logs[log_index], index=row_index)
+        rd = RecordDialog(application=self.application, log=self.logs[log_index], index=row_index)
         all_valid = False  # Are all the field entries valid?
 
         adif = ADIF()
