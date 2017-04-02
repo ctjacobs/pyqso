@@ -84,7 +84,8 @@ class DXCluster:
 
         # Build connection dialog
         logging.debug("Setting up the Telnet connection dialog...")
-        self.builder.add_objects_from_file(os.path.abspath(os.path.dirname(__file__)) + "/glade/pyqso.glade", ("telnet_connection_dialog",))
+        glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/pyqso.glade")
+        self.builder.add_objects_from_file(glade_file_path, ("telnet_connection_dialog",))
         dialog = self.builder.get_object("telnet_connection_dialog")
         connection_info = {"HOST": self.builder.get_object("host_entry"),
                            "PORT": self.builder.get_object("port_entry"),

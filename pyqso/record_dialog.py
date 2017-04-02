@@ -56,8 +56,8 @@ class RecordDialog:
 
         self.application = application
         self.builder = self.application.builder
-
-        self.builder.add_objects_from_file(os.path.abspath(os.path.dirname(__file__)) + "/glade/pyqso.glade", ("record_dialog",))
+        glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/pyqso.glade")
+        self.builder.add_objects_from_file(glade_file_path, ("record_dialog",))
         self.dialog = self.builder.get_object("record_dialog")
         self.builder.get_object("record_dialog").connect("key-release-event", self._on_key_release)
 

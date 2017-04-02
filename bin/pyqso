@@ -30,11 +30,6 @@ import os
 import os.path
 import sys
 import signal
-
-# This will help Python find the PyQSO modules that need to be imported below.
-pyqso_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir)
-sys.path.insert(0, pyqso_path)
-
 import logging
 logging.basicConfig(level=logging.INFO)
 logging.info("PyQSO version 1.0.0")
@@ -59,7 +54,8 @@ class PyQSO:
         """
 
         self.builder = Gtk.Builder()
-        self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/../pyqso/glade/pyqso.glade")
+        glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/pyqso.glade")
+        self.builder.add_from_file(glade_file_path)
         self.window = self.builder.get_object("pyqso")
 
         # Check that the directory for holding PyQSO configuration files exists. If it doesn't, create it now.
@@ -76,14 +72,7 @@ class PyQSO:
 
         # Check that the configuration file actually exists (and is readable)
         # otherwise, we will resort to the defaults.
-        have_config = (config.read(os.path.expanduser("~/.config/pyqso/preferences.ini")) != [])
-
-        possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
-        for icon_path in possible_icon_paths:
-            try:
-                self.window.set_icon_from_file(icon_path)
-            except Exception as e:
-                logging.error(e)
+        have_config = (config.read(config_directory + "/preferences.ini") != [])
 
         # Kills the application if the close button is clicked on the main window itself.
         self.window.connect("delete-event", Gtk.main_quit)
@@ -130,20 +119,15 @@ class PyQSO:
 
     def show_about(self, widget):
         """ Show the About dialog, which includes license information. """
-        self.builder.add_objects_from_file(os.path.abspath(os.path.dirname(__file__)) + "/../pyqso/glade/pyqso.glade", ("about_dialog",))
+        glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/pyqso.glade")
+        self.builder.add_objects_from_file(glade_file_path, ("about_dialog",))
         about = self.builder.get_object("about_dialog")
-        possible_icon_paths = [os.path.join(pyqso_path, "icons", "log_64x64.png")]
-        for icon_path in possible_icon_paths:
-            try:
-                about.set_logo(GdkPixbuf.Pixbuf.new_from_file_at_scale(icon_path, 64, 64, False))
-            except Exception as e:
-                logging.exception(e)
         about.run()
         about.destroy()
         return
 
     def show_preferences(self, widget):
-        """ Show the Preferences dialog. Any changes made by the user after clicking the 'Ok' button are saved in the .cfg file. """
+        """ Show the Preferences dialog. Any changes made by the user after clicking the 'Ok' button are saved in the configuration file. """
         preferences = PreferencesDialog(self)
         response = preferences.dialog.run()
         if(response == Gtk.ResponseType.OK):

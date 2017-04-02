@@ -36,7 +36,8 @@ class LogNameDialog:
         logging.debug("Building new log name dialog...")
 
         self.builder = application.builder
-        self.builder.add_objects_from_file(os.path.abspath(os.path.dirname(__file__)) + "/glade/pyqso.glade", ("log_name_dialog",))
+        glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/pyqso.glade")
+        self.builder.add_objects_from_file(glade_file_path, ("log_name_dialog",))
         self.dialog = self.builder.get_object("log_name_dialog")
 
         if(title is None):

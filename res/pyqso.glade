@@ -116,6 +116,7 @@
     <property name="window_position">center</property>
     <property name="default_width">800</property>
     <property name="default_height">600</property>
+    <property name="icon">log_64x64.png</property>
     <child>
       <object class="GtkBox" id="vbox_outer">
         <property name="visible">True</property>
@@ -875,7 +876,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</property>
     <property name="authors">Christian Thomas Jacobs, M0UOS</property>
-    <property name="logo_icon_name"/>
+    <property name="logo">log_64x64.png</property>
     <property name="license_type">custom</property>
     <child internal-child="vbox">
       <object class="GtkBox" id="about_dialog_vbox">
