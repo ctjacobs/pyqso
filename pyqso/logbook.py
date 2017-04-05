@@ -1336,7 +1336,8 @@ class TestLogbook(unittest.TestCase):
     def setUp(self):
         """ Set up the Logbook object and connection to the test database needed for the unit tests. """
         self.logbook = Logbook(application=mock.MagicMock())
-        success = self.logbook.db_connect(os.path.dirname(os.path.realpath(__file__))+"/unittest_resources/test.db")
+        path_to_test_database = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/test.db")
+        success = self.logbook.db_connect(path_to_test_database)
         assert success
 
     def tearDown(self):
