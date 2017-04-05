@@ -19,6 +19,7 @@
 
 import os
 import logging
+from pyqso.cabrillo import CONTESTS
 
 
 class CabrilloExportDialog:
@@ -65,4 +66,5 @@ class CabrilloExportDialog:
         :returns: The callsign used during the contest.
         :rtype: str
         """
-        return self.mycall_entry.get_text()
+        # Always show the callsigns in upper case.
+        return self.mycall_entry.get_text().upper()
