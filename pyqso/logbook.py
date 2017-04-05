@@ -50,6 +50,7 @@ from pyqso.log import *
 from pyqso.auxiliary_dialogs import *
 from pyqso.log_name_dialog import LogNameDialog
 from pyqso.record_dialog import RecordDialog
+from pyqso.cabrillo_export_dialog import CabrilloExportDialog
 
 
 class Logbook:
