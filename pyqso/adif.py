@@ -369,6 +369,7 @@ class ADIF:
             logging.error("An error occurred when writing the ADIF file.")
             logging.exception(e)
 
+        logging.info("Log exported to %s in ADIF format." % (path))
         return
 
     def is_valid(self, field_name, data, data_type):

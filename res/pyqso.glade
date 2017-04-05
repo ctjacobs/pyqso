@@ -2,6 +2,148 @@
 <!-- Generated with glade 3.18.3 -->
 <interface>
   <requires lib="gtk+" version="3.10"/>
+  <object class="GtkDialog" id="cabrillo_export_dialog">
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Cabrillo Export</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="type_hint">dialog</property>
+    <property name="transient_for">pyqso</property>
+    <child internal-child="vbox">
+      <object class="GtkBox" id="cabrillo_export_dialog_vbox">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox" id="cabrillo_export_dialog_action_area">
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="cabrillo_export_cancel_button">
+                <property name="label">gtk-cancel</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+                <property name="always_show_image">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="cabrillo_export_ok_button">
+                <property name="label">gtk-ok</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+                <property name="always_show_image">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="pack_type">end</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox" id="cabrillo_export_contest_hbox">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkLabel" id="cabrillo_export_contest_label">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Contest</property>
+                <property name="width_chars">15</property>
+                <property name="xalign">0</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="padding">2</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkComboBoxText" id="cabrillo_export_contest_combo">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="has_entry">True</property>
+                <child internal-child="entry">
+                  <object class="GtkEntry" id="cabrillo_export_contest_combo_entry">
+                    <property name="can_focus">True</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="padding">2</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox" id="cabrillo_export_mycall_hbox">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkLabel" id="cabrillo_export_mycall_label">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">My callsign</property>
+                <property name="width_chars">15</property>
+                <property name="xalign">0</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="padding">2</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="cabrillo_export_mycall_entry">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="padding">2</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="-6">cabrillo_export_cancel_button</action-widget>
+      <action-widget response="-5">cabrillo_export_ok_button</action-widget>
+    </action-widgets>
+  </object>
   <object class="GtkImage" id="image1">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -67,6 +209,11 @@
     <property name="can_focus">False</property>
     <property name="stock">gtk-open</property>
     <property name="icon_size">1</property>
+  </object>
+  <object class="GtkImage" id="image29">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-go-back</property>
   </object>
   <object class="GtkImage" id="image3">
     <property name="visible">True</property>
@@ -213,11 +360,20 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkImageMenuItem" id="mitem_export_log">
-                        <property name="label" translatable="yes">Export Log</property>
+                      <object class="GtkImageMenuItem" id="mitem_export_log_adif">
+                        <property name="label" translatable="yes">Export Log as ADIF</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="image">image10</property>
+                        <property name="use_stock">False</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="mitem_export_log_cabrillo">
+                        <property name="label" translatable="yes">Export Log as Cabrillo</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="image">image29</property>
                         <property name="use_stock">False</property>
                       </object>
                     </child>
@@ -963,11 +1119,13 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Log Name</property>
+                <property name="width_chars">12</property>
+                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="padding">6</property>
+                <property name="padding">2</property>
                 <property name="position">0</property>
               </packing>
             </child>
@@ -2339,7 +2497,7 @@ Base64-encoded plain text in the configuration file.</property>
               </packing>
             </child>
             <child>
-              <object class="GtkBox" id="preferences_adif_vbox">
+              <object class="GtkBox" id="preferences_import_export_vbox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
@@ -2382,7 +2540,7 @@ Base64-encoded plain text in the configuration file.</property>
                       <object class="GtkLabel" id="preferences_adif_import_label">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Import</property>
+                        <property name="label" translatable="yes">ADIF Import</property>
                       </object>
                     </child>
                   </object>
@@ -2398,10 +2556,10 @@ Base64-encoded plain text in the configuration file.</property>
               </packing>
             </child>
             <child type="tab">
-              <object class="GtkLabel" id="preferences_adif_label">
+              <object class="GtkLabel" id="preferences_import_export_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">ADIF</property>
+                <property name="label" translatable="yes">Import/Export</property>
               </object>
               <packing>
                 <property name="position">3</property>

@@ -72,9 +72,13 @@ class Menu:
         self.items["IMPORT_LOG"] = self.builder.get_object("mitem_import_log")
         self.items["IMPORT_LOG"].connect("activate", self.application.logbook.import_log)
 
-        # Export the current log
-        self.items["EXPORT_LOG"] = self.builder.get_object("mitem_export_log")
-        self.items["EXPORT_LOG"].connect("activate", self.application.logbook.export_log)
+        # Export the current log as ADIF
+        self.items["EXPORT_LOG_ADIF"] = self.builder.get_object("mitem_export_log_adif")
+        self.items["EXPORT_LOG_ADIF"].connect("activate", self.application.logbook.export_log_adif)
+
+        # Export the current log as Cabrillo
+        self.items["EXPORT_LOG_CABRILLO"] = self.builder.get_object("mitem_export_log_cabrillo")
+        self.items["EXPORT_LOG_CABRILLO"].connect("activate", self.application.logbook.export_log_cabrillo)
 
         # Print log
         self.items["PRINT_LOG"] = self.builder.get_object("mitem_print_log")
@@ -145,7 +149,7 @@ class Menu:
         :arg bool sensitive: If True, enable all the log-related menu items. If False, disable them all.
         """
         logging.debug("Setting log-related menu item sensitivity to: %s..." % sensitive)
-        for item_name in ["NEW_LOG", "DELETE_LOG", "RENAME_LOG", "IMPORT_LOG", "EXPORT_LOG", "PRINT_LOG"]:
+        for item_name in ["NEW_LOG", "DELETE_LOG", "RENAME_LOG", "IMPORT_LOG", "EXPORT_LOG_ADIF", "EXPORT_LOG_CABRILLO", "PRINT_LOG"]:
             self.items[item_name].set_sensitive(sensitive)
         logging.debug("Set log-related menu item sensitivity to: %s." % sensitive)
         return

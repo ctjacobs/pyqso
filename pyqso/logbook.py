@@ -45,6 +45,7 @@ except ImportError as e:
     have_matplotlib = False
 
 from pyqso.adif import *
+from pyqso.cabrillo import *
 from pyqso.log import *
 from pyqso.auxiliary_dialogs import *
 from pyqso.log_name_dialog import LogNameDialog
@@ -541,7 +542,7 @@ class Logbook:
         log = self.logs[log_index]
 
         # We also need the page's index in order to remove it using remove_page below.
-        # This may not be the same as what self.get_current_page() returns.
+        # This may not be the same as what get_current_page() returns.
         page_index = self.notebook.page_num(page)
 
         if(page_index == 0 or page_index == self.notebook.get_n_pages()-1):  # Only the "New Log" tab is present (i.e. no actual logs in the logbook)
@@ -900,9 +901,9 @@ class Logbook:
 
         return
 
-    def export_log(self, widget=None):
+    def export_log_adif(self, widget=None):
         """ Export the log (that is currently selected) to an ADIF file. """
-        page_index = self.get_current_page()  # Gets the index of the selected tab in the logbook
+        page_index = self.notebook.get_current_page()  # Gets the index of the selected tab in the logbook
         if(page_index == 0):  # If we are on the Summary page...
             logging.debug("No log currently selected!")
             return
@@ -910,7 +911,7 @@ class Logbook:
         log_index = self._get_log_index()
         log = self.logs[log_index]
 
-        dialog = Gtk.FileChooserDialog("Export Log to File",
+        dialog = Gtk.FileChooserDialog("Export Log as ADIF",
                                        self.application.window,
                                        Gtk.FileChooserAction.SAVE,
                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
@@ -942,6 +943,63 @@ class Logbook:
             records = log.get_all_records()
             if(records is not None):
                 adif.write(records, path)
+            else:
+                error(self.application.window, "Could not retrieve the records from the SQL database. No records have been exported.")
+        return
+
+    def export_log_cabrillo(self, widget=None):
+        """ Export the log (that is currently selected) to a Cabrillo file. """
+        page_index = self.notebook.get_current_page()  # Gets the index of the selected tab in the logbook
+        if(page_index == 0):  # If we are on the Summary page...
+            logging.debug("No log currently selected!")
+            return
+
+        log_index = self._get_log_index()
+        log = self.logs[log_index]
+
+        dialog = Gtk.FileChooserDialog("Export Log as Cabrillo",
+                                       self.application.window,
+                                       Gtk.FileChooserAction.SAVE,
+                                      (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                       Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+        dialog.set_do_overwrite_confirmation(True)
+
+        filter = Gtk.FileFilter()
+        filter.set_name("All Cabrillo files (*.log, *.LOG)")
+        filter.add_pattern("*.log")
+        filter.add_pattern("*.LOG")
+        dialog.add_filter(filter)
+
+        filter = Gtk.FileFilter()
+        filter.set_name("All files")
+        filter.add_pattern("*")
+        dialog.add_filter(filter)
+
+        response = dialog.run()
+        if(response == Gtk.ResponseType.OK):
+            path = dialog.get_filename()
+        else:
+            path = None
+        dialog.destroy()
+
+        if(path is None):
+            logging.debug("No file path specified.")
+        else:
+            # Get Cabrillo-specific fields, such as the callsign used during a contest and the contest's name.
+            ced = CabrilloExportDialog(self.application)
+            response = ced.dialog.run()
+            if(response == Gtk.ResponseType.OK):
+                contest = ced.contest
+                mycall = ced.mycall
+            else:
+                ced.dialog.destroy()
+                return
+            ced.dialog.destroy()
+
+            cabrillo = Cabrillo()
+            records = log.get_all_records()
+            if(records is not None):
+                cabrillo.write(records, path, contest=contest, mycall=mycall)
             else:
                 error(self.application.window, "Could not retrieve the records from the SQL database. No records have been exported.")
         return
