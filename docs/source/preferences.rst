@@ -13,21 +13,25 @@ Under the ``General`` tab, the user can choose to:
 
 -  display yearly logbook statistics on the Summary page when a logbook is opened (see figure:summary_)
 
+-  open a default logbook file
+
 -  keep the ``Add Record`` dialog window open after a new QSO is added, in preparation for the next QSO
+
+-  pin-point the user's QTH on the grey line map
 
    .. _figure:summary:
    .. figure::  images/summary.png
       :align:   center
       
       The Summary page which appears after a logbook is opened. This presents some basic logbook statistics.
-      
+
 View
 ----
 
 Not all the available fields have to be displayed in the logbook. The user can choose to hide a subset of them by unchecking them in the ``View`` tab. PyQSO must be restarted in order for any changes to take effect.
 
-ADIF
-----
+Import/Export
+-------------
 
 PyQSO currently supports the ``NOTES`` field in the ADIF specification, but not the ``COMMENTS`` field. When a user imports a log in ADIF format, they can choose to merge any existing text in the ``COMMENTS`` field with the ``NOTES`` field by checking the 'merge' checkbox. This way, no information in the ``COMMENTS`` field is discarded during the import process.
 
@@ -50,5 +54,5 @@ PyQSO features rudimentary support for the Hamlib library. The name and
 path of the radio device connected to the user's computer can be
 specified in the ``Hamlib`` tab of the preferences dialog. Upon adding a
 new record to the log, PyQSO will use Hamlib to retrieve the current
-frequency that the radio device is set to and automatically fill in the
-Frequency field.
+frequency and mode that the radio device is set to and automatically fill in the
+Frequency and Mode fields.

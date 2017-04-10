@@ -19,7 +19,7 @@ logbook). Furthermore, it can only be composed of alphanumeric
 characters and the underscore character, and the first character in the
 name must not be a number.
 
-Note: When logs are stored in the database file, field/column names from
+**Note:** When logs are stored in the database file, field/column names from
 the ADIF standard are used. However, please note that only the following
 subset of all the ADIF fields is considered: CALL, QSO\_DATE, TIME\_ON,
 FREQ, BAND, MODE, SUBMODE, TX\_PWR, RST\_SENT, RST\_RCVD, QSL\_SENT, QSL\_RCVD,
@@ -43,8 +43,8 @@ Importing and exporting a log
 -----------------------------
 
 While PyQSO stores logbooks in SQL format, it is possible to export
-individual logs in the well-known `ADIF <http://www.adif.org/>`_ format. Select the log to export,
-and click ``Export Log`` in the ``Logbook`` menu.
+individual logs in the well-known `ADIF <http://www.adif.org/>`_ and `Cabrillo <http://wwrof.org/cabrillo/>`_ formats. Select the log to export,
+and click ``Export Log as ADIF`` or ``Export Log as Cabrillo`` in the ``Logbook`` menu.
 
 Similarly, records can be imported from an ADIF file. Upon importing,
 users can choose to store the records in a new log, or append them to an

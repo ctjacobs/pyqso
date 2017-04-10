@@ -28,6 +28,30 @@ pyqso.awards module
     :undoc-members:
     :show-inheritance:
 
+pyqso.cabrillo module
+---------------------
+
+.. automodule:: pyqso.cabrillo
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pyqso.cabrillo_export_dialog module
+-----------------------------------
+
+.. automodule:: pyqso.cabrillo_export_dialog
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pyqso.calendar_dialog module
+----------------------------
+
+.. automodule:: pyqso.calendar_dialog
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 pyqso.callsign_lookup module
 ----------------------------
 
@@ -96,14 +120,6 @@ pyqso.record_dialog module
 --------------------------
 
 .. automodule:: pyqso.record_dialog
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-pyqso.telnet_connection_dialog module
--------------------------------------
-
-.. automodule:: pyqso.telnet_connection_dialog
     :members:
     :undoc-members:
     :show-inheritance:
