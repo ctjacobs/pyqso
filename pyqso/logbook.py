@@ -1220,10 +1220,7 @@ class Logbook:
         :returns: The total number of QSOs/records in the whole logbook.
         :rtype: int
         """
-        total = 0
-        for log in self.logs:
-            total += log.record_count
-        return total
+        return sum([log.record_count for log in self.logs])
 
     def log_name_exists(self, table_name):
         """ Determine whether a Log object with a given name exists in the SQL database.
@@ -1280,6 +1277,11 @@ class TestLogbook(unittest.TestCase):
         path_to_test_database = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/test.db")
         success = self.logbook.db_connect(path_to_test_database)
         assert success
+        # Populate test logs.
+        for log_name in ["test", "test2"]:
+            l = Log(self.logbook.connection, log_name)
+            l.populate()
+            self.logbook.logs.append(l)
 
     def tearDown(self):
         """ Disconnect from the test database. """
@@ -1290,6 +1292,14 @@ class TestLogbook(unittest.TestCase):
         """ Check that only the log called 'test' exists. """
         assert self.logbook.log_name_exists("test")  # Log 'test' exists.
         assert not self.logbook.log_name_exists("hello")  # Log 'hello' should not exist.
+
+    def test_log_count(self):
+        """ Check that the log count equals 2. """
+        assert self.logbook.log_count == 2  # A total of 2 logs in the logbook.
+
+    def test_record_count(self):
+        """ Check that the record count equals 5. """
+        assert self.logbook.record_count == 5  # A total of 5 records over all the logs in the logbook.
 
 if(__name__ == '__main__'):
     unittest.main()
