@@ -116,6 +116,14 @@ pyqso.preferences_dialog module
     :undoc-members:
     :show-inheritance:
 
+pyqso.printer module
+--------------------
+
+.. automodule:: pyqso.printer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 pyqso.record_dialog module
 --------------------------
 
