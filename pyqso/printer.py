@@ -42,7 +42,7 @@ class Printer(object):
 
         return
 
-    def print(self, records):
+    def print_records(self, records):
         """ Perform the print operation.
 
         :arg dict records: The records to be printed.
