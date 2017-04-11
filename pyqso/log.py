@@ -295,7 +295,8 @@ class Log(Gtk.ListStore):
             logging.exception(e)
             return None
 
-    def get_number_of_records(self):
+    @property
+    def record_count(self):
         """ Return the total number of records in the log.
 
         :returns: The total number of records in the log.
@@ -434,16 +435,16 @@ class TestLog(unittest.TestCase):
             assert(records[0][field_name] == self.fields_and_data[field_name])
             assert(records[1][field_name] == self.fields_and_data[field_name])
 
-    def test_log_get_number_of_records(self):
+    def test_log_record_count(self):
         query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
         c = self.connection.cursor()
         # Add the same record twice
         c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
         c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
 
-        number_of_records = self.log.get_number_of_records()
-        print("Number of records in the log: ", number_of_records)
-        assert(number_of_records == 2)  # There should be 2 records
+        record_count = self.log.record_count
+        print("Number of records in the log: ", record_count)
+        assert(record_count == 2)  # There should be 2 records
 
     def test_log_get_duplicates(self):
         query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"

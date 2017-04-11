@@ -458,8 +458,8 @@ class Logbook:
     def update_summary(self):
         """ Update the information presented on the summary page. """
 
-        self.summary["LOG_COUNT"].set_label(str(self.get_number_of_logs()))
-        self.summary["QSO_COUNT"].set_label(str(self.get_number_of_qsos()))
+        self.summary["LOG_COUNT"].set_label(str(self.log_count))
+        self.summary["QSO_COUNT"].set_label(str(self.record_count))
         try:
             t = datetime.fromtimestamp(getmtime(self.path)).strftime("%d %B %Y @ %H:%M")
             self.summary["DATE_MODIFIED"].set_label(str(t))
@@ -518,10 +518,10 @@ class Logbook:
         l.populate()
 
         self.logs.append(l)
-        self._render_log(self.get_number_of_logs()-1)
+        self._render_log(self.log_count-1)
         self.update_summary()
 
-        self.notebook.set_current_page(self.get_number_of_logs())
+        self.notebook.set_current_page(self.log_count)
         return
 
     def delete_log(self, widget, page=None):
@@ -897,7 +897,7 @@ class Logbook:
 
         if(not exists):
             self.logs.append(l)
-            self._render_log(self.get_number_of_logs()-1)
+            self._render_log(self.log_count-1)
         self.update_summary()
         self.application.toolbox.awards.count(self)
 
@@ -1081,9 +1081,9 @@ class Logbook:
                         self.update_summary()
                         self.application.toolbox.awards.count(self)
                         # Select the new Record's row in the treeview.
-                        number_of_records = log.get_number_of_records()
-                        if(number_of_records is not None):
-                            self.treeselection[log_index].select_path(number_of_records)
+                        record_count = log.record_count
+                        if(record_count is not None):
+                            self.treeselection[log_index].select_path(record_count)
                 else:
                     exit = True
                     break
@@ -1204,7 +1204,8 @@ class Logbook:
         info(self.application.window, "Found %d duplicate(s). Successfully removed %d duplicate(s)." % (number_of_duplicates, number_of_duplicates_removed))
         return
 
-    def get_number_of_logs(self):
+    @property
+    def log_count(self):
         """ Return the total number of logs in the logbook.
 
         :returns: The total number of logs in the logbook.
@@ -1212,7 +1213,8 @@ class Logbook:
         """
         return len(self.logs)
 
-    def get_number_of_qsos(self):
+    @property
+    def record_count(self):
         """ Return the total number of QSOs/records in the whole logbook.
 
         :returns: The total number of QSOs/records in the whole logbook.
@@ -1220,7 +1222,7 @@ class Logbook:
         """
         total = 0
         for log in self.logs:
-            total += log.get_number_of_records()
+            total += log.record_count
         return total
 
     def log_name_exists(self, table_name):
