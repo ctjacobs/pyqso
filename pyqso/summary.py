@@ -150,7 +150,7 @@ class Summary(object):
     def find_year_bounds(self):
         """ Find the years of the oldest and newest QSOs across all logs in the logbook.
 
-        :returns: The years of the oldest and newest QSOs. The tuple (None, None) is returned if no QSOs have been made, or no QSO dates have been specified.
+        :returns: The years of the oldest and newest QSOs. The tuple (None, None) is returned if no QSOs have been made or no QSO dates have been specified.
         :rtype: tuple
         """
 
@@ -176,7 +176,7 @@ class Summary(object):
 
         :arg int year: The year of interest.
         :returns: The total number of contacts made in each month of a given year.
-        :rtype: int
+        :rtype: dict
         """
 
         contact_count = {}
@@ -204,7 +204,7 @@ class Summary(object):
 
         :arg int year: The year of interest.
         :returns: The total number of contacts made with each mode in a given year.
-        :rtype: list
+        :rtype: dict
         """
 
         mode_count = {}
