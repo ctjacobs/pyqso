@@ -39,6 +39,7 @@ from pyqso.log_name_dialog import LogNameDialog
 from pyqso.record_dialog import RecordDialog
 from pyqso.cabrillo_export_dialog import CabrilloExportDialog
 from pyqso.summary import Summary
+from pyqso.blank import Blank
 from pyqso.printer import Printer
 from pyqso.compare import compare_date_and_time, compare_default
 
@@ -140,7 +141,7 @@ class Logbook:
             self.sorter = []
             self.filter = []
             self.summary = Summary(self.application)
-            self.create_dummy_page()
+            self.blank = Blank(self.application)
 
             # FIXME: This is an unfortunate work-around. If the area around the "+/New Log" button
             # is clicked, PyQSO will change to an empty page. This signal is used to stop this from happening.
@@ -227,36 +228,6 @@ class Logbook:
         else:
             logging.debug("Already disconnected. Nothing to do here.")
         return True
-
-    def create_dummy_page(self):
-        """ Create a blank page in the Gtk.Notebook for the "+" (New Log) tab. """
-
-        blank_treeview = Gtk.TreeView()
-        # Allow the Log to be scrolled up/down
-        sw = Gtk.ScrolledWindow()
-        sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
-        sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        sw.add(blank_treeview)
-        vbox = Gtk.VBox()
-        vbox.pack_start(sw, True, True, 0)
-
-        # Add a "+" button to the tab
-        hbox = Gtk.HBox(False, 0)
-        icon = Gtk.Image.new_from_stock(Gtk.STOCK_ADD, Gtk.IconSize.MENU)
-        button = Gtk.Button()
-        button.set_relief(Gtk.ReliefStyle.NONE)
-        button.set_focus_on_click(False)
-        button.connect("clicked", self.new_log)
-        button.add(icon)
-        button.set_tooltip_text('New Log')
-        hbox.pack_start(button, False, False, 0)
-        hbox.show_all()
-        vbox.show_all()
-
-        self.notebook.insert_page(vbox, hbox, 1)
-        self.notebook.show_all()
-        self.notebook.set_current_page(0)
-        return
 
     def on_switch_page(self, widget, label, new_page):
         """ Handle a tab/page change, and enable/disable the relevant Record-related buttons. """
@@ -998,7 +969,7 @@ class Logbook:
             # If no page name is supplied, then just use the currently selected page
             page_index = self.notebook.get_current_page()  # Gets the index of the selected tab in the logbook
             if(page_index == 0 or page_index == self.notebook.get_n_pages()-1):
-                # We either have the Summary page, or the "+" (add log) dummy page.
+                # We either have the Summary page, or the "+" (add log) blank/dummy page.
                 logging.debug("No log currently selected!")
                 return None
             name = self.notebook.get_nth_page(page_index).get_name()
