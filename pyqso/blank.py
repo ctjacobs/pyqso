@@ -31,7 +31,7 @@ class Blank(object):
 
         blank_treeview = Gtk.TreeView()
 
-        # Allow the Log to be scrolled up/down
+        # Allow the (blank) page to be scrolled up/down
         sw = Gtk.ScrolledWindow()
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)

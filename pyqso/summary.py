@@ -44,14 +44,13 @@ except ImportError as e:
 class Summary(object):
 
     def __init__(self, application):
-        """ Create a summary page containing the number of logs in the logbook, and the logbook's modification date.
+        """ Create a summary page containing various statistics such as the number of logs in the logbook, the logbook's modification date, etc.
 
         :arg application: The PyQSO application containing the main Gtk window, etc.
         """
 
         self.application = application
         self.logbook = self.application.logbook
-
         self.builder = self.application.builder
         glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/pyqso.glade")
         self.builder.add_objects_from_file(glade_file_path, ("summary_page",))
