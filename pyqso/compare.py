@@ -18,7 +18,7 @@
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
 
-def compare_date_and_time(self, model, row1, row2, user_data):
+def compare_date_and_time(model, row1, row2, user_data):
     """ Compare two rows (let's call them A and B) in a Gtk.ListStore, and sort by both date and time.
 
     :arg Gtk.TreeModel model: The model used to sort the log data.
@@ -46,7 +46,7 @@ def compare_date_and_time(self, model, row1, row2, user_data):
         return -1
 
 
-def compare_default(self, model, row1, row2, user_data):
+def compare_default(model, row1, row2, user_data):
     """ The default sorting function for all Gtk.ListStore objects.
 
     :arg Gtk.TreeModel model: The model used to sort the log data.
