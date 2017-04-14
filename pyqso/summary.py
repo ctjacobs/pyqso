@@ -21,6 +21,8 @@ from gi.repository import Gtk
 import logging
 from os.path import basename, getmtime, expanduser
 from datetime import datetime, date
+import os
+import os.path
 try:
     import configparser
 except ImportError:
@@ -41,43 +43,27 @@ except ImportError as e:
 
 class Summary(object):
 
-    def __init__(self, logbook):
-        """ Create a summary page containing the number of logs in the logbook, and the logbook's modification date. """
+    def __init__(self, application):
+        """ Create a summary page containing the number of logs in the logbook, and the logbook's modification date.
 
-        self.logbook = logbook
+        :arg application: The PyQSO application containing the main Gtk window, etc.
+        """
 
-        vbox = Gtk.VBox()
+        self.application = application
+        self.logbook = self.application.logbook
+
+        self.builder = self.application.builder
+        glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/pyqso.glade")
+        self.builder.add_objects_from_file(glade_file_path, ("summary_page",))
+        self.summary_page = self.builder.get_object("summary_page")
+
+        self.items = {}
 
         # Database name in large font at the top of the summary page
-        hbox = Gtk.HBox()
-        label = Gtk.Label(halign=Gtk.Align.START)
-        label.set_markup("<span size=\"x-large\">%s</span>" % basename(self.path))
-        hbox.pack_start(label, False, False, 6)
-        vbox.pack_start(hbox, False, False, 4)
-
-        hbox = Gtk.HBox()
-        label = Gtk.Label("Number of logs: ", halign=Gtk.Align.START)
-        hbox.pack_start(label, False, False, 6)
-        self.summary["LOG_COUNT"] = Gtk.Label("0")
-        hbox.pack_start(self.summary["LOG_COUNT"], False, False, 4)
-        vbox.pack_start(hbox, False, False, 4)
-
-        hbox = Gtk.HBox()
-        label = Gtk.Label("Total number of QSOs: ", halign=Gtk.Align.START)
-        hbox.pack_start(label, False, False, 6)
-        self.summary["QSO_COUNT"] = Gtk.Label("0")
-        hbox.pack_start(self.summary["QSO_COUNT"], False, False, 4)
-        vbox.pack_start(hbox, False, False, 4)
-
-        hbox = Gtk.HBox()
-        label = Gtk.Label("Date modified: ", halign=Gtk.Align.START)
-        hbox.pack_start(label, False, False, 6)
-        self.summary["DATE_MODIFIED"] = Gtk.Label("0")
-        hbox.pack_start(self.summary["DATE_MODIFIED"], False, False, 4)
-        vbox.pack_start(hbox, False, False, 4)
-
-        hseparator = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
-        vbox.pack_start(hseparator, False, False, 4)
+        self.builder.get_object("database_name").set_markup("<span size=\"x-large\">%s</span>" % basename(self.logbook.path))
+        self.items["LOG_COUNT"] = self.builder.get_object("log_count")
+        self.items["QSO_COUNT"] = self.builder.get_object("qso_count")
+        self.items["DATE_MODIFIED"] = self.builder.get_object("date_modified")
 
         # Yearly statistics
         config = configparser.ConfigParser()
@@ -88,32 +74,32 @@ class Summary(object):
                 hbox = Gtk.HBox()
                 label = Gtk.Label("Display statistics for year: ", halign=Gtk.Align.START)
                 hbox.pack_start(label, False, False, 6)
-                self.summary["YEAR_SELECT"] = Gtk.ComboBoxText()
-                min_year, max_year = self._find_year_bounds()
+                year_select = Gtk.ComboBoxText()
+                min_year, max_year = self.find_year_bounds()
                 if min_year and max_year:
                     for year in range(max_year, min_year-1, -1):
-                        self.summary["YEAR_SELECT"].append_text(str(year))
-                self.summary["YEAR_SELECT"].append_text("")
-                self.summary["YEAR_SELECT"].connect("changed", self._on_year_changed)
-                hbox.pack_start(self.summary["YEAR_SELECT"], False, False, 6)
-                vbox.pack_start(hbox, False, False, 4)
+                        year_select.append_text(str(year))
+                year_select.append_text("")
+                year_select.connect("changed", self.on_year_changed)
+                hbox.pack_start(year_select, False, False, 6)
+                self.summary_page.pack_start(hbox, False, False, 4)
 
-                self.summary["YEARLY_STATISTICS"] = Figure()
-                canvas = FigureCanvas(self.summary["YEARLY_STATISTICS"])
+                self.items["YEARLY_STATISTICS"] = Figure()
+                canvas = FigureCanvas(self.items["YEARLY_STATISTICS"])
                 canvas.set_size_request(800, 250)
                 canvas.show()
-                vbox.pack_start(canvas, True, True, 4)
+                self.summary_page.pack_start(canvas, True, True, 4)
 
         # Summary tab label and icon.
-        hbox = Gtk.HBox(False, 0)
+        tab = Gtk.HBox(False, 0)
         label = Gtk.Label("Summary  ")
         icon = Gtk.Image.new_from_stock(Gtk.STOCK_INDEX, Gtk.IconSize.MENU)
-        hbox.pack_start(label, False, False, 0)
-        hbox.pack_start(icon, False, False, 0)
-        hbox.show_all()
+        tab.pack_start(label, False, False, 0)
+        tab.pack_start(icon, False, False, 0)
+        tab.show_all()
 
-        self.notebook.insert_page(vbox, hbox, 0)  # Append as a new tab
-        self.notebook.show_all()
+        self.logbook.notebook.insert_page(self.summary_page, tab, 0)  # Append as a new tab
+        self.logbook.notebook.show_all()
 
         return
 
@@ -121,8 +107,8 @@ class Summary(object):
         """ Re-plot the statistics for the year selected by the user. """
 
         # Clear figure
-        self.summary["YEARLY_STATISTICS"].clf()
-        self.summary["YEARLY_STATISTICS"].canvas.draw()
+        self.items["YEARLY_STATISTICS"].clf()
+        self.items["YEARLY_STATISTICS"].canvas.draw()
 
         # Get year to show statistics for.
         year = combo.get_active_text()
@@ -133,8 +119,8 @@ class Summary(object):
             return
 
         # Number of contacts made each month
-        contact_count_plot = self.summary["YEARLY_STATISTICS"].add_subplot(121)
-        contact_count = self._get_annual_contact_count(year)
+        contact_count_plot = self.items["YEARLY_STATISTICS"].add_subplot(121)
+        contact_count = self.get_annual_contact_count(year)
 
         # x-axis formatting based on the date
         contact_count_plot.bar(list(contact_count.keys()), list(contact_count.values()), color="k", width=15, align="center")
@@ -149,15 +135,15 @@ class Summary(object):
         contact_count_plot.set_xlim([date(year-1, 12, 16), date(year, 12, 15)])  # Make a bit of space either side of January and December of the selected year.
 
         # Pie chart of all the modes used.
-        mode_count_plot = self.summary["YEARLY_STATISTICS"].add_subplot(122)
-        mode_count = self._get_annual_mode_count(year)
+        mode_count_plot = self.items["YEARLY_STATISTICS"].add_subplot(122)
+        mode_count = self.get_annual_mode_count(year)
         (patches, texts, autotexts) = mode_count_plot.pie(list(mode_count.values()), labels=mode_count.keys(), autopct='%1.1f%%', shadow=False)
         for p in patches:
             # Make the patches partially transparent.
             p.set_alpha(0.75)
         mode_count_plot.set_title("Modes used")
 
-        self.summary["YEARLY_STATISTICS"].canvas.draw()
+        self.items["YEARLY_STATISTICS"].canvas.draw()
 
         return
 
@@ -231,11 +217,11 @@ class Summary(object):
     def update(self):
         """ Update the information presented on the summary page. """
 
-        self.summary["LOG_COUNT"].set_label(str(self.logbook.log_count))
-        self.summary["QSO_COUNT"].set_label(str(self.logbook.record_count))
+        self.items["LOG_COUNT"].set_label(str(self.logbook.log_count))
+        self.items["QSO_COUNT"].set_label(str(self.logbook.record_count))
         try:
             t = datetime.fromtimestamp(getmtime(self.logbook.path)).strftime("%d %B %Y @ %H:%M")
-            self.summary["DATE_MODIFIED"].set_label(str(t))
+            self.items["DATE_MODIFIED"].set_label(str(t))
         except (IOError, OSError) as e:
             logging.exception(e)
         return

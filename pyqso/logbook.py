@@ -38,6 +38,7 @@ from pyqso.auxiliary_dialogs import *
 from pyqso.log_name_dialog import LogNameDialog
 from pyqso.record_dialog import RecordDialog
 from pyqso.cabrillo_export_dialog import CabrilloExportDialog
+from pyqso.summary import Summary
 from pyqso.printer import Printer
 from pyqso.compare import compare_date_and_time, compare_default
 
@@ -56,7 +57,6 @@ class Logbook:
         self.builder = self.application.builder
         self.notebook = self.builder.get_object("logbook")
         self.connection = None
-        self.summary = {}
         self.logs = []
         logging.debug("New Logbook instance created!")
         return
@@ -150,7 +150,7 @@ class Logbook:
                 self._render_log(i)
             logging.debug("All logs rendered successfully.")
 
-            self.update_summary()
+            self.summary.update()
             self.application.toolbox.awards.count(self)
 
             context_id = self.application.statusbar.get_context_id("Status")
