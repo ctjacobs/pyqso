@@ -488,7 +488,7 @@ class Logbook:
         if(page_index == 0):  # If we are on the Summary page...
             logging.debug("No log currently selected!")
             return
-        page = self.notebook.get_nth_page(page_index)  # Gets the Gtk.VBox of the selected tab in the logbook
+        page = self.notebook.get_nth_page(page_index)  # Gets the Gtk.VBox of the selected tab in the logbook.
         old_log_name = page.get_name()
 
         log_index = self.get_log_index(name=old_log_name)
@@ -509,10 +509,10 @@ class Logbook:
                 ln.dialog.destroy()
                 return
 
-        # Remember to change the page's name
+        # Remember to change the page's name ...
         page.set_name(self.logs[log_index].name)
 
-        # ...and update the tab's label
+        # ... and update the tab's label.
         hbox = Gtk.HBox(False, 0)
         label = Gtk.Label(new_log_name)
         hbox.pack_start(label, False, False, 0)
