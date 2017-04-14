@@ -241,6 +241,27 @@ class Log(Gtk.ListStore):
         assert(removed == len(duplicates))
         return (len(duplicates), removed)
 
+    def rename(self, new_name):
+        """ Rename the log.
+
+        :arg str new_name: The new name for the log.
+        :returns: True if the renaming process is successful. Otherwise returns False.
+        :rtype: bool
+        """
+        try:
+            with self.connection:
+                # First try to alter the table name in the database.
+                c = self.connection.cursor()
+                query = "ALTER TABLE %s RENAME TO %s" % (self.name, new_name)
+                c.execute(query)
+            # If the table name change was successful, then change the name attribute of the Log object too.
+            self.name = new_name
+            success = True
+        except sqlite.Error as e:
+            logging.exception(e)
+            success = False
+        return success
+
     def get_duplicates(self):
         """ Find the duplicates in the log, based on the CALL, QSO_DATE, TIME_ON, FREQ and MODE fields.
 

@@ -19,10 +19,9 @@
 
 from gi.repository import Gtk
 import logging
-from os.path import basename, getmtime, expanduser
+from os import pardir
+from os.path import basename, getmtime, expanduser, dirname, join, realpath
 from datetime import datetime, date
-import os
-import os.path
 try:
     import configparser
 except ImportError:
@@ -52,7 +51,7 @@ class Summary(object):
         self.application = application
         self.logbook = self.application.logbook
         self.builder = self.application.builder
-        glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/pyqso.glade")
+        glade_file_path = join(realpath(dirname(__file__)), pardir, "res/pyqso.glade")
         self.builder.add_objects_from_file(glade_file_path, ("summary_page",))
         self.summary_page = self.builder.get_object("summary_page")
 

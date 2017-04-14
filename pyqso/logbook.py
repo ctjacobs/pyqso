@@ -493,33 +493,23 @@ class Logbook:
 
         log_index = self.get_log_index(name=old_log_name)
 
-        exists = True
+        success = False
         ln = LogNameDialog(self.application, title="Rename Log", name=old_log_name)
-        while(exists):
+        while(not success):
             response = ln.dialog.run()
             if(response == Gtk.ResponseType.OK):
                 new_log_name = ln.name
-                try:
-                    with self.connection:
-                        c = self.connection.cursor()
-                        query = "ALTER TABLE %s RENAME TO %s" % (old_log_name, new_log_name)
-                        c.execute(query)
-                        exists = False
-                except sqlite.Error as e:
-                    logging.exception(e)
-                    # Data is not valid - inform the user.
+                success = self.logs[log_index].rename(new_log_name)
+                if(success):
+                    ln.dialog.destroy()
+                else:
+                    # Unsuccessful rename attempt. Inform the user.
                     error(parent=ln.dialog, message="Database error. Try another log name.")
-                    exists = True
             else:
                 ln.dialog.destroy()
                 return
 
-        ln.dialog.destroy()
-
-        # Remember to change the Log object's name...
-        self.logs[log_index].name = new_log_name
-
-        # ...and the page's name
+        # Remember to change the page's name
         page.set_name(self.logs[log_index].name)
 
         # ...and update the tab's label
