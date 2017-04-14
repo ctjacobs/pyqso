@@ -149,7 +149,7 @@ class GeneralPage:
             self.sources["DEFAULT_LOGBOOK"].set_active(config.get(section, option) == "True")
         else:
             self.sources["DEFAULT_LOGBOOK"].set_active(False)
-        self.sources["DEFAULT_LOGBOOK"].connect("toggled", self._on_default_logbook_toggled)
+        self.sources["DEFAULT_LOGBOOK"].connect("toggled", self.on_default_logbook_toggled)
 
         self.sources["DEFAULT_LOGBOOK_PATH"] = self.builder.get_object("general_default_logbook_entry")
         (section, option) = ("general", "default_logbook")
@@ -180,7 +180,7 @@ class GeneralPage:
 
         self.sources["QTH_NAME"] = self.builder.get_object("general_qth_name_entry")
         button = self.builder.get_object("general_qth_lookup")
-        button.connect("clicked", self._lookup_callback)  # Uses geocoding to find the latitude-longitude coordinates.
+        button.connect("clicked", self.lookup_callback)  # Uses geocoding to find the latitude-longitude coordinates.
 
         self.sources["QTH_LATITUDE"] = self.builder.get_object("general_qth_coordinates_latitude_entry")
         self.sources["QTH_LONGITUDE"] = self.builder.get_object("general_qth_coordinates_longitude_entry")
@@ -223,14 +223,14 @@ class GeneralPage:
         data["QTH_LONGITUDE"] = self.sources["QTH_LONGITUDE"].get_text()
         return data
 
-    def _on_default_logbook_toggled(self, widget, data=None):
+    def on_default_logbook_toggled(self, widget, data=None):
         if(widget.get_active()):
             self.sources["DEFAULT_LOGBOOK_PATH"].set_sensitive(True)
         else:
             self.sources["DEFAULT_LOGBOOK_PATH"].set_sensitive(False)
         return
 
-    def _on_show_qth_toggled(self, widget, data=None):
+    def on_show_qth_toggled(self, widget, data=None):
         if(widget.get_active()):
             self.sources["QTH_NAME"].set_sensitive(True)
             self.sources["QTH_LATITUDE"].set_sensitive(True)
@@ -241,7 +241,7 @@ class GeneralPage:
             self.sources["QTH_LONGITUDE"].set_sensitive(False)
         return
 
-    def _lookup_callback(self, widget=None):
+    def lookup_callback(self, widget=None):
         """ Performs geocoding of the QTH location to obtain latitude-longitude coordinates. """
         if(not have_geocoder):
             logging.warning("Geocoder module could not be imported. Geocoding aborted.")
@@ -334,7 +334,7 @@ class RecordsPage:
         else:
             mode = ""
         self.sources["DEFAULT_MODE"].set_active(sorted(MODES.keys()).index(mode))
-        self.sources["DEFAULT_MODE"].connect("changed", self._on_mode_changed)
+        self.sources["DEFAULT_MODE"].connect("changed", self.on_mode_changed)
 
         # Submode
         self.sources["DEFAULT_SUBMODE"] = self.builder.get_object("default_values_submode_combo")
@@ -405,7 +405,7 @@ class RecordsPage:
         data["IGNORE_PREFIX_SUFFIX"] = self.sources["IGNORE_PREFIX_SUFFIX"].get_active()
         return data
 
-    def _on_mode_changed(self, combo):
+    def on_mode_changed(self, combo):
         """ If the MODE field has changed its value, then fill the SUBMODE field with all the available SUBMODE options for that new MODE. """
         self.sources["DEFAULT_SUBMODE"].get_model().clear()
         mode = combo.get_active_text()

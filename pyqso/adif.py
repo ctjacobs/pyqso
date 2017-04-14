@@ -219,14 +219,14 @@ class ADIF:
             logging.error("An error occurred when reading the ADIF file.")
             logging.exception(e)
 
-        records = self._parse_adi(text)
+        records = self.parse_adi(text)
 
         if(records == []):
             logging.warning("No records found in the file. Empty file or wrong file type?")
 
         return records
 
-    def _parse_adi(self, text):
+    def parse_adi(self, text):
         """ Parse some raw text (defined in the 'text' argument) for ADIF field data.
 
         :arg str text: The raw text from the ADIF file to parse.

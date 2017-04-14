@@ -54,7 +54,7 @@ class DXCluster:
         self.builder.get_object("mitem_new").connect("activate", self.new_server)
         self.builder.get_object("mitem_disconnect").connect("activate", self.telnet_disconnect)
         self.builder.get_object("send").connect("clicked", self.telnet_send_command)
-        self.builder.get_object("command").connect("key-release-event", self._on_command_key_press)
+        self.builder.get_object("command").connect("key-release-event", self.on_command_key_press)
 
         # Get the text renderer and its buffer.
         self.renderer = self.builder.get_object("renderer")
@@ -67,13 +67,13 @@ class DXCluster:
         self.items["SEND"] = self.builder.get_object("send")
         self.set_items_sensitive(True)
 
-        self._populate_bookmarks()
+        self.populate_bookmarks()
 
         logging.debug("DX cluster ready!")
 
         return
 
-    def _on_command_key_press(self, widget, event, data=None):
+    def on_command_key_press(self, widget, event, data=None):
         """ If the Return key is pressed when the focus is on the command box, then send whatever command the user has entered. """
         if(event.keyval == Gdk.KEY_Return):
             self.telnet_send_command()
@@ -150,7 +150,7 @@ class DXCluster:
                     with open(BOOKMARKS_FILE, 'w') as f:
                         config.write(f)
 
-                    self._populate_bookmarks()
+                    self.populate_bookmarks()
 
                 except IOError:
                     # Maybe the bookmarks file could not be written to?
@@ -165,7 +165,7 @@ class DXCluster:
             dialog.destroy()
         return
 
-    def _populate_bookmarks(self):
+    def populate_bookmarks(self):
         """ Populate the list of bookmarked Telnet servers in the menu. """
 
         # Get the bookmarks submenu.
@@ -257,7 +257,7 @@ class DXCluster:
 
         self.set_items_sensitive(False)
 
-        self.check_io_event = GObject.timeout_add(1000, self._on_telnet_io)
+        self.check_io_event = GObject.timeout_add(1000, self.on_telnet_io)
 
         return
 
@@ -286,7 +286,7 @@ class DXCluster:
             command.set_text("")
         return
 
-    def _on_telnet_io(self):
+    def on_telnet_io(self):
         """ Retrieve any new data from the Telnet server and print it out in the Gtk.TextView widget.
 
         :returns: Always returns True to satisfy the GObject timer.
@@ -346,7 +346,7 @@ class TestDXCluster(unittest.TestCase):
         connection = telnetlib.Telnet("hello", "world")
         connection.read_very_eager.return_value = b"Test message from the Telnet server."
         self.dxcluster.connection = connection
-        result = self.dxcluster._on_telnet_io()
+        result = self.dxcluster.on_telnet_io()
         assert(result)
 
 if(__name__ == '__main__'):

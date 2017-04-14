@@ -140,14 +140,14 @@ class Logbook:
             self.sorter = []
             self.filter = []
             self.summary = Summary(self.application)
-            self._create_dummy_page()
+            self.create_dummy_page()
 
             # FIXME: This is an unfortunate work-around. If the area around the "+/New Log" button
             # is clicked, PyQSO will change to an empty page. This signal is used to stop this from happening.
-            self.notebook.connect("switch-page", self._on_switch_page)
+            self.notebook.connect("switch-page", self.on_switch_page)
 
             for i in range(len(self.logs)):
-                self._render_log(i)
+                self.render_log(i)
             logging.debug("All logs rendered successfully.")
 
             self.summary.update()
@@ -228,7 +228,7 @@ class Logbook:
             logging.debug("Already disconnected. Nothing to do here.")
         return True
 
-    def _create_dummy_page(self):
+    def create_dummy_page(self):
         """ Create a blank page in the Gtk.Notebook for the "+" (New Log) tab. """
 
         blank_treeview = Gtk.TreeView()
@@ -258,7 +258,7 @@ class Logbook:
         self.notebook.set_current_page(0)
         return
 
-    def _on_switch_page(self, widget, label, new_page):
+    def on_switch_page(self, widget, label, new_page):
         """ Handle a tab/page change, and enable/disable the relevant Record-related buttons. """
 
         if(new_page == self.notebook.get_n_pages()-1):  # The last (right-most) tab is the "New Log" tab.
@@ -309,8 +309,8 @@ class Logbook:
         l.populate()
 
         self.logs.append(l)
-        self._render_log(self.log_count-1)
-        self.update_summary()
+        self.render_log(self.log_count-1)
+        self.summary.update()
 
         self.notebook.set_current_page(self.log_count)
         return
@@ -331,7 +331,7 @@ class Logbook:
             else:
                 page = self.notebook.get_nth_page(page_index)  # Gets the Gtk.VBox of the selected tab in the logbook
 
-        log_index = self._get_log_index(name=page.get_name())
+        log_index = self.get_log_index(name=page.get_name())
         log = self.logs[log_index]
 
         # We also need the page's index in order to remove it using remove_page below.
@@ -362,7 +362,7 @@ class Logbook:
             # And finally remove the tab in the Logbook
             self.notebook.remove_page(page_index)
 
-        self.update_summary()
+        self.summary.update()
         self.application.toolbox.awards.count(self)
         return
 
@@ -372,7 +372,7 @@ class Logbook:
             self.filter[i].refilter()
         return
 
-    def _filter_by_callsign(self, model, iter, data):
+    def filter_by_callsign(self, model, iter, data):
         """ Filter all the logs in the logbook by the callsign field, based on a user-defined expression.
 
         :arg Gtk.TreeModel model: The model used to filter the log data.
@@ -392,14 +392,14 @@ class Logbook:
             # Also, we could use value[:][0:len(callsign))] if we wanted to match from the very start of each callsign.
             return callsign.upper() in value or callsign.lower() in value
 
-    def _render_log(self, index):
+    def render_log(self, index):
         """ Render a Log in the Gtk.Notebook.
 
         :arg int index: The index of the Log (in the list of Logs) to render.
         """
         self.filter.append(self.logs[index].filter_new(root=None))
         # Set the callsign column as the column we want to filter by
-        self.filter[index].set_visible_func(self._filter_by_callsign, data=None)
+        self.filter[index].set_visible_func(self.filter_by_callsign, data=None)
         self.sorter.append(Gtk.TreeModelSort(model=self.filter[index]))
         self.sorter[index].set_sort_column_id(0, Gtk.SortType.ASCENDING)
 
@@ -471,7 +471,7 @@ class Logbook:
         :arg int column_index: The index of the column to sort by.
         """
 
-        log_index = self._get_log_index()
+        log_index = self.get_log_index()
         column = self.treeview[log_index].get_column(column_index)
 
         if(AVAILABLE_FIELD_NAMES_ORDERED[column_index-1] == "QSO_DATE"):
@@ -520,7 +520,7 @@ class Logbook:
         page = self.notebook.get_nth_page(page_index)  # Gets the Gtk.VBox of the selected tab in the logbook
         old_log_name = page.get_name()
 
-        log_index = self._get_log_index(name=old_log_name)
+        log_index = self.get_log_index(name=old_log_name)
 
         exists = True
         ln = LogNameDialog(self.application, title="Rename Log", name=old_log_name)
@@ -560,7 +560,7 @@ class Logbook:
 
         # The number of logs will obviously stay the same, but
         # we want to update the logbook's modification date.
-        self.update_summary()
+        self.summary.update()
 
         return
 
@@ -601,7 +601,7 @@ class Logbook:
                 if(self.log_name_exists(log_name)):
                     # Import into existing log
                     exists = True
-                    l = self.logs[self._get_log_index(name=log_name)]
+                    l = self.logs[self.get_log_index(name=log_name)]
                     response = question(parent=ln.dialog, message="Are you sure you want to import into an existing log?")
                     if(response == Gtk.ResponseType.YES):
                         break
@@ -642,8 +642,8 @@ class Logbook:
 
         if(not exists):
             self.logs.append(l)
-            self._render_log(self.log_count-1)
-        self.update_summary()
+            self.render_log(self.log_count-1)
+        self.summary.update()
         self.application.toolbox.awards.count(self)
 
         return
@@ -655,7 +655,7 @@ class Logbook:
             logging.debug("No log currently selected!")
             return
 
-        log_index = self._get_log_index()
+        log_index = self.get_log_index()
         log = self.logs[log_index]
 
         dialog = Gtk.FileChooserDialog("Export Log as ADIF",
@@ -701,7 +701,7 @@ class Logbook:
             logging.debug("No log currently selected!")
             return
 
-        log_index = self._get_log_index()
+        log_index = self.get_log_index()
         log = self.logs[log_index]
 
         dialog = Gtk.FileChooserDialog("Export Log as Cabrillo",
@@ -758,7 +758,7 @@ class Logbook:
         if(page_index == 0):  # If we are on the Summary page...
             logging.debug("No log currently selected!")
             return
-        log_index = self._get_log_index()
+        log_index = self.get_log_index()
         log = self.logs[log_index]
         records = log.get_all_records()
         if(records is not None):
@@ -772,7 +772,7 @@ class Logbook:
         """ A callback function used to add a particular record/QSO. """
         # Get the log index
         try:
-            log_index = self._get_log_index()
+            log_index = self.get_log_index()
             if(log_index is None):
                 raise ValueError("The log index could not be determined. Perhaps you tried adding a record when the Summary page was selected?")
         except ValueError as e:
@@ -823,7 +823,7 @@ class Logbook:
                     if(all_valid):
                         # All data has been validated, so we can go ahead and add the new record.
                         log.add_record(fields_and_data)
-                        self.update_summary()
+                        self.summary.update()
                         self.application.toolbox.awards.count(self)
                         # Select the new Record's row in the treeview.
                         record_count = log.record_count
@@ -840,7 +840,7 @@ class Logbook:
 
         # Get the log index
         try:
-            log_index = self._get_log_index()
+            log_index = self.get_log_index()
             if(log_index is None):
                 raise ValueError("The log index could not be determined. Perhaps you tried deleting a record when the Summary page was selected?")
         except ValueError as e:
@@ -864,7 +864,7 @@ class Logbook:
             # Deletes the record with index 'row_index' from the Records list.
             # 'iter' is needed to remove the record from the ListStore itself.
             log.delete_record(row_index, iter=child_iter)
-            self.update_summary()
+            self.summary.update()
             self.application.toolbox.awards.count(self)
         return
 
@@ -876,7 +876,7 @@ class Logbook:
 
         # Get the log index
         try:
-            log_index = self._get_log_index()
+            log_index = self.get_log_index()
             if(log_index is None):
                 raise ValueError("The log index could not be determined. Perhaps you tried editing a record when the Summary page was selected?")
         except ValueError as e:
@@ -931,7 +931,7 @@ class Logbook:
                                 # Update the record in the database and then in the ListStore.
                                 # We add 1 onto the column_index here because we don't want to consider the index column.
                                 log.edit_record(row_index, field_names[i], fields_and_data[field_names[i]], iter=child_iter, column_index=i+1)
-                        self.update_summary()
+                        self.summary.update()
                         self.application.toolbox.awards.count(self)
 
         rd.dialog.destroy()
@@ -942,7 +942,7 @@ class Logbook:
         Detecting duplicate records is done based on the CALL, QSO_DATE, TIME_ON, FREQ, and MODE fields. """
         logging.debug("Removing duplicate records...")
 
-        log_index = self._get_log_index()
+        log_index = self.get_log_index()
         log = self.logs[log_index]
 
         (number_of_duplicates, number_of_duplicates_removed) = log.remove_duplicates()
@@ -987,7 +987,7 @@ class Logbook:
             logging.exception(e)  # Database error. PyQSO could not check if the log name exists.
             return None
 
-    def _get_log_index(self, name=None):
+    def get_log_index(self, name=None):
         """ Given the name of a log, return its index in the list of Log objects.
 
         :arg str name: The name of the log. If None, use the name of the currently-selected log.

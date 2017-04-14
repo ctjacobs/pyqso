@@ -45,7 +45,7 @@ class Toolbox:
         self.grey_line = GreyLine(self.application)
         self.awards = Awards(self.application)
 
-        self.tools.connect_after("switch-page", self._on_switch_page)
+        self.tools.connect_after("switch-page", self.on_switch_page)
 
         logging.debug("Toolbox ready!")
 
@@ -57,7 +57,7 @@ class Toolbox:
         toolbox_frame.set_visible(not toolbox_frame.get_visible())
         return
 
-    def _on_switch_page(self, widget, label, new_page):
+    def on_switch_page(self, widget, label, new_page):
         """ Re-draw the Grey Line if the user switches to the grey line tab. """
         if(widget.get_tab_label(label).get_text() == "Grey Line"):
             self.grey_line.draw()

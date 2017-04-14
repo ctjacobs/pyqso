@@ -59,7 +59,7 @@ class RecordDialog:
         glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/pyqso.glade")
         self.builder.add_objects_from_file(glade_file_path, ("record_dialog",))
         self.dialog = self.builder.get_object("record_dialog")
-        self.builder.get_object("record_dialog").connect("key-release-event", self._on_key_release)
+        self.builder.get_object("record_dialog").connect("key-release-event", self.on_key_release)
 
         # Set dialog title
         if(index is not None):
@@ -102,7 +102,7 @@ class RecordDialog:
         for mode in sorted(MODES.keys()):
             self.sources["MODE"].append_text(mode)
         self.sources["MODE"].set_active(0)  # Set an empty string as the default option.
-        self.sources["MODE"].connect("changed", self._on_mode_changed)
+        self.sources["MODE"].connect("changed", self.on_mode_changed)
 
         # SUBMODE
         self.sources["SUBMODE"] = self.builder.get_object("qso_submode_combo")
@@ -225,17 +225,17 @@ class RecordDialog:
                     rig_model = config.get("hamlib", "rig_model")
                     rig_pathname = config.get("hamlib", "rig_pathname")
                     if(autofill):
-                        self._hamlib_autofill(rig_model, rig_pathname)
+                        self.hamlib_autofill(rig_model, rig_pathname)
 
         # Do we want PyQSO to autocomplete the Band field based on the Frequency field?
         (section, option) = ("records", "autocomplete_band")
         if(have_config and config.has_option(section, option)):
             autocomplete_band = (config.get(section, option) == "True")
             if(autocomplete_band):
-                self.sources["FREQ"].connect("changed", self._autocomplete_band)
+                self.sources["FREQ"].connect("changed", self.autocomplete_band)
         else:
             # If no configuration file exists, autocomplete the Band field by default.
-            self.sources["FREQ"].connect("changed", self._autocomplete_band)
+            self.sources["FREQ"].connect("changed", self.autocomplete_band)
 
         self.dialog.show_all()
 
@@ -270,7 +270,7 @@ class RecordDialog:
         else:
             return self.sources[field_name].get_text()
 
-    def _on_mode_changed(self, combo):
+    def on_mode_changed(self, combo):
         """ If the MODE field has changed its value, then fill the SUBMODE field with all the available SUBMODE options for that new MODE. """
         self.sources["SUBMODE"].get_model().clear()
         text = combo.get_active_text()
@@ -278,14 +278,14 @@ class RecordDialog:
             self.sources["SUBMODE"].append_text(submode)
         return
 
-    def _on_key_release(self, widget, event):
+    def on_key_release(self, widget, event):
         """ If the Return key is pressed, emit the "OK" response to record the QSO. """
         child = widget.get_focus()
         if(not(isinstance(child, Gtk.ToggleButton) or isinstance(child, Gtk.Button) or isinstance(child, Gtk.TextView)) and event.keyval == Gdk.KEY_Return):
             self.dialog.emit('response', Gtk.ResponseType.OK)
         return
 
-    def _autocomplete_band(self, widget=None):
+    def autocomplete_band(self, widget=None):
         """ If a value for the Frequency is entered, this function autocompletes the Band field. """
 
         frequency = self.sources["FREQ"].get_text()
@@ -305,7 +305,7 @@ class RecordDialog:
         self.sources["BAND"].set_active(0)  # If we've reached this, then the frequency does not lie in any of the specified bands.
         return
 
-    def _hamlib_autofill(self, rig_model, rig_pathname):
+    def hamlib_autofill(self, rig_model, rig_pathname):
         """ Set the various fields using data from the radio via Hamlib.
 
         :arg str rig_model: The model of the radio/rig.
