@@ -75,7 +75,7 @@ class Summary(object):
                 label = Gtk.Label("Display statistics for year: ", halign=Gtk.Align.START)
                 hbox.pack_start(label, False, False, 6)
                 year_select = Gtk.ComboBoxText()
-                min_year, max_year = self.find_year_bounds()
+                min_year, max_year = self.get_year_bounds()
                 if min_year and max_year:
                     for year in range(max_year, min_year-1, -1):
                         year_select.append_text(str(year))
@@ -147,7 +147,7 @@ class Summary(object):
 
         return
 
-    def find_year_bounds(self):
+    def get_year_bounds(self):
         """ Find the years of the oldest and newest QSOs across all logs in the logbook.
 
         :returns: The years of the oldest and newest QSOs. The tuple (None, None) is returned if no QSOs have been made or no QSO dates have been specified.
