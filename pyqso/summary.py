@@ -148,7 +148,11 @@ class Summary(object):
         return
 
     def find_year_bounds(self):
-        """ Find the years of the oldest and newest QSOs across all logs in the logbook. """
+        """ Find the years of the oldest and newest QSOs across all logs in the logbook.
+
+        :returns: The years of the oldest and newest QSOs. The tuple (None, None) is returned if no QSOs have been made, or no QSO dates have been specified.
+        :rtype: tuple
+        """
 
         c = self.logbook.connection.cursor()
         max_years = []
@@ -161,14 +165,19 @@ class Summary(object):
                 min_years.append(int(years[0][:4]))
                 max_years.append(int(years[1][:4]))
 
-        if len(min_years) == 0 or max_years == 0:
+        if len(min_years) == 0 or len(max_years) == 0:
             return None, None
         else:
             # Return the min and max across all logs.
             return min(min_years), max(max_years)
 
     def get_annual_contact_count(self, year):
-        """ Find the total number of contacts made in each month in the specified year. """
+        """ Find the total number of contacts made in each month in the specified year.
+
+        :arg int year: The year of interest.
+        :returns: The total number of contacts made in each month of a given year.
+        :rtype: int
+        """
 
         contact_count = {}
         c = self.logbook.connection.cursor()
@@ -191,7 +200,12 @@ class Summary(object):
         return contact_count
 
     def get_annual_mode_count(self, year):
-        """ Find the total number of contacts made with each mode in a specified year. """
+        """ Find the total number of contacts made with each mode in a specified year.
+
+        :arg int year: The year of interest.
+        :returns: The total number of contacts made with each mode in a given year.
+        :rtype: list
+        """
 
         mode_count = {}
 

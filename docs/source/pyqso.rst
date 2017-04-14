@@ -60,6 +60,14 @@ pyqso.callsign_lookup module
     :undoc-members:
     :show-inheritance:
 
+pyqso.compare module
+--------------------
+
+.. automodule:: pyqso.compare
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 pyqso.dx_cluster module
 -----------------------
 
@@ -128,6 +136,14 @@ pyqso.record_dialog module
 --------------------------
 
 .. automodule:: pyqso.record_dialog
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pyqso.summary module
+--------------------
+
+.. automodule:: pyqso.summary
     :members:
     :undoc-members:
     :show-inheritance:
