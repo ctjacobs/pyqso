@@ -13,6 +13,7 @@
 - Using username and port information (in addition to hostname) when creating an identifier for a DX cluster bookmark.
 - Pressing the Return key after entering a DX cluster command will send the command to the Telnet server.
 - Pressing the Return key after entering QSO information via the record dialog will add the QSO to the log.
+- Moved all unit tests to a dedicated tests directory.
 
 ### Fixed
 - Replace any characters that cannot be decoded with a replacement marker in the DX cluster frame.
