@@ -28,6 +28,14 @@ pyqso.awards module
     :undoc-members:
     :show-inheritance:
 
+pyqso.blank module
+------------------
+
+.. automodule:: pyqso.blank
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 pyqso.cabrillo module
 ---------------------
 
