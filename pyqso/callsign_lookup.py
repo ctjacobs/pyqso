@@ -18,11 +18,6 @@
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import unittest
-try:
-    import unittest.mock as mock
-except ImportError:
-    import mock
 try:
     import http.client as http_client
 except ImportError:

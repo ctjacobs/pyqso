@@ -20,12 +20,7 @@
 from gi.repository import Gtk
 import logging
 import sqlite3 as sqlite
-import os
 from os.path import expanduser
-try:
-    import unittest.mock as mock
-except ImportError:
-    import mock
 try:
     import configparser
 except ImportError:

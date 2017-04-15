@@ -20,7 +20,6 @@
 from gi.repository import Gtk
 import logging
 import sqlite3 as sqlite
-import unittest
 
 from pyqso.adif import AVAILABLE_FIELD_NAMES_ORDERED
 

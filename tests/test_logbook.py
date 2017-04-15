@@ -17,6 +17,12 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
+import unittest
+try:
+    import unittest.mock as mock
+except ImportError:
+    import mock
+import os
 from pyqso.logbook import *
 
 

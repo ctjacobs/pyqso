@@ -20,11 +20,6 @@
 from gi.repository import Gtk, GObject, Gdk
 import logging
 import telnetlib
-import unittest
-try:
-    import unittest.mock as mock
-except ImportError:
-    import mock
 try:
     import configparser
 except ImportError:
