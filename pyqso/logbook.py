@@ -505,7 +505,7 @@ class Logbook:
                 return
 
         # Remember to change the page's name ...
-        page.set_name(self.logs[log_index].name)
+        page.set_name(new_log_name)
 
         # ... and update the tab's label.
         hbox = Gtk.HBox(False, 0)
