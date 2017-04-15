@@ -473,7 +473,22 @@ class TestLog(unittest.TestCase):
         n = 5  # The total number of records to insert.
         for i in range(0, n):
             c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
-        assert len(self.log.get_duplicates()) == n-1  # Expecting n-1 duplicates.
+        assert(len(self.log.get_duplicates()) == n-1)  # Expecting n-1 duplicates.
+
+    def test_log_rename(self):
+        old_name = "test"
+        new_name = "hello"
+        success = self.log.rename(new_name)
+        assert(success)
+        with self.connection:
+            c = self.connection.cursor()
+            c.execute("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE name=?)", [old_name])
+            exists = c.fetchone()
+            assert(exists[0] == 0)  # Old log name should no longer exist.
+            c.execute("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE name=?)", [new_name])
+            exists = c.fetchone()
+            assert(exists[0] == 1)  # New log name should now exist.
+        assert(self.log.name == new_name)
 
 if(__name__ == '__main__'):
     unittest.main()
