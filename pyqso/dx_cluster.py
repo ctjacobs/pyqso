@@ -324,30 +324,3 @@ class DXCluster:
         self.items["DISCONNECT"].set_sensitive(not sensitive)
         self.items["SEND"].set_sensitive(not sensitive)
         return
-
-
-class TestDXCluster(unittest.TestCase):
-
-    """ The unit tests for the DXCluster class. """
-
-    def setUp(self):
-        """ Set up the objects needed for the unit tests. """
-        PyQSO = mock.MagicMock()
-        self.dxcluster = DXCluster(application=PyQSO())
-
-    def tearDown(self):
-        """ Destroy any unit test resources. """
-        pass
-
-    def test_on_telnet_io(self):
-        """ Check that the response from the Telnet server can be correctly decoded. """
-
-        telnetlib.Telnet = mock.Mock(spec=telnetlib.Telnet)
-        connection = telnetlib.Telnet("hello", "world")
-        connection.read_very_eager.return_value = b"Test message from the Telnet server."
-        self.dxcluster.connection = connection
-        result = self.dxcluster.on_telnet_io()
-        assert(result)
-
-if(__name__ == '__main__'):
-    unittest.main()

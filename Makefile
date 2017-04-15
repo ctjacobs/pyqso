@@ -31,7 +31,7 @@ docs:
 
 test:
 	@echo "*** Running the unit tests"
-	python3 -m unittest discover --start-directory=pyqso --pattern=*.py --verbose
+	python3 -m unittest discover --start-directory=tests --pattern=*.py --verbose
 
 clean:
 	@echo "*** Cleaning docs directory"
