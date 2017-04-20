@@ -29,7 +29,7 @@ from pyqso.logbook import Logbook
 
 class TestAwards(unittest.TestCase):
 
-    """ The unit tests for the DXCluster class. """
+    """ The unit tests for the Awards class. """
 
     def setUp(self):
         """ Set up the objects needed for the unit tests. """
