@@ -70,7 +70,12 @@ class Awards:
         return
 
     def count(self, logbook):
-        """ Update the table for progress tracking. """
+        """ Update the table for progress tracking.
+
+        :arg logbook: The logbook containing logs which in turn contain QSOs.
+        :returns: A list of lists containing the QSO counts for different modes and bands.
+        :rtype: list
+        """
 
         logging.debug("Counting the band/mode combinations for the awards table...")
         # Wipe everything and start again.
