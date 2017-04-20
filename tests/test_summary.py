@@ -24,7 +24,7 @@ try:
 except ImportError:
     import mock
 from pyqso.summary import *
-from pyqso.logbook import *
+from pyqso.logbook import Logbook
 
 
 class TestSummary(unittest.TestCase):

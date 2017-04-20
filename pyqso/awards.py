@@ -104,4 +104,4 @@ class Awards:
             self.awards.append([self.modes[i]] + count[i])
 
         logging.debug("Awards table updated.")
-        return
+        return count

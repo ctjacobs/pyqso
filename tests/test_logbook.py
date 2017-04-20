@@ -58,12 +58,12 @@ class TestLogbook(unittest.TestCase):
         assert(not self.logbook.log_name_exists("hello"))  # Log 'hello' should not exist.
 
     def test_log_count(self):
-        """ Check that the log count equals 2. """
+        """ Check the log count. """
         assert(self.logbook.log_count == 2)
 
     def test_record_count(self):
-        """ Check that there is a total of 6 records over all the logs in the logbook. """
-        assert(self.logbook.record_count == 6)
+        """ Check the total number of records over all the logs in the logbook. """
+        assert(self.logbook.record_count == 7)
 
 if(__name__ == '__main__'):
     unittest.main()
