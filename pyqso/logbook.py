@@ -114,22 +114,15 @@ class Logbook:
 
             self.path = path
 
-            logging.debug("Trying to retrieve all the logs in the logbook...")
-            self.logs = []  # A fresh stack of Log objects
-            try:
-                with self.connection:
-                    c = self.connection.cursor()
-                    c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT GLOB 'sqlite_*'")
-                    for name in c:
-                        l = Log(self.connection, name[0])
-                        l.populate()
-                        self.logs.append(l)
-            except (sqlite.Error, IndexError) as e:
-                logging.exception(e)
-                error(parent=self.application.window, message="Something went wrong when trying to retrieve the logs from the logbook. Perhaps the logbook file is encrypted, corrupted, or in the wrong format?")
+            logging.debug("Retrieving all the logs in the logbook...")
+            self.logs = self.get_logs()
+            if(not self.logs):
+                error(parent=self.application.window, message="Could not open logbook. Something went wrong when trying to retrieve the logs. Perhaps the logbook file is encrypted, corrupted, or in the wrong format?")
                 return
+            else:
+                logging.debug("All logs retrieved successfully.")
 
-            logging.debug("All logs retrieved successfully. Now attempting to render them all in the Gtk.Notebook...")
+            logging.debug("Rendering logs...")
             # For rendering the logs. One treeview and one treeselection per Log.
             self.treeview = []
             self.treeselection = []
@@ -966,3 +959,23 @@ class Logbook:
                 log_index = i
                 break
         return log_index
+
+    def get_logs(self):
+        """ Retrieve all the logs in the logbook file, and create Log objects that represent them.
+
+        :returns: A list containing all the logs in the logbook, or None if the retrieval was unsuccessful.
+        :rtype: list
+        """
+        logs = []  # A fresh stack of Log objects
+        try:
+            with self.connection:
+                c = self.connection.cursor()
+                c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT GLOB 'sqlite_*'")
+                for name in c:
+                    l = Log(self.connection, name[0])
+                    l.populate()
+                    logs.append(l)
+        except (sqlite.Error, IndexError) as e:
+            logging.exception(e)
+            return None
+        return logs

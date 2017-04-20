@@ -89,9 +89,9 @@ class Summary(object):
                 self.summary_page.pack_start(canvas, True, True, 4)
 
         # Summary tab label and icon.
-        tab = Gtk.HBox(False, 0)
-        label = Gtk.Label("Summary  ")
-        icon = Gtk.Image.new_from_stock(Gtk.STOCK_INDEX, Gtk.IconSize.MENU)
+        tab = Gtk.HBox(homogeneous=False, spacing=0)
+        label = Gtk.Label(label="Summary  ")
+        icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_INDEX, Gtk.IconSize.MENU)
         tab.pack_start(label, False, False, 0)
         tab.pack_start(icon, False, False, 0)
         tab.show_all()
