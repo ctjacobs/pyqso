@@ -53,7 +53,7 @@ class Log(Gtk.ListStore):
         logging.debug("Populating '%s'..." % self.name)
         self.add_missing_db_columns()
         self.clear()
-        records = self.get_all_records()
+        records = self.records
         if(records is not None):
             for r in records:
                 liststore_entry = [r["id"]]
@@ -300,7 +300,8 @@ class Log(Gtk.ListStore):
             logging.exception(e)
             return None
 
-    def get_all_records(self):
+    @property
+    def records(self):
         """ Return a list of all the records in the log.
 
         :returns: A list of all the records in the log. Each record is represented by a dictionary.

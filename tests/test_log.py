@@ -130,14 +130,14 @@ class TestLog(unittest.TestCase):
                 assert(record[field_name.upper()] == self.fields_and_data[field_name.upper()])
         assert(len(record) == len(self.fields_and_data) + 1)
 
-    def test_log_get_all_records(self):
+    def test_log_records(self):
         query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
         c = self.connection.cursor()
         # Add the same record twice
         c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
         c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
 
-        records = self.log.get_all_records()
+        records = self.log.records
         print("Contents of all retrieved records: ", records)
         assert(len(records) == 2)  # There should be 2 records
         for field_name in self.field_names:

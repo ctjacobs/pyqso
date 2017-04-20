@@ -636,7 +636,7 @@ class Logbook:
             logging.debug("No file path specified.")
         else:
             adif = ADIF()
-            records = log.get_all_records()
+            records = log.records
             if(records is not None):
                 adif.write(records, path)
             else:
@@ -693,7 +693,7 @@ class Logbook:
             ced.dialog.destroy()
 
             cabrillo = Cabrillo()
-            records = log.get_all_records()
+            records = log.records
             if(records is not None):
                 cabrillo.write(records, path, contest=contest, mycall=mycall)
             else:
@@ -709,7 +709,7 @@ class Logbook:
             return
         log_index = self.get_log_index()
         log = self.logs[log_index]
-        records = log.get_all_records()
+        records = log.records
         if(records is not None):
             printer = Printer(self.application)
             printer.print_records(records)

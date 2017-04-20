@@ -81,7 +81,7 @@ class Awards:
             count.append([0]*len(self.bands))
 
         for log in logbook.logs:
-            records = log.get_all_records()
+            records = log.records
             if(records is not None):
                 for r in records:
                     if(r["BAND"] is not None and r["MODE"] is not None):
