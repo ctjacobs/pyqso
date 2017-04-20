@@ -371,10 +371,10 @@ class RecordDialog:
         try:
             if(database == "qrz.com"):
                 # QRZ.com
-                callsign_lookup = CallsignLookupQRZ(application=self.application)
+                callsign_lookup = CallsignLookupQRZ(parent=self.dialog)
             elif(database == "hamqth.com"):
                 # HamQTH
-                callsign_lookup = CallsignLookupHamQTH(application=self.application)
+                callsign_lookup = CallsignLookupHamQTH(parent=self.dialog)
             else:
                 raise ValueError("Unknown callsign database: %s" % database)
         except ValueError as e:
