@@ -74,20 +74,20 @@ class TestLogbook(unittest.TestCase):
         iter = model.get_iter(path)
 
         self.logbook.application.toolbar.filter_source.get_text.return_value = ""
-        result = self.logbook.filter_by_callsign(model, iter, data=None)
-        assert(result)  # Show all the callsigns.
+        present = self.logbook.filter_by_callsign(model, iter, data=None)
+        assert(present)  # Show all the callsigns.
 
         self.logbook.application.toolbar.filter_source.get_text.return_value = "MYCALL"
-        result = self.logbook.filter_by_callsign(model, iter, data=None)
-        assert(result)  # "MYCALL" is present.
+        present = self.logbook.filter_by_callsign(model, iter, data=None)
+        assert(present)  # "MYCALL" is present.
 
         self.logbook.application.toolbar.filter_source.get_text.return_value = "MY"
-        result = self.logbook.filter_by_callsign(model, iter, data=None)
-        assert(result)  # "MY" is present in "MYCALL"
+        present = self.logbook.filter_by_callsign(model, iter, data=None)
+        assert(present)  # "MY" is present in "MYCALL"
 
         self.logbook.application.toolbar.filter_source.get_text.return_value = "HELLOWORLD"
-        result = self.logbook.filter_by_callsign(model, iter, data=None)
-        assert(not result)  # "HELLOWORLD" is not present in "MYCALL"
+        present = self.logbook.filter_by_callsign(model, iter, data=None)
+        assert(not present)  # "HELLOWORLD" is not present in "MYCALL"
 
 if(__name__ == '__main__'):
     unittest.main()
