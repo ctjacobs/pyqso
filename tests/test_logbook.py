@@ -66,28 +66,28 @@ class TestLogbook(unittest.TestCase):
         assert(self.logbook.record_count == 7)
 
     def test_filter_by_callsign(self):
+        """ Check that callsigns are filtered correctly. """
         data_types = [int] + [str]*3
-        model = Gtk.ListStore(*data_types)
-        model.append([0, "MYCALL", "20150323", "1433"])
+        model = self.logbook.logs[0]  # Consider only the first log.
 
-        path = Gtk.TreePath(0)
+        path = Gtk.TreePath(0)  # Consider only the first record.
         iter = model.get_iter(path)
 
         self.logbook.application.toolbar.filter_source.get_text.return_value = ""
         present = self.logbook.filter_by_callsign(model, iter, data=None)
         assert(present)  # Show all the callsigns.
 
-        self.logbook.application.toolbar.filter_source.get_text.return_value = "MYCALL"
+        self.logbook.application.toolbar.filter_source.get_text.return_value = "TEST123"
         present = self.logbook.filter_by_callsign(model, iter, data=None)
-        assert(present)  # "MYCALL" is present.
+        assert(present)  # "TEST123" is present.
 
-        self.logbook.application.toolbar.filter_source.get_text.return_value = "MY"
+        self.logbook.application.toolbar.filter_source.get_text.return_value = "TEST"
         present = self.logbook.filter_by_callsign(model, iter, data=None)
-        assert(present)  # "MY" is present in "MYCALL"
+        assert(present)  # "TEST" is present in "TEST123"
 
         self.logbook.application.toolbar.filter_source.get_text.return_value = "HELLOWORLD"
         present = self.logbook.filter_by_callsign(model, iter, data=None)
-        assert(not present)  # "HELLOWORLD" is not present in "MYCALL"
+        assert(not present)  # "HELLOWORLD" is not present in "TEST123"
 
 if(__name__ == '__main__'):
     unittest.main()
