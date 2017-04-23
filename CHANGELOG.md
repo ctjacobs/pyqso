@@ -8,6 +8,7 @@
 - Auto-filling of the Mode field using Hamlib.
 - Glade design of main window and dialogs.
 - Exporting of logs in the Cabrillo format.
+- More unit tests.
 
 ### Changed
 - Using username and port information (in addition to hostname) when creating an identifier for a DX cluster bookmark.
