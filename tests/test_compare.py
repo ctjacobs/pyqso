@@ -35,7 +35,7 @@ class TestCompare(unittest.TestCase):
         self.model.append(row2)
         row3 = [2, "5000", "20160423", "1433"]
         self.model.append(row3)
-        row4 = [2, "25", "20160423", "1433"]
+        row4 = [3, "25", "20160423", "1433"]
         self.model.append(row4)
         return
 

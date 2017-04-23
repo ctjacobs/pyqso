@@ -65,5 +65,29 @@ class TestLogbook(unittest.TestCase):
         """ Check the total number of records over all the logs in the logbook. """
         assert(self.logbook.record_count == 7)
 
+    def test_filter_by_callsign(self):
+        data_types = [int] + [str]*3
+        model = Gtk.ListStore(*data_types)
+        model.append([0, "MYCALL", "20150323", "1433"])
+        
+        path = Gtk.TreePath(0)
+        iter = model.get_iter(path)
+
+        self.logbook.application.toolbar.filter_source.get_text.return_value = ""
+        result = self.logbook.filter_by_callsign(model, iter, data=None)
+        assert(result)  # Show all the callsigns.
+
+        self.logbook.application.toolbar.filter_source.get_text.return_value = "MYCALL"
+        result = self.logbook.filter_by_callsign(model, iter, data=None)
+        assert(result)  # "MYCALL" is present.
+
+        self.logbook.application.toolbar.filter_source.get_text.return_value = "MY"
+        result = self.logbook.filter_by_callsign(model, iter, data=None)
+        assert(result)  # "MY" is present in "MYCALL"
+
+        self.logbook.application.toolbar.filter_source.get_text.return_value = "HELLOWORLD"
+        result = self.logbook.filter_by_callsign(model, iter, data=None)
+        assert(not result)  # "HELLOWORLD" is not present in "MYCALL"
+
 if(__name__ == '__main__'):
     unittest.main()
