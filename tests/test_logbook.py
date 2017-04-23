@@ -69,7 +69,7 @@ class TestLogbook(unittest.TestCase):
         data_types = [int] + [str]*3
         model = Gtk.ListStore(*data_types)
         model.append([0, "MYCALL", "20150323", "1433"])
-        
+
         path = Gtk.TreePath(0)
         iter = model.get_iter(path)
 
