@@ -89,5 +89,11 @@ class TestLogbook(unittest.TestCase):
         present = self.logbook.filter_by_callsign(model, iter, data=None)
         assert(not present)  # "HELLOWORLD" is not present in "TEST123"
 
+    def test_get_log_index(self):
+        """ Check that a log's index can be resolved using the log's name. """
+        assert(self.logbook.get_log_index(name="test") == 0)
+        assert(self.logbook.get_log_index(name="test2") == 1)
+        assert(self.logbook.get_log_index(name="helloworld") is None)
+
 if(__name__ == '__main__'):
     unittest.main()

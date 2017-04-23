@@ -940,7 +940,7 @@ class Logbook:
         """ Given the name of a log, return its index in the list of Log objects.
 
         :arg str name: The name of the log. If None, use the name of the currently-selected log.
-        :returns: The index of the named log in the list of Log objects.
+        :returns: The index of the named log in the list of Log objects. Returns None is the log cannot be found.
         :rtype: int
         """
         if(name is None):
@@ -954,6 +954,7 @@ class Logbook:
         # If a page of the logbook (and therefore a Log object) gets deleted,
         # then the page_index may not correspond to the index of the log in the self.logs list.
         # Therefore, we have to search for the tab with the same name as the log.
+        log_index = None
         for i in range(0, len(self.logs)):
             if(self.logs[i].name == name):
                 log_index = i
