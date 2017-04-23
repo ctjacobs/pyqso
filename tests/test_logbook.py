@@ -67,10 +67,10 @@ class TestLogbook(unittest.TestCase):
 
     def test_filter_by_callsign(self):
         """ Check that callsigns are filtered correctly. """
-        data_types = [int] + [str]*3
-        model = self.logbook.logs[0]  # Consider only the first log.
 
-        path = Gtk.TreePath(0)  # Consider only the first record.
+        # Consider only the first record of the first log.
+        model = self.logbook.logs[0]
+        path = Gtk.TreePath(0)
         iter = model.get_iter(path)
 
         self.logbook.application.toolbar.filter_source.get_text.return_value = ""
