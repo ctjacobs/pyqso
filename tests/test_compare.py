@@ -24,6 +24,8 @@ from pyqso.compare import *
 
 class TestCompare(unittest.TestCase):
 
+    """ The unit tests for the Compare class. """
+
     def setUp(self):
         data_types = [int] + [str]*3
         self.model = Gtk.ListStore(*data_types)

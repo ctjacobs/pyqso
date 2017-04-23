@@ -23,6 +23,8 @@ from pyqso.log import *
 
 class TestLog(unittest.TestCase):
 
+    """ The unit tests for the Log class. """
+
     def setUp(self):
         self.connection = sqlite.connect(":memory:")
         self.connection.row_factory = sqlite.Row
