@@ -44,7 +44,7 @@ class Awards:
         self.awards = Gtk.ListStore(*data_types)
 
         # The main table for the awards
-        self.treeview = Gtk.TreeView(self.awards)
+        self.treeview = Gtk.TreeView(model=self.awards)
         # A separate, empty column just for the mode names
         renderer = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn("Modes", renderer, text=0)
