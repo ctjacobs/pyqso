@@ -87,6 +87,7 @@ AVAILABLE_FIELD_NAMES_FRIENDLY = {"CALL": "Callsign",
 # M: Multi-line string
 # G: Multi-line international string
 # L: Location
+# E: Enumerated
 DATA_TYPES = ["A", "B", "N", "S", "I", "D", "T", "M", "G", "L", "E"]
 
 # All the valid modes listed in the ADIF specification. This is a dictionary with the key-value pairs holding the MODE and SUBMODE(s) respectively.
