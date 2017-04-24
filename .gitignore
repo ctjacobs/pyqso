@@ -2,5 +2,5 @@
 pyqso.debug
 build/
 docs/build
-ADIF.test*.adi
-Cabrillo.test*.log
+ADIF.test_*.adi
+Cabrillo.test_*.log
