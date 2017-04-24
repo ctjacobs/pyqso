@@ -33,8 +33,7 @@ class TestRecordDialog(unittest.TestCase):
 
     def setUp(self):
         PyQSO = mock.MagicMock()
-        Log = mock.MagicMock()
-        self.record_dialog = RecordDialog(application=PyQSO(), log=Log())
+        self.record_dialog = RecordDialog(application=PyQSO(), log=None)
         self.record_dialog.sources["BAND"] = Gtk.ComboBoxText()
         for band in BANDS:
             self.record_dialog.sources["BAND"].append_text(band)
