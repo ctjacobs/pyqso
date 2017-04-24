@@ -49,5 +49,10 @@ class TestRecordDialog(unittest.TestCase):
         band = self.record_dialog.sources["BAND"].get_active_text()
         assert(band == "2m")
 
+        self.record_dialog.sources["FREQ"].get_text.return_value = "9001"
+        self.record_dialog.autocomplete_band()
+        band = self.record_dialog.sources["BAND"].get_active_text()
+        assert(band == "")  # Frequency does not lie in any of the specified bands.
+
 if(__name__ == '__main__'):
     unittest.main()
