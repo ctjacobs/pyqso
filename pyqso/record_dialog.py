@@ -90,6 +90,12 @@ class RecordDialog:
 
         # FREQ
         self.sources["FREQ"] = self.builder.get_object("qso_frequency_entry")
+        (section, option) = ("records", "frequency_unit")
+        if(have_config and config.has_option(section, option)):
+            self.frequency_unit = config.get(section, option)
+            self.builder.get_object("qso_frequency_label").set_label("Frequency (%s)" % self.frequency_unit)
+        else:
+            self.frequency_unit = "MHz"
 
         # BAND
         self.sources["BAND"] = self.builder.get_object("qso_band_combo")
@@ -172,14 +178,18 @@ class RecordDialog:
                     data = ""
                 if(field_names[i] == "BAND"):
                     self.sources[field_names[i]].set_active(BANDS.index(data))
+                elif(field_names[i] == "FREQ" and self.frequency_unit != "MHz"):
+                    converted = self.convert_frequency(data, from_unit="MHz", to_unit=self.frequency_unit)
+                    self.sources[field_names[i]].set_text(str(converted))
                 elif(field_names[i] == "MODE"):
                     self.sources[field_names[i]].set_active(sorted(MODES.keys()).index(data))
-
+                    # Handle SUBMODE at the same time.
                     submode_data = record["submode"]
                     if(submode_data is None):
                         submode_data = ""
                     self.sources["SUBMODE"].set_active(MODES[data].index(submode_data))
                 elif(field_names[i] == "SUBMODE"):
+                    # Skip, because this has been (or will be) handled when populating the MODE field.
                     continue
                 elif(field_names[i] == "QSL_SENT" or field_names[i] == "QSL_RCVD"):
                     self.sources[field_names[i]].set_active(qsl_options.index(data))
@@ -254,6 +264,9 @@ class RecordDialog:
         if(field_name == "CALL"):
             # Always show the callsigns in upper case.
             return self.sources[field_name].get_text().upper()
+        elif(field_name == "FREQ" and self.frequency_unit != "MHz"):
+            converted = self.convert_frequency(self.sources[field_name].get_text(), from_unit=self.frequency_unit, to_unit="MHz")
+            return str(converted)
         elif(field_name == "MODE"):
             return self.sources["MODE"].get_active_text()
         elif(field_name == "SUBMODE"):
@@ -290,12 +303,17 @@ class RecordDialog:
         """ If a value for the Frequency is entered, this function autocompletes the Band field. """
 
         frequency = self.sources["FREQ"].get_text()
+
         # Check whether we actually have a (valid) value to use. If not, set the BAND field to an empty string ("").
         try:
             frequency = float(frequency)
         except ValueError:
             self.sources["BAND"].set_active(0)
             return
+
+        # Convert to MHz if necessary.
+        if(self.frequency_unit != "MHz"):
+            frequency = self.convert_frequency(frequency, from_unit=self.frequency_unit, to_unit="MHz")
 
         # Find which band the frequency lies in.
         for i in range(1, len(BANDS)):
@@ -326,6 +344,9 @@ class RecordDialog:
         # Frequency
         try:
             frequency = "%.6f" % (rig.get_freq()/1.0e6)  # Converting to MHz here
+            # Convert to the desired unit, if necessary.
+            if(self.frequency_unit != "MHz"):
+                frequency = str(self.convert_frequency(frequency, from_unit="MHz", to_unit=self.frequency_unit))
             self.sources["FREQ"].set_text(frequency)
         except:
             logging.error("Could not obtain the current frequency via Hamlib!")
@@ -444,3 +465,36 @@ class RecordDialog:
         self.sources["TIME_ON"].set_text(dt.strftime("%H%M"))
 
         return
+
+    def convert_frequency(self, frequency, from_unit, to_unit):
+        """ Convert a frequency from one unit to another.
+
+        :arg float frequency: The frequency to convert.
+        :arg str from_unit: The current unit of the frequency.
+        :arg str to_unit: The desired unit of the frequency.
+        :rtype: float
+        :returns: The frequency in the to_unit.
+        """
+        scaling = {"Hz": 1, "kHz": 1e3, "MHz": 1e6, "GHz": 1e9}
+        # Check that the from/to frequency units are valid.
+        try:
+            if(from_unit not in scaling.keys()):
+                raise ValueError("Unknown frequency unit '%s' in from_unit" % from_unit)
+            if(to_unit not in scaling.keys()):
+                raise ValueError("Unknown frequency unit '%s' in to_unit" % to_unit)
+        except ValueError as e:
+            logging.exception(e)
+            return frequency
+        # Cast to float before scaling.
+        if(not isinstance(frequency, float)):
+            try:
+                frequency = float(frequency)
+            except TypeError:
+                logging.exception("Could not convert frequency to a floating-point value.")
+                return frequency
+        # Do not bother scaling if the units are the same.
+        if(from_unit == to_unit):
+            return frequency
+
+        coefficient = scaling[from_unit]/scaling[to_unit]
+        return float("%.6f" % (coefficient*frequency))

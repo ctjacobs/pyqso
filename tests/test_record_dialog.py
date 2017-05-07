@@ -54,5 +54,15 @@ class TestRecordDialog(unittest.TestCase):
         band = self.record_dialog.sources["BAND"].get_active_text()
         assert(band == "")  # Frequency does not lie in any of the specified bands.
 
+    def test_convert_frequency(self):
+        """ Check that a frequency can be successfully converted from one unit to another. """
+        frequency = "7.140"  # In MHz
+        converted = self.record_dialog.convert_frequency(frequency, from_unit="MHz", to_unit="AHz")  # Unknown to_unit. This should return the input unmodified.
+        assert(converted == frequency)
+        converted = self.record_dialog.convert_frequency(frequency, from_unit="MHz", to_unit="kHz")  # Convert from MHz to kHz.
+        assert(float(converted) == 1e3*float(frequency))
+        converted = self.record_dialog.convert_frequency(converted, from_unit="kHz", to_unit="MHz")  # Convert from kHz back to MHz. This should give the original frequency.
+        assert(float(converted) == float(frequency))
+
 if(__name__ == '__main__'):
     unittest.main()
