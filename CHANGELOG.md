@@ -9,6 +9,7 @@
 - Glade design of main window and dialogs.
 - Exporting of logs in the Cabrillo format.
 - More unit tests.
+- More tooltips.
 - The option to enter the frequency in Hz, kHz, MHz, or GHz in the Add/Edit Record dialog. Frequencies are still displayed in MHz in the logbook.
 
 ### Changed
