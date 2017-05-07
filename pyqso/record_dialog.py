@@ -90,7 +90,7 @@ class RecordDialog:
 
         # FREQ
         self.sources["FREQ"] = self.builder.get_object("qso_frequency_entry")
-        (section, option) = ("records", "frequency_unit")
+        (section, option) = ("records", "default_frequency_unit")
         if(have_config and config.has_option(section, option)):
             self.frequency_unit = config.get(section, option)
             self.builder.get_object("qso_frequency_label").set_label("Frequency (%s)" % self.frequency_unit)

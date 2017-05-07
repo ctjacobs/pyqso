@@ -2275,12 +2275,6 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                                     <property name="can_focus">False</property>
                                     <property name="tooltip_text" translatable="yes">The unit of the frequency that will be entered into the Frequency entry box in the Add/Edit Record dialog (e.g. by selecting kHz, a value of 7140 can be entered instead of 7.140 MHz). However, the frequency will still be shown in MHz in the logbook.</property>
                                     <property name="active">2</property>
-                                    <items>
-                                      <item translatable="yes">Hz</item>
-                                      <item translatable="yes">kHz</item>
-                                      <item translatable="yes">MHz</item>
-                                      <item translatable="yes">GHz</item>
-                                    </items>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>

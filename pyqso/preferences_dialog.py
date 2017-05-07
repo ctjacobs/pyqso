@@ -355,6 +355,17 @@ class RecordsPage:
         else:
             self.sources["DEFAULT_POWER"].set_text("")
 
+        # Frequency unit
+        self.sources["DEFAULT_FREQUENCY_UNIT"] = self.builder.get_object("default_values_frequency_unit_combo")
+        units = ["Hz", "kHz", "MHz", "GHz"]
+        for unit in units:
+            self.sources["DEFAULT_FREQUENCY_UNIT"].append_text(unit)
+        (section, option) = ("records", "default_frequency_unit")
+        if(have_config and config.has_option(section, option)):
+            self.sources["DEFAULT_FREQUENCY_UNIT"].set_active(units.index(config.get(section, option)))
+        else:
+            self.sources["DEFAULT_FREQUENCY_UNIT"].set_active(units.index("MHz"))
+
         # Callsign lookup
         self.sources["CALLSIGN_DATABASE"] = self.builder.get_object("callsign_lookup_database_combo")
         callsign_database = ["", "qrz.com", "hamqth.com"]
@@ -398,6 +409,7 @@ class RecordsPage:
         data["DEFAULT_MODE"] = self.sources["DEFAULT_MODE"].get_active_text()
         data["DEFAULT_SUBMODE"] = self.sources["DEFAULT_SUBMODE"].get_active_text()
         data["DEFAULT_POWER"] = self.sources["DEFAULT_POWER"].get_text()
+        data["DEFAULT_FREQUENCY_UNIT"] = self.sources["DEFAULT_FREQUENCY_UNIT"].get_active_text()
 
         data["CALLSIGN_DATABASE"] = self.sources["CALLSIGN_DATABASE"].get_active_text()
         data["CALLSIGN_DATABASE_USERNAME"] = self.sources["CALLSIGN_DATABASE_USERNAME"].get_text()
