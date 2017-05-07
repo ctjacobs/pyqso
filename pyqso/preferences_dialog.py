@@ -38,6 +38,7 @@ except ImportError:
     have_geocoder = False
 
 from pyqso.adif import *
+from pyqso.auxiliary_dialogs import error
 
 PREFERENCES_FILE = os.path.expanduser("~/.config/pyqso/preferences.ini")
 
@@ -60,11 +61,11 @@ class PreferencesDialog:
         self.builder.add_objects_from_file(glade_file_path, ("preferences_dialog",))
         self.dialog = self.builder.get_object("preferences_dialog")
 
-        self.general = GeneralPage(self.builder)
-        self.view = ViewPage(self.builder)
-        self.records = RecordsPage(self.builder)
-        self.adif = ADIFPage(self.builder)
-        self.hamlib = HamlibPage(self.builder)
+        self.general = GeneralPage(self.dialog, self.builder)
+        self.view = ViewPage(self.dialog, self.builder)
+        self.records = RecordsPage(self.dialog, self.builder)
+        self.adif = ADIFPage(self.dialog, self.builder)
+        self.hamlib = HamlibPage(self.dialog, self.builder)
 
         self.dialog.show_all()
 
@@ -115,9 +116,10 @@ class GeneralPage:
 
     """ The section of the preferences dialog containing general preferences. """
 
-    def __init__(self, builder):
+    def __init__(self, parent, builder):
         logging.debug("Setting up the General page of the preferences dialog...")
 
+        self.parent = parent
         self.builder = builder
         self.sources = {}
 
@@ -191,10 +193,12 @@ class GeneralPage:
             self.sources["QTH_NAME"].set_sensitive(self.sources["SHOW_QTH"].get_active())
             self.sources["QTH_LATITUDE"].set_sensitive(self.sources["SHOW_QTH"].get_active())
             self.sources["QTH_LONGITUDE"].set_sensitive(self.sources["SHOW_QTH"].get_active())
+            button.set_sensitive(self.sources["SHOW_QTH"].get_active())
         else:
             self.sources["QTH_NAME"].set_sensitive(False)
             self.sources["QTH_LATITUDE"].set_sensitive(False)
             self.sources["QTH_LONGITUDE"].set_sensitive(False)
+            button.set_sensitive(False)
         (section, option) = ("general", "qth_name")
         if(have_config and config.has_option(section, option)):
             self.sources["QTH_NAME"].set_text(config.get(section, option))
@@ -204,6 +208,7 @@ class GeneralPage:
         (section, option) = ("general", "qth_longitude")
         if(have_config and config.has_option(section, option)):
             self.sources["QTH_LONGITUDE"].set_text(config.get(section, option))
+        self.sources["SHOW_QTH"].connect("toggled", self.on_show_qth_toggled)
 
         logging.debug("General page of the preferences dialog ready!")
         return
@@ -235,10 +240,12 @@ class GeneralPage:
             self.sources["QTH_NAME"].set_sensitive(True)
             self.sources["QTH_LATITUDE"].set_sensitive(True)
             self.sources["QTH_LONGITUDE"].set_sensitive(True)
+            self.builder.get_object("general_qth_lookup").set_sensitive(True)
         else:
             self.sources["QTH_NAME"].set_sensitive(False)
             self.sources["QTH_LATITUDE"].set_sensitive(False)
             self.sources["QTH_LONGITUDE"].set_sensitive(False)
+            self.builder.get_object("general_qth_lookup").set_sensitive(False)
         return
 
     def lookup_callback(self, widget=None):
@@ -253,8 +260,12 @@ class GeneralPage:
             latitude, longitude = g.latlng
             self.sources["QTH_LATITUDE"].set_text(str(latitude))
             self.sources["QTH_LONGITUDE"].set_text(str(longitude))
-            logging.debug("Latitude-longitude coordinates found: (%s, %s)", str(latitude), str(longitude))
+            logging.debug("QTH coordinates found: (%s, %s)", str(latitude), str(longitude))
+        except ValueError as e:
+            error(parent=self.parent, message="Unable to lookup QTH coordinates. Is the QTH name correct?")
+            logging.exception(e)
         except Exception as e:
+            error(parent=self.parent, message="Unable to lookup QTH coordinates. Check connection to the internets?")
             logging.exception(e)
         return
 
@@ -263,9 +274,10 @@ class ViewPage:
 
     """ The section of the preferences dialog containing view-related preferences. """
 
-    def __init__(self, builder):
+    def __init__(self, parent, builder):
         logging.debug("Setting up the View page of the preferences dialog...")
 
+        self.parent = parent
         self.builder = builder
         self.sources = {}
 
@@ -296,9 +308,10 @@ class RecordsPage:
 
     """ The section of the preferences dialog containing record-related preferences. """
 
-    def __init__(self, builder):
+    def __init__(self, parent, builder):
         logging.debug("Setting up the Records page of the preferences dialog...")
 
+        self.parent = parent
         self.builder = builder
         self.sources = {}
 
@@ -430,9 +443,10 @@ class ADIFPage:
 
     """ The section of the preferences dialog containing ADIF-related preferences. """
 
-    def __init__(self, builder):
+    def __init__(self, parent, builder):
         logging.debug("Setting up the ADIF page of the preferences dialog...")
 
+        self.parent = parent
         self.builder = builder
         self.sources = {}
 
@@ -464,9 +478,10 @@ class HamlibPage:
 
     """ The section of the preferences dialog containing Hamlib-related preferences. """
 
-    def __init__(self, builder):
+    def __init__(self, parent, builder):
         logging.debug("Setting up the Hamlib page of the preferences dialog...")
 
+        self.parent = parent
         self.builder = builder
         self.sources = {}
 

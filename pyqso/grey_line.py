@@ -66,8 +66,8 @@ class GreyLine:
                     self.qth_name = config.get("general", "qth_name")
                     self.qth_latitude = float(config.get("general", "qth_latitude"))
                     self.qth_longitude = float(config.get("general", "qth_longitude"))
-                except ValueError as e:
-                    logging.exception(e)
+                except ValueError:
+                    logging.warning("Unable to get the QTH name, latitude and/or longitude. The QTH will not be pinpointed on the grey line map. Check preferences?")
                     self.show_qth = False
 
         if(have_necessary_modules):
