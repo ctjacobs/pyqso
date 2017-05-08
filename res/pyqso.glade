@@ -79,6 +79,12 @@
     <property name="stock">gtk-new</property>
     <property name="icon_size">1</property>
   </object>
+  <object class="GtkImage" id="image30">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-add</property>
+    <property name="icon_size">1</property>
+  </object>
   <object class="GtkImage" id="image4">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -177,11 +183,21 @@
                     </child>
                     <child>
                       <object class="GtkImageMenuItem" id="mitem_new_log">
-                        <property name="label" translatable="yes">New Log</property>
+                        <property name="label" translatable="yes">New Log...</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="image">image30</property>
                         <property name="use_stock">False</property>
                         <accelerator key="n" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="mitem_rename_log">
+                        <property name="label" translatable="yes">Rename Selected Log...</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="image">image8</property>
+                        <property name="use_stock">False</property>
                       </object>
                     </child>
                     <child>
@@ -194,15 +210,6 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkImageMenuItem" id="mitem_rename_log">
-                        <property name="label" translatable="yes">Rename Selected Log</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="image">image8</property>
-                        <property name="use_stock">False</property>
-                      </object>
-                    </child>
-                    <child>
                       <object class="GtkSeparatorMenuItem" id="separatormenuitem1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -210,7 +217,7 @@
                     </child>
                     <child>
                       <object class="GtkImageMenuItem" id="mitem_import_log">
-                        <property name="label" translatable="yes">Import Log</property>
+                        <property name="label" translatable="yes">Import Log...</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="image">image9</property>
@@ -219,7 +226,7 @@
                     </child>
                     <child>
                       <object class="GtkImageMenuItem" id="mitem_export_log_adif">
-                        <property name="label" translatable="yes">Export Log as ADIF</property>
+                        <property name="label" translatable="yes">Export Log as ADIF...</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="image">image10</property>
@@ -228,7 +235,7 @@
                     </child>
                     <child>
                       <object class="GtkImageMenuItem" id="mitem_export_log_cabrillo">
-                        <property name="label" translatable="yes">Export Log as Cabrillo</property>
+                        <property name="label" translatable="yes">Export Log as Cabrillo...</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="image">image29</property>
@@ -243,7 +250,7 @@
                     </child>
                     <child>
                       <object class="GtkImageMenuItem" id="mitem_print_log">
-                        <property name="label" translatable="yes">Print Log</property>
+                        <property name="label" translatable="yes">Print Log...</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="image">image11</property>
@@ -302,7 +309,7 @@
                     </child>
                     <child>
                       <object class="GtkImageMenuItem" id="mitem_delete_record">
-                        <property name="label" translatable="yes">Delete Selected Record...</property>
+                        <property name="label" translatable="yes">Delete Selected Record</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="image">image16</property>
@@ -636,12 +643,14 @@
                                   <object class="GtkMenuItem" id="mitem_connection">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
+                                    <property name="label" translatable="yes">Connection</property>
                                     <child type="submenu">
                                       <object class="GtkMenu" id="connection_menu">
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <child>
                                           <object class="GtkImageMenuItem" id="mitem_connect">
+                                            <property name="label" translatable="yes">Connect to Telnet Server</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="image">image5</property>
@@ -654,12 +663,14 @@
                                                   <object class="GtkMenuItem" id="mitem_new">
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">False</property>
+                                                    <property name="label" translatable="yes">New...</property>
                                                   </object>
                                                 </child>
                                                 <child>
                                                   <object class="GtkMenuItem" id="mitem_bookmark ">
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">False</property>
+                                                    <property name="label" translatable="yes">From Bookmark</property>
                                                     <child type="submenu">
                                                       <object class="GtkMenu" id="subm_bookmarks">
                                                         <property name="visible">True</property>
@@ -674,6 +685,7 @@
                                         </child>
                                         <child>
                                           <object class="GtkImageMenuItem" id="mitem_disconnect">
+                                            <property name="label" translatable="yes">Disconnect from Telnet Server</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">False</property>
                                             <property name="image">image6</property>
