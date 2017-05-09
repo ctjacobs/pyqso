@@ -38,10 +38,10 @@ class TelnetConnectionDialog:
         self.builder.add_objects_from_file(glade_file_path, ("telnet_connection_dialog",))
         self.dialog = self.builder.get_object("telnet_connection_dialog")
         self.sources = {"HOST": self.builder.get_object("host_entry"),
-                       "PORT": self.builder.get_object("port_entry"),
-                       "USERNAME": self.builder.get_object("username_entry"),
-                       "PASSWORD": self.builder.get_object("password_entry"),
-                       "BOOKMARK": self.builder.get_object("bookmark_checkbox")}
+                        "PORT": self.builder.get_object("port_entry"),
+                        "USERNAME": self.builder.get_object("username_entry"),
+                        "PASSWORD": self.builder.get_object("password_entry"),
+                        "BOOKMARK": self.builder.get_object("bookmark_checkbox")}
 
         self.dialog.show_all()
 
