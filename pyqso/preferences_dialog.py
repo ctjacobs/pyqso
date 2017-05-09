@@ -215,6 +215,7 @@ class GeneralPage:
 
     @property
     def data(self):
+        """ User preferences regarding General settings. """
         logging.debug("Retrieving data from the General page of the preferences dialog...")
         data = {}
         data["SHOW_TOOLBOX"] = self.sources["SHOW_TOOLBOX"].get_active()
@@ -297,6 +298,7 @@ class ViewPage:
 
     @property
     def data(self):
+        """ User preferences regarding View settings. """
         logging.debug("Retrieving data from the View page of the preferences dialog...")
         data = {}
         for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
@@ -414,6 +416,7 @@ class RecordsPage:
 
     @property
     def data(self):
+        """ User preferences regarding Records settings. """
         logging.debug("Retrieving data from the Records page of the preferences dialog...")
         data = {}
         data["AUTOCOMPLETE_BAND"] = self.sources["AUTOCOMPLETE_BAND"].get_active()
@@ -468,6 +471,7 @@ class ADIFPage:
 
     @property
     def data(self):
+        """ User preferences regarding ADIF settings. """
         logging.debug("Retrieving data from the ADIF page of the preferences dialog...")
         data = {}
         data["MERGE_COMMENT"] = self.sources["MERGE_COMMENT"].get_active()
@@ -527,6 +531,7 @@ class HamlibPage:
 
     @property
     def data(self):
+        """ User preferences regarding Hamlib settings. """
         logging.debug("Retrieving data from the Hamlib page of the preferences dialog...")
         data = {}
         data["AUTOFILL"] = self.sources["AUTOFILL"].get_active()
