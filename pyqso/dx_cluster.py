@@ -26,6 +26,9 @@ except ImportError:
     import ConfigParser as configparser
 import os.path
 
+from pyqso.telnet_connection_dialog import TelnetConnectionDialog
+from pyqso.auxiliary_dialogs import error
+
 BOOKMARKS_FILE = os.path.expanduser('~/.config/pyqso/bookmarks.ini')
 
 
@@ -77,32 +80,24 @@ class DXCluster:
     def new_server(self, widget=None):
         """ Get Telnet server host and login details specified in the Gtk.Entry boxes in the Telnet connection dialog and attempt a connection. """
 
-        # Build connection dialog
-        logging.debug("Setting up the Telnet connection dialog...")
-        glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/pyqso.glade")
-        self.builder.add_objects_from_file(glade_file_path, ("telnet_connection_dialog",))
-        dialog = self.builder.get_object("telnet_connection_dialog")
-        connection_info = {"HOST": self.builder.get_object("host_entry"),
-                           "PORT": self.builder.get_object("port_entry"),
-                           "USERNAME": self.builder.get_object("username_entry"),
-                           "PASSWORD": self.builder.get_object("password_entry"),
-                           "BOOKMARK": self.builder.get_object("bookmark_checkbox")}
-
-        response = dialog.run()
+        # Get connection details.
+        tcd = TelnetConnectionDialog(self.application)
+        response = tcd.dialog.run()
         if(response == Gtk.ResponseType.OK):
-            host = connection_info["HOST"].get_text()
-            port = connection_info["PORT"].get_text()
-            username = connection_info["USERNAME"].get_text()
-            password = connection_info["PASSWORD"].get_text()
+            host = tcd.host
+            port = tcd.port
+            username = tcd.username
+            password = tcd.password
+            bookmark = tcd.bookmark
+            tcd.dialog.destroy()
 
             # Handle empty hostname.
-            if(host == ""):
+            if(not host):
                 logging.error("No hostname specified.")
-                dialog.destroy()
                 return
 
             # Handle empty port number.
-            if(port == ""):
+            if(not port):
                 logging.warning("No port specified. Assuming default port 23...")
                 port = 23
             else:
@@ -112,17 +107,16 @@ class DXCluster:
                 except ValueError as e:
                     logging.error("Could not cast the DX cluster's port information to an integer.")
                     logging.exception(e)
-                    dialog.destroy()
                     return
 
             # Save the server details in a new bookmark, if desired.
-            if(connection_info["BOOKMARK"].get_active()):
+            if(bookmark):
                 try:
                     config = configparser.ConfigParser()
                     config.read(BOOKMARKS_FILE)
 
                     # Use the host name as the bookmark's identifier.
-                    if(username != ""):
+                    if(username):
                         bookmark_identifier = "%s@%s:%d" % (username, host, port)
                     else:
                         bookmark_identifier = "%s:%d" % (host, port)
@@ -151,13 +145,11 @@ class DXCluster:
                     # Maybe the bookmarks file could not be written to?
                     logging.error("Bookmark could not be saved. Check bookmarks file permissions? Going ahead with the server connection anyway...")
 
-            dialog.destroy()
-
             # Attempt a connection with the server.
             self.telnet_connect(host, port, username, password)
 
         else:
-            dialog.destroy()
+            tcd.dialog.destroy()
         return
 
     def populate_bookmarks(self):
@@ -227,16 +219,20 @@ class DXCluster:
         :arg str password: The user's password. This is an optional argument.
         """
 
-        if(host == "" or host is None):
-            logging.error("No hostname specified.")
+        # Handle empty host/port string (or the case where host/port are None).
+        if(not host):
+            message = "Unable to connect to a DX cluster because no hostname was specified."
+            logging.error(message)
+            error(parent=self.application.window, message=message)
             return
-        if(port == "" or port is None):
+        if(not port):
             logging.warning("No port specified. Assuming default port 23...")
-            port = 23  # Use the default Telnet port
+            port = 23  # Use the default Telnet port.
 
         try:
-            logging.debug("Attempting connection to Telnet server %s:%d" % (host, port))
+            logging.debug("Attempting connection to Telnet server %s:%d..." % (host, port))
             self.connection = telnetlib.Telnet(host, port)
+            assert(self.connection)
 
             if(username):
                 self.connection.read_until("login: ".encode())
@@ -245,10 +241,14 @@ class DXCluster:
                 self.connection.read_until("password: ".encode())
                 self.connection.write((password + "\n").encode())
         except Exception as e:
-            logging.error("Could not create a connection to the Telnet server.")
+            message = "Could not create a connection to the Telnet server %s:%d. Check connection to the internets? Check connection details?" % (host, port)
+            logging.error(message)
             logging.exception(e)
+            error(parent=self.application.window, message=message)
             self.connection = None
             return
+
+        logging.debug("Connection to %s:%d established." % (host, port))
 
         self.set_items_sensitive(False)
 
