@@ -2454,7 +2454,7 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="visibility">False</property>
-                                                <property name="invisible_char">●</property>
+                                                <property name="invisible_char">*</property>
                                                 <property name="width_chars">15</property>
                                                 <property name="input_purpose">password</property>
                                               </object>
@@ -4156,6 +4156,8 @@ Base64-encoded plain text in the configuration file.</property>
               <object class="GtkEntry" id="password_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="visibility">False</property>
+                <property name="invisible_char">*</property>
                 <property name="input_purpose">password</property>
               </object>
               <packing>
