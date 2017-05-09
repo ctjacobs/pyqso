@@ -31,7 +31,7 @@ class Awards:
 
         :arg application: The PyQSO application containing the main Gtk window, etc.
         """
-        # TODO: This only considers the DXCC award for now.
+        # TODO: Add more awards. This only considers the DXCC award for now.
         logging.debug("Setting up awards table...")
 
         self.application = application
@@ -43,9 +43,9 @@ class Awards:
         data_types = [str] + [int]*len(self.bands)
         self.awards = Gtk.ListStore(*data_types)
 
-        # The main table for the awards
+        # The main table for the awards.
         self.treeview = Gtk.TreeView(model=self.awards)
-        # A separate, empty column just for the mode names
+        # A separate, empty column just for the mode names.
         renderer = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn("Modes", renderer, text=0)
         column.set_clickable(False)
@@ -59,7 +59,7 @@ class Awards:
             column.set_clickable(False)
             self.treeview.append_column(column)
 
-        # Show the table in the Awards tab
+        # Show the table in the Awards tab.
         self.builder.get_object("awards").add(self.treeview)
         self.builder.get_object("awards").show_all()
 
@@ -104,7 +104,7 @@ class Awards:
             else:
                 logging.error("Could not update the awards table for '%s' because of a database error." % log.name)
 
-        # Insert the rows containing the totals
+        # Insert the rows containing the totals.
         for i in range(0, len(self.modes)):
             self.awards.append([self.modes[i]] + count[i])
 
