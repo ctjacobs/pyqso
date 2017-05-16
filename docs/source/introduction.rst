@@ -42,7 +42,7 @@ Data storage model
 Many amateur radio operators choose to store all the contacts they ever
 make in a single *logbook*, whereas others keep a separate logbook for
 each year, for example. Each logbook may be divided up to form multiple
-distinct *logs*, perhaps one for casual repeater contacts and another
+distinct *logs*, perhaps one for casual repeater contacts, another for satellite contacts, and another
 for DX'ing. Finally, each log can contain multiple *records*. PyQSO is
 based around this three-tier model for data storage, going from logbooks
 at the top to individual records at the bottom.
@@ -57,7 +57,7 @@ log.
 Licensing
 ---------
 
-PyQSO is free software, released under the `GNU General Public License <http://www.gnu.org/licenses/gpl-3.0.en.html>`_. Please see the file called ``COPYING`` for more information. A copyright year range of the form YYYY-ZZZZ specifies every single year from YYYY to ZZZZ inclusive (for example, 2012-2016 means 2012, 2013, 2014, 2015, 2016).
+PyQSO is free software, released under the `GNU General Public License <http://www.gnu.org/licenses/gpl-3.0.en.html>`_. Please see the file called ``COPYING`` for more information. A copyright year range of the form YYYY-ZZZZ specifies every single year from YYYY to ZZZZ inclusive (for example, 2012-2017 means 2012, 2013, 2014, 2015, 2016, 2017).
 
 Contact
 -------
