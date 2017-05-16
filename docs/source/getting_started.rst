@@ -8,7 +8,7 @@ It is recommended that users run PyQSO on the Linux operating system,
 since all development and testing of PyQSO takes place there.
 
 As the name suggests, PyQSO is written primarily in the Python
-programming language. The graphical user interface has been built using
+programming language (version 3.x). The graphical user interface has been built using
 the GTK+ library through the PyGObject bindings. PyQSO also uses an
 SQLite embedded database to manage all the contacts an amateur radio
 operator makes. Users must therefore make sure that the Python
