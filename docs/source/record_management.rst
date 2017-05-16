@@ -17,7 +17,7 @@ A new QSO can be added by either:
 
 A dialog window will appear where details of the QSO can be entered (see
 figure:edit_record_). Note that the current date and time
-are filled in automatically. When ready, click ``OK`` to save the
+are filled in automatically. When ready, click ``OK`` or press the Enter key to save the
 changes.
 
    .. _figure:edit_record:

@@ -22,8 +22,8 @@ supplied. Frequently used servers can be bookmarked for next time; bookmarked se
 
 Once connected, the server output will appear in the DX
 cluster frame (see figure:dx_cluster_). A command can also
-be sent to the server by typing it into the entry box beneath the server output, and clicking the
-adjacent ``Send Command`` button.
+be sent to the server by typing it into the entry box beneath the server output and clicking the
+adjacent ``Send Command`` button (or pressing the Enter key).
 
    .. _figure:dx_cluster:
    .. figure::  images/dx_cluster.png
@@ -36,7 +36,7 @@ Grey line
 
 The grey line tool (see figure:grey_line_) can be used to
 check which parts of the world are in darkness. The position of the grey
-line is automatically updated every 30 minutes.
+line is automatically updated every 30 minutes. The user's QTH can be pin-pointed on the map by specifying the latitude-longitude coordinates in the preferences.
 
    .. _figure:grey_line:
    .. figure::  images/grey_line.png

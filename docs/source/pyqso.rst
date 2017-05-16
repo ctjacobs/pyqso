@@ -156,6 +156,14 @@ pyqso.summary module
     :undoc-members:
     :show-inheritance:
 
+pyqso.telnet_connection_dialog module
+-------------------------------------
+
+.. automodule:: pyqso.telnet_connection_dialog
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 pyqso.toolbar module
 --------------------
 
