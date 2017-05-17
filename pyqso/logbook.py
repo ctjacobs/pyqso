@@ -871,7 +871,6 @@ class Logbook:
                     record = log.get_record_by_index(row_index)
                     if(record is None):
                         message = "Could not retrieve record with row_index %d from the SQL database. The record has not been edited." % row_index
-                        logging.error(message)
                         error(parent=rd.dialog, message=message)
                     else:
                         for i in range(0, len(field_names)):

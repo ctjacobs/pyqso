@@ -275,7 +275,7 @@ class GeneralPage:
     def lookup_callback(self, widget=None):
         """ Performs geocoding of the QTH location to obtain latitude-longitude coordinates. """
         if(not have_geocoder):
-            logging.warning("Geocoder module could not be imported. Geocoding aborted.")
+            error(parent=self.parent, message="Geocoder module could not be imported. Geocoding aborted.")
             return
         logging.debug("Geocoding QTH location...")
         name = self.sources["QTH_NAME"].get_text()

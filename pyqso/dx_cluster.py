@@ -221,9 +221,7 @@ class DXCluster:
 
         # Handle empty host/port string (or the case where host/port are None).
         if(not host):
-            message = "Unable to connect to a DX cluster because no hostname was specified."
-            logging.error(message)
-            error(parent=self.application.window, message=message)
+            error(parent=self.application.window, message="Unable to connect to a DX cluster because no hostname was specified.")
             return
         if(not port):
             logging.warning("No port specified. Assuming default port 23...")
@@ -242,9 +240,8 @@ class DXCluster:
                 self.connection.write((password + "\n").encode())
         except Exception as e:
             message = "Could not create a connection to the Telnet server %s:%d. Check connection to the internets? Check connection details?" % (host, port)
-            logging.error(message)
-            logging.exception(e)
             error(parent=self.application.window, message=message)
+            logging.exception(e)
             self.connection = None
             return
 

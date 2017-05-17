@@ -1242,6 +1242,8 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                       <object class="GtkAlignment" id="preferences_general_startup_alignment">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="left_padding">2</property>
+                        <property name="right_padding">2</property>
                         <child>
                           <object class="GtkBox" id="preferences_general_startup_vbox">
                             <property name="visible">True</property>
@@ -1282,7 +1284,7 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                               <object class="GtkBox" id="general_default_logbook_hbox">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="spacing">4</property>
+                                <property name="spacing">3</property>
                                 <child>
                                   <object class="GtkCheckButton" id="general_default_logbook_checkbutton">
                                     <property name="label" translatable="yes">Open a default logbook</property>
@@ -1367,6 +1369,8 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                       <object class="GtkAlignment" id="preferences_general_dialogs_alignment">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="left_padding">2</property>
+                        <property name="right_padding">2</property>
                         <child>
                           <object class="GtkBox" id="preferences_general_dialogs_vbox">
                             <property name="visible">True</property>
@@ -1427,6 +1431,8 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                       <object class="GtkAlignment" id="preferences_general_qth_alignment">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="left_padding">2</property>
+                        <property name="right_padding">2</property>
                         <child>
                           <object class="GtkBox" id="preferences_general_qth_vbox">
                             <property name="visible">True</property>
@@ -1464,6 +1470,7 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                                   <packing>
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
+                                    <property name="padding">2</property>
                                     <property name="position">0</property>
                                   </packing>
                                 </child>
@@ -1525,6 +1532,7 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                                   <packing>
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
+                                    <property name="padding">2</property>
                                     <property name="position">0</property>
                                   </packing>
                                 </child>
@@ -1562,6 +1570,7 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                                   <packing>
                                     <property name="expand">True</property>
                                     <property name="fill">True</property>
+                                    <property name="padding">2</property>
                                     <property name="position">3</property>
                                   </packing>
                                 </child>
@@ -2094,6 +2103,8 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                       <object class="GtkAlignment" id="preferences_records_autocomplete_alignment">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="left_padding">2</property>
+                        <property name="right_padding">2</property>
                         <child>
                           <object class="GtkBox" id="preferences_records_autocomplete_vbox">
                             <property name="visible">True</property>
@@ -2161,6 +2172,8 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                       <object class="GtkAlignment" id="preferences_records_default_values_alignment">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="left_padding">2</property>
+                        <property name="right_padding">2</property>
                         <child>
                           <object class="GtkBox" id="preferences_records_default_values_vbox">
                             <property name="visible">True</property>
@@ -2353,6 +2366,8 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                       <object class="GtkAlignment" id="preferences_records_callsign_lookup_alignment">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="left_padding">2</property>
+                        <property name="right_padding">2</property>
                         <child>
                           <object class="GtkBox" id="preferences_records_callsign_lookup_vbox">
                             <property name="visible">True</property>
@@ -2597,6 +2612,8 @@ Base64-encoded plain text in the configuration file.</property>
                       <object class="GtkAlignment" id="preferences_adif_import_alignment">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="left_padding">2</property>
+                        <property name="right_padding">2</property>
                         <child>
                           <object class="GtkBox" id="preferences_adif_import_vbox">
                             <property name="visible">True</property>
@@ -2667,6 +2684,8 @@ Base64-encoded plain text in the configuration file.</property>
                       <object class="GtkAlignment" id="preferences_hamlib_support_alignment">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="left_padding">2</property>
+                        <property name="right_padding">2</property>
                         <child>
                           <object class="GtkBox" id="preferences_hamlib_support_vbox">
                             <property name="visible">True</property>
@@ -2926,7 +2945,7 @@ Base64-encoded plain text in the configuration file.</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
-                                <property name="tooltip_text" translatable="yes">Callsign Lookup</property>
+                                <property name="tooltip_text" translatable="yes">Callsign lookup</property>
                                 <property name="always_show_image">True</property>
                                 <child>
                                   <object class="GtkImage" id="image26">
