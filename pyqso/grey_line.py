@@ -103,21 +103,21 @@ class GreyLine:
 
                 # Draw the map of the world. This is based on the example from:
                 # http://matplotlib.org/basemap/users/examples.html
-                m = mpl_toolkits.basemap.Basemap(projection='mill', lon_0=0, ax=sub, resolution='c', fix_aspect=False)
-                m.drawcountries(linewidth=0.5)
-                m.drawcoastlines(linewidth=0.5)
+                m = mpl_toolkits.basemap.Basemap(projection="mill", lon_0=0, ax=sub, resolution="c", fix_aspect=False)
+                m.drawcountries(linewidth=0.4)
+                m.drawcoastlines(linewidth=0.4)
                 m.drawparallels(numpy.arange(-90, 90, 30), labels=[1, 0, 0, 0])
                 m.drawmeridians(numpy.arange(m.lonmin, m.lonmax+30, 60), labels=[0, 0, 0, 1])
-                m.drawmapboundary(fill_color='lightblue')
-                m.fillcontinents(color='darkgreen', lake_color='lightblue')
+                m.drawmapboundary(fill_color="skyblue")
+                m.fillcontinents(color="green", lake_color="skyblue")
                 m.nightshade(datetime.utcnow())  # Add in the grey line using UTC time. Note that this requires NetCDF.
                 logging.debug("Grey line drawn.")
 
                 # Pin-point QTH on the map.
                 if(self.show_qth):
                     qth_x, qth_y = m(self.qth_longitude, self.qth_latitude)
-                    m.plot(qth_x, qth_y, "yo")
-                    sub.text(qth_x, qth_y, self.qth_name, color='yellow')
+                    m.plot(qth_x, qth_y, "ro")
+                    sub.text(qth_x+0.015*qth_x, qth_y+0.015*qth_y, self.qth_name, color="white", size="medium", weight="bold")
 
                 return True
         else:
