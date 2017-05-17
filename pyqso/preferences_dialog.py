@@ -17,6 +17,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
+from gi.repository import Gtk
 import logging
 try:
     import configparser
@@ -128,7 +129,7 @@ class GeneralPage:
         config = configparser.ConfigParser()
         have_config = (config.read(PREFERENCES_FILE) != [])
 
-        # Show toolbox
+        # Show toolbox.
         self.sources["SHOW_TOOLBOX"] = self.builder.get_object("general_show_toolbox_checkbutton")
         (section, option) = ("general", "show_toolbox")
         if(have_config and config.has_option(section, option)):
@@ -136,7 +137,7 @@ class GeneralPage:
         else:
             self.sources["SHOW_TOOLBOX"].set_active(False)
 
-        # Show statistics
+        # Show statistics.
         self.sources["SHOW_YEARLY_STATISTICS"] = self.builder.get_object("general_show_yearly_statistics_checkbutton")
         (section, option) = ("general", "show_yearly_statistics")
         if(have_config and config.has_option(section, option)):
@@ -144,7 +145,7 @@ class GeneralPage:
         else:
             self.sources["SHOW_YEARLY_STATISTICS"].set_active(False)
 
-        # Default logbook
+        # Default logbook.
         self.sources["DEFAULT_LOGBOOK"] = self.builder.get_object("general_default_logbook_checkbutton")
         (section, option) = ("general", "default_logbook")
         if(have_config and config.has_option(section, option)):
@@ -158,13 +159,17 @@ class GeneralPage:
         # Disable the text entry box if the default logbook checkbox is not checked.
         if(have_config and config.has_option(section, option)):
             self.sources["DEFAULT_LOGBOOK_PATH"].set_sensitive(self.sources["DEFAULT_LOGBOOK"].get_active())
+            self.builder.get_object("general_default_logbook_button").set_sensitive(self.sources["DEFAULT_LOGBOOK"].get_active())
         else:
             self.sources["DEFAULT_LOGBOOK_PATH"].set_sensitive(False)
+            self.builder.get_object("general_default_logbook_button").set_sensitive(False)
         (section, option) = ("general", "default_logbook_path")
         if(have_config and config.has_option(section, option)):
             self.sources["DEFAULT_LOGBOOK_PATH"].set_text(config.get(section, option))
 
-        # Keep 'Add Record' dialog open
+        self.builder.get_object("general_default_logbook_button").connect("clicked", self.on_default_logbook_clicked)
+
+        # Keep 'Add Record' dialog open.
         self.sources["KEEP_OPEN"] = self.builder.get_object("general_keep_open_checkbutton")
         (section, option) = ("general", "keep_open")
         if(have_config and config.has_option(section, option)):
@@ -232,8 +237,26 @@ class GeneralPage:
     def on_default_logbook_toggled(self, widget, data=None):
         if(widget.get_active()):
             self.sources["DEFAULT_LOGBOOK_PATH"].set_sensitive(True)
+            self.builder.get_object("general_default_logbook_button").set_sensitive(True)
         else:
             self.sources["DEFAULT_LOGBOOK_PATH"].set_sensitive(False)
+            self.builder.get_object("general_default_logbook_button").set_sensitive(False)
+        return
+
+    def on_default_logbook_clicked(self, widget):
+        """ Let the user select the default logbook file via a file chooser dialog,
+        and set the path in the adjacent entry box. """
+
+        dialog = Gtk.FileChooserDialog("Select SQLite Database File",
+                                       self.parent,
+                                       Gtk.FileChooserAction.OPEN,
+                                       (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                                        Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+        response = dialog.run()
+        if(response == Gtk.ResponseType.OK):
+            path = dialog.get_filename()
+            self.sources["DEFAULT_LOGBOOK_PATH"].set_text(path)
+        dialog.destroy()
         return
 
     def on_show_qth_toggled(self, widget, data=None):

@@ -1310,6 +1310,29 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                                     <property name="position">1</property>
                                   </packing>
                                 </child>
+                                <child>
+                                  <object class="GtkButton" id="general_default_logbook_button">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="receives_default">True</property>
+                                    <property name="tooltip_text" translatable="yes">Choose the default logbook file</property>
+                                    <property name="always_show_image">True</property>
+                                    <child>
+                                      <object class="GtkImage" id="image31">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="stock">gtk-open</property>
+                                        <property name="icon_size">1</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="padding">2</property>
+                                    <property name="position">2</property>
+                                  </packing>
+                                </child>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -1461,7 +1484,7 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="receives_default">True</property>
-                                    <property name="tooltip_text" translatable="yes">Lookup the latitude-longitude coordinates for the QTH based on the QTH's name.</property>
+                                    <property name="tooltip_text" translatable="yes">Lookup the latitude-longitude coordinates for the QTH based on the QTH's name</property>
                                     <property name="always_show_image">True</property>
                                     <child>
                                       <object class="GtkImage" id="image25">
