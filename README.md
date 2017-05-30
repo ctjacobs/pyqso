@@ -28,15 +28,15 @@ Installation and running
 
 Assuming that the current working directory is PyQSO's base directory (the directory that the Makefile is in), PyQSO can be installed via the terminal with the following command:
 
-   `make install`
+    make install
 
 Note: 'sudo' may be needed for this. Once installed, the following command will run PyQSO:
    
-   `pyqso`
+    pyqso
 
 Alternatively, PyQSO can be run (without installing) with:
 
-   `python3 bin/pyqso`
+    python3 bin/pyqso
 
 from PyQSO's base directory.
 
@@ -45,7 +45,7 @@ Documentation
 
 The PyQSO documentation is stored in the `docs` directory. It can be built with the following command:
 
-   `make docs`
+    make docs
 
 which will produce an HTML version of the documentation in `docs/build/html` that can be opened in a web browser.
 
@@ -75,17 +75,15 @@ The following extra package is necessary to build the documentation:
 
 There currently does not exist a Python 3-compatible Debian package for [Hamlib](http://www.hamlib.org). This library must be built manually to enable Hamlib support. As per the instructions on the [Hamlib mailing list](https://sourceforge.net/p/hamlib/mailman/message/35692744/), run the following commands in the Hamlib root directory (you may need to run `sudo apt-get install build-essential autoconf automake libtool` beforehand):
 
-```
-export PYTHON=/usr/bin/python3
-autoreconf --install
-./configure --with-python-binding
-make
-sudo make install
-```
+    export PYTHON=/usr/bin/python3
+    autoreconf --install
+    ./configure --with-python-binding
+    make
+    sudo make install
 
 You will also need to append the Hamlib `bindings` and `bindings/.lib` directories to the `PYTHONPATH`:
 
-   `export PYTHONPATH=$PYTHONPATH:/path/to/hamlib/bindings:/path/to/hamlib/bindings/.lib`
+    export PYTHONPATH=$PYTHONPATH:/path/to/hamlib/bindings:/path/to/hamlib/bindings/.lib
 
 Contact
 -------
