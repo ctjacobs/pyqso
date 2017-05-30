@@ -73,7 +73,15 @@ The following extra package is necessary to build the documentation:
 
 * python3-sphinx
 
-There currently does not exist a Python 3-compatible Debian package for [Hamlib](http://www.hamlib.org). This library must be built manually to enable Hamlib support.
+There currently does not exist a Python 3-compatible Debian package for [Hamlib](http://www.hamlib.org). This library must be built manually to enable Hamlib support. As per the instructions on the [Hamlib mailing list](https://sourceforge.net/p/hamlib/mailman/message/35692744/), run the following commands in the Hamlib root directory (you may need to run `sudo apt-get install build-essential autoconf automake libtool` beforehand):
+
+```
+export PYTHON=/usr/bin/python3
+autoreconf --install
+./configure --with-python-binding
+make
+sudo make install
+```
 
 Contact
 -------
