@@ -84,9 +84,9 @@ class Summary(object):
 
                 self.items["YEARLY_STATISTICS"] = Figure()
                 canvas = FigureCanvas(self.items["YEARLY_STATISTICS"])
-                canvas.set_size_request(800, 250)
+                canvas.set_size_request(800, 175)
                 canvas.show()
-                self.summary_page.pack_start(canvas, True, True, 4)
+                self.summary_page.pack_start(canvas, True, True, 0)
 
         # Summary tab label and icon.
         tab = Gtk.HBox(homogeneous=False, spacing=0)
