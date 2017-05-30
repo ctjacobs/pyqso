@@ -30,6 +30,11 @@ import os
 import os.path
 import sys
 import signal
+
+# This will help Python find the PyQSO modules that need to be imported below.
+pyqso_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir)
+sys.path.insert(0, pyqso_path)
+
 import logging
 logging.basicConfig(level=logging.INFO)
 logging.info("PyQSO version 1.0.0")
