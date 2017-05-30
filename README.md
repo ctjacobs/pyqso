@@ -83,6 +83,10 @@ make
 sudo make install
 ```
 
+You will also need to append the Hamlib `bindings` and `bindings/.lib` directories to the `PYTHONPATH`:
+
+   `export PYTHONPATH=$PYTHONPATH:/path/to/hamlib/bindings:/path/to/hamlib/bindings/.lib`
+
 Contact
 -------
 
