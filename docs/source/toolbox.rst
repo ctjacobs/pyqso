@@ -42,7 +42,7 @@ line is automatically updated every 30 minutes. The user's QTH can be pin-pointe
    .. figure::  images/grey_line.png
       :align:   center
       
-      The grey line tool.
+      The grey line tool with the user's QTH (e.g. Southampton) pin-pointed on the map.
 
 Awards
 ------

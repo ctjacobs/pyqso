@@ -50,7 +50,7 @@ Callsign lookup
 
 The user can enter their login details to access the `qrz.com <http://qrz.com/>`_ or `hamqth.com <http://hamqth.com/>`_ database and perform callsign lookups. Note that these details are currently stored in plain text (unencrypted) format.
 
-If the ``Ignore callsign prefixes and/or suffixes`` box is checked, then PyQSO will perform the callsign lookup whilst ignoring all prefixes (i.e. anything before a preceding "/" in the callsign) and the suffixes "P", "M", "A", "PM", "MM", "AM", and "QRP". For example, if the callsign to be looked up is EA3/MYCALL/QRP, only MYCALL will be looked up. If you get 'Callsign not found' errors, try enabling this option.
+If the ``Ignore callsign prefixes and/or suffixes`` box is checked, then PyQSO will perform the callsign lookup whilst ignoring all prefixes (i.e. anything before a preceding "/" in the callsign) and the suffixes "P", "M", "A", "PM", "MM", "AM", and "QRP". For example, if the callsign to be looked up is F/MYCALL/QRP, only MYCALL will be looked up. If you get 'Callsign not found' errors, try enabling this option.
 
 Import/Export
 -------------
