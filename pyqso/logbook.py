@@ -116,7 +116,7 @@ class Logbook:
 
             logging.debug("Retrieving all the logs in the logbook...")
             self.logs = self.get_logs()
-            if(not self.logs):
+            if(self.logs is None):
                 error(parent=self.application.window, message="Could not open logbook. Something went wrong when trying to retrieve the logs. Perhaps the logbook file is encrypted, corrupted, or in the wrong format?")
                 return
             else:
