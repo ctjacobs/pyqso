@@ -395,7 +395,7 @@ class RecordDialog:
                 # QRZ.com
                 callsign_lookup = CallsignLookupQRZ(parent=self.dialog)
             elif(database == "hamqth.com"):
-                # HamQTH
+                # HamQTH.com
                 callsign_lookup = CallsignLookupHamQTH(parent=self.dialog)
             else:
                 raise ValueError("Unknown callsign database: %s" % database)
@@ -418,7 +418,7 @@ class RecordDialog:
             error(parent=self.dialog, message="To perform a callsign lookup, please specify your username and password in the Preferences.")
             return
 
-        # Connect and look up
+        # Connect and look up.
         connected = callsign_lookup.connect(username, password)
         if(connected):
             full_callsign = self.sources["CALL"].get_text()
