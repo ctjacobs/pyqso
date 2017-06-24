@@ -491,7 +491,7 @@ class Logbook:
         if(page_index == 0):  # If we are on the Summary page...
             logging.debug("No log currently selected!")
             return
-        page = self.notebook.get_nth_page(page_index)  # Gets the Gtk.VBox of the selected tab in the logbook.
+        page = self.notebook.get_nth_page(page_index)  # Get the Gtk.VBox of the selected tab in the logbook.
         old_log_name = page.get_name()
 
         log_index = self.get_log_index(name=old_log_name)

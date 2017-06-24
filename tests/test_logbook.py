@@ -47,7 +47,7 @@ class TestLogbook(unittest.TestCase):
         assert(self.logbook.logs[1].name == "test2")
 
     def tearDown(self):
-        """ Disconnect from the test database. """
+        """ Close the logbook and disconnect from the test database. """
         self.logbook.notebook.get_n_pages.return_value = 0
         closed = self.logbook.close()
         assert(closed)

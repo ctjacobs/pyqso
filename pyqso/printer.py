@@ -53,9 +53,8 @@ class Printer(object):
         for r in records:
             self.text_to_print += str(r["CALL"]) + "\t---\t" + str(r["QSO_DATE"]) + "\t---\t" + str(r["TIME_ON"]) + "\t---\t" + str(r["FREQ"]) + "\t---\t" + str(r["MODE"]) + "\n"
 
-        self.operation.run(self.action, parent=self.application.window)
-
-        return
+        result = self.operation.run(self.action, parent=self.application.window)
+        return result
 
     def begin_print(self, operation, context):
         """ Specify the layout/position/font of the text on the pages to be printed.
