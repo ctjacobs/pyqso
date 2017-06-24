@@ -29,7 +29,7 @@ class TestADIF(unittest.TestCase):
         """ Set up the ADIF object needed for the unit tests. """
         self.adif = ADIF()
 
-    def test_adif_read(self):
+    def test_read(self):
         """ Check that a single ADIF record can be read and parsed correctly. """
         f = open("ADIF.test_read.adi", 'w')
         f.write("""Some test ADI data.<eoh>
@@ -46,7 +46,7 @@ class TestADIF(unittest.TestCase):
         assert(len(list(records[0].keys())) == len(list(expected_records[0].keys())))
         assert(records == expected_records)
 
-    def test_adif_read_multiple(self):
+    def test_read_multiple(self):
         """ Check that multiple ADIF records can be read and parsed correctly. """
         f = open("ADIF.test_read_multiple.adi", 'w')
         f.write("""Some test ADI data.<eoh>
@@ -69,7 +69,7 @@ class TestADIF(unittest.TestCase):
             assert(len(list(records[i].keys())) == len(list(expected_records[i].keys())))
         assert(records == expected_records)
 
-    def test_adif_read_alphabet(self):
+    def test_read_alphabet(self):
         """ Check that none of the letters of the alphabet are ignored during parsing. """
         f = open("ADIF.test_read_alphabet.adi", 'w')
         f.write("""Some test ADI data.<eoh>
@@ -84,7 +84,7 @@ class TestADIF(unittest.TestCase):
         assert(len(list(records[0].keys())) == len(list(expected_records[0].keys())))
         assert(records == expected_records)
 
-    def test_adif_read_capitalisation(self):
+    def test_read_capitalisation(self):
         """ Check that the CALL field is capitalised correctly. """
         f = open("ADIF.test_read_capitalisation.adi", 'w')
         f.write("""Some test ADI data.<eoh>
@@ -99,7 +99,7 @@ class TestADIF(unittest.TestCase):
         assert(len(list(records[0].keys())) == len(list(expected_records[0].keys())))
         assert(records == expected_records)
 
-    def test_adif_read_header_only(self):
+    def test_read_header_only(self):
         """ Check that no records are read in if the ADIF file only contains header information. """
         f = open("ADIF.test_read_header_only.adi", 'w')
         f.write("""Some test ADI data.<eoh>""")
@@ -112,7 +112,7 @@ class TestADIF(unittest.TestCase):
         assert(len(records) == 0)
         assert(records == expected_records)
 
-    def test_adif_read_no_header(self):
+    def test_read_no_header(self):
         """ Check that an ADIF file can be parsed with no header information. """
         f = open("ADIF.test_read_no_header.adi", 'w')
         f.write("""<call:4>TEST<band:3>40m<mode:2>CW<qso_date:8:d>20130322<time_on:4>1955<eor>""")
@@ -126,7 +126,7 @@ class TestADIF(unittest.TestCase):
         assert(len(list(records[0].keys())) == len(list(expected_records[0].keys())))
         assert(records == expected_records)
 
-    def test_adif_write(self):
+    def test_write(self):
         """ Check that records can be written to an ADIF file correctly. """
         records = [{"CALL": "TEST123", "QSO_DATE": "20120402", "TIME_ON": "1234", "FREQ": "145.500", "BAND": "2m", "MODE": "FM", "RST_SENT": "59", "RST_RCVD": "59"},
                    {"CALL": "TEST123", "QSO_DATE": "20130312", "TIME_ON": "0101", "FREQ": "145.750", "BAND": "2m", "MODE": "FM"}]
@@ -159,7 +159,7 @@ class TestADIF(unittest.TestCase):
 """ in text)  # Ignore the header line here, since it contains the date and time the ADIF file was written, which will change each time 'make unittest' is run.
         f.close()
 
-    def test_adif_write_sqlite3_Row(self):
+    def test_write_sqlite3_Row(self):
         """ Check that records can be written to an ADIF file from a test database file. """
         import sqlite3
         import os.path
@@ -203,7 +203,7 @@ class TestADIF(unittest.TestCase):
 
         self.connection.close()
 
-    def test_adif_is_valid(self):
+    def test_is_valid(self):
         """ Check that ADIF field validation is working correctly for different data types. """
         assert(self.adif.is_valid("CALL", "TEST123", "S"))
         assert(self.adif.is_valid("QSO_DATE", "20120402", "D"))

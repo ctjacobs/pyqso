@@ -23,6 +23,7 @@ try:
 except ImportError:
     import mock
 import os
+from shutil import copyfile
 from pyqso.logbook import *
 
 
@@ -61,11 +62,14 @@ class TestLogbook(unittest.TestCase):
         disconnected = self.logbook.db_disconnect()
         assert(disconnected)
 
-    def test_new(self):
-        """  """
-        #path_to_new_database = "Logbook.test_new.db"
-        #opened = self.logbook.open(path=path_to_invalid_database)
-        pass
+    @mock.patch('pyqso.auxiliary_dialogs.handle_gtk_dialog')
+    @mock.patch('gi.repository.Gtk.FileChooserDialog')
+    def test_new(self, mock_FileChooserDialog, mock_handle_gtk_dialog):
+        """ Check that a new logbook can be created. """
+        mock_FileChooserDialog().run.return_value = Gtk.ResponseType.OK
+        mock_FileChooserDialog().get_filename.return_value = "Logbook.test_new.db"
+        self.logbook.new()
+        assert(os.path.isfile("Logbook.test_new.db"))
 
     @mock.patch('pyqso.auxiliary_dialogs.handle_gtk_dialog')
     def test_open_invalid_logbook(self, mock_handle_gtk_dialog):
@@ -74,6 +78,23 @@ class TestLogbook(unittest.TestCase):
         opened = self.logbook.open(path=path_to_invalid_database)
         assert(not opened)
         assert(self.logbook.logs is None)
+
+    @mock.patch('pyqso.logbook.Logbook.render_log')
+    @mock.patch('pyqso.auxiliary_dialogs.handle_gtk_dialog')
+    @mock.patch('pyqso.logbook.LogNameDialog')
+    def test_new_log(self, mock_LogNameDialog, mock_handle_gtk_dialog, mock_render_log):
+        """ Create an empty logbook file, open it, and check that a new log can successfully be added. """
+        # Create a copy of the test database just for use in this particular test, since the contents will need to be modified.
+        path_to_test_database = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/test.db")
+        destination = "Logbook.test_new_log.db"
+        copyfile(path_to_test_database, destination)
+        opened = self.logbook.open(path=destination)
+        assert(opened)
+        mock_LogNameDialog().dialog.run.return_value = Gtk.ResponseType.OK
+        mock_LogNameDialog().name = "my_new_log"
+        self.logbook.new_log()
+        assert(len(self.logbook.logs) == 3)
+        assert(self.logbook.logs[-1].name == "my_new_log")
 
     def test_log_name_exists(self):
         """ Check that only the log called 'test' exists. """
@@ -117,20 +138,6 @@ class TestLogbook(unittest.TestCase):
         assert(self.logbook.get_log_index(name="test") == 0)
         assert(self.logbook.get_log_index(name="test2") == 1)
         assert(self.logbook.get_log_index(name="helloworld") is None)
-
-    @mock.patch('pyqso.logbook.Logbook.render_log')
-    @mock.patch('pyqso.auxiliary_dialogs.handle_gtk_dialog')
-    @mock.patch('pyqso.logbook.LogNameDialog')
-    def test_new_log(self, mock_LogNameDialog, mock_handle_gtk_dialog, mock_render_log):
-        """ Create an empty logbook file, open it, and check that a new log can successfully be added. """
-        open("Logbook.test_new_log.db", "w").close()
-        opened = self.logbook.open(path="Logbook.test_new_log.db")
-        assert(opened)
-        mock_LogNameDialog().dialog.run.return_value = Gtk.ResponseType.OK
-        mock_LogNameDialog().name = "my_new_log"
-        self.logbook.new_log()
-        assert(len(self.logbook.logs) == 1)
-        assert(self.logbook.logs[0].name == "my_new_log")
 
 if(__name__ == '__main__'):
     unittest.main()

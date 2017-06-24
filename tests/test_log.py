@@ -45,7 +45,7 @@ class TestLog(unittest.TestCase):
     def tearDown(self):
         self.connection.close()
 
-    def test_log_add_missing_db_columns(self):
+    def test_add_missing_db_columns(self):
 
         column_names_before = []
         column_names_after = []
@@ -71,7 +71,7 @@ class TestLog(unittest.TestCase):
         for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
             assert(field_name in column_names_after)
 
-    def test_log_add_record(self):
+    def test_add_record(self):
         self.log.add_record(self.fields_and_data)
         c = self.connection.cursor()
         c.execute("SELECT * FROM test")
@@ -83,7 +83,7 @@ class TestLog(unittest.TestCase):
             print(self.fields_and_data[field_name], records[0][field_name])
             assert self.fields_and_data[field_name] == records[0][field_name]
 
-    def test_log_delete_record(self):
+    def test_delete_record(self):
         query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
         c = self.connection.cursor()
         c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
@@ -99,7 +99,7 @@ class TestLog(unittest.TestCase):
         assert(len(records_before) == 1)
         assert(len(records_after) == 0)
 
-    def test_log_edit_record(self):
+    def test_edit_record(self):
         query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
         c = self.connection.cursor()
         c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
@@ -118,7 +118,7 @@ class TestLog(unittest.TestCase):
         assert(record_before["FREQ"] == "145.500")
         assert(record_after["FREQ"] == "145.450")
 
-    def test_log_get_record_by_index(self):
+    def test_get_record_by_index(self):
         query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
         c = self.connection.cursor()
         c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
@@ -132,7 +132,7 @@ class TestLog(unittest.TestCase):
                 assert(record[field_name.upper()] == self.fields_and_data[field_name.upper()])
         assert(len(record) == len(self.fields_and_data) + 1)
 
-    def test_log_records(self):
+    def test_records(self):
         query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
         c = self.connection.cursor()
         # Add the same record twice
@@ -146,7 +146,7 @@ class TestLog(unittest.TestCase):
             assert(records[0][field_name] == self.fields_and_data[field_name])
             assert(records[1][field_name] == self.fields_and_data[field_name])
 
-    def test_log_record_count(self):
+    def test_record_count(self):
         query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
         c = self.connection.cursor()
         # Add the same record twice
@@ -157,7 +157,7 @@ class TestLog(unittest.TestCase):
         print("Number of records in the log: ", record_count)
         assert(record_count == 2)  # There should be 2 records
 
-    def test_log_get_duplicates(self):
+    def test_get_duplicates(self):
         query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
         c = self.connection.cursor()
         n = 5  # The total number of records to insert.
@@ -165,7 +165,7 @@ class TestLog(unittest.TestCase):
             c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
         assert(len(self.log.get_duplicates()) == n-1)  # Expecting n-1 duplicates.
 
-    def test_log_rename(self):
+    def test_rename(self):
         old_name = "test"
         new_name = "hello"
         success = self.log.rename(new_name)
