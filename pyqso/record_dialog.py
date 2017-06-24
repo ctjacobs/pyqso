@@ -334,7 +334,7 @@ class RecordDialog:
         # Open a communication channel to the radio.
         try:
             Hamlib.rig_set_debug(Hamlib.RIG_DEBUG_NONE)
-            rig = Hamlib.Rig(Hamlib.__dict__[rig_model])  # Look up the model's numerical index in Hamlib's symbol dictionary
+            rig = Hamlib.Rig(Hamlib.__dict__[rig_model])  # Look up the model's numerical index in Hamlib's symbol dictionary.
             rig.set_conf("rig_pathname", rig_pathname)
             rig.open()
         except:
@@ -343,7 +343,7 @@ class RecordDialog:
 
         # Frequency
         try:
-            frequency = "%.6f" % (rig.get_freq()/1.0e6)  # Converting to MHz here
+            frequency = "%.6f" % (rig.get_freq()/1.0e6)  # Converting to MHz here.
             # Convert to the desired unit, if necessary.
             if(self.frequency_unit != "MHz"):
                 frequency = str(self.convert_frequency(frequency, from_unit="MHz", to_unit=self.frequency_unit))
@@ -354,7 +354,7 @@ class RecordDialog:
         # Mode
         try:
             (mode, width) = rig.get_mode()
-            mode = mode.upper()
+            mode = Hamlib.rig_strrmode(mode).upper()
             # Handle USB and LSB as special cases.
             if(mode == "USB" or mode == "LSB"):
                 submode = mode
