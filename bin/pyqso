@@ -158,6 +158,10 @@ if(__name__ == "__main__"):
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
+    # Enforce an absolute logbook file path.
+    if(args.logbook):
+        args.logbook = os.path.abspath(args.logbook)
+
     signal.signal(signal.SIGINT, signal.SIG_DFL)  # Exit PyQSO if a SIGINT signal is captured.
     application = PyQSO(args.logbook)  # Populate the main window and show it
     Gtk.main()  # Start up the event loop!
