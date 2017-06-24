@@ -24,7 +24,6 @@ try:
 except ImportError:
     import mock
 from pyqso.record_dialog import *
-from pyqso.adif import BANDS
 
 
 class TestRecordDialog(unittest.TestCase):
