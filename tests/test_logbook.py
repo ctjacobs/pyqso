@@ -53,12 +53,9 @@ class TestLogbook(unittest.TestCase):
         assert(closed)
 
     @mock.patch('pyqso.auxiliary_dialogs.handle_gtk_dialog')
-    def test_open_invalid_log(self, mock_handle_gtk_dialog):
-        """ Open an invalid database file and check that an error occurs. """
-        path_to_invalid_database = "Logbook.test_setUp_invalid.txt"
-        f = open("Logbook.test_setUp_invalid.txt", 'w')
-        f.write("This is a plain text file. Trying to open this file in PyQSO should case an error, since it is not a valid database file.")
-        f.close()
+    def test_open_invalid_logbook(self, mock_handle_gtk_dialog):
+        """ Open an invalid database file (comprising only one line of plain text) and check that an error occurs. """
+        path_to_invalid_database = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/invalid.db") 
         opened = self.logbook.open(path=path_to_invalid_database, render=False)
         assert(not opened)
         assert(self.logbook.logs is None)

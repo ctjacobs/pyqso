@@ -1,0 +1,1 @@
+This is a plain text file used for testing PyQSO. Trying to open this file in PyQSO should case an error, since it is not a valid database file.
