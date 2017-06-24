@@ -70,7 +70,7 @@ class Summary(object):
         if(have_config and config.has_option(section, option)):
             if(config.get("general", "show_yearly_statistics") == "True" and have_matplotlib):
                 hbox = Gtk.HBox()
-                label = Gtk.Label("Display statistics for year: ", halign=Gtk.Align.START)
+                label = Gtk.Label(label="Display statistics for year: ", halign=Gtk.Align.START)
                 hbox.pack_start(label, False, False, 6)
                 year_select = Gtk.ComboBoxText()
                 min_year, max_year = self.get_year_bounds()

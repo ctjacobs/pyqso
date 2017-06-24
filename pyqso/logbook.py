@@ -89,11 +89,10 @@ class Logbook:
             opened = self.open(path=path)
         return opened
 
-    def open(self, widget=None, path=None, render=True):
+    def open(self, widget=None, path=None):
         """ Open a logbook, and render all the logs within it.
 
         :arg str path: An optional argument containing the database file location, if already known. If this is None, a file selection dialog will appear.
-        :arg bool render: An optional argument to specify whether or not the logs should be rendered in the logbook. By default this is True, but is sometimes set to False for unit testing purposes.
         :returns: True if the logbook is successfully opened, and False otherwise.
         :rtype: bool
         """
@@ -129,35 +128,34 @@ class Logbook:
             else:
                 logging.debug("All logs retrieved successfully.")
 
-            if(render):
-                logging.debug("Rendering logs...")
-                # For rendering the logs. One treeview and one treeselection per Log.
-                self.treeview = []
-                self.treeselection = []
-                self.sorter = []
-                self.filter = []
-                self.summary = Summary(self.application)
-                self.blank = Blank(self.application)
+            logging.debug("Rendering logs...")
+            # For rendering the logs. One treeview and one treeselection per Log.
+            self.treeview = []
+            self.treeselection = []
+            self.sorter = []
+            self.filter = []
+            self.summary = Summary(self.application)
+            self.blank = Blank(self.application)
 
-                # FIXME: This is an unfortunate work-around. If the area around the "+/New Log" button
-                # is clicked, PyQSO will change to an empty page. This signal is used to stop this from happening.
-                self.notebook.connect("switch-page", self.on_switch_page)
+            # FIXME: This is an unfortunate work-around. If the area around the "+/New Log" button
+            # is clicked, PyQSO will change to an empty page. This signal is used to stop this from happening.
+            self.notebook.connect("switch-page", self.on_switch_page)
 
-                for i in range(len(self.logs)):
-                    self.render_log(i)
-                logging.debug("All logs rendered successfully.")
+            for i in range(len(self.logs)):
+                self.render_log(i)
+            logging.debug("All logs rendered successfully.")
 
-                self.summary.update()
-                self.application.toolbox.awards.count(self)
+            self.summary.update()
+            self.application.toolbox.awards.count(self)
 
-                context_id = self.application.statusbar.get_context_id("Status")
-                self.application.statusbar.push(context_id, "Logbook: %s" % self.path)
-                self.application.toolbar.set_logbook_button_sensitive(False)
-                self.application.menu.set_logbook_item_sensitive(False)
-                self.application.menu.set_log_items_sensitive(True)
-                self.application.toolbar.filter_source.set_sensitive(True)
+            context_id = self.application.statusbar.get_context_id("Status")
+            self.application.statusbar.push(context_id, "Logbook: %s" % self.path)
+            self.application.toolbar.set_logbook_button_sensitive(False)
+            self.application.menu.set_logbook_item_sensitive(False)
+            self.application.menu.set_log_items_sensitive(True)
+            self.application.toolbar.filter_source.set_sensitive(True)
 
-                self.notebook.show_all()
+            self.notebook.show_all()
 
         else:
             logging.debug("Not connected to a logbook. No logs were opened.")
@@ -377,7 +375,7 @@ class Logbook:
         self.sorter.append(Gtk.TreeModelSort(model=self.filter[index]))
         self.sorter[index].set_sort_column_id(0, Gtk.SortType.ASCENDING)
 
-        self.treeview.append(Gtk.TreeView(self.sorter[index]))
+        self.treeview.append(Gtk.TreeView(model=self.sorter[index]))
         self.treeview[index].set_grid_lines(Gtk.TreeViewGridLines.BOTH)
         self.treeview[index].connect("row-activated", self.edit_record_callback)
         self.treeselection.append(self.treeview[index].get_selection())
@@ -392,8 +390,8 @@ class Logbook:
         vbox.pack_start(sw, True, True, 0)
 
         # Add a close button to the tab
-        hbox = Gtk.HBox(False, 0)
-        label = Gtk.Label(self.logs[index].name)
+        hbox = Gtk.HBox(homogeneous=False, spacing=0)
+        label = Gtk.Label(label=self.logs[index].name)
         hbox.pack_start(label, False, False, 0)
         hbox.show_all()
 
@@ -516,8 +514,8 @@ class Logbook:
         page.set_name(new_log_name)
 
         # ... and update the tab's label.
-        hbox = Gtk.HBox(False, 0)
-        label = Gtk.Label(new_log_name)
+        hbox = Gtk.HBox(homogeneous=False, spacing=0)
+        label = Gtk.Label(label=new_log_name)
         hbox.pack_start(label, False, False, 0)
         hbox.show_all()
         self.notebook.set_tab_label(page, hbox)

@@ -25,19 +25,19 @@ except ImportError:
 import os
 from pyqso.logbook import *
 
-
 class TestLogbook(unittest.TestCase):
 
     """ The unit tests for the Logbook class. """
 
-    def setUp(self):
+    @mock.patch('pyqso.logbook.Logbook.filter_by_callsign')
+    def setUp(self, mock_filter_by_callsign):
         """ Set up the Logbook object and connection to the test database needed for the unit tests. """
 
         self.logbook = Logbook(application=mock.MagicMock())
 
         # Open the test database file.
         path_to_test_database = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/test.db")
-        opened = self.logbook.open(path=path_to_test_database, render=False)
+        opened = self.logbook.open(path=path_to_test_database)
         assert(opened)
         assert(self.logbook.connection is not None)
 
@@ -52,11 +52,25 @@ class TestLogbook(unittest.TestCase):
         closed = self.logbook.close()
         assert(closed)
 
+    def test_db_disconnect(self):
+        """ Check that the logbook can disconnect from the database. """
+        disconnected = self.logbook.db_disconnect()
+        assert(disconnected)
+        # Attempt to disconnect again. This shouldn't do anything.
+        disconnected = self.logbook.db_disconnect()
+        assert(disconnected)
+
+    def test_new(self):
+        """  """
+        #path_to_new_database = "Logbook.test_new.db"
+        #opened = self.logbook.open(path=path_to_invalid_database)
+        pass
+
     @mock.patch('pyqso.auxiliary_dialogs.handle_gtk_dialog')
     def test_open_invalid_logbook(self, mock_handle_gtk_dialog):
         """ Open an invalid database file (comprising only one line of plain text) and check that an error occurs. """
         path_to_invalid_database = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/invalid.db")
-        opened = self.logbook.open(path=path_to_invalid_database, render=False)
+        opened = self.logbook.open(path=path_to_invalid_database)
         assert(not opened)
         assert(self.logbook.logs is None)
 
@@ -102,6 +116,21 @@ class TestLogbook(unittest.TestCase):
         assert(self.logbook.get_log_index(name="test") == 0)
         assert(self.logbook.get_log_index(name="test2") == 1)
         assert(self.logbook.get_log_index(name="helloworld") is None)
+
+    @mock.patch('pyqso.logbook.Logbook.render_log')
+    @mock.patch('pyqso.auxiliary_dialogs.handle_gtk_dialog')
+    @mock.patch('pyqso.logbook.LogNameDialog')
+    def test_new_log(self, mock_LogNameDialog, mock_handle_gtk_dialog, mock_render_log):
+        """ Start off with an empty logbook and check that a new log can successfully be added. """
+        f = open("Logbook.test_new_log.db", "w").close()
+        opened = self.logbook.open(path="Logbook.test_new_log.db")
+        self.logbook.summary = mock.MagicMock()
+        assert(opened)
+        mock_LogNameDialog().dialog.run.return_value = Gtk.ResponseType.OK
+        mock_LogNameDialog().name = "my_new_log"
+        self.logbook.new_log()
+        assert(len(self.logbook.logs) == 1)
+        assert(self.logbook.logs[0].name == "my_new_log")
 
 if(__name__ == '__main__'):
     unittest.main()
