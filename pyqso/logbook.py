@@ -58,7 +58,11 @@ class Logbook:
         return
 
     def new(self, widget=None):
-        """ Create a new logbook, and open it. """
+        """ Create a new logbook, and open it.
+
+        :returns: True if the new logbook is successfully opened, and False otherwise.
+        :rtype: bool
+        """
 
         # Get the new file's path from a dialog.
         dialog = Gtk.FileChooserDialog("Create a New SQLite Database File",
@@ -82,13 +86,16 @@ class Logbook:
             # Clear the contents of the file, in case the file exists already.
             open(path, 'w').close()
             # Open the new logbook, ready for use.
-            self.open(path=path)
-        return
+            opened = self.open(path=path)
+        return opened
 
-    def open(self, widget=None, path=None):
+    def open(self, widget=None, path=None, render=True):
         """ Open a logbook, and render all the logs within it.
 
         :arg str path: An optional argument containing the database file location, if already known. If this is None, a file selection dialog will appear.
+        :arg bool render: An optional argument to specify whether or not the logs should be rendered in the logbook. By default this is True, but is sometimes set to False for unit testing purposes.
+        :returns: True if the logbook is successfully opened, and False otherwise.
+        :rtype: bool
         """
 
         if(path is None):
@@ -106,7 +113,7 @@ class Logbook:
 
             if(path is None):  # If the Cancel button has been clicked, path will still be None
                 logging.debug("No file path specified.")
-                return
+                return False
 
         connected = self.db_connect(path)
         if(connected):
@@ -118,46 +125,52 @@ class Logbook:
             self.logs = self.get_logs()
             if(self.logs is None):
                 error(parent=self.application.window, message="Could not open logbook. Something went wrong when trying to retrieve the logs. Perhaps the logbook file is encrypted, corrupted, or in the wrong format?")
-                return
+                return False
             else:
                 logging.debug("All logs retrieved successfully.")
 
-            logging.debug("Rendering logs...")
-            # For rendering the logs. One treeview and one treeselection per Log.
-            self.treeview = []
-            self.treeselection = []
-            self.sorter = []
-            self.filter = []
-            self.summary = Summary(self.application)
-            self.blank = Blank(self.application)
+            if(render):
+                logging.debug("Rendering logs...")
+                # For rendering the logs. One treeview and one treeselection per Log.
+                self.treeview = []
+                self.treeselection = []
+                self.sorter = []
+                self.filter = []
+                self.summary = Summary(self.application)
+                self.blank = Blank(self.application)
 
-            # FIXME: This is an unfortunate work-around. If the area around the "+/New Log" button
-            # is clicked, PyQSO will change to an empty page. This signal is used to stop this from happening.
-            self.notebook.connect("switch-page", self.on_switch_page)
+                # FIXME: This is an unfortunate work-around. If the area around the "+/New Log" button
+                # is clicked, PyQSO will change to an empty page. This signal is used to stop this from happening.
+                self.notebook.connect("switch-page", self.on_switch_page)
 
-            for i in range(len(self.logs)):
-                self.render_log(i)
-            logging.debug("All logs rendered successfully.")
+                for i in range(len(self.logs)):
+                    self.render_log(i)
+                logging.debug("All logs rendered successfully.")
 
-            self.summary.update()
-            self.application.toolbox.awards.count(self)
+                self.summary.update()
+                self.application.toolbox.awards.count(self)
 
-            context_id = self.application.statusbar.get_context_id("Status")
-            self.application.statusbar.push(context_id, "Logbook: %s" % self.path)
-            self.application.toolbar.set_logbook_button_sensitive(False)
-            self.application.menu.set_logbook_item_sensitive(False)
-            self.application.menu.set_log_items_sensitive(True)
-            self.application.toolbar.filter_source.set_sensitive(True)
+                context_id = self.application.statusbar.get_context_id("Status")
+                self.application.statusbar.push(context_id, "Logbook: %s" % self.path)
+                self.application.toolbar.set_logbook_button_sensitive(False)
+                self.application.menu.set_logbook_item_sensitive(False)
+                self.application.menu.set_log_items_sensitive(True)
+                self.application.toolbar.filter_source.set_sensitive(True)
 
-            self.notebook.show_all()
+                self.notebook.show_all()
 
         else:
             logging.debug("Not connected to a logbook. No logs were opened.")
+            return False
 
-        return
+        return True
 
     def close(self, widget=None):
-        """ Close the logbook that is currently open. """
+        """ Close the logbook that is currently open.
+
+        :returns: True if the logbook is successfully closed, and False otherwise.
+        :rtype: bool
+        """
 
         disconnected = self.db_disconnect()
         if(disconnected):
@@ -176,7 +189,9 @@ class Logbook:
             self.application.toolbar.filter_source.set_sensitive(False)
         else:
             logging.debug("Unable to disconnect from the database. No logs were closed.")
-        return
+            return False
+
+        return True
 
     def db_connect(self, path):
         """ Create an SQL database connection to the Logbook's data source.

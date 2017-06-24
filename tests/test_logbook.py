@@ -32,25 +32,36 @@ class TestLogbook(unittest.TestCase):
 
     def setUp(self):
         """ Set up the Logbook object and connection to the test database needed for the unit tests. """
+
         self.logbook = Logbook(application=mock.MagicMock())
+
+        # Open the test database file.
         path_to_test_database = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/test.db")
-        success = self.logbook.db_connect(path_to_test_database)
-        assert(success)
-        self.logbook.logs = self.logbook.get_logs()
-        assert(self.logbook.logs is not None)
+        opened = self.logbook.open(path=path_to_test_database, render=False)
+        assert(opened)
+        assert(self.logbook.connection is not None)
+
         # Check that the logs have been retrieved.
-        temp = []
-        for log_name in ["test", "test2"]:
-            l = Log(self.logbook.connection, log_name)
-            l.populate()
-            temp.append(l)
-        assert(self.logbook.logs[0].name == temp[0].name)
-        assert(self.logbook.logs[1].name == temp[1].name)
+        assert(len(self.logbook.logs) == 2)
+        assert(self.logbook.logs[0].name == "test")
+        assert(self.logbook.logs[1].name == "test2")
 
     def tearDown(self):
         """ Disconnect from the test database. """
-        success = self.logbook.db_disconnect()
-        assert(success)
+        self.logbook.notebook.get_n_pages.return_value = 0
+        closed = self.logbook.close()
+        assert(closed)
+
+    @mock.patch('pyqso.auxiliary_dialogs.handle_gtk_dialog')
+    def test_open_invalid_log(self, mock_handle_gtk_dialog):
+        """ Open an invalid database file and check that an error occurs. """
+        path_to_invalid_database = "Logbook.test_setUp_invalid.txt"
+        f = open("Logbook.test_setUp_invalid.txt", 'w')
+        f.write("This is a plain text file. Trying to open this file in PyQSO should case an error, since it is not a valid database file.")
+        f.close()
+        opened = self.logbook.open(path=path_to_invalid_database, render=False)
+        assert(not opened)
+        assert(self.logbook.logs is None)
 
     def test_log_name_exists(self):
         """ Check that only the log called 'test' exists. """

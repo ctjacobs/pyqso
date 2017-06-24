@@ -28,7 +28,7 @@ def error(parent, message):
     :arg str message: The message to display to the user.
     """
     logging.error(message)
-    _handle_gtk_dialog(parent, Gtk.MessageType.ERROR, message, "Error")
+    handle_gtk_dialog(parent, Gtk.MessageType.ERROR, message, "Error")
 
 
 def info(parent, message):
@@ -38,7 +38,7 @@ def info(parent, message):
     :arg str message: The message to display to the user.
     """
     logging.debug(message)
-    _handle_gtk_dialog(parent, Gtk.MessageType.INFO, message, "Information")
+    handle_gtk_dialog(parent, Gtk.MessageType.INFO, message, "Information")
 
 
 def question(parent, message):
@@ -49,10 +49,10 @@ def question(parent, message):
     :returns: The 'yes'/'no' response from the user.
     :rtype: Gtk.ResponseType
     """
-    return _handle_gtk_dialog(parent, Gtk.MessageType.QUESTION, message, "Question")
+    return handle_gtk_dialog(parent, Gtk.MessageType.QUESTION, message, "Question")
 
 
-def _handle_gtk_dialog(parent, msgtype, message, title):
+def handle_gtk_dialog(parent, msgtype, message, title):
     """
     Instantiate and present a dialog to the user.
 
