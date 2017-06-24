@@ -81,9 +81,9 @@ There currently does not exist a Python 3-compatible Debian package for [Hamlib]
     make
     sudo make install
 
-You will also need to append the Hamlib `bindings` and `bindings/.lib` directories to the `PYTHONPATH`:
+You will also need to append the Hamlib `bindings` and `bindings/.libs` directories to the `PYTHONPATH`:
 
-    export PYTHONPATH=$PYTHONPATH:/path/to/hamlib/bindings:/path/to/hamlib/bindings/.lib
+    export PYTHONPATH=$PYTHONPATH:/path/to/hamlib/bindings:/path/to/hamlib/bindings/.libs
 
 Contact
 -------
