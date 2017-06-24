@@ -25,6 +25,7 @@ except ImportError:
 import os
 from pyqso.logbook import *
 
+
 class TestLogbook(unittest.TestCase):
 
     """ The unit tests for the Logbook class. """
@@ -121,10 +122,9 @@ class TestLogbook(unittest.TestCase):
     @mock.patch('pyqso.auxiliary_dialogs.handle_gtk_dialog')
     @mock.patch('pyqso.logbook.LogNameDialog')
     def test_new_log(self, mock_LogNameDialog, mock_handle_gtk_dialog, mock_render_log):
-        """ Start off with an empty logbook and check that a new log can successfully be added. """
-        f = open("Logbook.test_new_log.db", "w").close()
+        """ Create an empty logbook file, open it, and check that a new log can successfully be added. """
+        open("Logbook.test_new_log.db", "w").close()
         opened = self.logbook.open(path="Logbook.test_new_log.db")
-        self.logbook.summary = mock.MagicMock()
         assert(opened)
         mock_LogNameDialog().dialog.run.return_value = Gtk.ResponseType.OK
         mock_LogNameDialog().name = "my_new_log"
