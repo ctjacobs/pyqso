@@ -265,6 +265,21 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkImageMenuItem" id="mitem_preferences">
+                        <property name="label" translatable="yes">Preferences</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="image">image18</property>
+                        <property name="use_stock">False</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="separatormenuitem6">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkImageMenuItem" id="mitem_quit">
                         <property name="label" translatable="yes">Quit</property>
                         <property name="visible">True</property>
@@ -351,15 +366,6 @@
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Toolbox</property>
                         <property name="use_underline">True</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="mitem_preferences">
-                        <property name="label" translatable="yes">Preferences...</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="image">image18</property>
-                        <property name="use_stock">False</property>
                       </object>
                     </child>
                   </object>
