@@ -34,9 +34,22 @@ class TestRecordDialog(unittest.TestCase):
     def setUp(self):
         PyQSO = mock.MagicMock()
         self.record_dialog = RecordDialog(application=PyQSO(), log=None)
+
+        # Set up the necessary sources.
+        self.record_dialog.sources["FREQ"] = Gtk.Entry()
+
         self.record_dialog.sources["BAND"] = Gtk.ComboBoxText()
         for band in BANDS:
             self.record_dialog.sources["BAND"].append_text(band)
+
+        self.record_dialog.sources["MODE"] = Gtk.ComboBoxText()
+        for mode in sorted(MODES.keys()):
+            self.record_dialog.sources["MODE"].append_text(mode)
+
+        self.record_dialog.sources["SUBMODE"] = Gtk.ComboBoxText()
+        self.record_dialog.sources["SUBMODE"].append_text("")
+        self.record_dialog.sources["SUBMODE"].set_active(0)
+
         return
 
     def tearDown(self):
@@ -44,12 +57,12 @@ class TestRecordDialog(unittest.TestCase):
 
     def test_autocomplete_band(self):
         """ Given a frequency, check that the band field is automatically set to the correct value. """
-        self.record_dialog.sources["FREQ"].get_text.return_value = "145.525"
+        self.record_dialog.sources["FREQ"].set_text("145.525")
         self.record_dialog.autocomplete_band()
         band = self.record_dialog.sources["BAND"].get_active_text()
         assert(band == "2m")
 
-        self.record_dialog.sources["FREQ"].get_text.return_value = "9001"
+        self.record_dialog.sources["FREQ"].set_text("9001")
         self.record_dialog.autocomplete_band()
         band = self.record_dialog.sources["BAND"].get_active_text()
         assert(band == "")  # Frequency does not lie in any of the specified bands.
@@ -63,6 +76,18 @@ class TestRecordDialog(unittest.TestCase):
         assert(float(converted) == 1e3*float(frequency))
         converted = self.record_dialog.convert_frequency(converted, from_unit="kHz", to_unit="MHz")  # Convert from kHz back to MHz. This should give the original frequency.
         assert(float(converted) == float(frequency))
+
+    def test_hamlib_autofill(self):
+        """ Check that FREQ, MODE and SUBMODE information can be retrieved from Hamlib's dummy rig (if the Hamlib module exists). """
+        if(have_hamlib):
+            rig_model = "RIG_MODEL_DUMMY"
+            rig_pathname = "/dev/Rig"
+            self.record_dialog.hamlib_autofill(rig_model, rig_pathname)
+            assert(self.record_dialog.sources["FREQ"].get_text() == "145.000000")
+            assert(self.record_dialog.sources["MODE"].get_active_text() == "FM")
+            assert(self.record_dialog.sources["SUBMODE"].get_active_text() == "")
+        else:
+            pass
 
 if(__name__ == '__main__'):
     unittest.main()

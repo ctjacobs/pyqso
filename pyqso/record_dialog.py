@@ -371,7 +371,8 @@ class RecordDialog:
             rig.close()
         except:
             logging.error("Could not close the communication channel to the rig via Hamlib!")
-            return
+
+        return
 
     def callsign_lookup_callback(self, widget=None):
         """ Get the callsign-related data from an online database and store it in the relevant Gtk.Entry boxes, but return None. """
