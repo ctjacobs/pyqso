@@ -84,6 +84,10 @@ class Menu:
         self.items["PRINT_LOG"] = self.builder.get_object("mitem_print_log")
         self.items["PRINT_LOG"].connect("activate", self.application.logbook.print_log)
 
+        # Preferences
+        self.items["PREFERENCES"] = self.builder.get_object("mitem_preferences")
+        self.items["PREFERENCES"].connect("activate", self.application.show_preferences)
+
         # Quit
         self.items["QUIT"] = self.builder.get_object("mitem_quit")
         self.items["QUIT"].connect("activate", Gtk.main_quit)
@@ -114,10 +118,6 @@ class Menu:
         else:
             self.items["TOOLBOX"].set_active(False)  # Don't show the toolbox by default
         self.items["TOOLBOX"].connect("activate", self.application.toolbox.toggle_visible_callback)
-
-        # Preferences
-        self.items["PREFERENCES"] = self.builder.get_object("mitem_preferences")
-        self.items["PREFERENCES"].connect("activate", self.application.show_preferences)
 
         # About
         self.items["ABOUT"] = self.builder.get_object("mitem_about")
