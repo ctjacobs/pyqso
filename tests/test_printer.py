@@ -46,7 +46,7 @@ class TestPrinter(unittest.TestCase):
         self.printer.action = Gtk.PrintOperationAction.EXPORT
         pdf = "Printer.test_print_records.pdf"
         self.printer.operation.set_export_filename(pdf)
-        records = [{"CALL":"MYCALL", "QSO_DATE":"24062017", "TIME_ON":"1519", "FREQ":"145.550", "MODE":"FM"}]
+        records = [{"CALL": "MYCALL", "QSO_DATE": "24062017", "TIME_ON": "1519", "FREQ": "145.550", "MODE": "FM"}]
         result = self.printer.print_records(records)
         assert(result != Gtk.PrintOperationResult.ERROR)
         assert(result == Gtk.PrintOperationResult.APPLY)
