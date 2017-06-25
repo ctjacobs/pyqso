@@ -39,7 +39,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logging.info("PyQSO version 1.0.0")
 
-# PyQSO modules
+# PyQSO modules.
 from pyqso.adif import *
 from pyqso.logbook import *
 from pyqso.menu import *
@@ -72,7 +72,7 @@ class PyQSO:
                 logging.error("An error occurred whilst creating a directory for PyQSO configuration files. Try creating the directory '~/.config/pyqso' manually.")
                 logging.exception(e)
 
-        # Get any application-specific preferences from the configuration file
+        # Get any application-specific preferences from the configuration file.
         config = configparser.ConfigParser()
 
         # Check that the configuration file actually exists (and is readable)
@@ -101,7 +101,7 @@ class PyQSO:
             if(config.get("general", "show_toolbox") == "False"):
                 self.toolbox.toggle_visible_callback()
         else:
-            # Hide the Toolbox by default
+            # Hide the Toolbox by default.
             self.toolbox.toggle_visible_callback()
 
         if(logbook_path is not None):
