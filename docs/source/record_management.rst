@@ -66,6 +66,5 @@ Removing duplicate records
 --------------------------
 
 PyQSO can find and delete duplicate records in a log. A record is a
-duplicate of another if its data in the Callsign, Date, Time, Frequency,
-and Mode fields are the same. Click ``Remove Duplicate Records`` in the
+duplicate of another if its data in the Callsign, Date, and Time fields are the same. Click ``Remove Duplicate Records`` in the
 ``Records`` menu.

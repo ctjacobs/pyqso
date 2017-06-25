@@ -235,6 +235,7 @@ class Log(Gtk.ListStore):
                 if(row_index in duplicates):  # Is this a duplicate row? If so, delete it.
                     self.delete_record(row_index, iter)
                     removed += 1
+                    break
                 iter = self.iter_next(iter)  # Move on to the next row, until iter_next returns None.
 
         assert(removed == len(duplicates))
@@ -262,7 +263,7 @@ class Log(Gtk.ListStore):
         return success
 
     def get_duplicates(self):
-        """ Find the duplicates in the log, based on the CALL, QSO_DATE, TIME_ON, FREQ and MODE fields.
+        """ Find the duplicates in the log, based on the CALL, QSO_DATE, and TIME_ON fields.
 
         :returns: A list of row IDs corresponding to the duplicate records.
         :rtype: list
@@ -274,7 +275,7 @@ class Log(Gtk.ListStore):
                 c.execute(
                     """SELECT rowid FROM %s WHERE rowid NOT IN
    (
-   SELECT MIN(rowid) FROM %s GROUP BY call, qso_date, time_on, freq, mode
+   SELECT MIN(rowid) FROM %s GROUP BY call, qso_date, time_on
    )""" % (self.name, self.name))
                 result = c.fetchall()
             for rowid in result:
