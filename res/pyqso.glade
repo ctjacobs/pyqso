@@ -3991,9 +3991,6 @@ Base64-encoded plain text in the configuration file.</property>
           <object class="GtkCalendar" id="calendar">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="year">2017</property>
-            <property name="month">1</property>
-            <property name="day">23</property>
           </object>
           <packing>
             <property name="expand">True</property>
