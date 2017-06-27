@@ -79,7 +79,7 @@ class Logbook:
             path = None
         dialog.destroy()
 
-        if(path is None):  # If the Cancel button has been clicked, path will still be None
+        if(path is None):  # If the Cancel button has been clicked, path will still be None.
             logging.debug("No file path specified.")
             return
         else:
@@ -110,13 +110,13 @@ class Logbook:
                 path = dialog.get_filename()
             dialog.destroy()
 
-            if(path is None):  # If the Cancel button has been clicked, path will still be None
+            if(path is None):  # If the Cancel button has been clicked, path will still be None.
                 logging.debug("No file path specified.")
                 return False
 
         connected = self.db_connect(path)
         if(connected):
-            # If the connection setup was successful, then open all the logs in the database
+            # If the connection setup was successful, then open all the logs in the database.
 
             self.path = path
 
@@ -198,7 +198,7 @@ class Logbook:
         """
 
         logging.debug("Attempting to connect to the logbook database...")
-        # Try setting up the SQL database connection
+        # Try setting up the SQL database connection.
         try:
             self.db_disconnect()  # Destroy any existing connections first.
             self.connection = sqlite.connect(path)
@@ -259,6 +259,7 @@ class Logbook:
                 try:
                     with self.connection:
                         c = self.connection.cursor()
+                        # NOTE: "id" is simply an alias for the "rowid" column here.
                         query = "CREATE TABLE %s (id INTEGER PRIMARY KEY AUTOINCREMENT" % log_name
                         for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
                             s = ", %s TEXT" % field_name.lower()
@@ -277,7 +278,8 @@ class Logbook:
 
         ln.dialog.destroy()
 
-        l = Log(self.connection, log_name)  # Empty log
+        # Instantiate and populate a new Log object.
+        l = Log(self.connection, log_name)
         l.populate()
 
         self.logs.append(l)
@@ -296,12 +298,12 @@ class Logbook:
             return
 
         if(page is None):
-            page_index = self.notebook.get_current_page()  # Gets the index of the selected tab in the logbook
+            page_index = self.notebook.get_current_page()  # Get the index of the selected tab in the logbook.
             if(page_index == 0):  # If we are on the Summary page...
                 logging.debug("No log currently selected!")
                 return
             else:
-                page = self.notebook.get_nth_page(page_index)  # Gets the Gtk.VBox of the selected tab in the logbook
+                page = self.notebook.get_nth_page(page_index)  # Get the Gtk.VBox of the selected tab in the logbook.
 
         log_index = self.get_log_index(name=page.get_name())
         log = self.logs[log_index]
@@ -310,7 +312,7 @@ class Logbook:
         # This may not be the same as what get_current_page() returns.
         page_index = self.notebook.page_num(page)
 
-        if(page_index == 0 or page_index == self.notebook.get_n_pages()-1):  # Only the "New Log" tab is present (i.e. no actual logs in the logbook)
+        if(page_index == 0 or page_index == self.notebook.get_n_pages()-1):  # Only the "New Log" tab is present (i.e. no actual logs in the logbook).
             logging.debug("No logs to delete!")
             return
 
@@ -326,12 +328,12 @@ class Logbook:
                 return
 
             self.logs.pop(log_index)
-            # Remove the log from the renderers too
+            # Remove the log from the renderers too.
             self.treeview.pop(log_index)
             self.treeselection.pop(log_index)
             self.sorter.pop(log_index)
             self.filter.pop(log_index)
-            # And finally remove the tab in the Logbook
+            # And finally remove the tab in the Logbook.
             self.notebook.remove_page(page_index)
 
         self.summary.update()
@@ -370,7 +372,7 @@ class Logbook:
         :arg int index: The index of the Log (in the list of Logs) to render.
         """
         self.filter.append(self.logs[index].filter_new(root=None))
-        # Set the callsign column as the column we want to filter by
+        # Set the callsign column as the column we want to filter by.
         self.filter[index].set_visible_func(self.filter_by_callsign, data=None)
         self.sorter.append(Gtk.TreeModelSort(model=self.filter[index]))
         self.sorter[index].set_sort_column_id(0, Gtk.SortType.ASCENDING)
@@ -380,7 +382,7 @@ class Logbook:
         self.treeview[index].connect("row-activated", self.edit_record_callback)
         self.treeselection.append(self.treeview[index].get_selection())
         self.treeselection[index].set_mode(Gtk.SelectionMode.SINGLE)
-        # Allow the Log to be scrolled up/down
+        # Allow the Log to be scrolled up/down.
         sw = Gtk.ScrolledWindow()
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
         sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
@@ -395,7 +397,7 @@ class Logbook:
         hbox.pack_start(label, False, False, 0)
         hbox.show_all()
 
-        self.notebook.insert_page(vbox, hbox, index+1)  # Append the new log as a new tab
+        self.notebook.insert_page(vbox, hbox, index+1)  # Append the new log as a new tab.
 
         # The first column of the logbook will always be the unique record index.
         # Let's append this separately to the field names.
@@ -561,7 +563,7 @@ class Logbook:
             if(response == Gtk.ResponseType.OK):
                 log_name = ln.name
                 if(self.log_name_exists(log_name)):
-                    # Import into existing log
+                    # Import into existing log.
                     exists = True
                     l = self.logs[self.get_log_index(name=log_name)]
                     response = question(parent=ln.dialog, message="Are you sure you want to import into an existing log?")
@@ -573,7 +575,7 @@ class Logbook:
                     ln.dialog.destroy()
                     return
                 else:
-                    # Create a new log with the name the user supplies
+                    # Create a new log with the name the user supplies.
                     exists = False
                     try:
                         with self.connection:
@@ -597,7 +599,6 @@ class Logbook:
         ln.dialog.destroy()
 
         adif = ADIF()
-        logging.debug("Importing records from the ADIF file with path: %s" % path)
         records = adif.read(path)
         l.add_record(records)
         l.populate()
@@ -605,14 +606,18 @@ class Logbook:
         if(not exists):
             self.logs.append(l)
             self.render_log(self.log_count-1)
+
+        # Update statistics, etc.
         self.summary.update()
         self.application.toolbox.awards.count(self)
+
+        info(parent=self.application.window, message="Imported %d QSOs into log '%s'." % (len(records), l.name))
 
         return
 
     def export_log_adif(self, widget=None):
         """ Export the log (that is currently selected) to an ADIF file. """
-        page_index = self.notebook.get_current_page()  # Gets the index of the selected tab in the logbook
+        page_index = self.notebook.get_current_page()  # Get the index of the selected tab in the logbook.
         if(page_index == 0):  # If we are on the Summary page...
             logging.debug("No log currently selected!")
             return
@@ -651,14 +656,18 @@ class Logbook:
             adif = ADIF()
             records = log.records
             if(records is not None):
-                adif.write(records, path)
+                try:
+                    adif.write(records, path)
+                    info(parent=self.application.window, message="Exported %d QSOs to %s in ADIF format." % (len(records), path))
+                except:
+                    error(parent=self.application.window, message="Could not export the records.")
             else:
-                error(self.application.window, "Could not retrieve the records from the SQL database. No records have been exported.")
+                error(parent=self.application.window, message="Could not retrieve the records from the SQL database. No records have been exported.")
         return
 
     def export_log_cabrillo(self, widget=None):
         """ Export the log (that is currently selected) to a Cabrillo file. """
-        page_index = self.notebook.get_current_page()  # Gets the index of the selected tab in the logbook
+        page_index = self.notebook.get_current_page()  # Get the index of the selected tab in the logbook.
         if(page_index == 0):  # If we are on the Summary page...
             logging.debug("No log currently selected!")
             return
@@ -708,15 +717,19 @@ class Logbook:
             cabrillo = Cabrillo()
             records = log.records
             if(records is not None):
-                cabrillo.write(records, path, contest=contest, mycall=mycall)
+                try:
+                    cabrillo.write(records, path, contest=contest, mycall=mycall)
+                    info(parent=self.application.window, message="Exported %d QSOs to %s in Cabrillo format." % (len(records), path))
+                except:
+                    error(parent=self.application.window, message="Could not export the records.")
             else:
-                error(self.application.window, "Could not retrieve the records from the SQL database. No records have been exported.")
+                error(parent=self.application.window, message="Could not retrieve the records from the SQL database. No records have been exported.")
         return
 
     def print_log(self, widget=None):
         """ Print all the records in the log (that is currently selected).
         Note that only a few important fields are printed because of the restricted width of the page. """
-        page_index = self.notebook.get_current_page()  # Gets the index of the selected tab in the logbook
+        page_index = self.notebook.get_current_page()  # Get the index of the selected tab in the logbook.
         if(page_index == 0):  # If we are on the Summary page...
             logging.debug("No log currently selected!")
             return
@@ -732,7 +745,7 @@ class Logbook:
 
     def add_record_callback(self, widget):
         """ A callback function used to add a particular record/QSO. """
-        # Get the log index
+        # Get the log index.
         try:
             log_index = self.get_log_index()
             if(log_index is None):
@@ -800,7 +813,7 @@ class Logbook:
     def delete_record_callback(self, widget):
         """ A callback function used to delete a particular record/QSO. """
 
-        # Get the log index
+        # Get the log index.
         try:
             log_index = self.get_log_index()
             if(log_index is None):
@@ -830,13 +843,13 @@ class Logbook:
             self.application.toolbox.awards.count(self)
         return
 
-    def edit_record_callback(self, widget, path, view_column):
+    def edit_record_callback(self, widget, path=None, view_column=None):
         """ A callback function used to edit a particular record/QSO.
         Note that the widget, path and view_column arguments are not used,
-        but need to be passed in since they associated with the row-activated signal
+        but need to be passed in since they are associated with the row-activated signal
         which is generated when the user double-clicks on a record. """
 
-        # Get the log index
+        # Get the log index.
         try:
             log_index = self.get_log_index()
             if(log_index is None):
@@ -846,7 +859,7 @@ class Logbook:
             return
         log = self.logs[log_index]
 
-        (sort_model, path) = self.treeselection[log_index].get_selected_rows()  # Get the selected row in the log
+        (sort_model, path) = self.treeselection[log_index].get_selected_rows()  # Get the selected row in the log.
         try:
             sort_iter = sort_model.get_iter(path[0])
             filter_iter = self.sorter[log_index].convert_iter_to_child_iter(sort_iter)
@@ -900,14 +913,20 @@ class Logbook:
 
     def remove_duplicates_callback(self, widget=None):
         """ Remove duplicate records in a log.
-        Detecting duplicate records is done based on the CALL, QSO_DATE, TIME_ON, FREQ, and MODE fields. """
+        Detecting duplicate records is done based on the CALL, QSO_DATE, and TIME_ON fields. """
         logging.debug("Removing duplicate records...")
 
         log_index = self.get_log_index()
         log = self.logs[log_index]
 
         (number_of_duplicates, number_of_duplicates_removed) = log.remove_duplicates()
-        info(self.application.window, "Found %d duplicate(s). Successfully removed %d duplicate(s)." % (number_of_duplicates, number_of_duplicates_removed))
+        info(parent=self.application.window, message="Found %d duplicate(s). Successfully removed %d duplicate(s)." % (number_of_duplicates, number_of_duplicates_removed))
+
+        if(number_of_duplicates_removed > 0):
+            # Update statistics.
+            self.summary.update()
+            self.application.toolbox.awards.count(self)
+
         return
 
     @property
@@ -956,8 +975,8 @@ class Logbook:
         :rtype: int
         """
         if(name is None):
-            # If no page name is supplied, then just use the currently selected page
-            page_index = self.notebook.get_current_page()  # Gets the index of the selected tab in the logbook
+            # If no page name is supplied, then just use the currently selected page.
+            page_index = self.notebook.get_current_page()  # Get the index of the selected tab in the logbook.
             if(page_index == 0 or page_index == self.notebook.get_n_pages()-1):
                 # We either have the Summary page, or the "+" (add log) blank/dummy page.
                 logging.debug("No log currently selected!")
@@ -979,7 +998,7 @@ class Logbook:
         :returns: A list containing all the logs in the logbook, or None if the retrieval was unsuccessful.
         :rtype: list
         """
-        logs = []  # A fresh stack of Log objects
+        logs = []
         try:
             with self.connection:
                 c = self.connection.cursor()

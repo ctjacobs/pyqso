@@ -114,12 +114,14 @@ class Log(Gtk.ListStore):
             fields_and_data = [fields_and_data]
 
         with self.connection:
-            # Get all the column names in the current database table.
             c = self.connection.cursor()
+
+            # Get all the column names in the current database table.
             c.execute("PRAGMA table_info(%s)" % self.name)
             column_names = c.fetchall()
-            # Get the index of the last inserted record in the database.
-            c.execute('SELECT max(id) FROM %s' % self.name)
+
+            # Get the index/rowid of the last inserted record in the database.
+            c.execute("SELECT max(id) FROM %s" % self.name)
             last_index = c.fetchone()[0]
             if last_index is None:
                 # Assume no records are currently present.
@@ -130,7 +132,7 @@ class Log(Gtk.ListStore):
 
         # Construct the SQL query.
         query = "INSERT INTO %s VALUES (NULL" % self.name
-        for i in range(len(column_names)-1):  # -1 here because we don't want to count the database's 'id' field.
+        for i in range(len(column_names)-1):  # -1 here because we don't want to count the database's 'id' column, since this is autoincremented.
             query = query + ",?"
         query = query + ")"
 
@@ -144,27 +146,33 @@ class Log(Gtk.ListStore):
                 if((column_name.upper() in AVAILABLE_FIELD_NAMES_ORDERED) and (column_name.upper() in list(fields_and_data[r].keys()))):
                     database_entry.append(fields_and_data[r][column_name.upper()])
                 else:
-                    if(column_name != "id"):  # Ignore the row index field. This is a special case since it's not in AVAILABLE_FIELD_NAMES_ORDERED.
+                    if(column_name != "id"):  # Ignore the index/rowid field. This is a special case since it's not in AVAILABLE_FIELD_NAMES_ORDERED.
                         database_entry.append("")
             database_entries.append(database_entry)
 
-            # Add the data to the ListStore as well.
-            liststore_entry = []
-            field_names = AVAILABLE_FIELD_NAMES_ORDERED
-            for i in range(0, len(field_names)):
-                if(field_names[i] in list(fields_and_data[r].keys())):
-                    liststore_entry.append(fields_and_data[r][field_names[i]])
-                else:
-                    liststore_entry.append("")
-
-            # Add the record's index.
-            index = last_index + (r+1)  # +1 here because r begins at zero, and we don't want to count the already-present record with index last_index.
-            liststore_entry.insert(0, index)
-            self.append(liststore_entry)
-
-        # Execute the query.
+        # Insert records in the database.
         with self.connection:
+            c = self.connection.cursor()
             c.executemany(query, database_entries)
+
+            # Get the indices/rowids of the newly-inserted records.
+            query = "SELECT id FROM %s WHERE id > %s ORDER BY id ASC" % (self.name, last_index)
+            c.execute(query)
+            inserted = c.fetchall()
+
+            # Check that the number of records we wanted to insert is the same as the number of records successfully inserted.
+            assert(len(inserted) == len(database_entries))
+
+            # Add the records to the ListStore as well.
+            for r in range(len(fields_and_data)):
+                liststore_entry = [inserted[r]["id"]]  # Add the record's index.
+                field_names = AVAILABLE_FIELD_NAMES_ORDERED
+                for i in range(0, len(field_names)):
+                    if(field_names[i] in list(fields_and_data[r].keys())):
+                        liststore_entry.append(fields_and_data[r][field_names[i]])
+                    else:
+                        liststore_entry.append("")
+                self.append(liststore_entry)
 
         logging.debug("Successfully added the record(s) to the log.")
         return
@@ -173,11 +181,11 @@ class Log(Gtk.ListStore):
         """ Delete a specified record from the log. The corresponding record is also deleted from the Gtk.ListStore data structure.
 
         :arg int index: The index of the record in the SQL database.
-        :arg iter: iter should always be given. It is given a default value of None for unit testing purposes only.
+        :arg iter: The iterator pointing to the record to be deleted in the Gtk.ListStore. If the default value of None is used, only the database entry is deleted and the corresponding Gtk.ListStore is left alone.
         :raises sqlite.Error, IndexError: if the record could not be deleted.
         """
         logging.debug("Deleting record from log...")
-        # Get the selected row in the logbook
+        # Get the selected row in the logbook.
         try:
             with self.connection:
                 c = self.connection.cursor()
@@ -197,8 +205,8 @@ class Log(Gtk.ListStore):
         :arg int index: The index of the record in the SQL database.
         :arg str field_name: The name of the field whose data should be modified.
         :arg str data: The data that should replace the current data in the field.
-        :arg iter: Should always be given. A default value of None is used for unit testing purposes only.
-        :arg column_index: Should always be given. A default value of None is used for unit testing purposes only.
+        :arg iter: The iterator pointing to the record to be edited in the Gtk.ListStore. If the default value of None is used, only the database entry is edited and the corresponding Gtk.ListStore is left alone.
+        :arg column_index: The index of the column in the Gtk.ListStore to be edited. If the default value of None is used, only the database entry is edited and the corresponding Gtk.ListStore is left alone.
         :raises sqlite.Error, IndexError: if the record could not be edited.
         """
         logging.debug("Editing field '%s' in record %d..." % (field_name, index))
@@ -227,18 +235,18 @@ class Log(Gtk.ListStore):
             return (0, 0)  # Nothing to do here.
 
         removed = 0  # Count the number of records that are removed. Hopefully this will be the same as len(duplicates).
-        while removed != len(duplicates):  # Unfortunately, in certain cases, extra passes may be necessary to ensure that all duplicates are removed.
-            path = Gtk.TreePath(0)  # Start with the first row in the log.
-            iter = self.get_iter(path)
-            while iter is not None:
-                row_index = self.get_value(iter, 0)  # Get the index.
-                if(row_index in duplicates):  # Is this a duplicate row? If so, delete it.
-                    self.delete_record(row_index, iter)
-                    removed += 1
-                    break
-                iter = self.iter_next(iter)  # Move on to the next row, until iter_next returns None.
+        iter = self.get_iter_first()  # Start with the first row in the log.
+        prev = iter  # Keep track of the previous iter (initially this will be the same as the first row in the log).
+        while iter is not None:
+            row_index = self.get_value(iter, 0)  # Get the index.
+            if(row_index in duplicates):  # Is this a duplicate row? If so, delete it.
+                self.delete_record(row_index, iter)
+                removed += 1
+                iter = prev  # Go back to the iter before the record that was just removed and continue from there.
+                continue
+            prev = iter
+            iter = self.iter_next(iter)  # Move on to the next row, until iter_next returns None.
 
-        assert(removed == len(duplicates))
         return (len(duplicates), removed)
 
     def rename(self, new_name):
@@ -265,7 +273,7 @@ class Log(Gtk.ListStore):
     def get_duplicates(self):
         """ Find the duplicates in the log, based on the CALL, QSO_DATE, and TIME_ON fields.
 
-        :returns: A list of row IDs corresponding to the duplicate records.
+        :returns: A list of indices/ids corresponding to the duplicate records.
         :rtype: list
         """
         duplicates = []
@@ -273,13 +281,14 @@ class Log(Gtk.ListStore):
             with self.connection:
                 c = self.connection.cursor()
                 c.execute(
-                    """SELECT rowid FROM %s WHERE rowid NOT IN
+                    """SELECT id FROM %s WHERE id NOT IN
    (
-   SELECT MIN(rowid) FROM %s GROUP BY call, qso_date, time_on
+   SELECT MIN(id) FROM %s GROUP BY call, qso_date, time_on
    )""" % (self.name, self.name))
                 result = c.fetchall()
-            for rowid in result:
-                duplicates.append(rowid[0])  # Get the integer from inside the tuple.
+            for index in result:
+                duplicates.append(index[0])  # Get the integer from inside the tuple.
+            duplicates.sort()  # These indices should monotonically increasing, but let's sort the list just in case.
         except (sqlite.Error, IndexError) as e:
             logging.exception(e)
         return duplicates
