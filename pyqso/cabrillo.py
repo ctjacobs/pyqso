@@ -26,7 +26,7 @@ CONTESTS = ["", "AP-SPRINT", "ARRL-10", "ARRL-160", "ARRL-222", "ARRL-DX-CW", "A
 
 class Cabrillo:
 
-    """ Write a list of records to a file in the Cabrillo format (v3.0).
+    """ The Cabrillo class supplies methods for writing log files in the Cabrillo format (v3.0).
     For more information, visit http://wwrof.org/cabrillo/ """
 
     def __init__(self):
@@ -34,6 +34,14 @@ class Cabrillo:
         return
 
     def write(self, records, path, contest="", mycall=""):
+        """ Write a list of QSO records to a file in the Cabrillo format.
+
+        :arg list records: The list of QSO records to write.
+        :arg str path: The desired path of the Cabrillo file to write to.
+        :arg str contest: The name of the contest.
+        :arg str mycall: The callsign used during the contest.
+        :returns: None
+        :raises IOError: if the Cabrillo file cannot be written (e.g. due to lack of write permissions)."""
 
         logging.debug("Writing records to an Cabrillo file...")
         try:
@@ -100,5 +108,5 @@ class Cabrillo:
             logging.error("An error occurred when writing the Cabrillo file.")
             logging.exception(e)
 
-        logging.info("Log exported to %s in Cabrillo format." % (path))
+        logging.info("Wrote %d QSOs to %s in Cabrillo format." % (len(records), path))
         return
