@@ -196,7 +196,7 @@ class ADIF:
 
     def __init__(self):
         """ Initialise class for I/O of files using the Amateur Data Interchange Format (ADIF). """
-        logging.debug("New ADIF instance created!")
+        return
 
     def read(self, path):
         """ Read an ADIF file and parse it.
@@ -224,6 +224,7 @@ class ADIF:
         if(records == []):
             logging.warning("No records found in the file. Empty file or wrong file type?")
 
+        logging.info("Read %d QSOs from %s in ADIF format." % (len(records), path))
         return records
 
     def parse_adi(self, text):
@@ -362,14 +363,13 @@ class ADIF:
 
             logging.debug("Finished writing records to the ADIF file.")
             f.close()
-
+            logging.info("Wrote %d QSOs to %s in ADIF format." % (len(records), path))
         except IOError as e:
             logging.error("I/O error %d: %s" % (e.errno, e.strerror))
         except Exception as e:  # All other exceptions.
             logging.error("An error occurred when writing the ADIF file.")
             logging.exception(e)
 
-        logging.info("Log exported to %s in ADIF format." % (path))
         return
 
     def is_valid(self, field_name, data, data_type):
