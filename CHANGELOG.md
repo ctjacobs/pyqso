@@ -17,9 +17,12 @@
 - Pressing the Return key after entering a DX cluster command will send the command to the Telnet server.
 - Pressing the Return key after entering QSO information via the record dialog will add the QSO to the log.
 - Moved all unit tests to a dedicated tests directory.
+- Duplicate QSOs are now defined as having the same CALL, QSO_DATE and TIME_ON values. FREQ and MODE are no longer considered.
+- Improved the runtime performance of duplicate QSO removal.
 
 ### Fixed
-- Replace any characters that cannot be decoded with a replacement marker in the DX cluster frame.
+- Any characters in the DX cluster server's reponse that cannot be decoded are now replaced with a replacement marker in the DX cluster frame.
+- Fixed the QSO index used in the Gtk.ListStore. Just before a QSO is added with add_record it was assumed that it's index would be max(rowid)+1, which is not always the case. This led to inconsistencies between the Gtk.ListStore and the database. Indices used in the Gtk.ListStore are now obtained directly from the database after insertion.
 
 ## [0.3] - 2016-05-28
 ### Added
