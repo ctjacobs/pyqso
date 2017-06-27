@@ -740,7 +740,7 @@ class Logbook:
             printer = Printer(self.application)
             printer.print_records(records)
         else:
-            error(self.application.window, "Could not retrieve the records from the SQL database. No records have been printed.")
+            error(parent=self.application.window, message="Could not retrieve the records from the SQL database. No records have been printed.")
         return
 
     def add_record_callback(self, widget):
@@ -927,6 +927,19 @@ class Logbook:
             self.summary.update()
             self.application.toolbox.awards.count(self)
 
+        return
+
+    def record_count_callback(self, widget=None):
+        """ Show the record count for the selected log. """
+        page_index = self.notebook.get_current_page()  # Get the index of the selected tab in the logbook.
+        if(page_index == 0):  # If we are on the Summary page...
+            logging.debug("No log currently selected!")
+            return
+        log_index = self.get_log_index()
+        log = self.logs[log_index]
+        record_count = log.record_count
+        if(record_count is not None):
+            info(parent=self.application.window, message="Log '%s' contains %d records." % (log.name, record_count))
         return
 
     @property

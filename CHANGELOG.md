@@ -11,6 +11,7 @@
 - More unit tests.
 - More tooltips.
 - The option to enter the frequency in Hz, kHz, MHz, or GHz in the Add/Edit Record dialog. Frequencies are still displayed in MHz in the logbook.
+- Record/QSO count feature.
 
 ### Changed
 - Using username and port information (in addition to hostname) when creating an identifier for a DX cluster bookmark.

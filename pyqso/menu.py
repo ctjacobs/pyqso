@@ -108,6 +108,10 @@ class Menu:
         self.items["REMOVE_DUPLICATES"] = self.builder.get_object("mitem_remove_duplicates")
         self.items["REMOVE_DUPLICATES"].connect("activate", self.application.logbook.remove_duplicates_callback)
 
+        # Record count
+        self.items["RECORD_COUNT"] = self.builder.get_object("mitem_record_count")
+        self.items["RECORD_COUNT"].connect("activate", self.application.logbook.record_count_callback)
+
         # View toolbox
         self.items["TOOLBOX"] = self.builder.get_object("mitem_toolbox")
         config = configparser.ConfigParser()
@@ -160,7 +164,7 @@ class Menu:
         :arg bool sensitive: If True, enable all the record-related menu items. If False, disable them all.
         """
         logging.debug("Setting record-related menu item sensitivity to: %s..." % sensitive)
-        for item_name in ["ADD_RECORD", "EDIT_RECORD", "DELETE_RECORD", "REMOVE_DUPLICATES"]:
+        for item_name in ["ADD_RECORD", "EDIT_RECORD", "DELETE_RECORD", "REMOVE_DUPLICATES", "RECORD_COUNT"]:
             self.items[item_name].set_sensitive(sensitive)
         logging.debug("Set record-related menu item sensitivity to: %s." % sensitive)
         return
