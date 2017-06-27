@@ -749,7 +749,7 @@ class Logbook:
         try:
             log_index = self.get_log_index()
             if(log_index is None):
-                raise ValueError("The log index could not be determined. Perhaps you tried adding a record when the Summary page was selected?")
+                raise ValueError("The log index could not be determined. Perhaps the Summary page is selected?")
         except ValueError as e:
             error(self.application.window, e)
             return
@@ -817,9 +817,9 @@ class Logbook:
         try:
             log_index = self.get_log_index()
             if(log_index is None):
-                raise ValueError("The log index could not be determined. Perhaps you tried deleting a record when the Summary page was selected?")
+                raise ValueError("The log index could not be determined. Perhaps the Summary page is selected?")
         except ValueError as e:
-            error(self.application, e)
+            error(self.application.window, e)
             return
         log = self.logs[log_index]
 
@@ -853,9 +853,9 @@ class Logbook:
         try:
             log_index = self.get_log_index()
             if(log_index is None):
-                raise ValueError("The log index could not be determined. Perhaps you tried editing a record when the Summary page was selected?")
+                raise ValueError("The log index could not be determined. Perhaps the Summary page is selected?")
         except ValueError as e:
-            error(self.application, e)
+            error(self.application.window, e)
             return
         log = self.logs[log_index]
 
@@ -916,7 +916,15 @@ class Logbook:
         Detecting duplicate records is done based on the CALL, QSO_DATE, and TIME_ON fields. """
         logging.debug("Removing duplicate records...")
 
-        log_index = self.get_log_index()
+        # Get the log index.
+        try:
+            log_index = self.get_log_index()
+            if(log_index is None):
+                raise ValueError("The log index could not be determined. Perhaps the Summary page is selected?")
+        except ValueError as e:
+            error(self.application.window, e)
+            return
+
         log = self.logs[log_index]
 
         (number_of_duplicates, number_of_duplicates_removed) = log.remove_duplicates()
@@ -931,11 +939,14 @@ class Logbook:
 
     def record_count_callback(self, widget=None):
         """ Show the record count for the selected log. """
-        page_index = self.notebook.get_current_page()  # Get the index of the selected tab in the logbook.
-        if(page_index == 0):  # If we are on the Summary page...
-            logging.debug("No log currently selected!")
+        # Get the log index.
+        try:
+            log_index = self.get_log_index()
+            if(log_index is None):
+                raise ValueError("The log index could not be determined. Perhaps the Summary page is selected?")
+        except ValueError as e:
+            error(self.application.window, e)
             return
-        log_index = self.get_log_index()
         log = self.logs[log_index]
         record_count = log.record_count
         if(record_count is not None):
