@@ -55,7 +55,7 @@ class Toolbar:
 
         # Edit record
         self.buttons["EDIT_RECORD"] = self.builder.get_object("toolbar_edit_record")
-        self.buttons["EDIT_RECORD"].connect("clicked", self.application.logbook.edit_record_callback, None, None)
+        self.buttons["EDIT_RECORD"].connect("clicked", self.application.logbook.edit_record_callback)
 
         # Delete record
         self.buttons["DELETE_RECORD"] = self.builder.get_object("toolbar_delete_record")
