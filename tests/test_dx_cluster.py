@@ -31,12 +31,9 @@ class TestDXCluster(unittest.TestCase):
 
     def setUp(self):
         """ Set up the objects needed for the unit tests. """
+
         PyQSO = mock.MagicMock()
         self.dxcluster = DXCluster(application=PyQSO())
-
-    def tearDown(self):
-        """ Destroy any unit test resources. """
-        pass
 
     def test_on_telnet_io(self):
         """ Check that the response from the Telnet server can be correctly decoded. """

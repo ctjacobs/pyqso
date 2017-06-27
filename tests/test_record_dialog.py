@@ -31,6 +31,7 @@ class TestRecordDialog(unittest.TestCase):
     """ The unit tests for the RecordDialog class. """
 
     def setUp(self):
+        """ Set up the objects needed for the unit tests. """
         PyQSO = mock.MagicMock()
         self.record_dialog = RecordDialog(application=PyQSO(), log=None)
 
@@ -49,9 +50,6 @@ class TestRecordDialog(unittest.TestCase):
         self.record_dialog.sources["SUBMODE"].append_text("")
         self.record_dialog.sources["SUBMODE"].set_active(0)
 
-        return
-
-    def tearDown(self):
         return
 
     def test_autocomplete_band(self):

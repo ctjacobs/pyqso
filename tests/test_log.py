@@ -26,6 +26,7 @@ class TestLog(unittest.TestCase):
     """ The unit tests for the Log class. """
 
     def setUp(self):
+        """ Create a connection to a temporary database and set up the objects needed for the unit tests. """
         self.connection = sqlite.connect(":memory:")
         self.connection.row_factory = sqlite.Row
 
@@ -43,21 +44,26 @@ class TestLog(unittest.TestCase):
         self.log = Log(self.connection, "test")
 
     def tearDown(self):
+        """ Destroy the connection to the temporary database. """
         self.connection.close()
 
     def test_add_missing_db_columns(self):
-
-        column_names_before = []
-        column_names_after = []
+        """ Check that any missing columns in the database are added successfully. """
 
         c = self.connection.cursor()
+
+        # 'Before' state.
+        column_names_before = []
         c.execute("PRAGMA table_info(test)")
         result = c.fetchall()
         for t in result:
             column_names_before.append(t[1].upper())
 
+        # Add missing columns.
         self.log.add_missing_db_columns()
 
+        # 'After' state.
+        column_names_after = []
         c.execute("PRAGMA table_info(test)")
         result = c.fetchall()
         for t in result:
@@ -66,24 +72,43 @@ class TestLog(unittest.TestCase):
         print("Column names before: ", column_names_before)
         print("Column names after: ", column_names_after)
 
-        assert(len(column_names_before) == len(self.field_names) + 1)  # Added 1 here because of the "ID" column in all database tables.
+        assert(len(column_names_before) == len(self.field_names) + 1)  # Added 1 here because of the "id" column in all database tables.
         assert(len(column_names_after) == len(AVAILABLE_FIELD_NAMES_ORDERED) + 1)
         for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
             assert(field_name in column_names_after)
 
     def test_add_record(self):
+        """ Check that a single record can be successfully added. """
+
         self.log.add_record(self.fields_and_data)
+
         c = self.connection.cursor()
         c.execute("SELECT * FROM test")
         records = c.fetchall()
-
         assert len(records) == 1
 
+        # Check that all the data has been added to all the fields.
         for field_name in self.field_names:
             print(self.fields_and_data[field_name], records[0][field_name])
             assert self.fields_and_data[field_name] == records[0][field_name]
 
+        # Check consistency of index between Gtk.ListStore and the database.
+        assert(records[0]["id"] == 1)
+        iter = self.log.get_iter_first()
+        row_index = self.log.get_value(iter, 0)
+        assert(records[0]["id"] == row_index)
+
+    def test_add_record_multiple(self):
+        """ Check that multiple records can be successfully added in one go. """
+        self.log.add_record([self.fields_and_data]*5)
+
+        c = self.connection.cursor()
+        c.execute("SELECT * FROM test")
+        records = c.fetchall()
+        assert len(records) == 5
+
     def test_delete_record(self):
+        """ Check that a record can be successfully deleted. """
         query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
         c = self.connection.cursor()
         c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
@@ -100,6 +125,7 @@ class TestLog(unittest.TestCase):
         assert(len(records_after) == 0)
 
     def test_edit_record(self):
+        """ Check that a record's fields can be successfully edited. """
         query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
         c = self.connection.cursor()
         c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
@@ -119,6 +145,7 @@ class TestLog(unittest.TestCase):
         assert(record_after["FREQ"] == "145.450")
 
     def test_get_record_by_index(self):
+        """ Check that a record can be retrieved using its index. """
         query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
         c = self.connection.cursor()
         c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
@@ -133,6 +160,7 @@ class TestLog(unittest.TestCase):
         assert(len(record) == len(self.fields_and_data) + 1)
 
     def test_records(self):
+        """ Check that all records in a log can be successfully retrieved. """
         query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
         c = self.connection.cursor()
         # Add the same record twice
@@ -147,6 +175,7 @@ class TestLog(unittest.TestCase):
             assert(records[1][field_name] == self.fields_and_data[field_name])
 
     def test_record_count(self):
+        """ Check that the total number of records in a log is calculated correctly. """
         query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
         c = self.connection.cursor()
         # Add the same record twice
@@ -158,6 +187,7 @@ class TestLog(unittest.TestCase):
         assert(record_count == 2)  # There should be 2 records
 
     def test_get_duplicates(self):
+        """ Insert n records, n-1 of which are duplicates, and check that the duplicates are successfully identified. """
         query = "INSERT INTO test VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?)"
         c = self.connection.cursor()
         n = 5  # The total number of records to insert.
@@ -165,7 +195,20 @@ class TestLog(unittest.TestCase):
             c.execute(query, (self.fields_and_data["CALL"], self.fields_and_data["QSO_DATE"], self.fields_and_data["TIME_ON"], self.fields_and_data["FREQ"], self.fields_and_data["BAND"], self.fields_and_data["MODE"], self.fields_and_data["RST_SENT"], self.fields_and_data["RST_RCVD"]))
         assert(len(self.log.get_duplicates()) == n-1)  # Expecting n-1 duplicates.
 
+    def test_remove_duplicates(self):
+        """ Insert n records, n-1 of which are duplicates, and check that the duplicates are successfully removed. """
+        n = 5  # The total number of records to insert.
+        for i in range(0, n):
+            self.log.add_record(self.fields_and_data)
+        (number_of_duplicates, number_of_duplicates_removed) = self.log.remove_duplicates()
+        print("Number of duplicates: %d" % number_of_duplicates)
+        print("Number of duplicates removed: %d" % number_of_duplicates_removed)
+        assert(number_of_duplicates == number_of_duplicates_removed)
+        assert(number_of_duplicates == 4)
+        assert(self.log.record_count == 1)
+
     def test_rename(self):
+        """ Check that a log can be successfully renamed. """
         old_name = "test"
         new_name = "hello"
         success = self.log.rename(new_name)

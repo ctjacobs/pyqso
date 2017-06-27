@@ -27,16 +27,12 @@ from pyqso.callsign_lookup import *
 
 class TestCallsignLookup(unittest.TestCase):
 
-    """ The unit tests for the CallsignLookup class. """
+    """ The unit tests for the callsign lookup functionality. """
 
     def setUp(self):
         """ Set up the objects needed for the unit tests. """
         self.qrz = CallsignLookupQRZ(parent=None)
         self.hamqth = CallsignLookupHamQTH(parent=None)
-
-    def tearDown(self):
-        """ Destroy any unit test resources. """
-        pass
 
     def test_strip(self):
         """ Check that a callsign with a prefix and a suffix is stripped correctly. """

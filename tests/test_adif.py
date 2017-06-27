@@ -23,7 +23,7 @@ from pyqso.adif import *
 
 class TestADIF(unittest.TestCase):
 
-    """ The unit tests for the ADIF module. """
+    """ The unit tests for the ADIF class. """
 
     def setUp(self):
         """ Set up the ADIF object needed for the unit tests. """

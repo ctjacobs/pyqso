@@ -24,9 +24,11 @@ from pyqso.compare import *
 
 class TestCompare(unittest.TestCase):
 
-    """ The unit tests for the Compare class. """
+    """ The unit tests for the comparison schemes. """
 
     def setUp(self):
+        """ Set up the objects needed for the unit tests. """
+
         data_types = [int] + [str]*3
         self.model = Gtk.ListStore(*data_types)
         row1 = [0, "100", "20150323", "1433"]
@@ -37,9 +39,6 @@ class TestCompare(unittest.TestCase):
         self.model.append(row3)
         row4 = [3, "25", "20160423", "1433"]
         self.model.append(row4)
-        return
-
-    def tearDown(self):
         return
 
     def test_compare_default(self):

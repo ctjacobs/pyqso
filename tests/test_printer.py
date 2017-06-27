@@ -37,10 +37,6 @@ class TestPrinter(unittest.TestCase):
         self.printer = Printer(application=PyQSO())
         self.printer.application.window = Gtk.Window()
 
-    def tearDown(self):
-        """ Destroy any unit test resources. """
-        return
-
     def test_print_records(self):
         """ Check that a list of records can be printed to a PDF file. """
         self.printer.action = Gtk.PrintOperationAction.EXPORT

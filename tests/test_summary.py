@@ -32,7 +32,7 @@ class TestSummary(unittest.TestCase):
     """ The unit tests for the Summary class. """
 
     def setUp(self):
-        """ Set up the objects needed for the unit tests. """
+        """ Set up the objects needed for the unit tests and create a connection to the test database. """
         PyQSO = mock.MagicMock()
         self.summary = Summary(application=PyQSO())
         self.summary.logbook = Logbook(application=PyQSO())
@@ -43,7 +43,7 @@ class TestSummary(unittest.TestCase):
         assert(self.summary.logbook.logs is not None)
 
     def tearDown(self):
-        """ Destroy any unit test resources. """
+        """ Destroy the connection to the test database. """
         success = self.summary.logbook.db_disconnect()
         assert(success)
 

@@ -37,10 +37,6 @@ class TestCalendarDialog(unittest.TestCase):
         self.cd.calendar.select_month(3, 2017)  # Note: Months start from 0 when using the Calendar widget. So "3" represents April here.
         self.cd.calendar.select_day(2)
 
-    def tearDown(self):
-        """ Destroy any unit test resources. """
-        pass
-
     def test_date(self):
         """ Check that the date obtained from the Calendar is in the correct format. """
         assert(self.cd.date == "20170402")

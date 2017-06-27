@@ -26,10 +26,8 @@ class TestCabrillo(unittest.TestCase):
     """ The unit tests for the Cabrillo class. """
 
     def setUp(self):
+        """ Set up the Cabrillo object needed for the unit tests. """
         self.cabrillo = Cabrillo()
-        return
-
-    def tearDown(self):
         return
 
     def test_write(self):

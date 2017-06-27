@@ -42,10 +42,6 @@ class TestAwards(unittest.TestCase):
         self.logbook.logs = self.logbook.get_logs()
         assert(self.logbook.logs is not None)
 
-    def tearDown(self):
-        """ Destroy any unit test resources. """
-        pass
-
     def test_count(self):
         """ Check that there are 3 FM/AM/SSB/SSTV QSOs and 1 CW QSO. Note that the BAND must be specified in order to be counted. """
         count = self.awards.count(self.logbook)
