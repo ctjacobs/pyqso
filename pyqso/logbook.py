@@ -912,7 +912,7 @@ class Logbook:
         return
 
     def remove_duplicates_callback(self, widget=None):
-        """ Remove duplicate records in a log.
+        """ A callback function used to remove duplicate records in a log.
         Detecting duplicate records is done based on the CALL, QSO_DATE, and TIME_ON fields. """
         logging.debug("Removing duplicate records...")
 
@@ -938,7 +938,7 @@ class Logbook:
         return
 
     def record_count_callback(self, widget=None):
-        """ Show the record count for the selected log. """
+        """ A callback function used to show the record count for the selected log. """
         # Get the log index.
         try:
             log_index = self.get_log_index()
