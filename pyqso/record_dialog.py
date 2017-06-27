@@ -59,7 +59,7 @@ class RecordDialog:
         glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/pyqso.glade")
         self.builder.add_objects_from_file(glade_file_path, ("record_dialog",))
         self.dialog = self.builder.get_object("record_dialog")
-        self.builder.get_object("record_dialog").connect("key-release-event", self.on_key_release)
+        self.builder.get_object("record_dialog").connect("key-press-event", self.on_key_press)
 
         # Set dialog title
         if(index is not None):
@@ -292,7 +292,7 @@ class RecordDialog:
         self.sources["SUBMODE"].set_active(MODES[mode].index(""))  # Set the submode to an empty string.
         return
 
-    def on_key_release(self, widget, event):
+    def on_key_press(self, widget, event):
         """ If the Return key is pressed, emit the "OK" response to record the QSO. """
         child = widget.get_focus()
         if(not(isinstance(child, Gtk.ToggleButton) or isinstance(child, Gtk.Button) or isinstance(child, Gtk.TextView)) and event.keyval == Gdk.KEY_Return):

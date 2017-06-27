@@ -52,7 +52,7 @@ class DXCluster:
         self.builder.get_object("mitem_new").connect("activate", self.new_server)
         self.builder.get_object("mitem_disconnect").connect("activate", self.telnet_disconnect)
         self.builder.get_object("send").connect("clicked", self.telnet_send_command)
-        self.builder.get_object("command").connect("key-release-event", self.on_command_key_press)
+        self.builder.get_object("command").connect("key-press-event", self.on_command_key_press)
 
         # Get the text renderer and its buffer.
         self.renderer = self.builder.get_object("renderer")
