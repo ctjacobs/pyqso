@@ -37,7 +37,7 @@ def info(parent, message):
     :arg parent: The Gtk parent window/dialog.
     :arg str message: The message to display to the user.
     """
-    logging.debug(message)
+    logging.info(message)
     handle_gtk_dialog(parent, Gtk.MessageType.INFO, message, "Information")
 
 
