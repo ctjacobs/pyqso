@@ -18,6 +18,7 @@
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
 from gi.repository import Gtk, Pango, PangoCairo
+from pyqso.auxiliary_dialogs import error
 
 
 class Printer(object):
@@ -54,6 +55,9 @@ class Printer(object):
             self.text_to_print += str(r["CALL"]) + "\t---\t" + str(r["QSO_DATE"]) + "\t---\t" + str(r["TIME_ON"]) + "\t---\t" + str(r["FREQ"]) + "\t---\t" + str(r["MODE"]) + "\n"
 
         result = self.operation.run(self.action, parent=self.application.window)
+        if(result == Gtk.PrintOperationResult.ERROR):
+            error(parent=self.application.window, message="Unable to print the log.")
+
         return result
 
     def begin_print(self, operation, context):
