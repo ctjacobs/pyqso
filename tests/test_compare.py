@@ -54,11 +54,11 @@ class TestCompare(unittest.TestCase):
         # Compare values in the second column.
         column_index = 1
         result = compare_default(self.model, iter1, iter2, column_index)
-        assert(result == 1)
+        assert(result == -1)
         result = compare_default(self.model, iter2, iter3, column_index)
         assert(result == 0)
         result = compare_default(self.model, iter3, iter4, column_index)
-        assert(result == -1)
+        assert(result == 1)
 
     def test_compare_date_and_time(self):
         """ Check that dates in yyyymmdd format are compared correctly. """
@@ -73,13 +73,13 @@ class TestCompare(unittest.TestCase):
         # Compare values in the third (and fourth, if necessary) column.
         column_index = 2
         result = compare_date_and_time(self.model, iter1, iter2, [column_index, column_index+1])
-        assert(result == 1)
+        assert(result == -1)
         result = compare_date_and_time(self.model, iter2, iter3, [column_index, column_index+1])
-        assert(result == 1)
+        assert(result == -1)
         result = compare_date_and_time(self.model, iter3, iter4, [column_index, column_index+1])
         assert(result == 0)
         result = compare_date_and_time(self.model, iter4, iter1, [column_index, column_index+1])
-        assert(result == -1)
+        assert(result == 1)
 
 if(__name__ == '__main__'):
     unittest.main()

@@ -24,6 +24,7 @@
 ### Fixed
 - Any characters in the DX cluster server's reponse that cannot be decoded are now replaced with a replacement marker in the DX cluster frame.
 - Fixed the QSO index used in the Gtk.ListStore. Just before a QSO is added with add_record it was assumed that it's index would be max(rowid)+1, which is not always the case. This led to inconsistencies between the Gtk.ListStore and the database. Indices used in the Gtk.ListStore are now obtained directly from the database after insertion.
+- Direction of sorting.
 
 ## [0.3] - 2016-05-28
 ### Added
