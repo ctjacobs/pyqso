@@ -738,7 +738,7 @@ class Logbook:
         records = log.records
         if(records is not None):
             printer = Printer(self.application)
-            printer.print_records(records)
+            printer.print_records(records, title="Log: %s" % log.name)
         else:
             error(parent=self.application.window, message="Could not retrieve the records from the SQL database. No records have been printed.")
         return

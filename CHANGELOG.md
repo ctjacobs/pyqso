@@ -20,6 +20,7 @@
 - Moved all unit tests to a dedicated tests directory.
 - Duplicate QSOs are now defined as having the same CALL, QSO_DATE and TIME_ON values. FREQ and MODE are no longer considered.
 - Improved the runtime performance of duplicate QSO removal.
+- Logs are now printed on a landscape page so that more QSO details can be included. The page layout has been improved.
 
 ### Fixed
 - Any characters in the DX cluster server's reponse that cannot be decoded are now replaced with a replacement marker in the DX cluster frame.
