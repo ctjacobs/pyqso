@@ -46,7 +46,7 @@ While PyQSO stores logbooks in SQL format, it is possible to export
 individual logs in the well-known `ADIF <http://www.adif.org/>`_ and `Cabrillo <http://wwrof.org/cabrillo/>`_ formats. Select the log to export,
 and click ``Export Log as ADIF...`` or ``Export Log as Cabrillo...`` in the ``Logbook`` menu.
 
-**Note for contesters:** Cabrillo records typically require contest QSO information in the form ``CALL RST EXCH``, where ``EXCH`` denotes exchange information (e.g. a serial number or US state). No dedicated field exists in PyQSO to store exchange information so the RST fields should be used to store both the RST report *and* exchange information, separated by a space. The ``RST Sent`` field should therefore contain the RST and exchange information that you give to the other station, and the ``RST Received`` field should contain the RST and exchange information that the other station gives you. The export process asks for your callsign (this should be the callsign used during the contest) and the contest's name which can be selected from a drop-down list. If the contest name does not appear in this list, you may enter its name manually.
+**Note for contesters:** Cabrillo records typically require contest QSO information in the form ``CALL RST EXCH``, where ``EXCH`` denotes exchange information (e.g. a serial number or US state). No dedicated field exists in PyQSO to store exchange information so the RST fields should be used to store both the RST report *and* exchange information, separated by a space. The ``RST Sent`` field should therefore contain the RST and exchange information that you give to the other station (e.g. 59 001), and the ``RST Received`` field should contain the RST and exchange information that the other station gives you (e.g. 57 029). The export process asks for your callsign (this should be the callsign used during the contest) and the contest's name which can be selected from a drop-down list. If the contest name does not appear in this list, you may enter its name manually.
 
 Importing a log
 ---------------
@@ -56,14 +56,12 @@ users can choose to store the records in a new log, or append them to an
 existing log in the logbook. To import, click ``Import Log...`` in the
 ``Logbook`` menu.
 
-Note that all data being imported must conform to the ADIF standard, otherwise it will
-be ignored.
+Note that each QSO record being imported must conform to the ADIF standard, otherwise the record will be ignored.
 
 Printing a log
 --------------
 
-Due to restrictions on the page width, only a selection of field names
-will be printed: callsign, date, time, frequency, and mode.
+The log that is currently selected can be printed out on paper or printed to a PDF file by clicking ``Print Log...`` in the ``Logbook`` menu. Each page uses a landscape orientation to maximise the amount of QSO information per line. The following data is included: Index, Callsign, Date, Time, Frequency, Mode, RST Sent, and RST Received.
 
 Filtering by callsign
 ---------------------
@@ -75,7 +73,7 @@ contain ``xyz``.
 Sorting by field
 ----------------
 
-To sort a log by a particular field name, left-click the column header
+To sort a log by a particular field name, click the column header
 that contains that field name. By default, it is the ``Index`` field
 that is sorted in ascending order.
 

@@ -10,8 +10,7 @@ about the contacts/QSOs they make with other operators on the air. All
 information is stored in a light-weight SQL database. Other key features
 include:
 
--  Customisable interface (e.g. only show callsign and frequency
-   information).
+-  Customisable interface (e.g. only show callsign and frequency information).
 
 -  Import logs in `ADIF <http://www.adif.org/>`_ format, and export logs in ADIF or `Cabrillo <http://wwrof.org/cabrillo/>`_ format.
 
@@ -27,14 +26,13 @@ include:
 
 -  Grey line plotter.
 
--  Filter out QSOs based on the callsign field (e.g. only display
-   contacts with callsigns beginning with "M6").
+-  Filter QSOs based on callsign (e.g. only display contacts with callsigns beginning with "M6").
 
 -  Remove duplicate QSOs.
 
 -  Basic support for the `Hamlib <http://hamlib.sourceforge.net/>`_ library.
 
-The source code for PyQSO, written in Python (version 3.x), is available for download from the `GitHub repository <https://github.com/ctjacobs/pyqso>`_.
+The source code for PyQSO, written in `Python <https://www.python.org/>`_ (version 3.x), is available for download from the `GitHub repository <https://github.com/ctjacobs/pyqso>`_.
 
 Data storage model
 ------------------

@@ -9,15 +9,15 @@ General
 
 Under the ``General`` tab, the user can choose to:
 
--  always show the toolbox (see the `Toolbox <toolbox.html>`_ section) when PyQSO is started
+-  Always show the toolbox (see the `Toolbox <toolbox.html>`_ section) when PyQSO is started.
 
--  display yearly logbook statistics on the Summary page when a logbook is opened (see figure:summary_)
+-  Display annual logbook statistics on the Summary page when a logbook is opened (see figure:summary_).
 
--  open a default logbook file
+-  Open a default logbook file.
 
--  keep the ``Add Record`` dialog window open after a new QSO is added, in preparation for the next QSO
+-  Keep the ``Add Record`` dialog window open after a new QSO is added, in preparation for the next QSO.
 
--  pin-point the user's QTH on the grey line map by specifying the latitude-longitude coordinates (or looking them up based on the QTH's name, e.g. city name)
+-  Pin-point the user's QTH on the grey line map by specifying the latitude-longitude coordinates (or looking them up based on the QTH's name, e.g. city name).
 
    .. _figure:summary:
    .. figure::  images/summary.png
@@ -28,22 +28,22 @@ Under the ``General`` tab, the user can choose to:
 View
 ----
 
-Not all the available fields have to be displayed in the logbook. The user can choose to hide a subset of them by unchecking them in the ``View`` tab. PyQSO must be restarted in order for any changes to take effect.
+Not all the available fields have to be displayed in the logbook. The user can choose to hide a subset by unchecking them in the ``View`` tab. PyQSO must be restarted in order for any changes to take effect.
 
 Records
 -------
 
 The records tab comprises options concerning the Add/Edit Record dialog window. It allows users to:
 
--  use the UTC timezone when autocompleting the date and time fields
+-  Use the UTC timezone when autocompleting the date and time fields.
 
--  choose whether the band should be automatically determined from the frequency field
+-  Choose whether the band should be automatically determined from the frequency field.
 
--  specify default values for the Power, Mode, and Submode fields
+-  Specify default values for the Power, Mode, and Submode fields.
 
--  enter the QSO's frequency in a unit other than MHz (note that the frequency will always be presented in MHz in the main window, regardless of this preference)
+-  Enter the QSO's frequency in a unit other than MHz (note that the frequency will always be presented in MHz in the main window, regardless of this preference).
 
--  specify the callsign lookup settings
+-  Specify the callsign lookup settings.
 
 Callsign lookup
 ~~~~~~~~~~~~~~~
@@ -60,7 +60,7 @@ PyQSO currently supports the ``NOTES`` field in the ADIF specification, but not 
 Hamlib support
 --------------
 
-PyQSO features rudimentary support for the Hamlib library. The name and
+PyQSO features rudimentary support for the `Hamlib <http://hamlib.sourceforge.net/>`_ library. The name and
 path of the radio device connected to the user's computer can be
 specified in the ``Hamlib`` tab of the preferences dialog. Upon adding a
 new record to the log, PyQSO will use Hamlib to retrieve the current
