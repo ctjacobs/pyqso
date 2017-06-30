@@ -18,7 +18,6 @@
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
 from gi.repository import Gtk
-import logging
 try:
     import configparser
 except ImportError:
