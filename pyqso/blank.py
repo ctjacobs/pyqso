@@ -21,8 +21,11 @@ from gi.repository import Gtk
 
 
 class Blank(object):
+
+    """ A blank page in the logbook for the "+" (New Log) tab. """
+
     def __init__(self, application):
-        """ Create a blank page in the Gtk.Notebook for the "+" (New Log) tab.
+        """ Create the blank page.
 
         :arg application: The PyQSO application containing the main Gtk window, etc.
         """

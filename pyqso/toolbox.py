@@ -34,8 +34,6 @@ class Toolbox:
         :arg application: The PyQSO application containing the main Gtk window, etc.
         """
 
-        logging.debug("Setting up the toolbox...")
-
         self.application = application
         self.builder = self.application.builder
 
@@ -46,8 +44,6 @@ class Toolbox:
         self.awards = Awards(self.application)
 
         self.tools.connect_after("switch-page", self.on_switch_page)
-
-        logging.debug("Toolbox ready!")
 
         return
 

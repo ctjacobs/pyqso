@@ -31,8 +31,6 @@ class TelnetConnectionDialog:
         :arg application: The PyQSO application containing the main Gtk window, etc.
         """
 
-        logging.debug("Building new Telnet connection dialog...")
-
         self.builder = application.builder
         glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/pyqso.glade")
         self.builder.add_objects_from_file(glade_file_path, ("telnet_connection_dialog",))
@@ -44,8 +42,6 @@ class TelnetConnectionDialog:
                         "BOOKMARK": self.builder.get_object("bookmark_checkbox")}
 
         self.dialog.show_all()
-
-        logging.debug("Telnet connection dialog built.")
 
         return
 

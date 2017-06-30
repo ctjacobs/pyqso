@@ -28,15 +28,13 @@ import os.path
 
 class Menu:
 
-    """ The PyQSO menu bar along the top of the main window. """
+    """ The menu bar along the top of the main window. """
 
     def __init__(self, application):
         """ Set up all menu items and connect to the various functions.
 
         :arg application: The PyQSO application containing the main Gtk window, etc.
         """
-
-        logging.debug("Setting up the menu bar...")
 
         self.application = application
         self.builder = self.application.builder
@@ -131,8 +129,6 @@ class Menu:
         self.set_log_items_sensitive(False)
         self.set_record_items_sensitive(False)
 
-        logging.debug("Menu bar ready!")
-
         return
 
     def set_logbook_item_sensitive(self, sensitive):
@@ -140,11 +136,10 @@ class Menu:
 
         :arg bool sensitive: If True, enable the 'new logbook' and 'open logbook' menu items. If False, disable them.
         """
-        logging.debug("Setting the 'Create/Open Logbook' menu item's sensitivity to: %s..." % sensitive)
+
         self.items["NEW_LOGBOOK"].set_sensitive(sensitive)
         self.items["OPEN_LOGBOOK"].set_sensitive(sensitive)
         self.items["CLOSE_LOGBOOK"].set_sensitive(not sensitive)
-        logging.debug("Set the 'Create/Open Logbook' menu item's sensitivity to: %s." % sensitive)
         return
 
     def set_log_items_sensitive(self, sensitive):
@@ -152,10 +147,9 @@ class Menu:
 
         :arg bool sensitive: If True, enable all the log-related menu items. If False, disable them all.
         """
-        logging.debug("Setting log-related menu item sensitivity to: %s..." % sensitive)
+
         for item_name in ["NEW_LOG", "DELETE_LOG", "RENAME_LOG", "IMPORT_LOG", "EXPORT_LOG_ADIF", "EXPORT_LOG_CABRILLO", "PRINT_LOG"]:
             self.items[item_name].set_sensitive(sensitive)
-        logging.debug("Set log-related menu item sensitivity to: %s." % sensitive)
         return
 
     def set_record_items_sensitive(self, sensitive):
@@ -163,8 +157,7 @@ class Menu:
 
         :arg bool sensitive: If True, enable all the record-related menu items. If False, disable them all.
         """
-        logging.debug("Setting record-related menu item sensitivity to: %s..." % sensitive)
+
         for item_name in ["ADD_RECORD", "EDIT_RECORD", "DELETE_RECORD", "REMOVE_DUPLICATES", "RECORD_COUNT"]:
             self.items[item_name].set_sensitive(sensitive)
-        logging.debug("Set record-related menu item sensitivity to: %s." % sensitive)
         return

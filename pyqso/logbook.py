@@ -54,7 +54,7 @@ class Logbook:
         self.notebook = self.builder.get_object("logbook")
         self.connection = None
         self.logs = []
-        logging.debug("New Logbook instance created!")
+
         return
 
     def new(self, widget=None):

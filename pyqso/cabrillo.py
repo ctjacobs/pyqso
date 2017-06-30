@@ -43,7 +43,7 @@ class Cabrillo:
         :returns: None
         :raises IOError: if the Cabrillo file cannot be written (e.g. due to lack of write permissions)."""
 
-        logging.debug("Writing records to an Cabrillo file...")
+        logging.debug("Writing records to a Cabrillo file...")
         try:
             f = open(path, mode='w', errors="replace")  # Open file for writing
 

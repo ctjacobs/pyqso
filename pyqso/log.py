@@ -26,13 +26,13 @@ from pyqso.adif import AVAILABLE_FIELD_NAMES_ORDERED
 
 class Log(Gtk.ListStore):
 
-    """ A single log inside of the whole logbook. A Log object can store multiple Record objects. """
+    """ A single log inside of the whole logbook. A Log object can store multiple records. This is """
 
     def __init__(self, connection, name):
         """ Set up a new Log object.
 
         :arg connection: An sqlite database connection.
-        :arg str name: The name of the log (i.e. the sqlite table name).
+        :arg str name: The name of the log (i.e. the database table name).
         """
 
         # The ListStore constructor needs to know the data types of the columns.
@@ -44,7 +44,6 @@ class Log(Gtk.ListStore):
         self.connection = connection
         self.name = name
 
-        logging.debug("New Log instance created!")
         return
 
     def populate(self):

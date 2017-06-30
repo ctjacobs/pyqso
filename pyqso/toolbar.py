@@ -30,8 +30,6 @@ class Toolbar:
         :arg application: The PyQSO application containing the main Gtk window, etc.
         """
 
-        logging.debug("Setting up the toolbar...")
-
         self.application = application
         self.builder = self.application.builder
 
@@ -70,8 +68,6 @@ class Toolbar:
         self.set_record_buttons_sensitive(False)
         self.filter_source.set_sensitive(False)
 
-        logging.debug("Toolbar ready!")
-
         return
 
     def set_logbook_button_sensitive(self, sensitive):
@@ -79,11 +75,9 @@ class Toolbar:
 
         :arg bool sensitive: If True, enable the 'new logbook' and 'open logbook' toolbar items. If False, disable them.
         """
-        logging.debug("Setting logbook-related toolbar item sensitivity to: %s..." % sensitive)
         self.buttons["NEW_LOGBOOK"].set_sensitive(sensitive)
         self.buttons["OPEN_LOGBOOK"].set_sensitive(sensitive)
         self.buttons["CLOSE_LOGBOOK"].set_sensitive(not sensitive)
-        logging.debug("Set logbook-related toolbar item sensitivity to: %s." % sensitive)
         return
 
     def set_record_buttons_sensitive(self, sensitive):
@@ -91,8 +85,6 @@ class Toolbar:
 
         :arg bool sensitive: If True, enable all the record-related toolbar items. If False, disable them all.
         """
-        logging.debug("Setting record-related toolbar item sensitivity to: %s..." % sensitive)
         for button_name in ["ADD_RECORD", "EDIT_RECORD", "DELETE_RECORD"]:
             self.buttons[button_name].set_sensitive(sensitive)
-        logging.debug("Set record-related toolbar item sensitivity to: %s." % sensitive)
         return
