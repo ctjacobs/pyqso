@@ -75,6 +75,26 @@ class TestRecordDialog(unittest.TestCase):
         converted = self.record_dialog.convert_frequency(converted, from_unit="kHz", to_unit="MHz")  # Convert from kHz back to MHz. This should give the original frequency.
         assert(float(converted) == float(frequency))
 
+        # Floating-point data type.
+        frequency = 7.140  # In MHz
+        converted = self.record_dialog.convert_frequency(frequency, from_unit="MHz", to_unit="kHz")
+        assert(converted == frequency*1e3)
+
+        # Floating-point data type.
+        frequency = 7.140  # In MHz
+        converted = self.record_dialog.convert_frequency(frequency, from_unit="MHz", to_unit="MHz")
+        assert(converted == frequency)
+
+        # Empty string.
+        frequency = ""
+        converted = self.record_dialog.convert_frequency(frequency, from_unit="MHz", to_unit="kHz")
+        assert(converted == frequency)
+
+        # Not a valid frequency.
+        frequency = "HelloWorld"
+        converted = self.record_dialog.convert_frequency(frequency, from_unit="MHz", to_unit="kHz")
+        assert(converted == frequency)
+
     def test_hamlib_autofill(self):
         """ Check that FREQ, MODE and SUBMODE information can be retrieved from Hamlib's dummy rig (if the Hamlib module exists). """
         if(have_hamlib):

@@ -130,7 +130,8 @@ class TestADIF(unittest.TestCase):
         """ Check that records can be written to an ADIF file correctly. """
         records = [{"CALL": "TEST123", "QSO_DATE": "20120402", "TIME_ON": "1234", "FREQ": "145.500", "BAND": "2m", "MODE": "FM", "RST_SENT": "59", "RST_RCVD": "59"},
                    {"CALL": "TEST123", "QSO_DATE": "20130312", "TIME_ON": "0101", "FREQ": "145.750", "BAND": "2m", "MODE": "FM"}]
-        self.adif.write(records, "ADIF.test_write.adi")
+        success = self.adif.write(records, "ADIF.test_write.adi")
+        assert(success)
 
         f = open("ADIF.test_write.adi", 'r')
         text = f.read()
@@ -172,7 +173,8 @@ class TestADIF(unittest.TestCase):
         records = c.fetchall()
         print(records)
 
-        self.adif.write(records, "ADIF.test_write_sqlite3_Row.adi")
+        success = self.adif.write(records, "ADIF.test_write_sqlite3_Row.adi")
+        assert(success)
 
         f = open("ADIF.test_write_sqlite3_Row.adi", 'r')
         text = f.read()
