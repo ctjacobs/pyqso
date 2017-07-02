@@ -11,7 +11,7 @@ Under the ``General`` tab, the user can choose to:
 
 -  Always show the toolbox (see the `Toolbox <toolbox.html>`_ section) when PyQSO is started.
 
--  Display annual logbook statistics on the Summary page when a logbook is opened (see figure:summary_).
+-  Display yearly logbook statistics on the Summary page when a logbook is opened (see figure:summary_).
 
 -  Open a default logbook file.
 
