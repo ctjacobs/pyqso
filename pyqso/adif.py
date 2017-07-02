@@ -202,7 +202,7 @@ class ADIF:
         """ Read an ADIF file and parse it.
 
         :arg str path: The path to the ADIF file to read.
-        :returns: A list of dictionaries (one dictionary per QSO), with each dictionary containing field-value pairs, e.g. {FREQ:145.500, BAND:2M, MODE:FM}.
+        :returns: A list of dictionaries (one dictionary per QSO), with each dictionary containing field-value pairs, e.g. {FREQ:145.500, BAND:2M, MODE:FM}. If the file cannot be read, the method returns None.
         :rtype: list
         :raises IOError: if the ADIF file does not exist or cannot be read (e.g. due to lack of read permissions).
         """
@@ -215,9 +215,11 @@ class ADIF:
             f.close()  # Close the file, otherwise "bad things" might happen!
         except IOError as e:
             logging.error("I/O error %d: %s" % (e.errno, e.strerror))
+            return None
         except Exception as e:
             logging.error("An error occurred when reading the ADIF file.")
             logging.exception(e)
+            return None
 
         records = self.parse_adi(text)
 
@@ -231,7 +233,7 @@ class ADIF:
         """ Parse some raw text (defined in the 'text' argument) for ADIF field data.
 
         :arg str text: The raw text from the ADIF file to parse.
-        :returns: A list of dictionaries (one dictionary per QSO). Each dictionary contains the field-value pairs, e.g. {FREQ:145.500, BAND:2M, MODE:FM}.
+        :returns: A list of dictionaries (one dictionary per QSO). Each dictionary contains the field-value pairs, e.g. {"FREQ": "145.500", "BAND": "2M", "MODE": "FM"}.
         :rtype: list
         """
 
@@ -331,11 +333,14 @@ class ADIF:
 
         :arg list records: The list of QSO records to write.
         :arg str path: The desired path of the ADIF file to write to.
-        :returns: None
+        :returns: True if the write process was successful, otherwise False.
+        :rtype: bool
         :raises IOError: if the ADIF file cannot be written (e.g. due to lack of write permissions).
         """
 
         logging.debug("Writing records to an ADIF file...")
+
+        success = False
         try:
             f = open(path, mode='w', errors="replace")  # Open file for writing
 
@@ -364,13 +369,14 @@ class ADIF:
             logging.debug("Finished writing records to the ADIF file.")
             f.close()
             logging.info("Wrote %d QSOs to %s in ADIF format." % (len(records), path))
+            success = True
         except IOError as e:
             logging.error("I/O error %d: %s" % (e.errno, e.strerror))
         except Exception as e:  # All other exceptions.
             logging.error("An error occurred when writing the ADIF file.")
             logging.exception(e)
 
-        return
+        return success
 
     def is_valid(self, field_name, data, data_type):
         """ Validate the data in a field with respect to the ADIF specification.

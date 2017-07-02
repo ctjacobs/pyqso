@@ -40,10 +40,13 @@ class Cabrillo:
         :arg str path: The desired path of the Cabrillo file to write to.
         :arg str contest: The name of the contest.
         :arg str mycall: The callsign used during the contest.
-        :returns: None
+        :returns: True if the write process was successful, otherwise False.
+        :rtype: bool
         :raises IOError: if the Cabrillo file cannot be written (e.g. due to lack of write permissions)."""
 
         logging.debug("Writing records to a Cabrillo file...")
+
+        success = False
         try:
             f = open(path, mode='w', errors="replace")  # Open file for writing
 
@@ -102,11 +105,13 @@ class Cabrillo:
 
             f.close()
 
+            logging.info("Wrote %d QSOs to %s in Cabrillo format." % (len(records), path))
+            success = True
+
         except IOError as e:
             logging.error("I/O error %d: %s" % (e.errno, e.strerror))
         except Exception as e:  # All other exceptions.
             logging.error("An error occurred when writing the Cabrillo file.")
             logging.exception(e)
 
-        logging.info("Wrote %d QSOs to %s in Cabrillo format." % (len(records), path))
-        return
+        return success

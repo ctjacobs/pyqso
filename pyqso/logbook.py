@@ -599,19 +599,24 @@ class Logbook:
         ln.dialog.destroy()
 
         adif = ADIF()
+
         records = adif.read(path)
-        l.add_record(records)
-        l.populate()
 
-        if(not exists):
-            self.logs.append(l)
-            self.render_log(self.log_count-1)
+        if(records is None):
+            error(parent=self.application.window, message="Could not import the log.")
+        else:
+            l.add_record(records)
+            l.populate()
 
-        # Update statistics, etc.
-        self.summary.update()
-        self.application.toolbox.awards.count(self)
+            if(not exists):
+                self.logs.append(l)
+                self.render_log(self.log_count-1)
 
-        info(parent=self.application.window, message="Imported %d QSOs into log '%s'." % (len(records), l.name))
+            # Update statistics, etc.
+            self.summary.update()
+            self.application.toolbox.awards.count(self)
+
+            info(parent=self.application.window, message="Imported %d QSOs into log '%s'." % (len(records), l.name))
 
         return
 
@@ -656,10 +661,10 @@ class Logbook:
             adif = ADIF()
             records = log.records
             if(records is not None):
-                try:
-                    adif.write(records, path)
+                success = adif.write(records, path)
+                if(success):
                     info(parent=self.application.window, message="Exported %d QSOs to %s in ADIF format." % (len(records), path))
-                except:
+                else:
                     error(parent=self.application.window, message="Could not export the records.")
             else:
                 error(parent=self.application.window, message="Could not retrieve the records from the SQL database. No records have been exported.")
@@ -717,10 +722,10 @@ class Logbook:
             cabrillo = Cabrillo()
             records = log.records
             if(records is not None):
-                try:
-                    cabrillo.write(records, path, contest=contest, mycall=mycall)
+                success = cabrillo.write(records, path, contest=contest, mycall=mycall)
+                if(success):
                     info(parent=self.application.window, message="Exported %d QSOs to %s in Cabrillo format." % (len(records), path))
-                except:
+                else:
                     error(parent=self.application.window, message="Could not export the records.")
             else:
                 error(parent=self.application.window, message="Could not retrieve the records from the SQL database. No records have been exported.")
