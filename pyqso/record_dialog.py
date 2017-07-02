@@ -489,7 +489,10 @@ class RecordDialog:
         # Cast to float before scaling.
         if(not isinstance(frequency, float)):
             try:
-                frequency = float(frequency)
+                if(frequency == "" or frequency is None):
+                    return frequency
+                else:
+                    frequency = float(frequency)
             except(ValueError, TypeError):
                 logging.exception("Could not convert frequency to a floating-point value.")
                 return frequency
