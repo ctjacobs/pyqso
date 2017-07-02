@@ -34,6 +34,7 @@ class TestRecordDialog(unittest.TestCase):
         """ Set up the objects needed for the unit tests. """
         PyQSO = mock.MagicMock()
         self.record_dialog = RecordDialog(application=PyQSO(), log=None)
+        self.record_dialog.frequency_unit = "MHz"
 
         # Set up the necessary sources.
         self.record_dialog.sources["FREQ"] = Gtk.Entry()
