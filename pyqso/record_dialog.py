@@ -490,7 +490,7 @@ class RecordDialog:
         if(not isinstance(frequency, float)):
             try:
                 frequency = float(frequency)
-            except TypeError:
+            except(ValueError, TypeError):
                 logging.exception("Could not convert frequency to a floating-point value.")
                 return frequency
         # Do not bother scaling if the units are the same.
