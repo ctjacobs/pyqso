@@ -530,6 +530,8 @@ class Logbook:
 
     def import_log(self, widget=None):
         """ Import a log from an ADIF file. """
+
+        # Get the path to the ADIF file.
         dialog = Gtk.FileChooserDialog("Import ADIF Log File",
                                        self.application.window,
                                        Gtk.FileChooserAction.OPEN,
@@ -556,7 +558,15 @@ class Logbook:
         if(path is None):
             logging.debug("No file path specified.")
             return
+        else:
+            # Read the records.
+            adif = ADIF()
+            records = adif.read(path)
+            if(records is None):
+                error(parent=self.application.window, message="Could not import the log.")
+                return
 
+        # Get the new log's name (or the name of the existing log the user wants to import into).
         ln = LogNameDialog(self.application, title="Import Log")
         while(True):
             response = ln.dialog.run()
@@ -598,25 +608,19 @@ class Logbook:
 
         ln.dialog.destroy()
 
-        adif = ADIF()
+        # Update new or existing Log object.
+        l.add_record(records)
+        l.populate()
 
-        records = adif.read(path)
+        if(not exists):
+            self.logs.append(l)
+            self.render_log(self.log_count-1)
 
-        if(records is None):
-            error(parent=self.application.window, message="Could not import the log.")
-        else:
-            l.add_record(records)
-            l.populate()
+        # Update statistics, etc.
+        self.summary.update()
+        self.application.toolbox.awards.count(self)
 
-            if(not exists):
-                self.logs.append(l)
-                self.render_log(self.log_count-1)
-
-            # Update statistics, etc.
-            self.summary.update()
-            self.application.toolbox.awards.count(self)
-
-            info(parent=self.application.window, message="Imported %d QSOs into log '%s'." % (len(records), l.name))
+        info(parent=self.application.window, message="Imported %d QSOs into log '%s'." % (len(records), l.name))
 
         return
 
