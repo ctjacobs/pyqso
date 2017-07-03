@@ -804,6 +804,7 @@ class Logbook:
             keep_open = config.get("general", "keep_open") == "True"
         else:
             keep_open = False
+
         adif = ADIF()
 
         exit = False
@@ -841,10 +842,9 @@ class Logbook:
                         log.add_record(fields_and_data)
                         self.summary.update()
                         self.application.toolbox.awards.count(self)
-                        # Select the new Record's row in the treeview.
+                        # Select the new record's row in the treeview.
                         record_count = log.record_count
-                        if(record_count is not None):
-                            self.treeselection[log_index].select_path(record_count)
+                        self.treeselection[log_index].select_path(record_count)
                 else:
                     exit = True
                     break
@@ -860,7 +860,7 @@ class Logbook:
             if(log_index is None):
                 raise ValueError("The log index could not be determined. Perhaps the Summary page is selected?")
         except ValueError as e:
-            error(self.application.window, e)
+            error(parent=self.application.window, message=e)
             return
         log = self.logs[log_index]
 
@@ -879,9 +879,13 @@ class Logbook:
         if(response == Gtk.ResponseType.YES):
             # Deletes the record with index 'row_index' from the Records list.
             # 'iter' is needed to remove the record from the ListStore itself.
-            log.delete_record(row_index, iter=child_iter)
-            self.summary.update()
-            self.application.toolbox.awards.count(self)
+            try:
+                log.delete_record(row_index, iter=child_iter)
+                self.summary.update()
+                self.application.toolbox.awards.count(self)
+            except (sqlite.Error, IndexError) as e:
+                error(parent=self.application.window, message="Could not delete the record from the log.")
+                logging.exception(e)
         return
 
     def edit_record_callback(self, widget, path=None, view_column=None):
@@ -934,20 +938,20 @@ class Logbook:
                         break  # Don't check the other fields until the user has fixed the current field's data.
 
                 if(all_valid):
-                    # All data has been validated, so we can go ahead and update the record.
-                    record = log.get_record_by_index(row_index)
-                    if(record is None):
-                        message = "Could not retrieve record with row_index %d from the SQL database. The record has not been edited." % row_index
-                        error(parent=rd.dialog, message=message)
-                    else:
+                    try:
+                        # Get the record in its current state from the database.
+                        record = log.get_record_by_index(row_index)
+                        # Iterate over all fields and check whether the data has actually changed. Database updates can be expensive.
                         for i in range(0, len(field_names)):
-                            # Check whether the data has actually changed. Database updates can be expensive.
                             if(record[field_names[i].lower()] != fields_and_data[field_names[i]]):
                                 # Update the record in the database and then in the ListStore.
                                 # We add 1 onto the column_index here because we don't want to consider the index column.
                                 log.edit_record(row_index, field_names[i], fields_and_data[field_names[i]], iter=child_iter, column_index=i+1)
                         self.summary.update()
                         self.application.toolbox.awards.count(self)
+                    except(sqlite.Error, IndexError) as e:
+                        error(parent=rd.dialog, message="Could not edit record %d." % row_index)
+                        logging.exception(e)
 
         rd.dialog.destroy()
         return
@@ -980,6 +984,7 @@ class Logbook:
 
     def record_count_callback(self, widget=None):
         """ A callback function used to show the record count for the selected log. """
+
         # Get the log index.
         try:
             log_index = self.get_log_index()
@@ -988,10 +993,16 @@ class Logbook:
         except ValueError as e:
             error(self.application.window, e)
             return
+
+        # Get the number of records.
         log = self.logs[log_index]
-        record_count = log.record_count
-        if(record_count is not None):
+        try:
+            record_count = log.record_count
             info(parent=self.application.window, message="Log '%s' contains %d records." % (log.name, record_count))
+        except sqlite.Error as e:
+            error("Could not get the record count for '%s' because of a database error." % log.name)
+            logging.exception(e)
+
         return
 
     @property

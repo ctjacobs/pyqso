@@ -189,18 +189,18 @@ class Log(Gtk.ListStore):
         :raises sqlite.Error, IndexError: if the record could not be deleted.
         """
         logging.debug("Deleting record from log...")
-        # Get the selected row in the logbook.
-        try:
-            with self.connection:
-                c = self.connection.cursor()
-                query = "DELETE FROM %s" % self.name
-                c.execute(query+" WHERE id=?", [index])
-            if(iter is not None):
-                self.remove(iter)
-            logging.debug("Successfully deleted the record from the log.")
-        except (sqlite.Error, IndexError) as e:
-            logging.exception(e)
-            logging.error("Could not delete the record from the log.")
+
+        # Delete the selected row in database.
+        with self.connection:
+            c = self.connection.cursor()
+            query = "DELETE FROM %s" % self.name
+            c.execute(query+" WHERE id=?", [index])
+
+        # Delete the selected row in the Gtk.ListStore.
+        if(iter is not None):
+            self.remove(iter)
+
+        logging.debug("Successfully deleted the record from the log.")
         return
 
     def edit_record(self, index, field_name, data, iter=None, column_index=None):
@@ -214,18 +214,14 @@ class Log(Gtk.ListStore):
         :raises sqlite.Error, IndexError: if the record could not be edited.
         """
         logging.debug("Editing field '%s' in record %d..." % (field_name, index))
-        try:
-            with self.connection:
-                c = self.connection.cursor()
-                query = "UPDATE %s SET %s" % (self.name, field_name)
-                query = query + "=? WHERE id=?"
-                c.execute(query, [data, index])  # First update the SQL database...
-            if(iter is not None and column_index is not None):
-                self.set(iter, column_index, data)  # ...and then the ListStore.
-            logging.debug("Successfully edited field '%s' in record %d in the log." % (field_name, index))
-        except (sqlite.Error, IndexError) as e:
-            logging.exception(e)
-            logging.error("Could not edit field %s in record %d in the log." % (field_name, index))
+        with self.connection:
+            c = self.connection.cursor()
+            query = "UPDATE %s SET %s" % (self.name, field_name)
+            query = query + "=? WHERE id=?"
+            c.execute(query, [data, index])  # First update the SQL database...
+        if(iter is not None and column_index is not None):
+            self.set(iter, column_index, data)  # ...and then the ListStore.
+        logging.debug("Successfully edited field '%s' in record %d in the log." % (field_name, index))
         return
 
     def remove_duplicates(self):
@@ -303,16 +299,13 @@ class Log(Gtk.ListStore):
         :arg int index: The index of the record in the SQL database.
         :returns: The desired record, represented by a dictionary of field-value pairs.
         :rtype: dict
+        :raises sqlite.Error: If the record could not be retrieved from the database.
         """
-        try:
-            with self.connection:
-                c = self.connection.cursor()
-                query = "SELECT * FROM %s WHERE id=?" % self.name
-                c.execute(query, [index])
-                return c.fetchone()
-        except sqlite.Error as e:
-            logging.exception(e)
-            return None
+        with self.connection:
+            c = self.connection.cursor()
+            query = "SELECT * FROM %s WHERE id=?" % self.name
+            c.execute(query, [index])
+            return c.fetchone()
 
     @property
     def records(self):
