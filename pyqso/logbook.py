@@ -204,9 +204,9 @@ class Logbook:
             self.connection = sqlite.connect(path)
             self.connection.row_factory = sqlite.Row
         except sqlite.Error as e:
-            # PyQSO can't connect to the database.
+            # Cannot connect to the database.
             logging.exception(e)
-            error(parent=self.application.window, message="PyQSO cannot connect to the database. Check file permissions?")
+            error(parent=self.application.window, message="Cannot connect to the database. Check file permissions?")
             return False
 
         logging.debug("Database connection created successfully!")
@@ -555,16 +555,21 @@ class Logbook:
             path = None
         dialog.destroy()
 
-        # Read the records.
-        adif = ADIF()
         if(path is None):
             logging.debug("No file path specified.")
             return
-        else:
+
+        # Read the records.
+        adif = ADIF()
+        try:
             records = adif.read(path)
-            if(records is None):
-                error(parent=self.application.window, message="Could not import the log.")
-                return
+        except IOError as e:
+            error(parent=self.application.window, message="Could not import the log. I/O error %d: %s" % (e.errno, e.strerror))
+            return
+        except Exception as e:
+            error(parent=self.application.window, message="Could not import the log.")
+            logging.exception(e)
+            return
 
         # Get the new log's name (or the name of the existing log the user wants to import into).
         ln = LogNameDialog(self.application, title="Import Log")
@@ -662,16 +667,26 @@ class Logbook:
         if(path is None):
             logging.debug("No file path specified.")
         else:
-            adif = ADIF()
-            records = log.records
-            if(records is not None):
-                success = adif.write(records, path)
-                if(success):
-                    info(parent=self.application.window, message="Exported %d QSOs to %s in ADIF format." % (len(records), path))
-                else:
-                    error(parent=self.application.window, message="Could not export the records.")
-            else:
+
+            # Retrieve the log's records from the database.
+            try:
+                records = log.records
+            except sqlite.Error as e:
                 error(parent=self.application.window, message="Could not retrieve the records from the SQL database. No records have been exported.")
+                logging.exception(e)
+                return
+
+            # Write the records.
+            adif = ADIF()
+            try:
+                adif.write(records, path)
+                info(parent=self.application.window, message="Exported %d QSOs to %s in ADIF format." % (len(records), path))
+            except IOError as e:
+                error(parent=self.application.window, message="Could not export the records. I/O error %d: %s" % (e.errno, e.strerror))
+            except Exception as e:  # All other exceptions.
+                error(parent=self.application.window, message="Could not export the records.")
+                logging.exception(e)
+
         return
 
     def export_log_cabrillo(self, widget=None):
@@ -723,33 +738,50 @@ class Logbook:
                 return
             ced.dialog.destroy()
 
-            cabrillo = Cabrillo()
-            records = log.records
-            if(records is not None):
-                success = cabrillo.write(records, path, contest=contest, mycall=mycall)
-                if(success):
-                    info(parent=self.application.window, message="Exported %d QSOs to %s in Cabrillo format." % (len(records), path))
-                else:
-                    error(parent=self.application.window, message="Could not export the records.")
-            else:
+            # Retrieve the log's records from the database.
+            try:
+                records = log.records
+            except sqlite.Error as e:
                 error(parent=self.application.window, message="Could not retrieve the records from the SQL database. No records have been exported.")
+                logging.exception(e)
+                return
+
+            # Write the records.
+            cabrillo = Cabrillo()
+            try:
+                cabrillo.write(records, path, contest=contest, mycall=mycall)
+                info(parent=self.application.window, message="Exported %d QSOs to %s in Cabrillo format." % (len(records), path))
+            except IOError as e:
+                error(parent=self.application.window, message="Could not export the records. I/O error %d: %s" % (e.errno, e.strerror))
+            except Exception as e:  # All other exceptions.
+                error(parent=self.application.window, message="Could not export the records.")
+                logging.exception(e)
+
         return
 
     def print_log(self, widget=None):
         """ Print all the records in the log (that is currently selected).
         Note that only a few important fields are printed because of the restricted width of the page. """
+
         page_index = self.notebook.get_current_page()  # Get the index of the selected tab in the logbook.
         if(page_index == 0):  # If we are on the Summary page...
             logging.debug("No log currently selected!")
             return
         log_index = self.get_log_index()
         log = self.logs[log_index]
-        records = log.records
-        if(records is not None):
-            printer = Printer(self.application)
-            printer.print_records(records, title="Log: %s" % log.name)
-        else:
+
+        # Retrieve the records.
+        try:
+            records = log.records
+        except sqlite.Error as e:
             error(parent=self.application.window, message="Could not retrieve the records from the SQL database. No records have been printed.")
+            logging.exception(e)
+            return
+
+        # Print the records.
+        printer = Printer(self.application)
+        printer.print_records(records, title="Log: %s" % log.name)
+
         return
 
     def add_record_callback(self, widget):
@@ -997,7 +1029,7 @@ class Logbook:
             else:
                 return False
         except (sqlite.Error, IndexError) as e:
-            logging.exception(e)  # Database error. PyQSO could not check if the log name exists.
+            logging.exception(e)  # Database error. Could not check if the log name exists.
             return None
 
     def get_log_index(self, name=None):

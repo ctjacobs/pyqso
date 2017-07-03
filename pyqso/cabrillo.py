@@ -40,15 +40,12 @@ class Cabrillo:
         :arg str path: The desired path of the Cabrillo file to write to.
         :arg str contest: The name of the contest.
         :arg str mycall: The callsign used during the contest.
-        :returns: True if the write process was successful, otherwise False.
-        :rtype: bool
-        :raises IOError: if the Cabrillo file cannot be written (e.g. due to lack of write permissions)."""
+        :returns: None
+        :raises IOError: If the Cabrillo file cannot be written (e.g. due to lack of write permissions)."""
 
         logging.debug("Writing records to a Cabrillo file...")
 
-        success = False
-        try:
-            f = open(path, mode='w', errors="replace")  # Open file for writing
+        with open(path, mode='w', errors="replace") as f:  # Open file for writing
 
             # Header
             f.write("""START-OF-LOG: %s\n""" % (CABRILLO_VERSION))
@@ -62,7 +59,7 @@ class Cabrillo:
                 # Frequency. Note that this must be in kHz. The frequency is stored in MHz in the database, so it's converted to kHz here.
                 try:
                     freq = str(float(r["FREQ"])*1e3)
-                except ValueError as e:
+                except ValueError:
                     freq = ""
 
                 # Mode
@@ -103,15 +100,6 @@ class Cabrillo:
             # Footer
             f.write("END-OF-LOG:")
 
-            f.close()
-
             logging.info("Wrote %d QSOs to %s in Cabrillo format." % (len(records), path))
-            success = True
 
-        except IOError as e:
-            logging.error("I/O error %d: %s" % (e.errno, e.strerror))
-        except Exception as e:  # All other exceptions.
-            logging.error("An error occurred when writing the Cabrillo file.")
-            logging.exception(e)
-
-        return success
+        return

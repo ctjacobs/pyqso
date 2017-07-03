@@ -52,8 +52,10 @@ class Log(Gtk.ListStore):
         logging.debug("Populating '%s'..." % self.name)
         self.add_missing_db_columns()
         self.clear()
-        records = self.records
-        if(records is not None):
+
+        try:
+            records = self.records
+
             for r in records:
                 liststore_entry = [r["id"]]
                 for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
@@ -63,8 +65,11 @@ class Log(Gtk.ListStore):
                     liststore_entry.append(r[field_name])
                 self.append(liststore_entry)
             logging.debug("Finished populating '%s'." % self.name)
-        else:
+
+        except sqlite.Error as e:
             logging.error("Could not populate '%s' because of a database error." % self.name)
+            logging.exception(e)
+
         return
 
     def add_missing_db_columns(self):
@@ -315,15 +320,12 @@ class Log(Gtk.ListStore):
 
         :returns: A list of all the records in the log. Each record is represented by a dictionary.
         :rtype: dict
+        :raises sqlite.Error: If the records could not be retrieved from the database.
         """
-        try:
-            with self.connection:
-                c = self.connection.cursor()
-                c.execute("SELECT * FROM %s" % self.name)
-                return c.fetchall()
-        except sqlite.Error as e:
-            logging.exception(e)
-            return None
+        with self.connection:
+            c = self.connection.cursor()
+            c.execute("SELECT * FROM %s" % self.name)
+            return c.fetchall()
 
     @property
     def record_count(self):
@@ -331,12 +333,9 @@ class Log(Gtk.ListStore):
 
         :returns: The total number of records in the log.
         :rtype: int
+        :raises sqlite.Error: If the record count could not be determined due to a database error.
         """
-        try:
-            with self.connection:
-                c = self.connection.cursor()
-                c.execute("SELECT Count(*) FROM %s" % self.name)
-                return c.fetchone()[0]
-        except (sqlite.Error, IndexError) as e:
-            logging.exception(e)
-            return None
+        with self.connection:
+            c = self.connection.cursor()
+            c.execute("SELECT Count(*) FROM %s" % self.name)
+            return c.fetchone()[0]

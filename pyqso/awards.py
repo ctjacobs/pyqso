@@ -19,6 +19,7 @@
 
 from gi.repository import Gtk
 import logging
+import sqlite
 
 
 class Awards:
@@ -78,16 +79,18 @@ class Awards:
         """
 
         logging.debug("Counting the band/mode combinations for the awards table...")
+
         # Wipe everything and start again.
         self.awards.clear()
+
         # For each mode, add a new list for holding the totals, and initialise the values to zero.
         count = []
         for i in range(0, len(self.bands)):
             count.append([0]*len(self.bands))
 
         for log in logbook.logs:
-            records = log.records
-            if(records is not None):
+            try:
+                records = log.records
                 for r in records:
                     if(r["BAND"] is not None and r["MODE"] is not None):
                         if(r["BAND"].lower() in self.bands and r["MODE"] != ""):
@@ -101,8 +104,10 @@ class Awards:
                                 # FIXME: This assumes that all the other modes in the ADIF list are digital modes. Is this the case?
                                 count[2][band] += 1
                             count[3][band] += 1  # Keep the total of each column in the "Mixed" mode.
-            else:
+
+            except sqlite.Error as e:
                 logging.error("Could not update the awards table for '%s' because of a database error." % log.name)
+                logging.exception(e)
 
         # Insert the rows containing the totals.
         for i in range(0, len(self.modes)):
