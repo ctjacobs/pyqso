@@ -555,12 +555,12 @@ class Logbook:
             path = None
         dialog.destroy()
 
+        # Read the records.
+        adif = ADIF()
         if(path is None):
             logging.debug("No file path specified.")
             return
         else:
-            # Read the records.
-            adif = ADIF()
             records = adif.read(path)
             if(records is None):
                 error(parent=self.application.window, message="Could not import the log.")
