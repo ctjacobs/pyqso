@@ -5,7 +5,7 @@ Keyboard shortcuts
 Description       Shortcut
 ==============    ===========
 Open logbook      Ctrl + O
-Close logbook     Ctrl + C
+Close logbook     Ctrl + W
 New log           Ctrl + N
 Print log         Ctrl + P
 Quit              Ctrl + Q
