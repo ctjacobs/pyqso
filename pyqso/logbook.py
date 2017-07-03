@@ -839,12 +839,24 @@ class Logbook:
 
                     if(all_valid):
                         # All data has been validated, so we can go ahead and add the new record.
-                        log.add_record(fields_and_data)
+                        try:
+                            log.add_record(fields_and_data)
+                        except (sqlite.Error, IndexError) as e:
+                            error(parent=self.application.window, message="Could not add the record to the log.")
+                            logging.exception(e)
+
+                        # Scroll to the new record's row in the treeview (but don't select it).
+                        try:
+                            record_count = log.record_count
+                            treepath = Gtk.TreePath(record_count-1)
+                            self.treeview[log_index].scroll_to_cell(treepath)
+                        except (sqlite.Error, IndexError) as e:
+                            logging.exception(e)
+
+                        # Update summary, etc.
                         self.summary.update()
                         self.application.toolbox.awards.count(self)
-                        # Select the new record's row in the treeview.
-                        record_count = log.record_count
-                        self.treeselection[log_index].select_path(record_count)
+                        
                 else:
                     exit = True
                     break
@@ -881,11 +893,14 @@ class Logbook:
             # 'iter' is needed to remove the record from the ListStore itself.
             try:
                 log.delete_record(row_index, iter=child_iter)
-                self.summary.update()
-                self.application.toolbox.awards.count(self)
             except (sqlite.Error, IndexError) as e:
                 error(parent=self.application.window, message="Could not delete the record from the log.")
                 logging.exception(e)
+
+            # Update summary, etc.
+            self.summary.update()
+            self.application.toolbox.awards.count(self)
+
         return
 
     def edit_record_callback(self, widget, path=None, view_column=None):
@@ -947,11 +962,13 @@ class Logbook:
                                 # Update the record in the database and then in the ListStore.
                                 # We add 1 onto the column_index here because we don't want to consider the index column.
                                 log.edit_record(row_index, field_names[i], fields_and_data[field_names[i]], iter=child_iter, column_index=i+1)
-                        self.summary.update()
-                        self.application.toolbox.awards.count(self)
                     except(sqlite.Error, IndexError) as e:
                         error(parent=rd.dialog, message="Could not edit record %d." % row_index)
                         logging.exception(e)
+
+                    # Update summary, etc.
+                    self.summary.update()
+                    self.application.toolbox.awards.count(self)
 
         rd.dialog.destroy()
         return
