@@ -126,7 +126,7 @@ class Printer(object):
             current_line_number += 1
             if((current_line_number+1)*self.line_height >= context.get_height()):
                 for j in range(0, current_line_number-1):
-                    self.text_to_print.pop(0)  # Remove what has been printed already before draw_page is called again
+                    self.text_to_print.pop(0)  # Remove what has been printed already before draw_page is called again.
                 break
 
         return
