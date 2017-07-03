@@ -20,7 +20,7 @@ Installation and running
 ------------------------
 
 Assuming that the current working directory is PyQSO's base directory
-(the directory that the Makefile is in), PyQSO can be installed via the
+(the directory that the ``Makefile`` is in), PyQSO can be installed via the
 terminal with the following command:
 
 .. code-block:: bash
