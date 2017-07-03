@@ -402,7 +402,7 @@ class RecordDialog:
                 raise ValueError("Unknown callsign database: %s" % database)
         except ValueError as e:
             logging.exception(e)
-            error(e)
+            error(parent=self.dialog, message=e)
             return
 
         # Get username and password from configuration file

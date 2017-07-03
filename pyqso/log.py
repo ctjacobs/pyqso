@@ -76,7 +76,7 @@ class Log(Gtk.ListStore):
         """ Check whether each field name in AVAILABLE_FIELD_NAMES_ORDERED is in the database table. If not, add it
         (with all entries being set to an empty string initially).
 
-        :raises sqlite.Error, IndexError: if the existing database column names could not be obtained, or missing column names could not be added.
+        :raises sqlite.Error, IndexError: If the existing database column names could not be obtained, or missing column names could not be added.
         """
         logging.debug("Adding any missing database columns...")
 
@@ -186,7 +186,7 @@ class Log(Gtk.ListStore):
 
         :arg int index: The index of the record in the SQL database.
         :arg iter: The iterator pointing to the record to be deleted in the Gtk.ListStore. If the default value of None is used, only the database entry is deleted and the corresponding Gtk.ListStore is left alone.
-        :raises sqlite.Error, IndexError: if the record could not be deleted.
+        :raises sqlite.Error, IndexError: If the record could not be deleted.
         """
         logging.debug("Deleting record from log...")
 
@@ -211,7 +211,7 @@ class Log(Gtk.ListStore):
         :arg str data: The data that should replace the current data in the field.
         :arg iter: The iterator pointing to the record to be edited in the Gtk.ListStore. If the default value of None is used, only the database entry is edited and the corresponding Gtk.ListStore is left alone.
         :arg column_index: The index of the column in the Gtk.ListStore to be edited. If the default value of None is used, only the database entry is edited and the corresponding Gtk.ListStore is left alone.
-        :raises sqlite.Error, IndexError: if the record could not be edited.
+        :raises sqlite.Error, IndexError: If the record could not be edited.
         """
         logging.debug("Editing field '%s' in record %d..." % (field_name, index))
         with self.connection:

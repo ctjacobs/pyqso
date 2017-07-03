@@ -121,12 +121,14 @@ class Logbook:
             self.path = path
 
             logging.debug("Retrieving all the logs in the logbook...")
-            self.logs = self.get_logs()
-            if(self.logs is None):
+            try:
+                self.logs = self.get_logs()
+            except (sqlite.Error, IndexError) as e:
+                logging.exception(e)
                 error(parent=self.application.window, message="Could not open logbook. Something went wrong when trying to retrieve the logs. Perhaps the logbook file is encrypted, corrupted, or in the wrong format?")
                 return False
-            else:
-                logging.debug("All logs retrieved successfully.")
+
+            logging.debug("All logs retrieved successfully.")
 
             logging.debug("Rendering logs...")
             # For rendering the logs. One treeview and one treeselection per Log.
@@ -672,8 +674,8 @@ class Logbook:
             try:
                 records = log.records
             except sqlite.Error as e:
-                error(parent=self.application.window, message="Could not retrieve the records from the SQL database. No records have been exported.")
                 logging.exception(e)
+                error(parent=self.application.window, message="Could not retrieve the records from the SQL database. No records have been exported.")
                 return
 
             # Write the records.
@@ -684,8 +686,8 @@ class Logbook:
             except IOError as e:
                 error(parent=self.application.window, message="Could not export the records. I/O error %d: %s" % (e.errno, e.strerror))
             except Exception as e:  # All other exceptions.
-                error(parent=self.application.window, message="Could not export the records.")
                 logging.exception(e)
+                error(parent=self.application.window, message="Could not export the records.")
 
         return
 
@@ -742,8 +744,8 @@ class Logbook:
             try:
                 records = log.records
             except sqlite.Error as e:
-                error(parent=self.application.window, message="Could not retrieve the records from the SQL database. No records have been exported.")
                 logging.exception(e)
+                error(parent=self.application.window, message="Could not retrieve the records from the SQL database. No records have been exported.")
                 return
 
             # Write the records.
@@ -754,8 +756,8 @@ class Logbook:
             except IOError as e:
                 error(parent=self.application.window, message="Could not export the records. I/O error %d: %s" % (e.errno, e.strerror))
             except Exception as e:  # All other exceptions.
-                error(parent=self.application.window, message="Could not export the records.")
                 logging.exception(e)
+                error(parent=self.application.window, message="Could not export the records.")
 
         return
 
@@ -774,8 +776,8 @@ class Logbook:
         try:
             records = log.records
         except sqlite.Error as e:
-            error(parent=self.application.window, message="Could not retrieve the records from the SQL database. No records have been printed.")
             logging.exception(e)
+            error(parent=self.application.window, message="Could not retrieve the records from the SQL database. No records have been printed.")
             return
 
         # Print the records.
@@ -842,8 +844,8 @@ class Logbook:
                         try:
                             log.add_record(fields_and_data)
                         except (sqlite.Error, IndexError) as e:
-                            error(parent=self.application.window, message="Could not add the record to the log.")
                             logging.exception(e)
+                            error(parent=self.application.window, message="Could not add the record to the log.")
 
                         # Scroll to the new record's row in the treeview (but don't select it).
                         try:
@@ -894,8 +896,8 @@ class Logbook:
             try:
                 log.delete_record(row_index, iter=child_iter)
             except (sqlite.Error, IndexError) as e:
-                error(parent=self.application.window, message="Could not delete the record from the log.")
                 logging.exception(e)
+                error(parent=self.application.window, message="Could not delete the record from the log.")
 
             # Update summary, etc.
             self.summary.update()
@@ -963,8 +965,8 @@ class Logbook:
                                 # We add 1 onto the column_index here because we don't want to consider the index column.
                                 log.edit_record(row_index, field_names[i], fields_and_data[field_names[i]], iter=child_iter, column_index=i+1)
                     except(sqlite.Error, IndexError) as e:
-                        error(parent=rd.dialog, message="Could not edit record %d." % row_index)
                         logging.exception(e)
+                        error(parent=rd.dialog, message="Could not edit record %d." % row_index)
 
                     # Update summary, etc.
                     self.summary.update()
@@ -1017,8 +1019,8 @@ class Logbook:
             record_count = log.record_count
             info(parent=self.application.window, message="Log '%s' contains %d records." % (log.name, record_count))
         except sqlite.Error as e:
-            error(parent=self.application.window, message="Could not get the record count for '%s' because of a database error." % log.name)
             logging.exception(e)
+            error(parent=self.application.window, message="Could not get the record count for '%s' because of a database error." % log.name)
 
         return
 
@@ -1090,17 +1092,14 @@ class Logbook:
 
         :returns: A list containing all the logs in the logbook, or None if the retrieval was unsuccessful.
         :rtype: list
+        :raises sqlite.Error: If the log names could not be determined from the sqlite_master table in the database.
         """
         logs = []
-        try:
-            with self.connection:
-                c = self.connection.cursor()
-                c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT GLOB 'sqlite_*'")
-                for name in c:
-                    l = Log(self.connection, name[0])
-                    l.populate()
-                    logs.append(l)
-        except (sqlite.Error, IndexError) as e:
-            logging.exception(e)
-            return None
+        with self.connection:
+            c = self.connection.cursor()
+            c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT GLOB 'sqlite_*'")
+            for name in c:
+                l = Log(self.connection, name[0])
+                l.populate()
+                logs.append(l)
         return logs

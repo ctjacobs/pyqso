@@ -74,10 +74,11 @@ class TestLogbook(unittest.TestCase):
     @mock.patch('pyqso.auxiliary_dialogs.handle_gtk_dialog')
     def test_open_invalid_logbook(self, mock_handle_gtk_dialog):
         """ Open an invalid database file (comprising only one line of plain text) and check that an error occurs. """
+        invalid_logbook = Logbook(application=mock.MagicMock())
         path_to_invalid_database = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/invalid.db")
-        opened = self.logbook.open(path=path_to_invalid_database)
+        opened = invalid_logbook.open(path=path_to_invalid_database)
         assert(not opened)
-        assert(self.logbook.logs is None)
+        assert(not invalid_logbook.logs)
 
     @mock.patch('pyqso.logbook.Logbook.render_log')
     @mock.patch('pyqso.auxiliary_dialogs.handle_gtk_dialog')
