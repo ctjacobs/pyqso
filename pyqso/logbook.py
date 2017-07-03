@@ -792,7 +792,7 @@ class Logbook:
             if(log_index is None):
                 raise ValueError("The log index could not be determined. Perhaps the Summary page is selected?")
         except ValueError as e:
-            error(self.application.window, e)
+            error(parent=self.application.window, message=e)
             return
         log = self.logs[log_index]
 
@@ -915,7 +915,7 @@ class Logbook:
             if(log_index is None):
                 raise ValueError("The log index could not be determined. Perhaps the Summary page is selected?")
         except ValueError as e:
-            error(self.application.window, e)
+            error(parent=self.application.window, message=e)
             return
         log = self.logs[log_index]
 
@@ -984,7 +984,7 @@ class Logbook:
             if(log_index is None):
                 raise ValueError("The log index could not be determined. Perhaps the Summary page is selected?")
         except ValueError as e:
-            error(self.application.window, e)
+            error(parent=self.application.window, message=e)
             return
 
         log = self.logs[log_index]
@@ -1008,7 +1008,7 @@ class Logbook:
             if(log_index is None):
                 raise ValueError("The log index could not be determined. Perhaps the Summary page is selected?")
         except ValueError as e:
-            error(self.application.window, e)
+            error(parent=self.application.window, message=e)
             return
 
         # Get the number of records.
@@ -1017,7 +1017,7 @@ class Logbook:
             record_count = log.record_count
             info(parent=self.application.window, message="Log '%s' contains %d records." % (log.name, record_count))
         except sqlite.Error as e:
-            error("Could not get the record count for '%s' because of a database error." % log.name)
+            error(parent=self.application.window, message="Could not get the record count for '%s' because of a database error." % log.name)
             logging.exception(e)
 
         return
