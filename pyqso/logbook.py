@@ -856,7 +856,7 @@ class Logbook:
                         # Update summary, etc.
                         self.summary.update()
                         self.application.toolbox.awards.count(self)
-                        
+
                 else:
                     exit = True
                     break
