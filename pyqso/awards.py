@@ -19,7 +19,7 @@
 
 from gi.repository import Gtk
 import logging
-import sqlite
+import sqlite3 as sqlite
 
 
 class Awards:

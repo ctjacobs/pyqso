@@ -47,8 +47,7 @@ END-OF-LOG:"""
         mycall = "MYCALL"
         mycontest = "MYCONTEST"
         path = "Cabrillo.test_write.log"
-        success = self.cabrillo.write(records, path, contest=mycontest, mycall=mycall)
-        assert(success)
+        self.cabrillo.write(records, path, contest=mycontest, mycall=mycall)
 
         actual = ""
         f = open(path, "r")
