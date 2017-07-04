@@ -141,18 +141,18 @@ class PyQSO:
         return
 
 if(__name__ == "__main__"):
-    # Get any command line arguments
+    # Get any command line arguments.
     parser = argparse.ArgumentParser(prog="pyqso")
     parser.add_argument("-d", "--debug", action="store_true", default=False, help="Enable debugging. All debugging messages will be written to pyqso.debug.")
     parser.add_argument("-l", "--logbook", action="store", type=str, metavar="/path/to/my_logbook_file.db", default=None, help="Path to a Logbook file. If this file does not already exist, then it will be created.")
     args = parser.parse_args()
 
-    # Output debugging messages to a file
+    # Output debugging messages to a file.
     if(args.debug):
-        # Get the root logger
+        # Get the root logger.
         logger = logging.getLogger()
         logger.setLevel(logging.DEBUG)
-        # Add a file handler
+        # Add a file handler.
         handler = logging.FileHandler("pyqso.debug", mode="w")
         formatter = logging.Formatter(fmt="%(asctime)s %(levelname)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
         handler.setFormatter(formatter)
@@ -163,5 +163,5 @@ if(__name__ == "__main__"):
         args.logbook = os.path.abspath(args.logbook)
 
     signal.signal(signal.SIGINT, signal.SIG_DFL)  # Exit PyQSO if a SIGINT signal is captured.
-    application = PyQSO(args.logbook)  # Populate the main window and show it
+    application = PyQSO(args.logbook)  # Populate the main window and show it.
     Gtk.main()  # Start up the event loop!
