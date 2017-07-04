@@ -28,7 +28,7 @@ setup(name="PyQSO",
       packages=["pyqso"],
       package_dir={"pyqso": "pyqso"},
       scripts=["bin/pyqso"],
-      data_files=[("res", ["res/pyqso.glade", "res/log_64x64.png", "res/invalid.db", "res/test.db"])],
+      data_files=[("res", ["res/pyqso.glade", "res/log_64x64.png"])],
       classifiers=[
           "Development Status :: 5 - Production/Stable",
           "Intended Audience :: End Users/Desktop",
