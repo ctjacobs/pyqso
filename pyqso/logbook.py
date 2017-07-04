@@ -579,21 +579,25 @@ class Logbook:
             response = ln.dialog.run()
             if(response == Gtk.ResponseType.OK):
                 log_name = ln.name
-                if(self.log_name_exists(log_name)):
+
+                # Check if the log name exists.
+                try:
+                    exists = self.log_name_exists(log_name)
+                except (sqlite.Error, IndexError) as e:
+                    # Could not determine if the log name exists. It's safer to stop here than to try to add a new log.
+                    logging.exception(e)
+                    error(parent=ln.dialog, message="Database error. Could not check if the log name exists.")
+                    ln.dialog.destroy()
+                    return
+
+                if(exists):
                     # Import into existing log.
-                    exists = True
                     l = self.logs[self.get_log_index(name=log_name)]
                     response = question(parent=ln.dialog, message="Are you sure you want to import into an existing log?")
                     if(response == Gtk.ResponseType.YES):
                         break
-                elif(self.log_name_exists(log_name) is None):
-                    # Could not determine if the log name exists. It's safer to stop here than to try to add a new log.
-                    error(parent=ln.dialog, message="Database error. Could not check if the log name exists.")
-                    ln.dialog.destroy()
-                    return
                 else:
                     # Create a new log with the name the user supplies.
-                    exists = False
                     try:
                         with self.connection:
                             c = self.connection.cursor()
@@ -1046,21 +1050,19 @@ class Logbook:
         """ Determine whether a Log object with a given name exists in the SQL database.
 
         :arg str table_name: The name of the log (i.e. the name of the table in the SQL database).
-        :returns: True if the log name already exists in the logbook; False if it does not already exist; None if there is a database error.
-        :rtype: bool or None
+        :returns: True if the log name already exists in the logbook; False if it does not already exist.
+        :rtype: bool
+        :raises sqlite.Error: If a database error occurs.
         """
-        try:
-            with self.connection:
-                c = self.connection.cursor()
-                c.execute("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE name=?)", [table_name])
-                exists = c.fetchone()
-            if(exists[0] == 1):
-                return True
-            else:
-                return False
-        except (sqlite.Error, IndexError) as e:
-            logging.exception(e)  # Database error. Could not check if the log name exists.
-            return None
+
+        with self.connection:
+            c = self.connection.cursor()
+            c.execute("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE name=?)", [table_name])
+            exists = c.fetchone()
+        if(exists[0] == 1):
+            return True
+        else:
+            return False
 
     def get_log_index(self, name=None):
         """ Given the name of a log, return its index in the list of Log objects.
@@ -1090,7 +1092,7 @@ class Logbook:
     def get_logs(self):
         """ Retrieve all the logs in the logbook file, and create Log objects that represent them.
 
-        :returns: A list containing all the logs in the logbook, or None if the retrieval was unsuccessful.
+        :returns: A list containing all the logs in the logbook.
         :rtype: list
         :raises sqlite.Error: If the log names could not be determined from the sqlite_master table in the database.
         """
