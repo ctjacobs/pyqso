@@ -65,7 +65,7 @@ The following extra packages are necessary to fully enable the grey line tool an
 * python3-numpy
 * libxcb-render0-dev
 * python3-cairocffi
-* [geocoder](https://pypi.python.org/pypi/geocoder) (installable via `pip` and used for QTH lookups)
+* [geocoder](https://pypi.python.org/pypi/geocoder) (installable with `pip3` and used for QTH lookups)
 
 The following extra package is necessary to build the documentation:
 
