@@ -30,7 +30,7 @@ import os
 import os.path
 import sys
 import signal
-from pkg_resources import resource_filename
+import pkg_resources
 
 # This will help Python find the PyQSO modules that need to be imported below.
 pyqso_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir)
@@ -59,8 +59,13 @@ class PyQSO:
         :arg str logbook_path: An optional argument containing the path of the logbook file to open. If no value is provided, this defaults to None and no logbook is opened.
         """
 
+        # Get the PyQSO main window defined in the Glade file.
         self.builder = Gtk.Builder()
-        glade_file_path = resource_filename("pyqso", os.path.join(os.pardir, "res", "pyqso.glade"))
+        try:
+            glade_file_path = pkg_resources.resource_filename("pyqso", os.path.join(os.pardir, "res", "pyqso.glade"))
+        except ImportError:
+            # Assume the resources directory is in the parent directory of the directory containing this file.
+            glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res", "pyqso.glade")
         self.builder.add_from_file(glade_file_path)
         self.window = self.builder.get_object("pyqso")
 
