@@ -17,7 +17,7 @@ before_install:
  - "sh -e /etc/init.d/xvfb start"
 
 install:
-  - sudo pip3 install . 
+  - sudo make install
 
 before_script:
   - export PYTHONPATH=`pwd`:$PYTHONPATH

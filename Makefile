@@ -23,7 +23,7 @@ input: 	clean install docs
 
 install:
 	@echo "*** Installing PyQSO"
-	python3 setup.py install
+	pip3 install .
 
 docs:
 	@echo "*** Building the documentation"
