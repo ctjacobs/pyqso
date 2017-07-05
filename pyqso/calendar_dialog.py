@@ -32,7 +32,7 @@ class CalendarDialog:
         """
 
         self.builder = application.builder
-        glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/pyqso.glade")
+        glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res", "pyqso.glade")
         self.builder.add_objects_from_file(glade_file_path, ("calendar_dialog",))
         self.dialog = self.builder.get_object("calendar_dialog")
         self.calendar = self.builder.get_object("calendar")

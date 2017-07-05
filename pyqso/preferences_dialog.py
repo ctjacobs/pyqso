@@ -58,7 +58,7 @@ class PreferencesDialog:
 
         self.application = application
         self.builder = self.application.builder
-        glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/pyqso.glade")
+        glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res", "pyqso.glade")
         self.builder.add_objects_from_file(glade_file_path, ("preferences_dialog",))
         self.dialog = self.builder.get_object("preferences_dialog")
 

@@ -31,7 +31,7 @@ class TelnetConnectionDialog:
         """
 
         self.builder = application.builder
-        glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/pyqso.glade")
+        glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res", "pyqso.glade")
         self.builder.add_objects_from_file(glade_file_path, ("telnet_connection_dialog",))
         self.dialog = self.builder.get_object("telnet_connection_dialog")
         self.sources = {"HOST": self.builder.get_object("host_entry"),
