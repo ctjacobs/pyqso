@@ -112,7 +112,7 @@ class PyQSO:
 
         if(logbook_path):
             logging.info("Opening logbook: %s" % logbook_path)
-            self.logbook.open(widget=None, path=logbook_path)
+            self.logbook.open(path=logbook_path)
         else:
             # If no logbook path is specified at the command line,
             # then check if the user wants to open a default logbook.
@@ -124,7 +124,7 @@ class PyQSO:
                     logbook_path = config.get(section, option)
                     if(logbook_path is not None and logbook_path != ""):
                         logging.info("Opening the default logbook: %s" % logbook_path)
-                        self.logbook.open(widget=None, path=logbook_path)
+                        self.logbook.open(path=logbook_path)
 
         return
 
