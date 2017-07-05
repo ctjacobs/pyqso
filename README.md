@@ -30,11 +30,11 @@ Assuming that the current working directory is PyQSO's base directory (the direc
 
     python3 bin/pyqso
 
-If the `pip3` package manager is available on your system then PyQSO can be installed using:
+If the `pip3` package manager is available on your system then PyQSO can be installed system-wide using:
 
-    make install
+    sudo make install
 
-Note that `sudo` may also be needed here for system-wide installation. Once installed, the following command will run PyQSO:
+Once installed, the following command will run PyQSO:
 
     pyqso
 
