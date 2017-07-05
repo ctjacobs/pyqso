@@ -26,7 +26,7 @@ PyQSO is a contact logging tool for amateur radio operators.
 Installation and running
 ------------------------
 
-Assuming that the current working directory is PyQSO's base directory (the directory that the `Makefile` is in), PyQSO can be run via the terminal by issuing the following command:
+Assuming that the current working directory is PyQSO's base directory (the directory that the `Makefile` is in), PyQSO can be run without installation by issuing the following command in the terminal:
 
     python3 bin/pyqso
 
