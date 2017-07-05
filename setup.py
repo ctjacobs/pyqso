@@ -32,7 +32,7 @@ setup(name="PyQSO",
           "Natural Language :: English",
           "Programming Language :: Python :: 3",
           "Topic :: Communications :: Ham Radio",
-      ]
+      ],
       packages=["pyqso"],
       package_dir={"pyqso": "pyqso"},
       package_data={"pyqso": ["res/pyqso.glade", "res/log_64x64.png"]},
