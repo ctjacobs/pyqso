@@ -17,7 +17,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(name="PyQSO",
       version="1.0.0",
@@ -25,10 +25,6 @@ setup(name="PyQSO",
       author="Christian Thomas Jacobs",
       author_email="christian@christianjacobs.uk",
       url="https://github.com/ctjacobs/pyqso",
-      packages=["pyqso"],
-      package_dir={"pyqso": "pyqso"},
-      scripts=["bin/pyqso"],
-      data_files=[("res", ["res/pyqso.glade", "res/log_64x64.png"])],
       classifiers=[
           "Development Status :: 5 - Production/Stable",
           "Intended Audience :: End Users/Desktop",
@@ -37,4 +33,9 @@ setup(name="PyQSO",
           "Programming Language :: Python :: 3",
           "Topic :: Communications :: Ham Radio",
       ]
+      packages=["pyqso"],
+      package_dir={"pyqso": "pyqso"},
+      package_data={"pyqso": ["res/pyqso.glade", "res/log_64x64.png"]},
+      scripts=["bin/pyqso"],
+      zip_safe=False
       )
