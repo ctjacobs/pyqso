@@ -130,11 +130,19 @@ class PyQSO:
 
     def show_about(self, widget):
         """ Show the About dialog, which includes license information. """
-        glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/pyqso.glade")
+
+        # Get the About dialog defined in the Glade file.
+        try:
+            glade_file_path = pkg_resources.resource_filename("pyqso", os.path.join(os.pardir, "res", "pyqso.glade"))
+        except ImportError:
+            # Assume the resources directory is in the parent directory of the directory containing this file.
+            glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res", "pyqso.glade")
         self.builder.add_objects_from_file(glade_file_path, ("about_dialog",))
         about = self.builder.get_object("about_dialog")
+
         about.run()
         about.destroy()
+
         return
 
     def show_preferences(self, widget):
