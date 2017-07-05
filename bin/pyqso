@@ -110,7 +110,7 @@ class PyQSO:
             # Hide the Toolbox by default.
             self.toolbox.toggle_visible_callback()
 
-        if(logbook_path is not None):
+        if(logbook_path):
             logging.info("Opening logbook: %s" % logbook_path)
             self.logbook.open(widget=None, path=logbook_path)
         else:
