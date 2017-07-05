@@ -62,10 +62,10 @@ class PyQSO:
         # Get the PyQSO main window defined in the Glade file.
         self.builder = Gtk.Builder()
         try:
-            glade_file_path = pkg_resources.resource_filename("pyqso", os.path.join(os.pardir, "res", "pyqso.glade"))
+            glade_file_path = pkg_resources.resource_filename("pyqso", os.path.join("res", "pyqso.glade"))
         except ImportError:
             # Assume the resources directory is in the parent directory of the directory containing this file.
-            glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res", "pyqso.glade")
+            glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "pyqso", "res", "pyqso.glade")
         self.builder.add_from_file(glade_file_path)
         self.window = self.builder.get_object("pyqso")
 
@@ -133,10 +133,10 @@ class PyQSO:
 
         # Get the About dialog defined in the Glade file.
         try:
-            glade_file_path = pkg_resources.resource_filename("pyqso", os.path.join(os.pardir, "res", "pyqso.glade"))
+            glade_file_path = pkg_resources.resource_filename("pyqso", os.path.join("res", "pyqso.glade"))
         except ImportError:
             # Assume the resources directory is in the parent directory of the directory containing this file.
-            glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res", "pyqso.glade")
+            glade_file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "pyqso", "res", "pyqso.glade")
         self.builder.add_objects_from_file(glade_file_path, ("about_dialog",))
         about = self.builder.get_object("about_dialog")
 

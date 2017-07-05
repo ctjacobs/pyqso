@@ -35,7 +35,7 @@ setup(name="PyQSO",
       ],
       packages=["pyqso"],
       package_dir={"pyqso": "pyqso"},
-      package_data={"pyqso": ["../res/pyqso.glade", "../res/log_64x64.png"]},
+      package_data={"pyqso": ["res/pyqso.glade", "res/log_64x64.png"]},
       scripts=["bin/pyqso"],
       zip_safe=False
       )

@@ -163,7 +163,7 @@ class TestADIF(unittest.TestCase):
         """ Check that records can be written to an ADIF file from a test database file. """
         import sqlite3
         import os.path
-        path_to_test_database = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/test.db")
+        path_to_test_database = os.path.join(os.path.realpath(os.path.dirname(__file__)), "res", "test.db")
         self.connection = sqlite3.connect(path_to_test_database)
         self.connection.row_factory = sqlite3.Row
 

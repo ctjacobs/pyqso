@@ -38,7 +38,7 @@ class TestLogbook(unittest.TestCase):
         self.logbook = Logbook(application=mock.MagicMock())
 
         # Open the test database file.
-        path_to_test_database = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/test.db")
+        path_to_test_database = os.path.join(os.path.realpath(os.path.dirname(__file__)), "res", "test.db")
         opened = self.logbook.open(path=path_to_test_database)
         assert(opened)
         assert(self.logbook.connection is not None)
@@ -75,7 +75,7 @@ class TestLogbook(unittest.TestCase):
     def test_open_invalid_logbook(self, mock_handle_gtk_dialog):
         """ Open an invalid database file (comprising only one line of plain text) and check that an error occurs. """
         invalid_logbook = Logbook(application=mock.MagicMock())
-        path_to_invalid_database = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/invalid.db")
+        path_to_invalid_database = os.path.join(os.path.realpath(os.path.dirname(__file__)), "res", "invalid.db")
         opened = invalid_logbook.open(path=path_to_invalid_database)
         assert(not opened)
         assert(not invalid_logbook.logs)
@@ -86,7 +86,7 @@ class TestLogbook(unittest.TestCase):
     def test_new_log(self, mock_LogNameDialog, mock_handle_gtk_dialog, mock_render_log):
         """ Create an empty logbook file, open it, and check that a new log can successfully be added. """
         # Create a copy of the test database just for use in this particular test, since the contents will need to be modified.
-        path_to_test_database = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/test.db")
+        path_to_test_database = os.path.join(os.path.realpath(os.path.dirname(__file__)), "res", "test.db")
         destination = "Logbook.test_new_log.db"
         copyfile(path_to_test_database, destination)
         opened = self.logbook.open(path=destination)

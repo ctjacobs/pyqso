@@ -36,7 +36,7 @@ class TestAwards(unittest.TestCase):
         PyQSO = mock.MagicMock()
         self.awards = Awards(application=PyQSO())
         self.logbook = Logbook(application=PyQSO())
-        path_to_test_database = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir, "res/test.db")
+        path_to_test_database = os.path.join(os.path.realpath(os.path.dirname(__file__)), "res", "test.db")
         success = self.logbook.db_connect(path_to_test_database)
         assert(success)
         self.logbook.logs = self.logbook.get_logs()
