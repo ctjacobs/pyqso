@@ -17,7 +17,7 @@ before_install:
  - "sh -e /etc/init.d/xvfb start"
 
 install:
-  - sudo make install
+  - sudo easy_install3 .
 
 before_script:
   - export PYTHONPATH=`pwd`:$PYTHONPATH
