@@ -46,13 +46,17 @@ class TestCallsignLookup(unittest.TestCase):
 
     def test_strip_prefix_only(self):
         """ Check that a callsign with only a prefix is stripped correctly. """
-        callsign = "F/MYCALL"
-        assert strip(callsign) == "MYCALL"
+        assert strip("F/MYCALL") == "MYCALL"
 
     def test_strip_suffix_only(self):
         """ Check that a callsign with only a suffix is stripped correctly. """
-        callsign = "MYCALL/M"
-        assert strip(callsign) == "MYCALL"
+        assert strip("MYCALL/M") == "MYCALL"
+        assert strip("MYCALL/P") == "MYCALL"
+        assert strip("MYCALL/A") == "MYCALL"
+        assert strip("MYCALL/MM") == "MYCALL"
+        assert strip("MYCALL/PM") == "MYCALL"
+        assert strip("MYCALL/AM") == "MYCALL"
+        assert strip("MYCALL/QRP") == "MYCALL"
 
     def test_strip_no_prefix_or_suffix(self):
         """ Check that a callsign with no prefix or suffix remains unmodified. """
