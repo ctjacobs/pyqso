@@ -425,6 +425,7 @@ class RecordDialog:
             full_callsign = self.sources["CALL"].get_text()
             if(not full_callsign):
                 # Empty callsign field.
+                error(parent=self.dialog, message="Please enter a callsign to lookup.")
                 return
 
             # Check whether we want to ignore any prefixes (e.g. "IA/") or suffixes "(e.g. "/M") in the callsign
