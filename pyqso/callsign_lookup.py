@@ -60,7 +60,7 @@ class CallsignLookupQRZ:
             return False
 
         xml_data = minidom.parseString(response.read())
-        session_node = xml_data.getElementsByTagName("Session")[0]  # There should only be one Session element
+        session_node = xml_data.getElementsByTagName("Session")[0]  # There should only be one Session element.
         session_key_node = session_node.getElementsByTagName("Key")
         if(len(session_key_node) > 0):
             self.session_key = session_key_node[0].firstChild.nodeValue
@@ -69,7 +69,7 @@ class CallsignLookupQRZ:
         else:
             connected = False
 
-        # If there are any errors or warnings, print them out
+        # If there are any errors or warnings, print them out.
         session_error_node = session_node.getElementsByTagName("Error")
         if(len(session_error_node) > 0):
             session_error = session_error_node[0].firstChild.nodeValue
@@ -86,7 +86,7 @@ class CallsignLookupQRZ:
         :rtype: dict
         """
 
-        logging.debug("Looking up callsign. The full callsign (with a prefix and/or suffix) is %s" % full_callsign)
+        logging.debug("Looking up callsign. The full callsign (with a prefix and/or suffix) is %s." % full_callsign)
 
         # Remove any prefix or suffix from the callsign before performing the lookup.
         if(ignore_prefix_suffix):
@@ -104,20 +104,20 @@ class CallsignLookupQRZ:
             xml_data = minidom.parseString(response.read())
             callsign_node = xml_data.getElementsByTagName("Callsign")
             if(len(callsign_node) > 0):
-                callsign_node = callsign_node[0]  # There should only be a maximum of one Callsign element
+                callsign_node = callsign_node[0]  # There should only be a maximum of one Callsign element.
 
                 callsign_fname_node = callsign_node.getElementsByTagName("fname")
                 callsign_name_node = callsign_node.getElementsByTagName("name")
                 if(len(callsign_fname_node) > 0):
                     fields_and_data["NAME"] = callsign_fname_node[0].firstChild.nodeValue
-                if(len(callsign_name_node) > 0):  # Add the surname, if present
+                if(len(callsign_name_node) > 0):  # Add the surname, if present.
                     fields_and_data["NAME"] = fields_and_data["NAME"] + " " + callsign_name_node[0].firstChild.nodeValue
 
                 callsign_addr1_node = callsign_node.getElementsByTagName("addr1")
                 callsign_addr2_node = callsign_node.getElementsByTagName("addr2")
                 if(len(callsign_addr1_node) > 0):
                     fields_and_data["ADDRESS"] = callsign_addr1_node[0].firstChild.nodeValue
-                if(len(callsign_addr2_node) > 0):  # Add the second line of the address, if present
+                if(len(callsign_addr2_node) > 0):  # Add the second line of the address, if present.
                     fields_and_data["ADDRESS"] = (fields_and_data["ADDRESS"] + ", " if len(callsign_addr1_node) > 0 else "") + callsign_addr2_node[0].firstChild.nodeValue
 
                 callsign_state_node = callsign_node.getElementsByTagName("state")
@@ -144,14 +144,14 @@ class CallsignLookupQRZ:
                 if(len(callsign_iota_node) > 0):
                     fields_and_data["IOTA"] = callsign_iota_node[0].firstChild.nodeValue
             else:
-                # If there is no Callsign element, then print out the error message in the Session element
+                # If there is no Callsign element, then print out the error message in the Session element.
                 session_node = xml_data.getElementsByTagName("Session")
                 if(len(session_node) > 0):
                     session_error_node = session_node[0].getElementsByTagName("Error")
                     if(len(session_error_node) > 0):
                         session_error = session_error_node[0].firstChild.nodeValue
                         error(parent=self.parent, message=session_error)
-                # Return empty strings for the field data
+                # Return empty strings for the field data.
             logging.debug("Callsign lookup complete. Returning data...")
         return fields_and_data
 
@@ -186,7 +186,7 @@ class CallsignLookupHamQTH:
             return False
 
         xml_data = minidom.parseString(response.read())
-        session_node = xml_data.getElementsByTagName("session")[0]  # There should only be one Session element
+        session_node = xml_data.getElementsByTagName("session")[0]  # There should only be one Session element.
         session_id_node = session_node.getElementsByTagName("session_id")
         if(len(session_id_node) > 0):
             self.session_id = session_id_node[0].firstChild.nodeValue
@@ -195,7 +195,7 @@ class CallsignLookupHamQTH:
         else:
             connected = False
 
-        # If there are any errors or warnings, print them out
+        # If there are any errors or warnings, print them out.
         session_error_node = session_node.getElementsByTagName("error")
         if(len(session_error_node) > 0):
             session_error = session_error_node[0].firstChild.nodeValue
@@ -212,7 +212,7 @@ class CallsignLookupHamQTH:
         :rtype: dict
         """
 
-        logging.debug("Looking up callsign. The full callsign (with a prefix and/or suffix) is %s" % full_callsign)
+        logging.debug("Looking up callsign. The full callsign (with a prefix and/or suffix) is %s." % full_callsign)
 
         # Remove any prefix or suffix from the callsign before performing the lookup.
         if(ignore_prefix_suffix):
@@ -230,7 +230,7 @@ class CallsignLookupHamQTH:
             xml_data = minidom.parseString(response.read())
             search_node = xml_data.getElementsByTagName("search")
             if(len(search_node) > 0):
-                search_node = search_node[0]  # There should only be a maximum of one Callsign element
+                search_node = search_node[0]  # There should only be a maximum of one Callsign element.
 
                 search_name_node = search_node.getElementsByTagName("nick")
                 if(len(search_name_node) > 0):
@@ -240,7 +240,7 @@ class CallsignLookupHamQTH:
                 search_addr2_node = search_node.getElementsByTagName("adr_street2")
                 if(len(search_addr1_node) > 0):
                     fields_and_data["ADDRESS"] = search_addr1_node[0].firstChild.nodeValue
-                if(len(search_addr2_node) > 0):  # Add the second line of the address, if present
+                if(len(search_addr2_node) > 0):  # Add the second line of the address, if present.
                     fields_and_data["ADDRESS"] = (fields_and_data["ADDRESS"] + ", " if len(search_addr1_node) > 0 else "") + search_addr2_node[0].firstChild.nodeValue
 
                 search_state_node = search_node.getElementsByTagName("us_state")
@@ -259,18 +259,18 @@ class CallsignLookupHamQTH:
                 if(len(search_ituzone_node) > 0):
                     fields_and_data["ITUZ"] = search_ituzone_node[0].firstChild.nodeValue
 
-                search_iota_node = search_node.getElementsByTagName("grid")
+                search_iota_node = search_node.getElementsByTagName("iota")
                 if(len(search_iota_node) > 0):
                     fields_and_data["IOTA"] = search_iota_node[0].firstChild.nodeValue
             else:
-                # If there is no Callsign element, then print out the error message in the Session element
+                # If there is no Callsign element, then print out the error message in the Session element.
                 session_node = xml_data.getElementsByTagName("session")
                 if(len(session_node) > 0):
                     session_error_node = session_node[0].getElementsByTagName("error")
                     if(len(session_error_node) > 0):
                         session_error = session_error_node[0].firstChild.nodeValue
                         error(parent=self.parent, message=session_error)
-                # Return empty strings for the field data
+                # Return empty strings for the field data.
             logging.debug("Callsign lookup complete. Returning data...")
         return fields_and_data
 
@@ -294,16 +294,16 @@ def strip(full_callsign):
             if(components[1].upper() in suffixes or components[1].lower() in suffixes):
                 # If the last part of the full_callsign is a valid suffix, then use the part before that.
                 callsign = components[0]
-                logging.debug("Suffix %s found. Callsign to lookup is %s" % (components[1], callsign))
+                logging.debug("Suffix %s found. Callsign to lookup is %s." % (components[1], callsign))
             else:
                 # We have a prefix, so take the part after the first "/".
                 callsign = components[1]
-                logging.debug("Prefix %s found. Callsign to lookup is %s" % (components[0], callsign))
+                logging.debug("Prefix %s found. Callsign to lookup is %s." % (components[0], callsign))
 
         elif(len(components) == 1):
             # We have neither a prefix nor a suffix, so use the full_callsign.
             callsign = full_callsign
-            logging.debug("No prefix or suffix found. Callsign to lookup is %s" % callsign)
+            logging.debug("No prefix or suffix found. Callsign to lookup is %s." % callsign)
 
         else:
             raise ValueError
