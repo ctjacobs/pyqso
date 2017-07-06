@@ -423,6 +423,10 @@ class RecordDialog:
         connected = callsign_lookup.connect(username, password)
         if(connected):
             full_callsign = self.sources["CALL"].get_text()
+            if(not full_callsign):
+                # Empty callsign field.
+                return
+
             # Check whether we want to ignore any prefixes (e.g. "IA/") or suffixes "(e.g. "/M") in the callsign
             # before performing the lookup.
             if(have_config and config.has_option("records", "ignore_prefix_suffix")):
