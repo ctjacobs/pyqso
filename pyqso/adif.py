@@ -209,7 +209,7 @@ class ADIF:
         logging.debug("Reading in ADIF file with path: %s..." % path)
 
         text = ""
-        with open(path, mode='r', errors="replace") as f:
+        with open(path, mode="r", errors="replace") as f:
             text = f.read()
 
         records = self.parse_adi(text)
@@ -234,7 +234,7 @@ class ADIF:
 
         # ADIF-related configuration options
         config = configparser.ConfigParser()
-        have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
+        have_config = (config.read(expanduser("~/.config/pyqso/preferences.ini")) != [])
         (section, option) = ("adif", "merge_comment")
         if(have_config and config.has_option(section, option) and config.get(section, option) == "True"):
             merge_comment = True
@@ -242,12 +242,12 @@ class ADIF:
             merge_comment = False
 
         # Separate the text at the <eor> or <eoh> markers.
-        tokens = re.split('(<eor>|<eoh>)', text, flags=re.IGNORECASE)
+        tokens = re.split("(<eor>|<eoh>)", text, flags=re.IGNORECASE)
         tokens.pop()  # Anything after the final <eor> marker should be ignored.
 
         # The header might tell us the number of records, but let's not assume
         # this and simply ignore it instead (if it exists).
-        if(re.search('<eoh>', text, flags=re.IGNORECASE) is not None):
+        if(re.search("<eoh>", text, flags=re.IGNORECASE) is not None):
             # There is a header present, so let's ignore everything
             # up to and including the <eoh> marker. Note that
             # re.search has been used here to handle any case sensitivity.
@@ -255,16 +255,16 @@ class ADIF:
             # but wasn't being detected before.
             while len(tokens) > 0:
                 t = tokens.pop(0)
-                if(re.match('<eoh>', t, flags=re.IGNORECASE) is not None):
+                if(re.match("<eoh>", t, flags=re.IGNORECASE) is not None):
                     break
 
         n_eor = 0
         n_record = 0
         records = []
-        pattern = re.compile('<(.*?):(\d*).*?>([^<\t\n\r\f\v]+)')
+        pattern = re.compile("<(.*?):(\d*).*?>([^<\t\n\r\f\v]+)")
 
         for t in tokens:
-            if(re.match('<eor>', t, flags=re.IGNORECASE) is not None):
+            if(re.match("<eor>", t, flags=re.IGNORECASE) is not None):
                 n_eor += 1
                 continue
             else:
@@ -330,7 +330,7 @@ class ADIF:
 
         logging.debug("Writing records to an ADIF file...")
 
-        with open(path, mode='w', errors="replace") as f:  # Open file for writing
+        with open(path, mode="w", errors="replace") as f:  # Open file for writing
 
             # First write a header containing program version, number of records, etc.
             dt = datetime.now()
