@@ -63,6 +63,7 @@ class CallsignLookupQRZ:
             logging.error("Could not percent-escape the password. Falling back to non-percent-escaped password.")
             pass
 
+        # Connect to the server.
         try:
             self.connection = http_client.HTTPConnection("xmldata.qrz.com")
             request = "/xml/current/?username=%s;password=%s;agent=pyqso" % (username, password)
@@ -72,6 +73,7 @@ class CallsignLookupQRZ:
             error(parent=self.parent, message="Could not connect to the qrz.com server. Check connection to the internets?")
             return False
 
+        # Get the session key.
         xml_data = minidom.parseString(response.read())
         session_node = xml_data.getElementsByTagName("Session")[0]  # There should only be one Session element.
         session_key_node = session_node.getElementsByTagName("Key")
@@ -198,6 +200,7 @@ class CallsignLookupHamQTH:
             logging.error("Could not percent-escape the password. Falling back to non-percent-escaped password.")
             pass
 
+        # Connect to the server.
         try:
             self.connection = http_client.HTTPSConnection("www.hamqth.com")
             request = "/xml.php?u=%s&p=%s" % (username, password)
@@ -207,6 +210,7 @@ class CallsignLookupHamQTH:
             error(parent=self.parent, message="Could not connect to the hamqth.com server. Check connection to the internets?")
             return False
 
+        # Get the session ID.
         xml_data = minidom.parseString(response.read())
         session_node = xml_data.getElementsByTagName("session")[0]  # There should only be one Session element.
         session_id_node = session_node.getElementsByTagName("session_id")
