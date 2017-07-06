@@ -110,7 +110,7 @@ class TestCallsignLookup(unittest.TestCase):
         connection = http_client.HTTPSConnection()
         response = http_client.HTTPResponse()
 
-        response.read.return_value = b'<?xml version="1.0"?>\n<HamQTH version="2.6" xmlns="https://www.hamqth.com">\n<search>\n<callsign>MYCALL</callsign>\n<nick>NAME</nick>\n<country>COUNTRY</country>\n<itu>ITU</itu>\n<cq>CQ</cq>\n<grid>GRID</grid>\n<adr_street1>ADDRESS</adr_street1>\n</search>\n</HamQTH>\n'
+        response.read.return_value = b'<?xml version="1.0"?>\n<HamQTH version="2.6" xmlns="https://www.hamqth.com">\n<search>\n<callsign>MYCALL</callsign>\n<nick>NAME</nick>\n<country>COUNTRY</country>\n<itu>ITU</itu>\n<cq>CQ</cq>\n<iota>IOTA</iota>\n<adr_street1>ADDRESS</adr_street1>\n</search>\n</HamQTH>\n'
         connection.getresponse.return_value = response
 
         self.hamqth.connection = connection
@@ -121,7 +121,7 @@ class TestCallsignLookup(unittest.TestCase):
         assert(fields_and_data["COUNTRY"] == "COUNTRY")
         assert(fields_and_data["CQZ"] == "CQ")
         assert(fields_and_data["ITUZ"] == "ITU")
-        assert(fields_and_data["IOTA"] == "GRID")
+        assert(fields_and_data["IOTA"] == "IOTA")
 
 if(__name__ == '__main__'):
     unittest.main()
