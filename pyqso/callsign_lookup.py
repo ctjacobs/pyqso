@@ -23,6 +23,7 @@ try:
 except ImportError:
     import httplib as http_client
 from xml.dom import minidom
+import urllib
 
 from pyqso.auxiliary_dialogs import *
 
@@ -52,7 +53,7 @@ class CallsignLookupQRZ:
         logging.debug("Connecting to the qrz.com server...")
         try:
             self.connection = http_client.HTTPConnection("xmldata.qrz.com")
-            request = "/xml/current/?username=%s;password=%s;agent=pyqso" % (username, password)
+            request = "/xml/current/?username=%s;password=%s;agent=pyqso" % (username, urllib.parse.quote(password))
             self.connection.request("GET", request)
             response = self.connection.getresponse()
         except:
@@ -64,7 +65,7 @@ class CallsignLookupQRZ:
         session_key_node = session_node.getElementsByTagName("Key")
         if(len(session_key_node) > 0):
             self.session_key = session_key_node[0].firstChild.nodeValue
-            logging.debug("Successfully connected to the qrz.com server...")
+            logging.debug("Successfully connected to the qrz.com server.")
             connected = True
         else:
             connected = False
@@ -178,7 +179,7 @@ class CallsignLookupHamQTH:
         logging.debug("Connecting to the hamqth.com server...")
         try:
             self.connection = http_client.HTTPSConnection("www.hamqth.com")
-            request = "/xml.php?u=%s&p=%s" % (username, password)
+            request = "/xml.php?u=%s&p=%s" % (username, urllib.parse.quote(password))
             self.connection.request("GET", request)
             response = self.connection.getresponse()
         except:
@@ -190,7 +191,7 @@ class CallsignLookupHamQTH:
         session_id_node = session_node.getElementsByTagName("session_id")
         if(len(session_id_node) > 0):
             self.session_id = session_id_node[0].firstChild.nodeValue
-            logging.debug("Successfully connected to the hamqth.com server...")
+            logging.debug("Successfully connected to the hamqth.com server.")
             connected = True
         else:
             connected = False
