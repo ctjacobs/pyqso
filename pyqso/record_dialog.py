@@ -409,7 +409,7 @@ class RecordDialog:
         if(have_config and config.has_option("records", "callsign_database_username") and config.has_option("records", "callsign_database_password")):
             username = config.get("records", "callsign_database_username")
             password = base64.b64decode(config.get("records", "callsign_database_password")).decode("utf-8")
-            if(username == "" or password == ""):
+            if(not username or not password):
                 details_given = False
             else:
                 details_given = True
