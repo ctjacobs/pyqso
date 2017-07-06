@@ -90,9 +90,9 @@ class TestCallsignLookup(unittest.TestCase):
     def test_hamqth_connect(self):
         """ Check the example response from the hamqth.com server, and make sure the session ID has been correctly extracted. """
 
-        http_client.HTTPConnection = mock.Mock(spec=http_client.HTTPConnection)
+        http_client.HTTPSConnection = mock.Mock(spec=http_client.HTTPSConnection)
         http_client.HTTPResponse = mock.Mock(spec=http_client.HTTPResponse)
-        connection = http_client.HTTPConnection()
+        connection = http_client.HTTPSConnection()
         response = http_client.HTTPResponse()
 
         response.read.return_value = b'<?xml version="1.0"?>\n<HamQTH version="2.6" xmlns="https://www.hamqth.com">\n<session>\n<session_id>09b0ae90050be03c452ad235a1f2915ad684393c</session_id>\n</session>\n</HamQTH>\n'
@@ -105,9 +105,9 @@ class TestCallsignLookup(unittest.TestCase):
     def test_hamqth_lookup(self):
         """ Check the example callsign lookup response from the hamqth.com server, and make sure the callsign information has been correctly extracted. """
 
-        http_client.HTTPConnection = mock.Mock(spec=http_client.HTTPConnection)
+        http_client.HTTPSConnection = mock.Mock(spec=http_client.HTTPSConnection)
         http_client.HTTPResponse = mock.Mock(spec=http_client.HTTPResponse)
-        connection = http_client.HTTPConnection()
+        connection = http_client.HTTPSConnection()
         response = http_client.HTTPResponse()
 
         response.read.return_value = b'<?xml version="1.0"?>\n<HamQTH version="2.6" xmlns="https://www.hamqth.com">\n<search>\n<callsign>MYCALL</callsign>\n<nick>NAME</nick>\n<country>COUNTRY</country>\n<itu>ITU</itu>\n<cq>CQ</cq>\n<grid>GRID</grid>\n<adr_street1>ADDRESS</adr_street1>\n</search>\n</HamQTH>\n'
