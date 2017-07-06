@@ -23,7 +23,10 @@ try:
 except ImportError:
     import httplib as http_client
 from xml.dom import minidom
-import urllib
+try:
+    from urllib.parse import quote
+except ImportError:
+    from urllib import quote
 
 from pyqso.auxiliary_dialogs import *
 
@@ -51,9 +54,18 @@ class CallsignLookupQRZ:
         :rtype: bool
         """
         logging.debug("Connecting to the qrz.com server...")
+
+        # Percent-escape the password.
+        try:
+            password = quote(password)
+        except Exception as e:
+            logging.exception(e)
+            logging.error("Could not percent-escape the password. Falling back to non-percent-escaped password.")
+            pass
+
         try:
             self.connection = http_client.HTTPConnection("xmldata.qrz.com")
-            request = "/xml/current/?username=%s;password=%s;agent=pyqso" % (username, urllib.parse.quote(password))
+            request = "/xml/current/?username=%s;password=%s;agent=pyqso" % (username, password)
             self.connection.request("GET", request)
             response = self.connection.getresponse()
         except:
@@ -177,9 +189,18 @@ class CallsignLookupHamQTH:
         """
 
         logging.debug("Connecting to the hamqth.com server...")
+
+        # Percent-escape the password.
+        try:
+            password = quote(password)
+        except Exception as e:
+            logging.exception(e)
+            logging.error("Could not percent-escape the password. Falling back to non-percent-escaped password.")
+            pass
+
         try:
             self.connection = http_client.HTTPSConnection("www.hamqth.com")
-            request = "/xml.php?u=%s&p=%s" % (username, urllib.parse.quote(password))
+            request = "/xml.php?u=%s&p=%s" % (username, password)
             self.connection.request("GET", request)
             response = self.connection.getresponse()
         except:
