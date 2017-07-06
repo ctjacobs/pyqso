@@ -53,7 +53,7 @@
 - Button to add the current date and time.
 - Option to specify default values for the power and mode fields.
 - Allow UTC time to be used when creating records.
-- Allow prefixes/suffixes to be removed when looking up a callsign (e.g. "MYCALL" would be extracted from "EA3/MYCALL/M").
+- Allow prefixes/suffixes to be removed when looking up a callsign (e.g. "MYCALL" would be extracted from "F/MYCALL/QRP").
 
 ### Changed
 - Migrated the documentation to a Sphinx-based setup.
