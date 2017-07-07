@@ -38,7 +38,7 @@ class Log(Gtk.ListStore):
         # The ListStore constructor needs to know the data types of the columns.
         # The index is always an integer. We will assume the fields are strings.
         data_types = [int] + [str]*len(AVAILABLE_FIELD_NAMES_ORDERED)
-        # Call the constructor of the super class (Gtk.ListStore)
+        # Call the constructor of the super class (Gtk.ListStore).
         Gtk.ListStore.__init__(self, *data_types)
 
         self.connection = connection
