@@ -405,7 +405,7 @@ class RecordDialog:
             error(parent=self.dialog, message=e)
             return
 
-        # Get username and password from configuration file
+        # Get username and password from configuration file.
         if(have_config and config.has_option("records", "callsign_database_username") and config.has_option("records", "callsign_database_password")):
             username = config.get("records", "callsign_database_username")
             password = base64.b64decode(config.get("records", "callsign_database_password")).decode("utf-8")
@@ -419,15 +419,16 @@ class RecordDialog:
             error(parent=self.dialog, message="To perform a callsign lookup, please specify your username and password in the Preferences.")
             return
 
-        # Connect and look up.
+        # Get the callsign from the CALL field.
+        full_callsign = self.sources["CALL"].get_text()
+        if(not full_callsign):
+            # Empty callsign field.
+            error(parent=self.dialog, message="Please enter a callsign to lookup.")
+            return
+
+        # Connect to the database.
         connected = callsign_lookup.connect(username, password)
         if(connected):
-            full_callsign = self.sources["CALL"].get_text()
-            if(not full_callsign):
-                # Empty callsign field.
-                error(parent=self.dialog, message="Please enter a callsign to lookup.")
-                return
-
             # Check whether we want to ignore any prefixes (e.g. "IA/") or suffixes "(e.g. "/M") in the callsign
             # before performing the lookup.
             if(have_config and config.has_option("records", "ignore_prefix_suffix")):
@@ -435,6 +436,7 @@ class RecordDialog:
             else:
                 ignore_prefix_suffix = True
 
+            # Perform the lookup.
             fields_and_data = callsign_lookup.lookup(full_callsign, ignore_prefix_suffix=ignore_prefix_suffix)
             for field_name in list(fields_and_data.keys()):
                 self.sources[field_name].set_text(fields_and_data[field_name])
