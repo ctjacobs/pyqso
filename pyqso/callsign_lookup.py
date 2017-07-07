@@ -28,7 +28,7 @@ try:
 except ImportError:
     from urllib import quote
 
-from pyqso.auxiliary_dialogs import *
+from pyqso.auxiliary_dialogs import error
 
 
 class CallsignLookupQRZ:
@@ -55,21 +55,14 @@ class CallsignLookupQRZ:
         """
         logging.debug("Connecting to the qrz.com server...")
 
-        # Percent-escape the password.
-        try:
-            password = quote(password)
-        except Exception as e:
-            logging.exception(e)
-            logging.error("Could not percent-escape the password. Falling back to non-percent-escaped password.")
-            pass
-
         # Connect to the server.
         try:
             self.connection = http_client.HTTPConnection("xmldata.qrz.com")
-            request = "/xml/current/?username=%s;password=%s;agent=pyqso" % (username, password)
+            request = "/xml/current/?username=%s;password=%s;agent=pyqso" % (username, quote(password))  # Percent-escape the password in case there are reserved characters present.
             self.connection.request("GET", request)
             response = self.connection.getresponse()
-        except:
+        except Exception as e:
+            logging.exception(e)
             error(parent=self.parent, message="Could not connect to the qrz.com server. Check connection to the internets?")
             return False
 
@@ -77,18 +70,18 @@ class CallsignLookupQRZ:
         xml_data = minidom.parseString(response.read())
         session_node = xml_data.getElementsByTagName("Session")[0]  # There should only be one Session element.
         session_key_node = session_node.getElementsByTagName("Key")
-        if(len(session_key_node) > 0):
+        if(session_key_node):
             self.session_key = session_key_node[0].firstChild.nodeValue
-            logging.debug("Successfully connected to the qrz.com server.")
+            logging.debug("Successfully connected to the qrz.com server. Session key is: %s." % self.session_key)
             connected = True
         else:
             connected = False
 
         # If there are any errors or warnings, print them out.
         session_error_node = session_node.getElementsByTagName("Error")
-        if(len(session_error_node) > 0):
+        if(session_error_node):
             session_error = session_error_node[0].firstChild.nodeValue
-            error(parent=self.parent, message="qrz.com session error: "+session_error)
+            error(parent=self.parent, message="qrz.com session error: %s" % session_error)
 
         return connected
 
@@ -118,52 +111,52 @@ class CallsignLookupQRZ:
 
             xml_data = minidom.parseString(response.read())
             callsign_node = xml_data.getElementsByTagName("Callsign")
-            if(len(callsign_node) > 0):
+            if(callsign_node):
                 callsign_node = callsign_node[0]  # There should only be a maximum of one Callsign element.
 
                 callsign_fname_node = callsign_node.getElementsByTagName("fname")
                 callsign_name_node = callsign_node.getElementsByTagName("name")
-                if(len(callsign_fname_node) > 0):
+                if(callsign_fname_node):
                     fields_and_data["NAME"] = callsign_fname_node[0].firstChild.nodeValue
-                if(len(callsign_name_node) > 0):  # Add the surname, if present.
+                if(callsign_name_node):  # Add the surname, if present.
                     fields_and_data["NAME"] = fields_and_data["NAME"] + " " + callsign_name_node[0].firstChild.nodeValue
 
                 callsign_addr1_node = callsign_node.getElementsByTagName("addr1")
                 callsign_addr2_node = callsign_node.getElementsByTagName("addr2")
-                if(len(callsign_addr1_node) > 0):
+                if(callsign_addr1_node):
                     fields_and_data["ADDRESS"] = callsign_addr1_node[0].firstChild.nodeValue
-                if(len(callsign_addr2_node) > 0):  # Add the second line of the address, if present.
-                    fields_and_data["ADDRESS"] = (fields_and_data["ADDRESS"] + ", " if len(callsign_addr1_node) > 0 else "") + callsign_addr2_node[0].firstChild.nodeValue
+                if(callsign_addr2_node):  # Add the second line of the address, if present.
+                    fields_and_data["ADDRESS"] = (fields_and_data["ADDRESS"] + ", " if callsign_addr1_node else "") + callsign_addr2_node[0].firstChild.nodeValue
 
                 callsign_state_node = callsign_node.getElementsByTagName("state")
-                if(len(callsign_state_node) > 0):
+                if(callsign_state_node):
                     fields_and_data["STATE"] = callsign_state_node[0].firstChild.nodeValue
 
                 callsign_country_node = callsign_node.getElementsByTagName("country")
-                if(len(callsign_country_node) > 0):
+                if(callsign_country_node):
                     fields_and_data["COUNTRY"] = callsign_country_node[0].firstChild.nodeValue
 
                 callsign_ccode_node = callsign_node.getElementsByTagName("ccode")
-                if(len(callsign_ccode_node) > 0):
+                if(callsign_ccode_node):
                     fields_and_data["DXCC"] = callsign_ccode_node[0].firstChild.nodeValue
 
                 callsign_cqzone_node = callsign_node.getElementsByTagName("cqzone")
-                if(len(callsign_cqzone_node) > 0):
+                if(callsign_cqzone_node):
                     fields_and_data["CQZ"] = callsign_cqzone_node[0].firstChild.nodeValue
 
                 callsign_ituzone_node = callsign_node.getElementsByTagName("ituzone")
-                if(len(callsign_ituzone_node) > 0):
+                if(callsign_ituzone_node):
                     fields_and_data["ITUZ"] = callsign_ituzone_node[0].firstChild.nodeValue
 
                 callsign_iota_node = callsign_node.getElementsByTagName("iota")
-                if(len(callsign_iota_node) > 0):
+                if(callsign_iota_node):
                     fields_and_data["IOTA"] = callsign_iota_node[0].firstChild.nodeValue
             else:
                 # If there is no Callsign element, then print out the error message in the Session element.
                 session_node = xml_data.getElementsByTagName("Session")
-                if(len(session_node) > 0):
+                if(session_node):
                     session_error_node = session_node[0].getElementsByTagName("Error")
-                    if(len(session_error_node) > 0):
+                    if(session_error_node):
                         session_error = session_error_node[0].firstChild.nodeValue
                         error(parent=self.parent, message=session_error)
                 # Return empty strings for the field data.
@@ -192,21 +185,14 @@ class CallsignLookupHamQTH:
 
         logging.debug("Connecting to the hamqth.com server...")
 
-        # Percent-escape the password.
-        try:
-            password = quote(password)
-        except Exception as e:
-            logging.exception(e)
-            logging.error("Could not percent-escape the password. Falling back to non-percent-escaped password.")
-            pass
-
         # Connect to the server.
         try:
             self.connection = http_client.HTTPSConnection("www.hamqth.com")
-            request = "/xml.php?u=%s&p=%s" % (username, password)
+            request = "/xml.php?u=%s&p=%s" % (username, quote(password))  # Percent-escape the password in case there are reserved characters present.
             self.connection.request("GET", request)
             response = self.connection.getresponse()
-        except:
+        except Exception as e:
+            logging.exception(e)
             error(parent=self.parent, message="Could not connect to the hamqth.com server. Check connection to the internets?")
             return False
 
@@ -214,18 +200,18 @@ class CallsignLookupHamQTH:
         xml_data = minidom.parseString(response.read())
         session_node = xml_data.getElementsByTagName("session")[0]  # There should only be one Session element.
         session_id_node = session_node.getElementsByTagName("session_id")
-        if(len(session_id_node) > 0):
+        if(session_id_node):
             self.session_id = session_id_node[0].firstChild.nodeValue
-            logging.debug("Successfully connected to the hamqth.com server.")
+            logging.debug("Successfully connected to the hamqth.com server. Session ID is: %s." % self.session_id)
             connected = True
         else:
             connected = False
 
         # If there are any errors or warnings, print them out.
         session_error_node = session_node.getElementsByTagName("error")
-        if(len(session_error_node) > 0):
+        if(session_error_node):
             session_error = session_error_node[0].firstChild.nodeValue
-            error(parent=self.parent, message="hamqth.com session error: "+session_error)
+            error(parent=self.parent, message="hamqth.com session error: %s" % session_error)
 
         return connected
 
@@ -255,48 +241,49 @@ class CallsignLookupHamQTH:
 
             xml_data = minidom.parseString(response.read())
             search_node = xml_data.getElementsByTagName("search")
-            if(len(search_node) > 0):
+            if(search_node):
                 search_node = search_node[0]  # There should only be a maximum of one Callsign element.
 
                 search_name_node = search_node.getElementsByTagName("nick")
-                if(len(search_name_node) > 0):
+                if(search_name_node):
                     fields_and_data["NAME"] = search_name_node[0].firstChild.nodeValue
 
                 search_addr1_node = search_node.getElementsByTagName("adr_street1")
                 search_addr2_node = search_node.getElementsByTagName("adr_street2")
-                if(len(search_addr1_node) > 0):
+                if(search_addr1_node):
                     fields_and_data["ADDRESS"] = search_addr1_node[0].firstChild.nodeValue
-                if(len(search_addr2_node) > 0):  # Add the second line of the address, if present.
-                    fields_and_data["ADDRESS"] = (fields_and_data["ADDRESS"] + ", " if len(search_addr1_node) > 0 else "") + search_addr2_node[0].firstChild.nodeValue
+                if(search_addr2_node):  # Add the second line of the address, if present.
+                    fields_and_data["ADDRESS"] = (fields_and_data["ADDRESS"] + ", " if search_addr1_node else "") + search_addr2_node[0].firstChild.nodeValue
 
                 search_state_node = search_node.getElementsByTagName("us_state")
-                if(len(search_state_node) > 0):
+                if(search_state_node):
                     fields_and_data["STATE"] = search_state_node[0].firstChild.nodeValue
 
                 search_country_node = search_node.getElementsByTagName("country")
-                if(len(search_country_node) > 0):
+                if(search_country_node):
                     fields_and_data["COUNTRY"] = search_country_node[0].firstChild.nodeValue
 
                 search_cqzone_node = search_node.getElementsByTagName("cq")
-                if(len(search_cqzone_node) > 0):
+                if(search_cqzone_node):
                     fields_and_data["CQZ"] = search_cqzone_node[0].firstChild.nodeValue
 
                 search_ituzone_node = search_node.getElementsByTagName("itu")
-                if(len(search_ituzone_node) > 0):
+                if(search_ituzone_node):
                     fields_and_data["ITUZ"] = search_ituzone_node[0].firstChild.nodeValue
 
                 search_iota_node = search_node.getElementsByTagName("iota")
-                if(len(search_iota_node) > 0):
+                if(search_iota_node):
                     fields_and_data["IOTA"] = search_iota_node[0].firstChild.nodeValue
             else:
                 # If there is no Callsign element, then print out the error message in the Session element.
                 session_node = xml_data.getElementsByTagName("session")
-                if(len(session_node) > 0):
+                if(session_node):
                     session_error_node = session_node[0].getElementsByTagName("error")
-                    if(len(session_error_node) > 0):
+                    if(session_error_node):
                         session_error = session_error_node[0].firstChild.nodeValue
                         error(parent=self.parent, message=session_error)
                 # Return empty strings for the field data.
+
             logging.debug("Callsign lookup complete. Returning data...")
         return fields_and_data
 
