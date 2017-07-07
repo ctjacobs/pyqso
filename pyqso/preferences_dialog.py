@@ -38,7 +38,7 @@ except ImportError:
     logging.warning("Could not import the geocoder module!")
     have_geocoder = False
 
-from pyqso.adif import *
+from pyqso.adif import AVAILABLE_FIELD_NAMES_ORDERED, MODES
 from pyqso.auxiliary_dialogs import error
 
 PREFERENCES_FILE = os.path.expanduser("~/.config/pyqso/preferences.ini")
@@ -65,7 +65,7 @@ class PreferencesDialog:
         self.general = GeneralPage(self.dialog, self.builder)
         self.view = ViewPage(self.dialog, self.builder)
         self.records = RecordsPage(self.dialog, self.builder)
-        self.adif = ADIFPage(self.dialog, self.builder)
+        self.import_export = ImportExportPage(self.dialog, self.builder)
         self.hamlib = HamlibPage(self.dialog, self.builder)
 
         self.dialog.show_all()
@@ -96,10 +96,10 @@ class PreferencesDialog:
         for key in list(self.records.data.keys()):
             config.set("records", key.lower(), str(self.records.data[key]))
 
-        # ADIF
-        config.add_section("adif")
-        for key in list(self.adif.data.keys()):
-            config.set("adif", key.lower(), str(self.adif.data[key]))
+        # Import/Export
+        config.add_section("import_export")
+        for key in list(self.import_export.data.keys()):
+            config.set("import_export", key.lower(), str(self.import_export.data[key]))
 
         # Hamlib
         config.add_section("hamlib")
@@ -118,7 +118,7 @@ class GeneralPage:
     """ The section of the preferences dialog containing general preferences. """
 
     def __init__(self, parent, builder):
-        logging.debug("Setting up the General page of the preferences dialog...")
+        """ Set up the General page of the Preferences dialog. """
 
         self.parent = parent
         self.builder = builder
@@ -215,13 +215,11 @@ class GeneralPage:
             self.sources["QTH_LONGITUDE"].set_text(config.get(section, option))
         self.sources["SHOW_QTH"].connect("toggled", self.on_show_qth_toggled)
 
-        logging.debug("General page of the preferences dialog ready!")
         return
 
     @property
     def data(self):
         """ User preferences regarding General settings. """
-        logging.debug("Retrieving data from the General page of the preferences dialog...")
         data = {}
         data["SHOW_TOOLBOX"] = self.sources["SHOW_TOOLBOX"].get_active()
         data["SHOW_YEARLY_STATISTICS"] = self.sources["SHOW_YEARLY_STATISTICS"].get_active()
@@ -273,7 +271,7 @@ class GeneralPage:
         return
 
     def lookup_callback(self, widget=None):
-        """ Performs geocoding of the QTH location to obtain latitude-longitude coordinates. """
+        """ Perform geocoding of the QTH location to obtain latitude-longitude coordinates. """
         if(not have_geocoder):
             error(parent=self.parent, message="Geocoder module could not be imported. Geocoding aborted.")
             return
@@ -299,7 +297,7 @@ class ViewPage:
     """ The section of the preferences dialog containing view-related preferences. """
 
     def __init__(self, parent, builder):
-        logging.debug("Setting up the View page of the preferences dialog...")
+        """ Set up the View page of the Preferences dialog. """
 
         self.parent = parent
         self.builder = builder
@@ -316,13 +314,11 @@ class ViewPage:
             else:
                 self.sources[field_name].set_active(True)
 
-        logging.debug("View page of the preferences dialog ready!")
         return
 
     @property
     def data(self):
         """ User preferences regarding View settings. """
-        logging.debug("Retrieving data from the View page of the preferences dialog...")
         data = {}
         for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
             data[field_name] = self.sources[field_name].get_active()
@@ -334,7 +330,7 @@ class RecordsPage:
     """ The section of the preferences dialog containing record-related preferences. """
 
     def __init__(self, parent, builder):
-        logging.debug("Setting up the Records page of the preferences dialog...")
+        """ Set up the Record page of the Preferences dialog. """
 
         self.parent = parent
         self.builder = builder
@@ -434,13 +430,11 @@ class RecordsPage:
         else:
             self.sources["IGNORE_PREFIX_SUFFIX"].set_active(True)
 
-        logging.debug("Records page of the preferences dialog ready!")
         return
 
     @property
     def data(self):
         """ User preferences regarding Records settings. """
-        logging.debug("Retrieving data from the Records page of the preferences dialog...")
         data = {}
         data["AUTOCOMPLETE_BAND"] = self.sources["AUTOCOMPLETE_BAND"].get_active()
         data["USE_UTC"] = self.sources["USE_UTC"].get_active()
@@ -465,12 +459,12 @@ class RecordsPage:
         return
 
 
-class ADIFPage:
+class ImportExportPage:
 
-    """ The section of the preferences dialog containing ADIF-related preferences. """
+    """ The section of the preferences dialog containing import/export-related preferences. """
 
     def __init__(self, parent, builder):
-        logging.debug("Setting up the ADIF page of the preferences dialog...")
+        """ Set up the Import/Export page of the Preferences dialog. """
 
         self.parent = parent
         self.builder = builder
@@ -483,19 +477,17 @@ class ADIFPage:
 
         # Import
         self.sources["MERGE_COMMENT"] = self.builder.get_object("adif_import_merge_comment_checkbutton")
-        (section, option) = ("adif", "merge_comment")
+        (section, option) = ("import_export", "merge_comment")
         if(have_config and config.has_option(section, option)):
             self.sources["MERGE_COMMENT"].set_active(config.get(section, option) == "True")
         else:
             self.sources["MERGE_COMMENT"].set_active(False)
 
-        logging.debug("ADIF page of the preferences dialog ready!")
         return
 
     @property
     def data(self):
-        """ User preferences regarding ADIF settings. """
-        logging.debug("Retrieving data from the ADIF page of the preferences dialog...")
+        """ User preferences regarding Import/Export settings. """
         data = {}
         data["MERGE_COMMENT"] = self.sources["MERGE_COMMENT"].get_active()
         return data
@@ -506,7 +498,7 @@ class HamlibPage:
     """ The section of the preferences dialog containing Hamlib-related preferences. """
 
     def __init__(self, parent, builder):
-        logging.debug("Setting up the Hamlib page of the preferences dialog...")
+        """ Set up the Hamlib page of the Preferences dialog. """
 
         self.parent = parent
         self.builder = builder
@@ -549,13 +541,11 @@ class HamlibPage:
         if(have_config and config.has_option(section, option)):
             self.sources["RIG_PATHNAME"].set_text(config.get(section, option))
 
-        logging.debug("Hamlib page of the preferences dialog ready!")
         return
 
     @property
     def data(self):
         """ User preferences regarding Hamlib settings. """
-        logging.debug("Retrieving data from the Hamlib page of the preferences dialog...")
         data = {}
         data["AUTOFILL"] = self.sources["AUTOFILL"].get_active()
         data["RIG_PATHNAME"] = self.sources["RIG_PATHNAME"].get_text()
