@@ -63,6 +63,11 @@ class TestCallsignLookup(unittest.TestCase):
         callsign = "MYCALL"
         assert strip(callsign) == "MYCALL"
 
+    def test_strip_too_many_components(self):
+        """ Check that a callsign with too many prefix/suffix components remains unmodified. """
+        callsign = "F/HB9/MYCALL/MM"
+        assert strip(callsign) == "F/HB9/MYCALL/MM"
+
     def test_qrz_connect(self):
         """ Check the example response from the qrz.com server, and make sure the session key has been correctly extracted. """
 
