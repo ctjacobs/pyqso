@@ -60,7 +60,7 @@ class GreyLine:
         (section, option) = ("general", "show_qth")
         self.show_qth = False
         if(have_config and config.has_option(section, option)):
-            if(config.get("general", "show_qth") == "True"):
+            if(config.getboolean(section, option)):
                 self.show_qth = True
                 try:
                     self.qth_name = config.get("general", "qth_name")

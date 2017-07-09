@@ -236,7 +236,7 @@ class ADIF:
         config = configparser.ConfigParser()
         have_config = (config.read(expanduser("~/.config/pyqso/preferences.ini")) != [])
         (section, option) = ("import_export", "merge_comment")
-        if(have_config and config.has_option(section, option) and config.get(section, option) == "True"):
+        if(have_config and config.has_option(section, option) and config.getboolean(section, option)):
             merge_comment = True
         else:
             merge_comment = False
@@ -373,9 +373,9 @@ class ADIF:
 
         logging.debug("Validating the following data in field '%s': %s" % (field_name, data))
 
-        # Allow an empty string, in case the user doesn't want
+        # Allow an empty string or None, in case the user doesn't want
         # to fill in this field.
-        if(data == ""):
+        if(not data):
             return True
 
         if(data_type == "N"):

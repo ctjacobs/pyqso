@@ -435,7 +435,7 @@ class Logbook:
             have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
             (section, option) = ("view", AVAILABLE_FIELD_NAMES_ORDERED[i].lower())
             if(have_config and config.has_option(section, option)):
-                column.set_visible(config.get(section, option) == "True")
+                column.set_visible(config.getboolean(section, option))
             self.treeview[index].append_column(column)
 
         self.notebook.show_all()
@@ -807,7 +807,7 @@ class Logbook:
         have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
         (section, option) = ("general", "keep_open")
         if(have_config and config.has_option(section, option)):
-            keep_open = config.get("general", "keep_open") == "True"
+            keep_open = config.getboolean("general", "keep_open")
         else:
             keep_open = False
 

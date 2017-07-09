@@ -115,7 +115,7 @@ class Menu:
         have_config = (config.read(os.path.expanduser('~/.config/pyqso/preferences.ini')) != [])
         (section, option) = ("general", "show_toolbox")
         if(have_config and config.has_option(section, option)):
-            self.items["TOOLBOX"].set_active(config.get(section, option) == "True")
+            self.items["TOOLBOX"].set_active(config.getboolean(section, option))
         else:
             self.items["TOOLBOX"].set_active(False)  # Don't show the toolbox by default
         self.items["TOOLBOX"].connect("activate", self.application.toolbox.toggle_visible_callback)

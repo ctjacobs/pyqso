@@ -100,7 +100,7 @@ class PyQSO:
         self.window.show_all()
 
         if(have_config):
-            if(config.get("general", "show_toolbox") == "False"):
+            if(not config.getboolean("general", "show_toolbox")):
                 self.toolbox.toggle_visible_callback()
         else:
             # Hide the Toolbox by default.
@@ -114,7 +114,7 @@ class PyQSO:
             # then check if the user wants to open a default logbook.
             (section, option) = ("general", "default_logbook")
             if(have_config and config.has_option(section, option)):
-                open_default_logbook = (config.get(section, option) == "True")
+                open_default_logbook = config.getboolean(section, option)
                 (section, option) = ("general", "default_logbook_path")
                 if(open_default_logbook and config.has_option(section, option)):
                     logbook_path = config.get(section, option)

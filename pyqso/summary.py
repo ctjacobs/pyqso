@@ -67,7 +67,7 @@ class Summary(object):
         have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
         (section, option) = ("general", "show_yearly_statistics")
         if(have_config and config.has_option(section, option)):
-            if(config.get("general", "show_yearly_statistics") == "True" and have_matplotlib):
+            if(config.getboolean("general", "show_yearly_statistics") and have_matplotlib):
                 hbox = Gtk.HBox()
                 label = Gtk.Label(label="Display statistics for year: ", halign=Gtk.Align.START)
                 hbox.pack_start(label, False, False, 6)

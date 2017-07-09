@@ -133,7 +133,7 @@ class GeneralPage:
         self.sources["SHOW_TOOLBOX"] = self.builder.get_object("general_show_toolbox_checkbutton")
         (section, option) = ("general", "show_toolbox")
         if(have_config and config.has_option(section, option)):
-            self.sources["SHOW_TOOLBOX"].set_active(config.get(section, option) == "True")
+            self.sources["SHOW_TOOLBOX"].set_active(config.getboolean(section, option))
         else:
             self.sources["SHOW_TOOLBOX"].set_active(False)
 
@@ -141,7 +141,7 @@ class GeneralPage:
         self.sources["SHOW_YEARLY_STATISTICS"] = self.builder.get_object("general_show_yearly_statistics_checkbutton")
         (section, option) = ("general", "show_yearly_statistics")
         if(have_config and config.has_option(section, option)):
-            self.sources["SHOW_YEARLY_STATISTICS"].set_active(config.get(section, option) == "True")
+            self.sources["SHOW_YEARLY_STATISTICS"].set_active(config.getboolean(section, option))
         else:
             self.sources["SHOW_YEARLY_STATISTICS"].set_active(False)
 
@@ -149,7 +149,7 @@ class GeneralPage:
         self.sources["DEFAULT_LOGBOOK"] = self.builder.get_object("general_default_logbook_checkbutton")
         (section, option) = ("general", "default_logbook")
         if(have_config and config.has_option(section, option)):
-            self.sources["DEFAULT_LOGBOOK"].set_active(config.get(section, option) == "True")
+            self.sources["DEFAULT_LOGBOOK"].set_active(config.getboolean(section, option))
         else:
             self.sources["DEFAULT_LOGBOOK"].set_active(False)
         self.sources["DEFAULT_LOGBOOK"].connect("toggled", self.on_default_logbook_toggled)
@@ -173,7 +173,7 @@ class GeneralPage:
         self.sources["KEEP_OPEN"] = self.builder.get_object("general_keep_open_checkbutton")
         (section, option) = ("general", "keep_open")
         if(have_config and config.has_option(section, option)):
-            self.sources["KEEP_OPEN"].set_active(config.get(section, option) == "True")
+            self.sources["KEEP_OPEN"].set_active(config.getboolean(section, option))
         else:
             self.sources["KEEP_OPEN"].set_active(False)
 
@@ -181,7 +181,7 @@ class GeneralPage:
         self.sources["SHOW_QTH"] = self.builder.get_object("general_show_qth_checkbutton")
         (section, option) = ("general", "show_qth")
         if(have_config and config.has_option(section, option)):
-            self.sources["SHOW_QTH"].set_active(config.get(section, option) == "True")
+            self.sources["SHOW_QTH"].set_active(config.getboolean(section, option))
         else:
             self.sources["SHOW_QTH"].set_active(False)
 
@@ -310,7 +310,7 @@ class ViewPage:
         for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
             self.sources[field_name] = self.builder.get_object("visible_fields_%s" % (field_name.lower()))
             if(have_config and config.has_option("view", field_name.lower())):
-                self.sources[field_name].set_active(config.get("view", field_name.lower()) == "True")
+                self.sources[field_name].set_active(config.getboolean("view", field_name.lower()))
             else:
                 self.sources[field_name].set_active(True)
 
@@ -345,14 +345,14 @@ class RecordsPage:
         self.sources["AUTOCOMPLETE_BAND"] = self.builder.get_object("records_autocomplete_band_checkbutton")
         (section, option) = ("records", "autocomplete_band")
         if(have_config and config.has_option(section, option)):
-            self.sources["AUTOCOMPLETE_BAND"].set_active(config.get(section, option) == "True")
+            self.sources["AUTOCOMPLETE_BAND"].set_active(config.getboolean(section, option))
         else:
             self.sources["AUTOCOMPLETE_BAND"].set_active(True)
 
         self.sources["USE_UTC"] = self.builder.get_object("records_autocomplete_utc_checkbutton")
         (section, option) = ("records", "use_utc")
         if(have_config and config.has_option(section, option)):
-            self.sources["USE_UTC"].set_active(config.get(section, option) == "True")
+            self.sources["USE_UTC"].set_active(config.getboolean(section, option))
         else:
             self.sources["USE_UTC"].set_active(True)
 
@@ -426,7 +426,7 @@ class RecordsPage:
         self.sources["IGNORE_PREFIX_SUFFIX"] = self.builder.get_object("callsign_lookup_ignore_prefix_suffix_checkbutton")
         (section, option) = ("records", "ignore_prefix_suffix")
         if(have_config and config.has_option(section, option)):
-            self.sources["IGNORE_PREFIX_SUFFIX"].set_active(config.get(section, option) == "True")
+            self.sources["IGNORE_PREFIX_SUFFIX"].set_active(config.getboolean(section, option))
         else:
             self.sources["IGNORE_PREFIX_SUFFIX"].set_active(True)
 
@@ -479,7 +479,7 @@ class ImportExportPage:
         self.sources["MERGE_COMMENT"] = self.builder.get_object("adif_import_merge_comment_checkbutton")
         (section, option) = ("import_export", "merge_comment")
         if(have_config and config.has_option(section, option)):
-            self.sources["MERGE_COMMENT"].set_active(config.get(section, option) == "True")
+            self.sources["MERGE_COMMENT"].set_active(config.getboolean(section, option))
         else:
             self.sources["MERGE_COMMENT"].set_active(False)
 
@@ -510,7 +510,7 @@ class HamlibPage:
         self.sources["AUTOFILL"] = self.builder.get_object("hamlib_support_checkbutton")
         (section, option) = ("hamlib", "autofill")
         if(have_config and config.has_option(section, option)):
-            self.sources["AUTOFILL"].set_active(config.get(section, option) == "True")
+            self.sources["AUTOFILL"].set_active(config.getboolean(section, option))
         else:
             self.sources["AUTOFILL"].set_active(False)
 

@@ -231,7 +231,7 @@ class RecordDialog:
             # If the Hamlib module is present, then use it to fill in various fields if desired.
             if(have_hamlib):
                 if(have_config and config.has_option("hamlib", "autofill") and config.has_option("hamlib", "rig_model") and config.has_option("hamlib", "rig_pathname")):
-                    autofill = (config.get("hamlib", "autofill") == "True")
+                    autofill = (config.getboolean("hamlib", "autofill"))
                     rig_model = config.get("hamlib", "rig_model")
                     rig_pathname = config.get("hamlib", "rig_pathname")
                     if(autofill):
@@ -240,7 +240,7 @@ class RecordDialog:
         # Do we want PyQSO to autocomplete the Band field based on the Frequency field?
         (section, option) = ("records", "autocomplete_band")
         if(have_config and config.has_option(section, option)):
-            autocomplete_band = (config.get(section, option) == "True")
+            autocomplete_band = (config.getboolean(section, option))
             if(autocomplete_band):
                 self.sources["FREQ"].connect("changed", self.autocomplete_band)
         else:
@@ -432,7 +432,7 @@ class RecordDialog:
             # Check whether we want to ignore any prefixes (e.g. "IA/") or suffixes "(e.g. "/M") in the callsign
             # before performing the lookup.
             if(have_config and config.has_option("records", "ignore_prefix_suffix")):
-                ignore_prefix_suffix = (config.get("records", "ignore_prefix_suffix") == "True")
+                ignore_prefix_suffix = (config.getboolean("records", "ignore_prefix_suffix"))
             else:
                 ignore_prefix_suffix = True
 
@@ -461,7 +461,7 @@ class RecordDialog:
         # Do we want to use UTC or the computer's local time?
         (section, option) = ("records", "use_utc")
         if(have_config and config.has_option(section, option)):
-            use_utc = (config.get(section, option) == "True")
+            use_utc = (config.getboolean(section, option))
             if(use_utc):
                 dt = datetime.utcnow()
             else:
