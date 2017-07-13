@@ -17,9 +17,9 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-from pyqso.dx_cluster import *
-from pyqso.grey_line import *
-from pyqso.awards import *
+from pyqso.dx_cluster import DXCluster
+from pyqso.grey_line import GreyLine
+from pyqso.awards import Awards
 
 
 class Toolbox:
