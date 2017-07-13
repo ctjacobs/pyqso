@@ -258,7 +258,7 @@ class ADIF:
         n_eor = 0
         n_record = 0
         records = []
-        pattern = re.compile("<(.*?):(\d*).*?>([^<\t\n\r\f\v]+)")
+        pattern = re.compile("<(.*?):(\d*).*?>([^<]+)")
 
         for t in tokens:
             if(re.match("<eor>", t, flags=re.IGNORECASE) is not None):
