@@ -87,11 +87,8 @@ class TestADIF(unittest.TestCase):
 
     def test_read_no_header(self):
         """ Check that an ADIF file can be parsed with no header information. """
-        f = open("ADIF.test_read_no_header.adi", 'w')
-        f.write("""<call:4>TEST<band:3>40m<mode:2>CW<qso_date:8:d>20130322<time_on:4>1955<eor>""")
-        f.close()
-
-        records = self.adif.read("ADIF.test_read_no_header.adi")
+        path = os.path.join(os.path.realpath(os.path.dirname(__file__)), "res", "ADIF.test_read_no_header.adi")
+        records = self.adif.read(path)
         expected_records = [{'TIME_ON': '1955', 'BAND': '40m', 'CALL': 'TEST', 'MODE': 'CW', 'QSO_DATE': '20130322'}]
         print("Imported records: ", records)
         print("Expected records: ", expected_records)
