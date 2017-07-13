@@ -193,10 +193,6 @@ class RecordDialog:
                     continue
                 elif(field_names[i] == "QSL_SENT" or field_names[i] == "QSL_RCVD"):
                     self.sources[field_names[i]].set_active(qsl_options.index(data))
-                elif(field_names[i] == "NOTES"):
-                    # Remember to put the new line escape characters back in when displaying the data in a Gtk.TextView
-                    text = data.replace("\\n", "\n")
-                    self.sources[field_names[i]].set_text(text)
                 else:
                     self.sources[field_names[i]].set_text(data)
         else:
@@ -276,9 +272,6 @@ class RecordDialog:
         elif(field_name == "NOTES"):
             (start, end) = self.sources[field_name].get_bounds()
             text = self.sources[field_name].get_text(start, end, True)
-            # Replace the escape characters with a slightly different new line marker.
-            # If we don't do this, the rows in the Gtk.TreeView expand based on the number of new lines.
-            text = text.replace("\n", "\\n")
             return text
         else:
             return self.sources[field_name].get_text()

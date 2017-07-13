@@ -3513,7 +3513,7 @@ Base64-encoded plain text in the configuration file.</property>
                                   <object class="GtkTextView" id="qso_notes_textview">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
-                                    <property name="wrap_mode">word</property>
+                                    <property name="wrap_mode">word-char</property>
                                   </object>
                                 </child>
                               </object>

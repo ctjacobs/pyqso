@@ -417,6 +417,10 @@ class Logbook:
         field_names = AVAILABLE_FIELD_NAMES_ORDERED
         for i in range(0, len(field_names)):
             renderer = Gtk.CellRendererText()
+
+            # Keep each row to a single line.
+            renderer.set_property("single-paragraph-mode", True)
+
             column = Gtk.TreeViewColumn(AVAILABLE_FIELD_NAMES_FRIENDLY[field_names[i]], renderer, text=i+1)
             column.set_resizable(True)
             column.set_min_width(50)
@@ -424,9 +428,11 @@ class Logbook:
 
             # Special cases
             if(field_names[i] == "NOTES"):
-                # Give the 'Notes' column some extra space, since this is likely to contain some long sentences...
+                # Give the 'Notes' column some extra space, since this is likely to contain some long sentences ...
                 column.set_min_width(300)
-                # ... but don't let it automatically re-size itself.
+                # ... but not too much extra space ...
+                column.set_max_width(600)
+                # ... and don't let the column automatically re-size itself.
                 column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
 
             column.connect("clicked", self.sort_log, i+1)

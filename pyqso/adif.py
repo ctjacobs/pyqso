@@ -249,10 +249,7 @@ class ADIF:
         # this and simply ignore it instead (if it exists).
         if(re.search("<eoh>", text, flags=re.IGNORECASE) is not None):
             # There is a header present, so let's ignore everything
-            # up to and including the <eoh> marker. Note that
-            # re.search has been used here to handle any case sensitivity.
-            # Previously we were checking for <eoh>. <EOH> is also valid
-            # but wasn't being detected before.
+            # up to and including the <eoh> marker.
             while len(tokens) > 0:
                 t = tokens.pop(0)
                 if(re.match("<eoh>", t, flags=re.IGNORECASE) is not None):
@@ -281,6 +278,7 @@ class ADIF:
                     # This will help us later when comparing the field names
                     # against the available field names in the ADIF specification.
                     field_name = fd[0].upper()
+                    # Only read in the number of characters specified by the data length.
                     field_data = fd[2][:int(fd[1])]
 
                     # Combo boxes are used later on and these are case sensitive,
@@ -303,7 +301,7 @@ class ADIF:
                 if(merge_comment):
                     if("NOTES" in list(fields_and_data_dictionary.keys()) and comment):
                         logging.debug("Merging COMMENT field with NOTES field...")
-                        fields_and_data_dictionary["NOTES"] += "\\n" + comment
+                        fields_and_data_dictionary["NOTES"] += "\n" + comment
                         logging.debug("Merged fields.")
                     elif(comment):
                         # Create the NOTES entry, but only store the contents of the COMMENT field.
