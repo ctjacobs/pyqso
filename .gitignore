@@ -2,7 +2,3 @@
 pyqso.debug
 build/
 docs/build
-ADIF.test_*.adi
-Cabrillo.test_*.log
-Logbook.test_*.db
-Printer.test_*.pdf

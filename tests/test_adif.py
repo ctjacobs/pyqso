@@ -18,6 +18,7 @@
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+import os
 from pyqso.adif import *
 
 
@@ -31,14 +32,8 @@ class TestADIF(unittest.TestCase):
 
     def test_read(self):
         """ Check that a single ADIF record can be read and parsed correctly. """
-        f = open("ADIF.test_read.adi", 'w')
-        f.write("""Some test ADI data.<eoh>
-
-<call:4>TEST<band:3>40m<mode:2>CW
-<qso_date:8:d>20130322<time_on:4>1955<eor>""")
-        f.close()
-
-        records = self.adif.read("ADIF.test_read.adi")
+        path = os.path.join(os.path.realpath(os.path.dirname(__file__)), "res", "ADIF.test_read.adi")
+        records = self.adif.read(path)
         expected_records = [{'TIME_ON': '1955', 'BAND': '40m', 'CALL': 'TEST', 'MODE': 'CW', 'QSO_DATE': '20130322'}]
         print("Imported records: ", records)
         print("Expected records: ", expected_records)
@@ -48,19 +43,8 @@ class TestADIF(unittest.TestCase):
 
     def test_read_multiple(self):
         """ Check that multiple ADIF records can be read and parsed correctly. """
-        f = open("ADIF.test_read_multiple.adi", 'w')
-        f.write("""Some test ADI data.<eoh>
-
-<call:4>TEST<band:3>40m<mode:2>CW
-<qso_date:8:d>20130322<time_on:4>1955<eor>
-
-<call:8>TEST2ABC<band:3>20m<mode:3>SSB
-<qso_date:8>20150227<time_on:4>0820<eor>
-
-<call:5>HELLO<band:2>2m<mode:2>FM<qso_date:8:d>20150227<time_on:4>0832<eor>""")
-        f.close()
-
-        records = self.adif.read("ADIF.test_read_multiple.adi")
+        path = os.path.join(os.path.realpath(os.path.dirname(__file__)), "res", "ADIF.test_read_multiple.adi")
+        records = self.adif.read(path)
         expected_records = [{'TIME_ON': '1955', 'BAND': '40m', 'CALL': 'TEST', 'MODE': 'CW', 'QSO_DATE': '20130322'}, {'TIME_ON': '0820', 'BAND': '20m', 'CALL': 'TEST2ABC', 'MODE': 'SSB', 'QSO_DATE': '20150227'}, {'TIME_ON': '0832', 'BAND': '2m', 'CALL': 'HELLO', 'MODE': 'FM', 'QSO_DATE': '20150227'}]
         print("Imported records: ", records)
         print("Expected records: ", expected_records)
@@ -71,12 +55,8 @@ class TestADIF(unittest.TestCase):
 
     def test_read_alphabet(self):
         """ Check that none of the letters of the alphabet are ignored during parsing. """
-        f = open("ADIF.test_read_alphabet.adi", 'w')
-        f.write("""Some test ADI data.<eoh>
-<call:64>ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ<eor>""")
-        f.close()
-
-        records = self.adif.read("ADIF.test_read_alphabet.adi")
+        path = os.path.join(os.path.realpath(os.path.dirname(__file__)), "res", "ADIF.test_read_alphabet.adi")
+        records = self.adif.read(path)
         expected_records = [{'CALL': 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'}]
         print("Imported records: ", records)
         print("Expected records: ", expected_records)
@@ -86,12 +66,8 @@ class TestADIF(unittest.TestCase):
 
     def test_read_capitalisation(self):
         """ Check that the CALL field is capitalised correctly. """
-        f = open("ADIF.test_read_capitalisation.adi", 'w')
-        f.write("""Some test ADI data.<eoh>
-<call:4>test<eor>""")
-        f.close()
-
-        records = self.adif.read("ADIF.test_read_capitalisation.adi")
+        path = os.path.join(os.path.realpath(os.path.dirname(__file__)), "res", "ADIF.test_read_capitalisation.adi")
+        records = self.adif.read(path)
         expected_records = [{'CALL': 'TEST'}]
         print("Imported records: ", records)
         print("Expected records: ", expected_records)
@@ -101,11 +77,8 @@ class TestADIF(unittest.TestCase):
 
     def test_read_header_only(self):
         """ Check that no records are read in if the ADIF file only contains header information. """
-        f = open("ADIF.test_read_header_only.adi", 'w')
-        f.write("""Some test ADI data.<eoh>""")
-        f.close()
-
-        records = self.adif.read("ADIF.test_read_header_only.adi")
+        path = os.path.join(os.path.realpath(os.path.dirname(__file__)), "res", "ADIF.test_read_header_only.adi")
+        records = self.adif.read(path)
         expected_records = []
         print("Imported records: ", records)
         print("Expected records: ", expected_records)

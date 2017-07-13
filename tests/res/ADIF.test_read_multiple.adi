@@ -1,0 +1,9 @@
+Some test ADI data.<eoh>
+
+<call:4>TEST<band:3>40m<mode:2>CW
+<qso_date:8:d>20130322<time_on:4>1955<eor>
+
+<call:8>TEST2ABC<band:3>20m<mode:3>SSB
+<qso_date:8>20150227<time_on:4>0820<eor>
+
+<call:5>HELLO<band:2>2m<mode:2>FM<qso_date:8:d>20150227<time_on:4>0832<eor>
