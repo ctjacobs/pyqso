@@ -126,15 +126,15 @@ class RecordDialog:
 
         # QSL_SENT
         self.sources["QSL_SENT"] = self.builder.get_object("qso_qsl_sent_combo")
-        qsl_options = ["", "Y", "N", "R", "I"]
-        for option in qsl_options:
+        qsl_sent_options = ["", "Y", "N", "R", "Q", "I"]
+        for option in qsl_sent_options:
             self.sources["QSL_SENT"].append_text(option)
         self.sources["QSL_SENT"].set_active(0)  # Set an empty string as the default option.
 
         # QSL_RCVD
         self.sources["QSL_RCVD"] = self.builder.get_object("qso_qsl_received_combo")
-        qsl_options = ["", "Y", "N", "R", "I"]
-        for option in qsl_options:
+        qsl_rcvd_options = ["", "Y", "N", "R", "I", "V"]
+        for option in qsl_rcvd_options:
             self.sources["QSL_RCVD"].append_text(option)
         self.sources["QSL_RCVD"].set_active(0)  # Set an empty string as the default option.
 
@@ -191,8 +191,10 @@ class RecordDialog:
                 elif(field_names[i] == "SUBMODE"):
                     # Skip, because this has been (or will be) handled when populating the MODE field.
                     continue
-                elif(field_names[i] == "QSL_SENT" or field_names[i] == "QSL_RCVD"):
-                    self.sources[field_names[i]].set_active(qsl_options.index(data))
+                elif(field_names[i] == "QSL_SENT"):
+                    self.sources[field_names[i]].set_active(qsl_sent_options.index(data))
+                elif(field_names[i] == "QSL_RCVD"):
+                    self.sources[field_names[i]].set_active(qsl_rcvd_options.index(data))
                 else:
                     self.sources[field_names[i]].set_text(data)
         else:
