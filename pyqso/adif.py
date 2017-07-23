@@ -511,6 +511,9 @@ class ADIF:
             # Enumeration, AwardList.
             if(field_name == "MODE"):
                 return (data in list(MODES.keys()))
+            elif(field_name == "SUBMODE"):
+                submodes = [submode for mode in list(MODES.keys()) for submode in MODES[mode]]
+                return (data in submodes)
             elif(field_name == "BAND"):
                 return (data in BANDS)
             else:
