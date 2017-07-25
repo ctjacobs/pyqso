@@ -456,6 +456,7 @@ class RecordsPage:
         mode = combo.get_active_text()
         for submode in MODES[mode]:
             self.sources["DEFAULT_SUBMODE"].append_text(submode)
+        self.sources["DEFAULT_SUBMODE"].set_active(MODES[mode].index(""))
         return
 
 
