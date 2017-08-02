@@ -1,6 +1,6 @@
 # Change Log
 
-## [Unreleased]
+## [1.0.0] - 2017-08-02
 ### Added
 - Pin-pointing of QTH on grey line map.
 - Default logbook.
@@ -95,7 +95,7 @@
 - QSO filtering and sorting.
 - Duplicate record removal.
 
-[Unreleased]: https://github.com/ctjacobs/pyqso/compare/v0.3...master
+[1.0.0]: https://github.com/ctjacobs/pyqso/compare/v0.3...v1.0.0
 [0.3]: https://github.com/ctjacobs/pyqso/compare/v0.2...v0.3
 [0.2]: https://github.com/ctjacobs/pyqso/compare/v0.1...v0.2
 [0.1]: https://github.com/ctjacobs/pyqso/compare/v0.1b...v0.1
