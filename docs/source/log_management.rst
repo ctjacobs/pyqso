@@ -22,8 +22,8 @@ name must not be a number.
 **Note:** When logs are stored in the database file, field/column names from
 the ADIF standard are used. However, please note that only the following
 subset of all the ADIF fields is considered: CALL, QSO\_DATE, TIME\_ON,
-FREQ, BAND, MODE, SUBMODE, TX\_PWR, RST\_SENT, RST\_RCVD, QSL\_SENT, QSL\_RCVD,
-NOTES, NAME, ADDRESS, STATE, COUNTRY, DXCC, CQZ, ITUZ, IOTA. Visit the `ADIF website <http://adif.org/>`_ for more information about these fields.
+FREQ, BAND, MODE, SUBMODE, PROP\_MODE, TX\_PWR, RST\_SENT, RST\_RCVD, QSL\_SENT, QSL\_RCVD,
+NOTES, NAME, ADDRESS, STATE, COUNTRY, DXCC, CQZ, ITUZ, IOTA, GRIDSQUARE, SAT\_NAME, SAT\_MODE. Visit the `ADIF website <http://adif.org/>`_ for more information about these fields.
 
 Renaming a log
 --------------
