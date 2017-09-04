@@ -115,6 +115,12 @@ class RecordDialog:
         self.sources["SUBMODE"].append_text("")
         self.sources["SUBMODE"].set_active(0)  # Set an empty string initially. As soon as the user selects a particular MODE, the available SUBMODES will appear.
 
+        # PROP_MODE
+        self.sources["PROP_MODE"] = self.builder.get_object("qso_propagation_mode_combo")
+        for propagation_mode in PROPAGATION_MODES:
+            self.sources["PROP_MODE"].append_text(propagation_mode)
+        self.sources["PROP_MODE"].set_active(0)  # Set an empty string as the default option.
+
         # POWER
         self.sources["TX_PWR"] = self.builder.get_object("qso_power_entry")
 
@@ -167,6 +173,17 @@ class RecordDialog:
         # IOTA
         self.sources["IOTA"] = self.builder.get_object("station_iota_entry")
 
+        # GRIDSQUARE
+        self.sources["GRIDSQUARE"] = self.builder.get_object("station_gridsquare_entry")
+
+        # SATELLITE INFORMATION
+
+        # SAT_NAME
+        self.sources["SAT_NAME"] = self.builder.get_object("satellite_name_entry")
+
+        # SAT_MODE
+        self.sources["SAT_MODE"] = self.builder.get_object("satellite_mode_entry")
+
         # Populate various fields, if possible.
         if(index is not None):
             # The record already exists, so display its current data in the input boxes.
@@ -191,6 +208,8 @@ class RecordDialog:
                 elif(field_names[i] == "SUBMODE"):
                     # Skip, because this has been (or will be) handled when populating the MODE field.
                     continue
+                elif(field_names[i] == "PROP_MODE"):
+                    self.sources[field_names[i]].set_active(PROPAGATION_MODES.index(data))
                 elif(field_names[i] == "QSL_SENT"):
                     self.sources[field_names[i]].set_active(qsl_sent_options.index(data))
                 elif(field_names[i] == "QSL_RCVD"):
@@ -269,6 +288,8 @@ class RecordDialog:
             return self.sources["MODE"].get_active_text()
         elif(field_name == "SUBMODE"):
             return self.sources["SUBMODE"].get_active_text()
+        elif(field_name == "PROP_MODE"):
+            return self.sources["PROP_MODE"].get_active_text()
         elif(field_name == "BAND" or field_name == "QSL_SENT" or field_name == "QSL_RCVD"):
             return self.sources[field_name].get_active_text()
         elif(field_name == "NOTES"):

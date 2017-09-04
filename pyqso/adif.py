@@ -35,6 +35,7 @@ AVAILABLE_FIELD_NAMES_TYPES = {"CALL": "S",
                                "BAND": "E",
                                "MODE": "E",
                                "SUBMODE": "E",
+                               "PROP_MODE": "E",
                                "TX_PWR": "N",
                                "RST_SENT": "S",
                                "RST_RCVD": "S",
@@ -48,12 +49,15 @@ AVAILABLE_FIELD_NAMES_TYPES = {"CALL": "S",
                                "DXCC": "N",
                                "CQZ": "N",
                                "ITUZ": "N",
-                               "IOTA": "C"}
+                               "IOTA": "C",
+                               "GRIDSQUARE": "S",
+                               "SAT_NAME": "S",
+                               "SAT_MODE": "S"}
 # Note: The logbook uses the ADIF field names for the database column names.
 # This list is used to display the columns in a logical order.
-AVAILABLE_FIELD_NAMES_ORDERED = ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "SUBMODE", "TX_PWR",
+AVAILABLE_FIELD_NAMES_ORDERED = ["CALL", "QSO_DATE", "TIME_ON", "FREQ", "BAND", "MODE", "SUBMODE", "PROP_MODE", "TX_PWR",
                                  "RST_SENT", "RST_RCVD", "QSL_SENT", "QSL_RCVD", "NOTES", "NAME",
-                                 "ADDRESS", "STATE", "COUNTRY", "DXCC", "CQZ", "ITUZ", "IOTA"]
+                                 "ADDRESS", "STATE", "COUNTRY", "DXCC", "CQZ", "ITUZ", "IOTA", "GRIDSQUARE", "SAT_NAME", "SAT_MODE"]
 # Define the more user-friendly versions of the field names.
 AVAILABLE_FIELD_NAMES_FRIENDLY = {"CALL": "Callsign",
                                   "QSO_DATE": "Date",
@@ -62,6 +66,7 @@ AVAILABLE_FIELD_NAMES_FRIENDLY = {"CALL": "Callsign",
                                   "BAND": "Band",
                                   "MODE": "Mode",
                                   "SUBMODE": "Submode",
+                                  "PROP_MODE": "Propagation Mode",
                                   "TX_PWR": "TX Power (W)",
                                   "RST_SENT": "RST Sent",
                                   "RST_RCVD": "RST Received",
@@ -75,7 +80,10 @@ AVAILABLE_FIELD_NAMES_FRIENDLY = {"CALL": "Callsign",
                                   "DXCC": "DXCC",
                                   "CQZ": "CQ Zone",
                                   "ITUZ": "ITU Zone",
-                                  "IOTA": "IOTA Designator"}
+                                  "IOTA": "IOTA Designator",
+                                  "GRIDSQUARE": "Grid Square",
+                                  "SAT_NAME": "Satellite Name",
+                                  "SAT_MODE": "Satellite Mode"}
 
 # A: AwardList
 # B: Boolean
@@ -185,6 +193,8 @@ MODES.update(MODES_DEPRECATED)
 BANDS = ["", "2190m", "630m", "560m", "160m", "80m", "60m", "40m", "30m", "20m", "17m", "15m", "12m", "10m", "6m", "4m", "2m", "1.25m", "70cm", "33cm", "23cm", "13cm", "9cm", "6cm", "3cm", "1.25cm", "6mm", "4mm", "2.5mm", "2mm", "1mm"]
 # The lower and upper frequency bounds (in MHz) for each band in BANDS.
 BANDS_RANGES = [(None, None), (0.136, 0.137), (0.472, 0.479), (0.501, 0.504), (1.8, 2.0), (3.5, 4.0), (5.102, 5.4065), (7.0, 7.3), (10.0, 10.15), (14.0, 14.35), (18.068, 18.168), (21.0, 21.45), (24.890, 24.99), (28.0, 29.7), (50.0, 54.0), (70.0, 71.0), (144.0, 148.0), (222.0, 225.0), (420.0, 450.0), (902.0, 928.0), (1240.0, 1300.0), (2300.0, 2450.0), (3300.0, 3500.0), (5650.0, 5925.0), (10000.0, 10500.0), (24000.0, 24250.0), (47000.0, 47200.0), (75500.0, 81000.0), (119980.0, 120020.0), (142000.0, 149000.0), (241000.0, 250000.0)]
+
+PROPAGATION_MODES = ["", "AS", "AUE", "AUR", "BS", "ECH", "EME", "ES", "F2", "FAI", "INTERNET", "ION", "IRL", "MS", "RPT", "RS", "SAT", "TEP", "TR"]
 
 ADIF_VERSION = "3.0.4"
 
