@@ -25,6 +25,12 @@ try:
     import configparser
 except ImportError:
     import ConfigParser as configparser
+try:
+    import geocoder
+    have_geocoder = True
+except ImportError:
+    logging.warning("Could not import the geocoder module!")
+    have_geocoder = False
 
 from pyqso.adif import *
 from pyqso.cabrillo import *
@@ -384,6 +390,7 @@ class Logbook:
         self.treeview[index].connect("row-activated", self.edit_record_callback)
         self.treeselection.append(self.treeview[index].get_selection())
         self.treeselection[index].set_mode(Gtk.SelectionMode.SINGLE)
+        self.treeselection[index].connect('changed', self.on_selection_changed)
         # Allow the Log to be scrolled up/down.
         sw = Gtk.ScrolledWindow()
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
@@ -1111,3 +1118,24 @@ class Logbook:
                 l.populate()
                 logs.append(l)
         return logs
+
+    def on_selection_changed(self, selection):
+        if(have_geocoder):
+            # Plot the COUNTRY field of the selected QSO on the grey line map, if desired.
+            (model, iter) = selection.get_selected()
+            index = model.get_value(iter, 0)
+            log = self.logs[self.get_log_index()]
+            country = log.get_record_by_index(index)["COUNTRY"]
+
+            # Get the latitude-longitude coordinates of the country.
+            if(country):
+                try:
+                    g = geocoder.google(country)
+                    latitude, longitude = g.latlng
+                    logging.debug("QTH coordinates found: (%s, %s)", str(latitude), str(longitude))
+                except ValueError as e:
+                    logging.exception("Unable to lookup QTH coordinates.")
+                except Exception as e:
+                    logging.exception("Unable to lookup QTH coordinates. Check connection to the internets?")
+
+        return
