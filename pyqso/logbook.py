@@ -1133,9 +1133,9 @@ class Logbook:
                     g = geocoder.google(country)
                     latitude, longitude = g.latlng
                     logging.debug("QTH coordinates found: (%s, %s)", str(latitude), str(longitude))
-                except ValueError as e:
+                except ValueError:
                     logging.exception("Unable to lookup QTH coordinates.")
-                except Exception as e:
+                except Exception:
                     logging.exception("Unable to lookup QTH coordinates. Check connection to the internets?")
 
         return
