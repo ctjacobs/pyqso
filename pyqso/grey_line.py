@@ -40,6 +40,14 @@ except ImportError as e:
     have_necessary_modules = False
 
 
+class Point:
+    def __init__(self, name, latitude, longitude):
+        self.name = name
+        self.latitude = latitude
+        self.longitude = longitude
+        return
+
+
 class GreyLine:
 
     """ A tool for visualising the grey line. """
@@ -76,10 +84,25 @@ class GreyLine:
             self.builder.get_object("greyline").pack_start(self.canvas, True, True, 0)
             self.refresh_event = GObject.timeout_add(1800000, self.draw)  # Re-draw the grey line automatically after 30 minutes (if the grey line tool is visible).
 
+        self.points = []
+
         self.builder.get_object("greyline").show_all()
 
         logging.debug("Grey line ready!")
 
+        return
+
+    def add_point(self, name, latitude, longitude):
+        """ Add a point to the map. """
+        p = Point(name, latitude, longitude)
+        self.points.append(p)
+        self.draw()
+        return
+
+    def remove_point(self, p):
+        """ Remove a point from the map. """
+        self.points.remove(p)
+        self.draw()
         return
 
     def draw(self):
@@ -118,6 +141,12 @@ class GreyLine:
                     qth_x, qth_y = m(self.qth_longitude, self.qth_latitude)
                     m.plot(qth_x, qth_y, "ro")
                     sub.text(qth_x+0.015*qth_x, qth_y+0.015*qth_y, self.qth_name, color="white", size="medium", weight="bold")
+
+                if(self.points):
+                    for p in self.points:
+                        x, y = m(p.longitude, p.latitude)
+                        m.plot(x, y, "yo")
+                        sub.text(x+0.015*x, y+0.015*y, p.name, color="white", size="medium", weight="bold")
 
                 return True
         else:

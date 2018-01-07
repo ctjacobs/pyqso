@@ -388,9 +388,10 @@ class Logbook:
         self.treeview.append(Gtk.TreeView(model=self.sorter[index]))
         self.treeview[index].set_grid_lines(Gtk.TreeViewGridLines.BOTH)
         self.treeview[index].connect("row-activated", self.edit_record_callback)
+        self.treeview[index].connect("button-release-event", self.on_button_release_event)
         self.treeselection.append(self.treeview[index].get_selection())
         self.treeselection[index].set_mode(Gtk.SelectionMode.SINGLE)
-        self.treeselection[index].connect('changed', self.on_selection_changed)
+        
         # Allow the Log to be scrolled up/down.
         sw = Gtk.ScrolledWindow()
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
@@ -1119,13 +1120,39 @@ class Logbook:
                 logs.append(l)
         return logs
 
-    def on_selection_changed(self, selection):
-        if(have_geocoder):
+    def on_button_release_event(self, treeview, event):
+        if(event.button == 3):
             # Plot the COUNTRY field of the selected QSO on the grey line map, if desired.
-            (model, iter) = selection.get_selected()
-            index = model.get_value(iter, 0)
-            log = self.logs[self.get_log_index()]
-            country = log.get_record_by_index(index)["COUNTRY"]
+            self.application.popup.menu.popup(None, None, None, None, event.button, event.time)
+            self.application.popup.menu.show_all()
+            return True
+
+    def plot_on_map(self, widget=None, path=None):
+        if(have_geocoder):
+            # Get the log index.
+            try:
+                log_index = self.get_log_index()
+                if(log_index is None):
+                    raise ValueError("The log index could not be determined. Perhaps the Summary page is selected?")
+            except ValueError as e:
+                error(parent=self.application.window, message=e)
+                return
+            log = self.logs[log_index]
+
+            (sort_model, path) = self.treeselection[log_index].get_selected_rows()  # Get the selected row in the log.
+            try:
+                sort_iter = sort_model.get_iter(path[0])
+                filter_iter = self.sorter[log_index].convert_iter_to_child_iter(sort_iter)
+                # ...and the ListStore model (i.e. the log) is a child of the filter model.
+                child_iter = self.filter[log_index].convert_iter_to_child_iter(filter_iter)
+                row_index = log.get_value(child_iter, 0)
+            except IndexError:
+                logging.debug("Could not find the selected row's index!")
+                return
+
+            r = log.get_record_by_index(row_index)
+            country = r["COUNTRY"]
+            callsign = r["CALL"]
 
             # Get the latitude-longitude coordinates of the country.
             if(country):
@@ -1137,5 +1164,7 @@ class Logbook:
                     logging.exception("Unable to lookup QTH coordinates.")
                 except Exception:
                     logging.exception("Unable to lookup QTH coordinates. Check connection to the internets?")
+
+                self.application.toolbox.grey_line.add_point(callsign, latitude, longitude)
 
         return
