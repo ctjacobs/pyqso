@@ -391,7 +391,7 @@ class Logbook:
         self.treeview[index].connect("button-release-event", self.on_button_release_event)
         self.treeselection.append(self.treeview[index].get_selection())
         self.treeselection[index].set_mode(Gtk.SelectionMode.SINGLE)
-        
+
         # Allow the Log to be scrolled up/down.
         sw = Gtk.ScrolledWindow()
         sw.set_shadow_type(Gtk.ShadowType.ETCHED_IN)
