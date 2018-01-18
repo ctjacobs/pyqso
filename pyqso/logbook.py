@@ -25,12 +25,6 @@ try:
     import configparser
 except ImportError:
     import ConfigParser as configparser
-try:
-    import geocoder
-    have_geocoder = True
-except ImportError:
-    logging.warning("Could not import the geocoder module!")
-    have_geocoder = False
 
 from pyqso.adif import *
 from pyqso.cabrillo import *
@@ -252,6 +246,14 @@ class Logbook:
             self.application.toolbar.set_record_buttons_sensitive(True)
             self.application.menu.set_record_items_sensitive(True)
         return
+
+    def on_button_release_event(self, treeview, event):
+        """ Show a popup menu when the user right-clicks a record in the logbook. """
+
+        if(event.button == 3):
+            self.application.popup.menu.popup(None, None, None, None, event.button, event.time)            
+            self.application.popup.menu.show_all()
+            return True
 
     def new_log(self, widget=None):
         """ Create a new log in the logbook. """
@@ -651,12 +653,14 @@ class Logbook:
 
     def export_log_adif(self, widget=None):
         """ Export the log (that is currently selected) to an ADIF file. """
-        page_index = self.notebook.get_current_page()  # Get the index of the selected tab in the logbook.
-        if(page_index == 0):  # If we are on the Summary page...
-            logging.debug("No log currently selected!")
+        # Get the index of the selected tab in the logbook.
+        try:
+            log_index = self.get_log_index()
+            if(log_index is None):
+                raise ValueError("The log index could not be determined. Perhaps the Summary page is selected?")
+        except ValueError as e:
+            error(parent=self.application.window, message=e)
             return
-
-        log_index = self.get_log_index()
         log = self.logs[log_index]
 
         dialog = Gtk.FileChooserDialog("Export Log as ADIF",
@@ -711,12 +715,14 @@ class Logbook:
 
     def export_log_cabrillo(self, widget=None):
         """ Export the log (that is currently selected) to a Cabrillo file. """
-        page_index = self.notebook.get_current_page()  # Get the index of the selected tab in the logbook.
-        if(page_index == 0):  # If we are on the Summary page...
-            logging.debug("No log currently selected!")
+        # Get the index of the selected tab in the logbook.
+        try:
+            log_index = self.get_log_index()
+            if(log_index is None):
+                raise ValueError("The log index could not be determined. Perhaps the Summary page is selected?")
+        except ValueError as e:
+            error(parent=self.application.window, message=e)
             return
-
-        log_index = self.get_log_index()
         log = self.logs[log_index]
 
         dialog = Gtk.FileChooserDialog("Export Log as Cabrillo",
@@ -783,11 +789,14 @@ class Logbook:
         """ Print all the records in the log (that is currently selected).
         Note that only a few important fields are printed because of the restricted width of the page. """
 
-        page_index = self.notebook.get_current_page()  # Get the index of the selected tab in the logbook.
-        if(page_index == 0):  # If we are on the Summary page...
-            logging.debug("No log currently selected!")
+        # Get the index of the selected tab in the logbook.
+        try:
+            log_index = self.get_log_index()
+            if(log_index is None):
+                raise ValueError("The log index could not be determined. Perhaps the Summary page is selected?")
+        except ValueError as e:
+            error(parent=self.application.window, message=e)
             return
-        log_index = self.get_log_index()
         log = self.logs[log_index]
 
         # Retrieve the records.
@@ -806,7 +815,7 @@ class Logbook:
 
     def add_record_callback(self, widget):
         """ A callback function used to add a particular record/QSO. """
-        # Get the log index.
+        # Get the index of the selected tab in the logbook.
         try:
             log_index = self.get_log_index()
             if(log_index is None):
@@ -1042,6 +1051,23 @@ class Logbook:
 
         return
 
+    def pinpoint_callback(self, widget=None, path=None):
+        """ A callback function used to pinpoint the callsign on the grey line map. """
+
+        try:
+            log_index = self.get_log_index()
+            row_index = self.get_record_index()
+            if(log_index is None or row_index is None):
+                raise ValueError("Could not determine the log and/or record index.")
+            r = self.logs[log_index].get_record_by_index(row_index)
+        except ValueError as e:
+            logging.error(e)
+            return
+
+        self.application.toolbox.grey_line.pinpoint(r)
+
+        return
+
     @property
     def log_count(self):
         """ Return the total number of logs in the logbook.
@@ -1082,7 +1108,7 @@ class Logbook:
         """ Given the name of a log, return its index in the list of Log objects.
 
         :arg str name: The name of the log. If None, use the name of the currently-selected log.
-        :returns: The index of the named log in the list of Log objects. Returns None is the log cannot be found.
+        :returns: The index of the named log in the list of Log objects. Returns None if the log cannot be found.
         :rtype: int
         """
         if(name is None):
@@ -1103,6 +1129,37 @@ class Logbook:
                 break
         return log_index
 
+    def get_record_index(self):
+        """ Return the index of the currently selected record.
+        
+        :returns: The index of the currently selected record in the currently selected log. Returns None if the record or log cannot be found.
+        :rtype: int
+        """
+
+        # Get the index of the selected log.
+        try:
+            log_index = self.get_log_index()
+            if(log_index is None):
+                raise ValueError("The log index could not be determined. Perhaps the Summary page is selected?")
+        except ValueError as e:
+            logging.error(e)
+            return None
+        log = self.logs[log_index]
+
+        # Get the selected row in the log.
+        (sort_model, path) = self.treeselection[log_index].get_selected_rows()
+        try:
+            sort_iter = sort_model.get_iter(path[0])
+            filter_iter = self.sorter[log_index].convert_iter_to_child_iter(sort_iter)
+            # ...and the ListStore model (i.e. the log) is a child of the filter model.
+            child_iter = self.filter[log_index].convert_iter_to_child_iter(filter_iter)
+            row_index = log.get_value(child_iter, 0)
+        except IndexError:
+            logging.error("Could not find the selected row's index!")
+            return None
+
+        return row_index
+
     def get_logs(self):
         """ Retrieve all the logs in the logbook file, and create Log objects that represent them.
 
@@ -1120,51 +1177,3 @@ class Logbook:
                 logs.append(l)
         return logs
 
-    def on_button_release_event(self, treeview, event):
-        if(event.button == 3):
-            # Plot the COUNTRY field of the selected QSO on the grey line map, if desired.
-            self.application.popup.menu.popup(None, None, None, None, event.button, event.time)
-            self.application.popup.menu.show_all()
-            return True
-
-    def plot_on_map(self, widget=None, path=None):
-        if(have_geocoder):
-            # Get the log index.
-            try:
-                log_index = self.get_log_index()
-                if(log_index is None):
-                    raise ValueError("The log index could not be determined. Perhaps the Summary page is selected?")
-            except ValueError as e:
-                error(parent=self.application.window, message=e)
-                return
-            log = self.logs[log_index]
-
-            (sort_model, path) = self.treeselection[log_index].get_selected_rows()  # Get the selected row in the log.
-            try:
-                sort_iter = sort_model.get_iter(path[0])
-                filter_iter = self.sorter[log_index].convert_iter_to_child_iter(sort_iter)
-                # ...and the ListStore model (i.e. the log) is a child of the filter model.
-                child_iter = self.filter[log_index].convert_iter_to_child_iter(filter_iter)
-                row_index = log.get_value(child_iter, 0)
-            except IndexError:
-                logging.debug("Could not find the selected row's index!")
-                return
-
-            r = log.get_record_by_index(row_index)
-            country = r["COUNTRY"]
-            callsign = r["CALL"]
-
-            # Get the latitude-longitude coordinates of the country.
-            if(country):
-                try:
-                    g = geocoder.google(country)
-                    latitude, longitude = g.latlng
-                    logging.debug("QTH coordinates found: (%s, %s)", str(latitude), str(longitude))
-                except ValueError:
-                    logging.exception("Unable to lookup QTH coordinates.")
-                except Exception:
-                    logging.exception("Unable to lookup QTH coordinates. Check connection to the internets?")
-
-                self.application.toolbox.grey_line.add_point(callsign, latitude, longitude)
-
-        return

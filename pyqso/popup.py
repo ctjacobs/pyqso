@@ -23,6 +23,7 @@ class Popup:
     """ The popup menu that appears when a QSO record is right-clicked. """
 
     def __init__(self, application):
+        """ Set up popup menu items. """
 
         self.application = application
         self.builder = self.application.builder
@@ -33,7 +34,7 @@ class Popup:
         self.items = {}
 
         # Plot selected QSO on the grey line map.
-        self.items["PLOT_ON_MAP"] = self.builder.get_object("mitem_map")
-        self.items["PLOT_ON_MAP"].connect("activate", self.application.logbook.plot_on_map)
+        self.items["PINPOINT"] = self.builder.get_object("mitem_pinpoint")
+        self.items["PINPOINT"].connect("activate", self.application.logbook.pinpoint_callback)
 
         return
