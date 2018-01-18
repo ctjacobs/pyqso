@@ -287,7 +287,7 @@ class GeneralPage:
             error(parent=self.parent, message="Unable to lookup QTH coordinates. Is the QTH name correct?")
             logging.exception(e)
         except Exception as e:
-            error(parent=self.parent, message="Unable to lookup QTH coordinates. Check connection to the internets?")
+            error(parent=self.parent, message="Unable to lookup QTH coordinates. Check connection to the internets? Lookup limit reached?")
             logging.exception(e)
         return
 

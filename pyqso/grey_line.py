@@ -38,6 +38,30 @@ except ImportError as e:
     logging.warning(e)
     logging.warning("Could not import a non-standard Python module needed by the GreyLine class, or the version of the non-standard module is too old. Check that all the PyQSO dependencies are satisfied.")
     have_necessary_modules = False
+try:
+    import geocoder
+    have_geocoder = True
+except ImportError:
+    logging.warning("Could not import the geocoder module!")
+    have_geocoder = False
+
+
+class Point:
+    """ A point on the grey line map. """
+    def __init__(self, name, latitude, longitude, style="yo"):
+        """ Set up the point's attributes.
+
+        :arg str name: The name that identifies the point.
+        :arg float latitude: The latitude of the point on the map.
+        :arg float longitude: The longitude of the point on the map.
+        :arg str style: The style of the point when plotted. By default it is a filled yellow circle.
+        """
+
+        self.name = name
+        self.latitude = latitude
+        self.longitude = longitude
+        self.style = style
+        return
 
 
 class GreyLine:
@@ -53,22 +77,7 @@ class GreyLine:
 
         self.application = application
         self.builder = self.application.builder
-
-        # Get the QTH coordinates, if available.
-        config = configparser.ConfigParser()
-        have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
-        (section, option) = ("general", "show_qth")
-        self.show_qth = False
-        if(have_config and config.has_option(section, option)):
-            if(config.getboolean(section, option)):
-                self.show_qth = True
-                try:
-                    self.qth_name = config.get("general", "qth_name")
-                    self.qth_latitude = float(config.get("general", "qth_latitude"))
-                    self.qth_longitude = float(config.get("general", "qth_longitude"))
-                except ValueError:
-                    logging.warning("Unable to get the QTH name, latitude and/or longitude. The QTH will not be pinpointed on the grey line map. Check preferences?")
-                    self.show_qth = False
+        self.points = []
 
         if(have_necessary_modules):
             self.fig = matplotlib.figure.Figure()
@@ -76,9 +85,60 @@ class GreyLine:
             self.builder.get_object("greyline").pack_start(self.canvas, True, True, 0)
             self.refresh_event = GObject.timeout_add(1800000, self.draw)  # Re-draw the grey line automatically after 30 minutes (if the grey line tool is visible).
 
+        # Plot the QTH coordinates, if available.
+        config = configparser.ConfigParser()
+        have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
+        (section, option) = ("general", "show_qth")
+        if(have_config and config.has_option(section, option)):
+            if(config.getboolean(section, option)):
+                try:
+                    qth_name = config.get("general", "qth_name")
+                    qth_latitude = float(config.get("general", "qth_latitude"))
+                    qth_longitude = float(config.get("general", "qth_longitude"))
+                    self.add_point(qth_name, qth_latitude, qth_longitude, "ro")
+                except ValueError:
+                    logging.warning("Unable to get the QTH name, latitude and/or longitude. The QTH will not be pinpointed on the grey line map. Check preferences?")
+
         self.builder.get_object("greyline").show_all()
 
         logging.debug("Grey line ready!")
+
+        return
+
+    def add_point(self, name, latitude, longitude, style="yo"):
+        """ Add a point and re-draw the map.
+
+        :arg str name: The name that identifies the point.
+        :arg float latitude: The latitude of the point on the map.
+        :arg float longitude: The longitude of the point on the map.
+        :arg str style: The style of the point when plotted. By default it is a filled yellow circle.
+        """
+        p = Point(name, latitude, longitude, style)
+        self.points.append(p)
+        self.draw()
+        return
+
+    def pinpoint(self, r):
+        """ Pinpoint the location of a QSO on the grey line map based on the COUNTRY field.
+
+        :arg r: The QSO record containing the location to pinpoint.
+        """
+
+        if(have_geocoder):
+            country = r["COUNTRY"]
+            callsign = r["CALL"]
+
+            # Get the latitude-longitude coordinates of the country.
+            if(country):
+                try:
+                    g = geocoder.google(country)
+                    latitude, longitude = g.latlng
+                    logging.debug("QTH coordinates found: (%s, %s)", str(latitude), str(longitude))
+                    self.add_point(callsign, latitude, longitude)
+                except ValueError:
+                    logging.exception("Unable to lookup QTH coordinates.")
+                except Exception:
+                    logging.exception("Unable to lookup QTH coordinates. Check connection to the internets? Lookup limit reached?")
 
         return
 
@@ -113,11 +173,12 @@ class GreyLine:
                 m.nightshade(datetime.utcnow())  # Add in the grey line using UTC time. Note that this requires NetCDF.
                 logging.debug("Grey line drawn.")
 
-                # Pin-point QTH on the map.
-                if(self.show_qth):
-                    qth_x, qth_y = m(self.qth_longitude, self.qth_latitude)
-                    m.plot(qth_x, qth_y, "ro")
-                    sub.text(qth_x+0.015*qth_x, qth_y+0.015*qth_y, self.qth_name, color="white", size="medium", weight="bold")
+                # Plot points on the map.
+                if(self.points):
+                    for p in self.points:
+                        x, y = m(p.longitude, p.latitude)
+                        m.plot(x, y, p.style)
+                        sub.text(x+0.01*x, y+0.01*y, p.name, color="white", size="small", weight="bold")
 
                 return True
         else:

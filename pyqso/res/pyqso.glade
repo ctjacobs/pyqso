@@ -4547,6 +4547,18 @@ Base64-encoded plain text in the configuration file.</property>
       <action-widget response="-5">telnet_connection_ok_button</action-widget>
     </action-widgets>
   </object>
+  <object class="GtkMenu" id="popup">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <child>
+      <object class="GtkMenuItem" id="mitem_pinpoint">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Pinpoint</property>
+        <property name="use_underline">True</property>
+      </object>
+    </child>
+  </object>
   <object class="GtkBox" id="summary_page">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
