@@ -120,8 +120,8 @@ class GreyLine:
 
     def pinpoint(self, r):
         """ Pinpoint the location of a QSO on the grey line map based on the COUNTRY field.
-        
-        :arg r: The QSO location to pinpoint.
+
+        :arg r: The QSO record containing the location to pinpoint.
         """
 
         if(have_geocoder):

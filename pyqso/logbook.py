@@ -251,7 +251,7 @@ class Logbook:
         """ Show a popup menu when the user right-clicks a record in the logbook. """
 
         if(event.button == 3):
-            self.application.popup.menu.popup(None, None, None, None, event.button, event.time)            
+            self.application.popup.menu.popup(None, None, None, None, event.button, event.time)
             self.application.popup.menu.show_all()
             return True
 
@@ -1131,7 +1131,7 @@ class Logbook:
 
     def get_record_index(self):
         """ Return the index of the currently selected record.
-        
+
         :returns: The index of the currently selected record in the currently selected log. Returns None if the record or log cannot be found.
         :rtype: int
         """
@@ -1176,4 +1176,3 @@ class Logbook:
                 l.populate()
                 logs.append(l)
         return logs
-
