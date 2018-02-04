@@ -20,6 +20,7 @@
 from gi.repository import Gtk
 import logging
 import sqlite3 as sqlite
+import json
 from os.path import expanduser
 try:
     import configparser
@@ -1065,6 +1066,49 @@ class Logbook:
             return
 
         self.application.toolbox.grey_line.pinpoint(r)
+
+        return
+
+    def copy_callback(self, widget=None, path=None):
+        """ A callback function used to copy selected logs. """
+
+        try:
+            log_index = self.get_log_index()
+            row_index = self.get_record_index()
+            if(log_index is None or row_index is None):
+                raise ValueError("Could not determine the log and/or record index.")
+            r = self.logs[log_index].get_record_by_index(row_index)
+        except ValueError as e:
+            logging.error(e)
+            return
+
+        d = {}
+        for key in r.keys():
+            d[key.upper()] = r[key]
+        j = json.dumps(d)
+
+        self.application.clipboard.set_text(j, len(j))
+
+        return
+
+    def clipboard_text_received(self, clipboard, text, log):
+        r = json.loads(text)
+        log.add_record(r)
+        return
+
+    def paste_callback(self, widget=None, path=None):
+        """ A callback function used to paste selected logs. """
+
+        try:
+            log_index = self.get_log_index()
+            if(log_index is None):
+                raise ValueError("Could not determine the log index.")
+            l = self.logs[log_index]
+        except ValueError as e:
+            logging.error(e)
+            return
+
+        self.application.clipboard.request_text(self.clipboard_text_received, l)
 
         return
 

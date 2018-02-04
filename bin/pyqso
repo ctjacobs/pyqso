@@ -20,7 +20,7 @@
 from gi import require_version
 require_version('Gtk', '3.0')
 require_version('PangoCairo', '1.0')
-from gi.repository import Gtk, GdkPixbuf
+from gi.repository import Gtk, Gdk, GdkPixbuf
 import argparse
 try:
     import configparser
@@ -94,11 +94,15 @@ class PyQSO:
         self.logbook = Logbook(self)
         self.toolbox = Toolbox(self)
 
-        # Set up menu and toolbar. These classes depend on the Logbook and Toolbox class.
+        # Set up the menu and toolbar. These classes depend on the Logbook and Toolbox class.
         self.menu = Menu(self)
         self.popup = Popup(self)
         self.toolbar = Toolbar(self)
 
+        # Clipboard for copy/paste operations.
+        self.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+
+        # Show the main window.
         self.window.show_all()
 
         if(have_config):

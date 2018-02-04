@@ -37,4 +37,10 @@ class Popup:
         self.items["PINPOINT"] = self.builder.get_object("mitem_pinpoint")
         self.items["PINPOINT"].connect("activate", self.application.logbook.pinpoint_callback)
 
+        self.items["COPY"] = self.builder.get_object("mitem_copy")
+        self.items["COPY"].connect("activate", self.application.logbook.copy_callback)
+
+        self.items["PASTE"] = self.builder.get_object("mitem_paste")
+        self.items["PASTE"].connect("activate", self.application.logbook.paste_callback)
+
         return
