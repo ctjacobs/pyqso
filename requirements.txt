@@ -1,0 +1,6 @@
+numpy
+matplotlib>=1.3.0
+basemap
+cairocffi
+sphinx
+geocoder
