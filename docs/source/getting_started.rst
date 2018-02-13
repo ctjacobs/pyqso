@@ -8,11 +8,11 @@ It is recommended that users run PyQSO on the Linux operating system,
 since all development and testing of PyQSO takes place there.
 
 As the name suggests, PyQSO is written primarily in the `Python <https://www.python.org/>`_
-programming language (version 3.x). The graphical user interface has been built using
+programming language (version 3.x). The graphical user interface has been developed using
 the `GTK+ library <https://www.gtk.org/>`_ through the `PyGObject bindings <https://pygobject.readthedocs.io>`_. PyQSO also uses an
 `SQLite <https://www.sqlite.org/>`_ embedded database to manage all the contacts an amateur radio
 operator makes. Users must therefore make sure that the Python
-interpreter and any additional software dependencies are satisfied
+interpreter is installed and that any additional software dependencies are satisfied
 before PyQSO can be run successfully. The list of software packages that
 PyQSO depends on is provided in the ``README.md`` file.
 
