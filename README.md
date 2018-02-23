@@ -1,4 +1,4 @@
-    Copyright (C) 2013-2017 Christian Thomas Jacobs.
+    Copyright (C) 2013-2018 Christian Thomas Jacobs.
 
     This file is part of PyQSO.
 
@@ -15,61 +15,37 @@
     You should have received a copy of the GNU General Public License
     along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
-PyQSO
-=====
+# PyQSO
 
 PyQSO is a contact logging tool for amateur radio operators.
 
 [![Build Status](https://travis-ci.org/ctjacobs/pyqso.svg)](https://travis-ci.org/ctjacobs/pyqso)
 [![Documentation Status](https://readthedocs.org/projects/pyqso/badge/?version=latest)](https://readthedocs.org/projects/pyqso/?badge=latest)
 
-Installation and running
-------------------------
+## Dependencies
 
-Assuming that the current working directory is PyQSO's base directory (the directory that the `Makefile` is in), PyQSO can be run without installation by issuing the following command in the terminal:
+As the name suggests, PyQSO is written primarily in the [Python](https://www.python.org/) programming language (version 3.x). The graphical user interface has been developed using the [GTK+ library](https://www.gtk.org/) through the [PyGObject bindings](https://pygobject.readthedocs.io). Therefore, in order to run PyQSO, the Python interpreter must be present on your system along with support for GTK+. On many Linux-based systems this can be accomplished by installing the following Debian packages:
 
-    python3 bin/pyqso
-
-If the `pip3` package manager is available on your system then PyQSO can be installed system-wide using:
-
-    sudo make install
-
-Once installed, the following command will run PyQSO:
-
-    pyqso
-
-Documentation
--------------
-
-The PyQSO documentation is stored in the `docs` directory. It can be built with the following command:
-
-    make docs
-
-which will produce an HTML version of the documentation in `docs/build/html` that can be opened in a web browser.
-
-Alternatively, a ready-built version of the PyQSO documentation can be found on [Read the Docs](http://pyqso.readthedocs.io/).
-
-Dependencies
-------------
-
-PyQSO depends on the following Debian packages:
-
-* gir1.2-gtk-3.0
 * python3
-* python3-gi-cairo (for log printing purposes)
+* gir1.2-gtk-3.0
+* python3-gi-cairo
 
-The following extra packages are necessary to fully enable the grey line tool and the plotting of logbook statistics:
+Several extra packages are necessary to enable the full functionality of PyQSO, such as the grey line tool. Many of these (specified in the `requirements.txt` file) can be readily installed system-wide using the Python package manager by issuing the following command in the terminal:
+
+    sudo pip3 install -U -r requirements.txt
+
+but the complete list is given below:
 
 * python3-matplotlib (version 1.3.0 or later)
 * python3-mpltoolkits.basemap
 * python3-numpy
 * libxcb-render0-dev
 * python3-cairocffi
-* [geocoder](https://pypi.python.org/pypi/geocoder) (installable with `pip3` and used for QTH lookups)
+* [geocoder](https://pypi.python.org/pypi/geocoder) (for QTH lookups)
+* python3-sphinx (for building the documentation)
+* python3-hamlib (for Hamlib support)
 
-The following extra package is necessary to build the documentation:
-
-* python3-sphinx
+### Hamlib support
 
 There currently does not exist a Python 3-compatible Debian package for [Hamlib](http://www.hamlib.org). This library must be built manually to enable Hamlib support. As per the instructions on the [Hamlib mailing list](https://sourceforge.net/p/hamlib/mailman/message/35692744/), run the following commands in the Hamlib root directory (you may need to run `sudo apt-get install build-essential autoconf automake libtool` beforehand):
 
@@ -83,7 +59,32 @@ You will also need to append the Hamlib `bindings` and `bindings/.libs` director
 
     export PYTHONPATH=$PYTHONPATH:/path/to/hamlib/bindings:/path/to/hamlib/bindings/.libs
 
-Contact
--------
+## Installing and running
+
+Assuming that the current working directory is PyQSO's base directory (the directory that the `Makefile` is in), PyQSO can be run without installation by issuing the following command in the terminal:
+
+    python3 bin/pyqso
+
+If the Python package manager `pip3` is available on your system then PyQSO can be installed system-wide using:
+
+    sudo make install
+
+Once installed, the following command will run PyQSO:
+
+    pyqso
+
+## Documentation
+
+Guidance on how to use PyQSO is available on [Read the Docs](http://pyqso.readthedocs.io/) and in the screencast below.
+
+[![PyQSO: A Logging Tool for Amateur Radio Operators](https://img.youtube.com/vi/sVdZl9KnDsk/0.jpg)](https://www.youtube.com/watch?v=sVdZl9KnDsk)
+
+The documentation can also be built locally with the following command:
+
+    make docs
+
+which will produce an HTML version of the documentation in `docs/build/html` that can be opened in a web browser.
+
+## Contact
 
 If you have any comments or questions about PyQSO please send them via email to Christian Jacobs, M0UOS, at <christian@christianjacobs.uk>.
