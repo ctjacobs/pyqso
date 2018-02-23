@@ -19,7 +19,6 @@
 
 from gi.repository import GObject
 import logging
-from datetime import datetime
 from os.path import expanduser
 try:
     import configparser
@@ -30,8 +29,8 @@ try:
     logging.info("Using version %s of numpy." % (numpy.__version__))
     import matplotlib
     logging.info("Using version %s of matplotlib." % (matplotlib.__version__))
-    import mpl_toolkits.basemap
-    logging.info("Using version %s of mpl_toolkits.basemap." % (mpl_toolkits.basemap.__version__))
+    import cartopy
+    logging.info("Using version %s of cartopy." % (cartopy.__version__))
     from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
     have_necessary_modules = True
 except ImportError as e:
@@ -156,29 +155,24 @@ class GreyLine:
                 # Don't re-draw if the grey line is not visible.
                 return True  # We need to return True in case this is method was called by a timer event.
             else:
-                logging.debug("Drawing the grey line...")
-                # Re-draw the grey line
+                # Set up the world map.
                 self.fig.clf()
-                sub = self.fig.add_subplot(111)
+                ax = self.fig.add_subplot(111, projection=cartopy.crs.PlateCarree())
+                ax.set_extent([-180, 180, -90, 90])
+                ax.gridlines()
+                ax.add_feature(cartopy.feature.LAND)
+                ax.add_feature(cartopy.feature.OCEAN)
+                ax.add_feature(cartopy.feature.COASTLINE)
+                ax.add_feature(cartopy.feature.BORDERS, alpha=0.25)
 
-                # Draw the map of the world. This is based on the example from:
-                # http://matplotlib.org/basemap/users/examples.html
-                m = mpl_toolkits.basemap.Basemap(projection="mill", lon_0=0, ax=sub, resolution="c", fix_aspect=False)
-                m.drawcountries(linewidth=0.4)
-                m.drawcoastlines(linewidth=0.4)
-                m.drawparallels(numpy.arange(-90, 90, 30), labels=[1, 0, 0, 0])
-                m.drawmeridians(numpy.arange(m.lonmin, m.lonmax+30, 60), labels=[0, 0, 0, 1])
-                m.drawmapboundary(fill_color="skyblue")
-                m.fillcontinents(color="green", lake_color="skyblue")
-                m.nightshade(datetime.utcnow())  # Add in the grey line using UTC time. Note that this requires NetCDF.
-                logging.debug("Grey line drawn.")
+                # TODO: Re-draw the grey line.
 
                 # Plot points on the map.
                 if(self.points):
+                    logging.debug("Plotting QTHs on the map...")
                     for p in self.points:
-                        x, y = m(p.longitude, p.latitude)
-                        m.plot(x, y, p.style)
-                        sub.text(x+0.01*x, y+0.01*y, p.name, color="white", size="small", weight="bold")
+                        ax.plot(p.longitude, p.latitude, p.style, transform=cartopy.crs.PlateCarree())
+                        ax.text(p.longitude+0.01*p.longitude, p.latitude+0.01*p.latitude, p.name, color="black", size="small", weight="bold")
 
                 return True
         else:
