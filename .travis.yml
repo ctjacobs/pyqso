@@ -12,7 +12,7 @@ virtualenv:
 
 before_install:
  - sudo apt-get update -qq
- - sudo apt-get install -yq xvfb python3 python3-pip gir1.2-gtk-3.0 python3-gi-cairo python3-flake8 python-libhamlib2
+ - sudo apt-get install -yq xvfb python3 python3-pip gir1.2-gtk-3.0 python3-gi-cairo python3-flake8 libproj-dev libgeos-dev python-libhamlib2
  - sudo pip3 install -U -r requirements.txt
  - "export DISPLAY=:99.0"
  - "sh -e /etc/init.d/xvfb start"

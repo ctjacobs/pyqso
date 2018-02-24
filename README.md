@@ -40,6 +40,8 @@ but the complete list is given below:
 * python3-numpy
 * libxcb-render0-dev
 * python3-cairocffi
+* libproj-dev (version 4.9.0 or later)
+* libgeos-dev (version 3.3.3 or later)
 * [cartopy](http://scitools.org.uk/cartopy/) (for drawing the world map and grey line)
 * [geocoder](https://pypi.python.org/pypi/geocoder) (for QTH lookups)
 * python3-sphinx (for building the documentation)
