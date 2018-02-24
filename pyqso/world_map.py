@@ -85,7 +85,7 @@ class WorldMap:
             self.builder.get_object("worldmap").pack_start(self.canvas, True, True, 0)
             self.refresh_event = GObject.timeout_add(1800000, self.draw)  # Re-draw the world map automatically after 30 minutes (if the world map tool is visible).
 
-        # Plot the QTH coordinates, if available.
+        # Add the QTH coordinates for plotting, if available.
         config = configparser.ConfigParser()
         have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
         (section, option) = ("general", "show_qth")
@@ -160,7 +160,12 @@ class WorldMap:
                 self.fig.clf()
                 ax = self.fig.add_subplot(111, projection=cartopy.crs.PlateCarree())
                 ax.set_extent([-180, 180, -90, 90])
-                ax.gridlines()
+                ax.set_aspect("auto")
+                gl = ax.gridlines(draw_labels=True)
+                gl.xlabels_top = False
+                gl.ylabels_right = False
+                gl.xformatter = cartopy.mpl.gridliner.LONGITUDE_FORMATTER
+                gl.yformatter = cartopy.mpl.gridliner.LATITUDE_FORMATTER
                 ax.add_feature(cartopy.feature.LAND)
                 ax.add_feature(cartopy.feature.OCEAN)
                 ax.add_feature(cartopy.feature.COASTLINE)
