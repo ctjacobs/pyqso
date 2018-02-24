@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#    Copyright (C) 2013-2017 Christian Thomas Jacobs.
+#    Copyright (C) 2013-2018 Christian Thomas Jacobs.
 
 #    This file is part of PyQSO.
 
@@ -19,8 +19,8 @@
 
 from gi.repository import GObject
 import logging
-from datetime import datetime
 from os.path import expanduser
+from datetime import datetime
 try:
     import configparser
 except ImportError:
@@ -30,13 +30,13 @@ try:
     logging.info("Using version %s of numpy." % (numpy.__version__))
     import matplotlib
     logging.info("Using version %s of matplotlib." % (matplotlib.__version__))
-    import mpl_toolkits.basemap
-    logging.info("Using version %s of mpl_toolkits.basemap." % (mpl_toolkits.basemap.__version__))
+    import cartopy
+    logging.info("Using version %s of cartopy." % (cartopy.__version__))
     from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo as FigureCanvas
     have_necessary_modules = True
 except ImportError as e:
     logging.warning(e)
-    logging.warning("Could not import a non-standard Python module needed by the GreyLine class, or the version of the non-standard module is too old. Check that all the PyQSO dependencies are satisfied.")
+    logging.warning("Could not import a non-standard Python module needed by the WorldMap class, or the version of the non-standard module is too old. Check that all the PyQSO dependencies are satisfied.")
     have_necessary_modules = False
 try:
     import geocoder
@@ -64,16 +64,16 @@ class Point:
         return
 
 
-class GreyLine:
+class WorldMap:
 
-    """ A tool for visualising the grey line. """
+    """ A tool for visualising the world map. """
 
     def __init__(self, application):
-        """ Set up the drawing canvas and the timer which will re-plot the grey line every 30 minutes.
+        """ Set up the drawing canvas and the timer which will re-plot the world map every 30 minutes.
 
         :arg application: The PyQSO application containing the main Gtk window, etc.
         """
-        logging.debug("Setting up the grey line...")
+        logging.debug("Setting up the world map...")
 
         self.application = application
         self.builder = self.application.builder
@@ -82,10 +82,10 @@ class GreyLine:
         if(have_necessary_modules):
             self.fig = matplotlib.figure.Figure()
             self.canvas = FigureCanvas(self.fig)  # For embedding in the Gtk application
-            self.builder.get_object("greyline").pack_start(self.canvas, True, True, 0)
-            self.refresh_event = GObject.timeout_add(1800000, self.draw)  # Re-draw the grey line automatically after 30 minutes (if the grey line tool is visible).
+            self.builder.get_object("worldmap").pack_start(self.canvas, True, True, 0)
+            self.refresh_event = GObject.timeout_add(1800000, self.draw)  # Re-draw the world map automatically after 30 minutes (if the world map tool is visible).
 
-        # Plot the QTH coordinates, if available.
+        # Add the QTH coordinates for plotting, if available.
         config = configparser.ConfigParser()
         have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
         (section, option) = ("general", "show_qth")
@@ -97,11 +97,11 @@ class GreyLine:
                     qth_longitude = float(config.get("general", "qth_longitude"))
                     self.add_point(qth_name, qth_latitude, qth_longitude, "ro")
                 except ValueError:
-                    logging.warning("Unable to get the QTH name, latitude and/or longitude. The QTH will not be pinpointed on the grey line map. Check preferences?")
+                    logging.warning("Unable to get the QTH name, latitude and/or longitude. The QTH will not be pinpointed on the world map. Check preferences?")
 
-        self.builder.get_object("greyline").show_all()
+        self.builder.get_object("worldmap").show_all()
 
-        logging.debug("Grey line ready!")
+        logging.debug("World map ready!")
 
         return
 
@@ -119,7 +119,7 @@ class GreyLine:
         return
 
     def pinpoint(self, r):
-        """ Pinpoint the location of a QSO on the grey line map based on the COUNTRY field.
+        """ Pinpoint the location of a QSO on the world map based on the COUNTRY field.
 
         :arg r: The QSO record containing the location to pinpoint.
         """
@@ -145,7 +145,7 @@ class GreyLine:
     def draw(self):
         """ Draw the world map and the grey line on top of it.
 
-        :returns: Always returns True to satisfy the GObject timer, unless the necessary GreyLine dependencies are not satisfied (in which case, the method returns False so as to not re-draw the canvas).
+        :returns: Always returns True to satisfy the GObject timer, unless the necessary WorldMap dependencies are not satisfied (in which case, the method returns False so as to not re-draw the canvas).
         :rtype: bool
         """
 
@@ -153,32 +153,64 @@ class GreyLine:
             toolbox = self.builder.get_object("toolbox")
             tools = self.builder.get_object("tools")
             if(tools.get_current_page() != 1 or not toolbox.get_visible()):
-                # Don't re-draw if the grey line is not visible.
+                # Don't re-draw if the world map is not visible.
                 return True  # We need to return True in case this is method was called by a timer event.
             else:
-                logging.debug("Drawing the grey line...")
-                # Re-draw the grey line
+                # Set up the world map.
+                logging.debug("Drawing the world map...")
                 self.fig.clf()
-                sub = self.fig.add_subplot(111)
+                ax = self.fig.add_subplot(111, projection=cartopy.crs.PlateCarree())
+                ax.set_extent([-180, 180, -90, 90])
+                ax.set_aspect("auto")
 
-                # Draw the map of the world. This is based on the example from:
-                # http://matplotlib.org/basemap/users/examples.html
-                m = mpl_toolkits.basemap.Basemap(projection="mill", lon_0=0, ax=sub, resolution="c", fix_aspect=False)
-                m.drawcountries(linewidth=0.4)
-                m.drawcoastlines(linewidth=0.4)
-                m.drawparallels(numpy.arange(-90, 90, 30), labels=[1, 0, 0, 0])
-                m.drawmeridians(numpy.arange(m.lonmin, m.lonmax+30, 60), labels=[0, 0, 0, 1])
-                m.drawmapboundary(fill_color="skyblue")
-                m.fillcontinents(color="green", lake_color="skyblue")
-                m.nightshade(datetime.utcnow())  # Add in the grey line using UTC time. Note that this requires NetCDF.
-                logging.debug("Grey line drawn.")
+                gl = ax.gridlines(draw_labels=True)
+                gl.xlabels_top = False
+                gl.ylabels_right = False
+                gl.xformatter = cartopy.mpl.gridliner.LONGITUDE_FORMATTER
+                gl.yformatter = cartopy.mpl.gridliner.LATITUDE_FORMATTER
+                ax.add_feature(cartopy.feature.LAND, facecolor="green")
+                ax.add_feature(cartopy.feature.OCEAN, color="skyblue")
+                ax.add_feature(cartopy.feature.COASTLINE)
+                ax.add_feature(cartopy.feature.BORDERS, alpha=0.4)
+
+                # Draw the grey line. This is based on the code from the Cartopy Aurora Forecast example (http://scitools.org.uk/cartopy/docs/latest/gallery/aurora_forecast.html) and used under the Open Government Licence (http://scitools.org.uk/cartopy/docs/v0.15/copyright.html).
+                logging.debug("Drawing the grey line...")
+                dt = datetime.utcnow()
+                axial_tilt = 23.5
+                reference_solstice = datetime(2016, 6, 21, 22, 22)
+                days_per_year = 365.2425
+                seconds_per_day = 86400.0
+
+                days_since_reference = (dt - reference_solstice).total_seconds()/seconds_per_day
+                latitude = axial_tilt*numpy.cos(2*numpy.pi*days_since_reference/days_per_year)
+                seconds_since_midnight = (dt - datetime(dt.year, dt.month, dt.day)).seconds
+                longitude = -(seconds_since_midnight/seconds_per_day - 0.5)*360
+
+                pole_longitude = longitude
+                if latitude > 0:
+                    pole_latitude = -90 + latitude
+                    central_rotated_longitude = 180
+                else:
+                    pole_latitude = 90 + latitude
+                    central_rotated_longitude = 0
+
+                rotated_pole = cartopy.crs.RotatedPole(pole_latitude=pole_latitude, pole_longitude=pole_longitude, central_rotated_longitude=central_rotated_longitude)
+
+                x = numpy.empty(360)
+                y = numpy.empty(360)
+                x[:180] = -90
+                y[:180] = numpy.arange(-90, 90.)
+                x[180:] = 90
+                y[180:] = numpy.arange(90, -90., -1)
+
+                ax.fill(x, y, transform=rotated_pole, color="black", alpha=0.5)
 
                 # Plot points on the map.
                 if(self.points):
+                    logging.debug("Plotting QTHs on the map...")
                     for p in self.points:
-                        x, y = m(p.longitude, p.latitude)
-                        m.plot(x, y, p.style)
-                        sub.text(x+0.01*x, y+0.01*y, p.name, color="white", size="small", weight="bold")
+                        ax.plot(p.longitude, p.latitude, p.style, transform=cartopy.crs.PlateCarree())
+                        ax.text(p.longitude+0.02*p.longitude, p.latitude+0.02*p.latitude, p.name, color="white", size="small", weight="bold")
 
                 return True
         else:

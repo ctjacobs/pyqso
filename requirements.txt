@@ -1,6 +1,6 @@
 numpy
 matplotlib>=1.3.0
-basemap
+cartopy>=0.16.0
 cairocffi
 sphinx
 geocoder

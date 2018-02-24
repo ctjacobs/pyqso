@@ -33,7 +33,7 @@ class Popup:
         # Collect Gtk menu items and connect signals.
         self.items = {}
 
-        # Plot selected QSO on the grey line map.
+        # Plot selected QSO on the world map.
         self.items["PINPOINT"] = self.builder.get_object("mitem_pinpoint")
         self.items["PINPOINT"].connect("activate", self.application.logbook.pinpoint_callback)
 

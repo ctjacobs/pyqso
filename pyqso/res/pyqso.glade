@@ -792,7 +792,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkBox" id="greyline">
+                          <object class="GtkBox" id="worldmap">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="orientation">vertical</property>
@@ -806,10 +806,10 @@
                           </packing>
                         </child>
                         <child type="tab">
-                          <object class="GtkLabel" id="greyline_label">
+                          <object class="GtkLabel" id="worldmap_label">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Grey Line</property>
+                            <property name="label" translatable="yes">World Map</property>
                           </object>
                           <packing>
                             <property name="position">1</property>
@@ -908,8 +908,8 @@
     <property name="type_hint">dialog</property>
     <property name="transient_for">pyqso</property>
     <property name="program_name">PyQSO</property>
-    <property name="version">1.0.0</property>
-    <property name="copyright" translatable="yes">Copyright (C) 2012-2017 Christian Thomas Jacobs</property>
+    <property name="version">1.1.0-dev</property>
+    <property name="copyright" translatable="yes">Copyright (C) 2012-2018 Christian Thomas Jacobs</property>
     <property name="comments" translatable="yes">A contact logging tool for amateur radio operators.</property>
     <property name="website">http://christianjacobs.uk/pyqso</property>
     <property name="license" translatable="yes">This program is free software: you can redistribute it and/or modify
@@ -1460,7 +1460,7 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
                             <property name="spacing">2</property>
                             <child>
                               <object class="GtkCheckButton" id="general_show_qth_checkbutton">
-                                <property name="label" translatable="yes">Pin-point QTH on grey line map</property>
+                                <property name="label" translatable="yes">Pin-point QTH on world map</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>

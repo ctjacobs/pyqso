@@ -17,7 +17,7 @@ Under the ``General`` tab, the user can choose to:
 
 -  Keep the ``Add Record`` dialog window open after a new QSO is added, in preparation for the next QSO.
 
--  Pin-point the user's QTH on the grey line map by specifying the latitude-longitude coordinates (or looking them up based on the QTH's name, e.g. city name).
+-  Pin-point the user's QTH on the world map by specifying the latitude-longitude coordinates (or looking them up based on the QTH's name, e.g. city name).
 
    .. _figure:summary:
    .. figure::  images/summary.png

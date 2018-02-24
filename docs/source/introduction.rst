@@ -24,7 +24,7 @@ include:
 
 -  Progress tracker for the `DXCC <http://www.arrl.org/dxcc/>`_ award.
 
--  Grey line plotter.
+-  World map with grey line.
 
 -  Filter QSOs based on callsign (e.g. only display contacts with callsigns beginning with "M6").
 
@@ -65,5 +65,5 @@ If you have any comments or questions about PyQSO, please send them via email to
 Structure of this documentation
 -------------------------------
 
-The structure of this documentation is as follows. The section on `Getting Started <getting_started.html>`_ provides information on the PyQSO installation process through to creating a new logbook (or opening an existing one). The `Log Management <log_management.html>`_ section explains how to create a log in the logbook, as well as the basic operations that users can perform with existing logs, such as printing, importing/exporting logs, and sorting. The `Record Management <record_management.html>`_ section deals with the bottom layer of the three-tier model - the creation, deletion, and modification of QSO records in a log. The `Toolbox <toolbox.html>`_ section introduces the PyQSO toolbox which contains three tools that are useful to amateur radio operators: a DX cluster, a grey line plotter, and an awards progress tracker. Finally, the `Preferences <preferences.html>`_ section explains how users can set up Hamlib support and show/hide various fields in a log, along with several other user preferences that can be set via the Preferences dialog window. A `keyboard shortcuts list <shortcuts.html>`_ is also available for reference.
+The structure of this documentation is as follows. The section on `Getting Started <getting_started.html>`_ provides information on the PyQSO installation process through to creating a new logbook (or opening an existing one). The `Log Management <log_management.html>`_ section explains how to create a log in the logbook, as well as the basic operations that users can perform with existing logs, such as printing, importing/exporting logs, and sorting. The `Record Management <record_management.html>`_ section deals with the bottom layer of the three-tier model - the creation, deletion, and modification of QSO records in a log. The `Toolbox <toolbox.html>`_ section introduces the PyQSO toolbox which contains three tools that are useful to amateur radio operators: a DX cluster, a world map, and an awards progress tracker. Finally, the `Preferences <preferences.html>`_ section explains how users can set up Hamlib support and show/hide various fields in a log, along with several other user preferences that can be set via the Preferences dialog window. A `keyboard shortcuts list <shortcuts.html>`_ is also available for reference.
 
