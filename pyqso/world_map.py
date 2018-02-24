@@ -169,24 +169,24 @@ class WorldMap:
                 # Draw the grey line. This is based on the code from the Cartopy Aurora Forecast example (http://scitools.org.uk/cartopy/docs/latest/gallery/aurora_forecast.html) and used under the Open Government Licence (http://scitools.org.uk/cartopy/docs/v0.15/copyright.html).
                 dt = datetime.utcnow()
                 axial_tilt = 23.5
-                ref_solstice = datetime(2016, 6, 21, 22, 22)
+                reference_solstice = datetime(2016, 6, 21, 22, 22)
                 days_per_year = 365.2425
                 seconds_per_day = 86400.0
 
-                days_since_ref = (dt - ref_solstice).total_seconds()/seconds_per_day
-                lat = axial_tilt*numpy.cos(2*numpy.pi*days_since_ref/days_per_year)
-                sec_since_midnight = (dt - datetime(dt.year, dt.month, dt.day)).seconds
-                lng = -(sec_since_midnight/seconds_per_day - 0.5)*360
+                days_since_reference = (dt - reference_solstice).total_seconds()/seconds_per_day
+                latitude = axial_tilt*numpy.cos(2*numpy.pi*days_since_reference/days_per_year)
+                seconds_since_midnight = (dt - datetime(dt.year, dt.month, dt.day)).seconds
+                longitude = -(seconds_since_midnight/seconds_per_day - 0.5)*360
 
-                pole_lng = lng
-                if lat > 0:
-                    pole_lat = -90 + lat
-                    central_rot_lng = 180
+                pole_longitude = longitude
+                if latitude > 0:
+                    pole_latitude = -90 + latitude
+                    central_rotated_longitude = 180
                 else:
-                    pole_lat = 90 + lat
-                    central_rot_lng = 0
+                    pole_latitude = 90 + latitude
+                    central_rotated_longitude = 0
 
-                rotated_pole = cartopy.crs.RotatedPole(pole_latitude=pole_lat, pole_longitude=pole_lng, central_rotated_longitude=central_rot_lng)
+                rotated_pole = cartopy.crs.RotatedPole(pole_latitude=pole_latitude, pole_longitude=pole_longitude, central_rotated_longitude=central_rotated_longitude)
 
                 x = numpy.empty(360)
                 y = numpy.empty(360)
@@ -202,7 +202,7 @@ class WorldMap:
                     logging.debug("Plotting QTHs on the map...")
                     for p in self.points:
                         ax.plot(p.longitude, p.latitude, p.style, transform=cartopy.crs.PlateCarree())
-                        ax.text(p.longitude+0.05*p.longitude, p.latitude+0.025*p.latitude, p.name, color="black", size="small", weight="bold")
+                        ax.text(p.longitude+0.02*p.longitude, p.latitude+0.02*p.latitude, p.name, color="black", size="small", weight="bold")
 
                 return True
         else:
