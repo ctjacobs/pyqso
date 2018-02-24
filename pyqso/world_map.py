@@ -161,15 +161,16 @@ class WorldMap:
                 ax = self.fig.add_subplot(111, projection=cartopy.crs.PlateCarree())
                 ax.set_extent([-180, 180, -90, 90])
                 ax.set_aspect("auto")
+
                 gl = ax.gridlines(draw_labels=True)
                 gl.xlabels_top = False
                 gl.ylabels_right = False
                 gl.xformatter = cartopy.mpl.gridliner.LONGITUDE_FORMATTER
                 gl.yformatter = cartopy.mpl.gridliner.LATITUDE_FORMATTER
-                ax.add_feature(cartopy.feature.LAND)
-                ax.add_feature(cartopy.feature.OCEAN)
+                ax.add_feature(cartopy.feature.LAND, facecolor="green")
+                ax.add_feature(cartopy.feature.OCEAN, color="skyblue")
                 ax.add_feature(cartopy.feature.COASTLINE)
-                ax.add_feature(cartopy.feature.BORDERS, alpha=0.25)
+                ax.add_feature(cartopy.feature.BORDERS, alpha=0.4)
 
                 # Draw the grey line. This is based on the code from the Cartopy Aurora Forecast example (http://scitools.org.uk/cartopy/docs/latest/gallery/aurora_forecast.html) and used under the Open Government Licence (http://scitools.org.uk/cartopy/docs/v0.15/copyright.html).
                 dt = datetime.utcnow()
@@ -200,14 +201,14 @@ class WorldMap:
                 x[180:] = 90
                 y[180:] = numpy.arange(90, -90., -1)
 
-                ax.fill(x, y, transform=rotated_pole, color='grey', alpha=0.75)
+                ax.fill(x, y, transform=rotated_pole, color="black", alpha=0.5)
 
                 # Plot points on the map.
                 if(self.points):
                     logging.debug("Plotting QTHs on the map...")
                     for p in self.points:
                         ax.plot(p.longitude, p.latitude, p.style, transform=cartopy.crs.PlateCarree())
-                        ax.text(p.longitude+0.02*p.longitude, p.latitude+0.02*p.latitude, p.name, color="black", size="small", weight="bold")
+                        ax.text(p.longitude+0.02*p.longitude, p.latitude+0.02*p.latitude, p.name, color="white", size="small", weight="bold")
 
                 return True
         else:
