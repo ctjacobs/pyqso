@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#    Copyright (C) 2013-2017 Christian Thomas Jacobs.
+#    Copyright (C) 2013-2018 Christian Thomas Jacobs.
 
 #    This file is part of PyQSO.
 
@@ -18,7 +18,7 @@
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
 from pyqso.dx_cluster import DXCluster
-from pyqso.grey_line import GreyLine
+from pyqso.world_map import WorldMap
 from pyqso.awards import Awards
 
 
@@ -38,7 +38,7 @@ class Toolbox:
         self.tools = self.builder.get_object("tools")
 
         self.dx_cluster = DXCluster(self.application)
-        self.grey_line = GreyLine(self.application)
+        self.world_map = WorldMap(self.application)
         self.awards = Awards(self.application)
 
         self.tools.connect_after("switch-page", self.on_switch_page)
@@ -52,7 +52,7 @@ class Toolbox:
         return
 
     def on_switch_page(self, widget, label, new_page):
-        """ Re-draw the Grey Line if the user switches to the grey line tab. """
-        if(widget.get_tab_label(label).get_text() == "Grey Line"):
-            self.grey_line.draw()
+        """ Re-draw the WorldMap if the user switches to the World Map tab. """
+        if(widget.get_tab_label(label).get_text() == "World Map"):
+            self.world_map.draw()
         return

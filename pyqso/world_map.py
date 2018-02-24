@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#    Copyright (C) 2013-2017 Christian Thomas Jacobs.
+#    Copyright (C) 2013-2018 Christian Thomas Jacobs.
 
 #    This file is part of PyQSO.
 
@@ -20,6 +20,7 @@
 from gi.repository import GObject
 import logging
 from os.path import expanduser
+from datetime import datetime
 try:
     import configparser
 except ImportError:
@@ -35,7 +36,7 @@ try:
     have_necessary_modules = True
 except ImportError as e:
     logging.warning(e)
-    logging.warning("Could not import a non-standard Python module needed by the GreyLine class, or the version of the non-standard module is too old. Check that all the PyQSO dependencies are satisfied.")
+    logging.warning("Could not import a non-standard Python module needed by the WorldMap class, or the version of the non-standard module is too old. Check that all the PyQSO dependencies are satisfied.")
     have_necessary_modules = False
 try:
     import geocoder
@@ -63,16 +64,16 @@ class Point:
         return
 
 
-class GreyLine:
+class WorldMap:
 
-    """ A tool for visualising the grey line. """
+    """ A tool for visualising the world map. """
 
     def __init__(self, application):
-        """ Set up the drawing canvas and the timer which will re-plot the grey line every 30 minutes.
+        """ Set up the drawing canvas and the timer which will re-plot the world map every 30 minutes.
 
         :arg application: The PyQSO application containing the main Gtk window, etc.
         """
-        logging.debug("Setting up the grey line...")
+        logging.debug("Setting up the world map...")
 
         self.application = application
         self.builder = self.application.builder
@@ -81,8 +82,8 @@ class GreyLine:
         if(have_necessary_modules):
             self.fig = matplotlib.figure.Figure()
             self.canvas = FigureCanvas(self.fig)  # For embedding in the Gtk application
-            self.builder.get_object("greyline").pack_start(self.canvas, True, True, 0)
-            self.refresh_event = GObject.timeout_add(1800000, self.draw)  # Re-draw the grey line automatically after 30 minutes (if the grey line tool is visible).
+            self.builder.get_object("worldmap").pack_start(self.canvas, True, True, 0)
+            self.refresh_event = GObject.timeout_add(1800000, self.draw)  # Re-draw the world map automatically after 30 minutes (if the world map tool is visible).
 
         # Plot the QTH coordinates, if available.
         config = configparser.ConfigParser()
@@ -96,11 +97,11 @@ class GreyLine:
                     qth_longitude = float(config.get("general", "qth_longitude"))
                     self.add_point(qth_name, qth_latitude, qth_longitude, "ro")
                 except ValueError:
-                    logging.warning("Unable to get the QTH name, latitude and/or longitude. The QTH will not be pinpointed on the grey line map. Check preferences?")
+                    logging.warning("Unable to get the QTH name, latitude and/or longitude. The QTH will not be pinpointed on the world map. Check preferences?")
 
-        self.builder.get_object("greyline").show_all()
+        self.builder.get_object("worldmap").show_all()
 
-        logging.debug("Grey line ready!")
+        logging.debug("World map ready!")
 
         return
 
@@ -118,7 +119,7 @@ class GreyLine:
         return
 
     def pinpoint(self, r):
-        """ Pinpoint the location of a QSO on the grey line map based on the COUNTRY field.
+        """ Pinpoint the location of a QSO on the world map based on the COUNTRY field.
 
         :arg r: The QSO record containing the location to pinpoint.
         """
@@ -144,7 +145,7 @@ class GreyLine:
     def draw(self):
         """ Draw the world map and the grey line on top of it.
 
-        :returns: Always returns True to satisfy the GObject timer, unless the necessary GreyLine dependencies are not satisfied (in which case, the method returns False so as to not re-draw the canvas).
+        :returns: Always returns True to satisfy the GObject timer, unless the necessary WorldMap dependencies are not satisfied (in which case, the method returns False so as to not re-draw the canvas).
         :rtype: bool
         """
 
@@ -152,7 +153,7 @@ class GreyLine:
             toolbox = self.builder.get_object("toolbox")
             tools = self.builder.get_object("tools")
             if(tools.get_current_page() != 1 or not toolbox.get_visible()):
-                # Don't re-draw if the grey line is not visible.
+                # Don't re-draw if the world map is not visible.
                 return True  # We need to return True in case this is method was called by a timer event.
             else:
                 # Set up the world map.
@@ -165,14 +166,43 @@ class GreyLine:
                 ax.add_feature(cartopy.feature.COASTLINE)
                 ax.add_feature(cartopy.feature.BORDERS, alpha=0.25)
 
-                # TODO: Re-draw the grey line.
+                # Draw the grey line. This is based on the code from the Cartopy Aurora Forecast example (http://scitools.org.uk/cartopy/docs/latest/gallery/aurora_forecast.html) and used under the Open Government Licence (http://scitools.org.uk/cartopy/docs/v0.15/copyright.html).
+                dt = datetime.utcnow()
+                axial_tilt = 23.5
+                ref_solstice = datetime(2016, 6, 21, 22, 22)
+                days_per_year = 365.2425
+                seconds_per_day = 86400.0
+
+                days_since_ref = (dt - ref_solstice).total_seconds()/seconds_per_day
+                lat = axial_tilt*numpy.cos(2*numpy.pi*days_since_ref/days_per_year)
+                sec_since_midnight = (dt - datetime(dt.year, dt.month, dt.day)).seconds
+                lng = -(sec_since_midnight/seconds_per_day - 0.5)*360
+
+                pole_lng = lng
+                if lat > 0:
+                    pole_lat = -90 + lat
+                    central_rot_lng = 180
+                else:
+                    pole_lat = 90 + lat
+                    central_rot_lng = 0
+
+                rotated_pole = cartopy.crs.RotatedPole(pole_latitude=pole_lat, pole_longitude=pole_lng, central_rotated_longitude=central_rot_lng)
+
+                x = numpy.empty(360)
+                y = numpy.empty(360)
+                x[:180] = -90
+                y[:180] = numpy.arange(-90, 90.)
+                x[180:] = 90
+                y[180:] = numpy.arange(90, -90., -1)
+
+                ax.fill(x, y, transform=rotated_pole, color='grey', alpha=0.75)
 
                 # Plot points on the map.
                 if(self.points):
                     logging.debug("Plotting QTHs on the map...")
                     for p in self.points:
                         ax.plot(p.longitude, p.latitude, p.style, transform=cartopy.crs.PlateCarree())
-                        ax.text(p.longitude+0.01*p.longitude, p.latitude+0.01*p.latitude, p.name, color="black", size="small", weight="bold")
+                        ax.text(p.longitude+0.05*p.longitude, p.latitude+0.025*p.latitude, p.name, color="black", size="small", weight="bold")
 
                 return True
         else:

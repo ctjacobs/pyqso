@@ -1053,7 +1053,7 @@ class Logbook:
         return
 
     def pinpoint_callback(self, widget=None, path=None):
-        """ A callback function used to pinpoint the callsign on the grey line map. """
+        """ A callback function used to pinpoint the callsign on the world map. """
 
         try:
             log_index = self.get_log_index()
@@ -1065,7 +1065,7 @@ class Logbook:
             logging.error(e)
             return
 
-        self.application.toolbox.grey_line.pinpoint(r)
+        self.application.toolbox.world_map.pinpoint(r)
 
         return
 

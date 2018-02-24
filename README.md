@@ -30,17 +30,17 @@ As the name suggests, PyQSO is written primarily in the [Python](https://www.pyt
 * gir1.2-gtk-3.0
 * python3-gi-cairo
 
-Several extra packages are necessary to enable the full functionality of PyQSO, such as the grey line tool. Many of these (specified in the `requirements.txt` file) can be readily installed system-wide using the Python package manager by issuing the following command in the terminal:
+Several extra packages are necessary to enable the full functionality of PyQSO. Many of these (specified in the `requirements.txt` file) can be readily installed system-wide using the Python package manager by issuing the following command in the terminal:
 
     sudo pip3 install -U -r requirements.txt
 
 but the complete list is given below:
 
 * python3-matplotlib (version 1.3.0 or later)
-* python3-mpltoolkits.basemap
 * python3-numpy
 * libxcb-render0-dev
 * python3-cairocffi
+* [cartopy](http://scitools.org.uk/cartopy/) (for drawing the world map and grey line)
 * [geocoder](https://pypi.python.org/pypi/geocoder) (for QTH lookups)
 * python3-sphinx (for building the documentation)
 * python3-hamlib (for Hamlib support)

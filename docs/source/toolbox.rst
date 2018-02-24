@@ -31,20 +31,18 @@ adjacent ``Send Command`` button (or pressing the Enter key).
       
       The DX cluster frame.
 
-Grey line
+World map
 ---------
 
-The grey line tool (see figure:grey_line_) can be used to
-check which parts of the world are in darkness. The position of the grey
-line is automatically updated every 30 minutes.
+The world map tool (see figure:world_map_) can be used to plot the QTH of your station and stations that you have contacted. It also features a grey line to check which parts of the world are in darkness. The position of the grey line is automatically updated every 30 minutes.
 
 The user's QTH can be pin-pointed on the map by specifying the QTH's location (e.g. city name) and latitude-longitude coordinates in the preferences. If the `geocoder <https://pypi.python.org/pypi/geocoder>`_ library is installed then these coordinates can be filled in for you by clicking the lookup button after entering the QTH's name, otherwise the coordinates will have to be entered manually.
 
-   .. _figure:grey_line:
-   .. figure::  images/grey_line.png
+   .. _figure:world_map:
+   .. figure::  images/world_map.png
       :align:   center
       
-      The grey line tool with the user's QTH (e.g. Southampton) pin-pointed on the map.
+      The world map tool with the user's QTH (e.g. Southampton) pin-pointed.
 
 Awards
 ------
