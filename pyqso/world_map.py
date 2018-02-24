@@ -157,6 +157,7 @@ class WorldMap:
                 return True  # We need to return True in case this is method was called by a timer event.
             else:
                 # Set up the world map.
+                logging.debug("Drawing the world map...")
                 self.fig.clf()
                 ax = self.fig.add_subplot(111, projection=cartopy.crs.PlateCarree())
                 ax.set_extent([-180, 180, -90, 90])
@@ -173,6 +174,7 @@ class WorldMap:
                 ax.add_feature(cartopy.feature.BORDERS, alpha=0.4)
 
                 # Draw the grey line. This is based on the code from the Cartopy Aurora Forecast example (http://scitools.org.uk/cartopy/docs/latest/gallery/aurora_forecast.html) and used under the Open Government Licence (http://scitools.org.uk/cartopy/docs/v0.15/copyright.html).
+                logging.debug("Drawing the grey line...")
                 dt = datetime.utcnow()
                 axial_tilt = 23.5
                 reference_solstice = datetime(2016, 6, 21, 22, 22)
