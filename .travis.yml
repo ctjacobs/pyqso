@@ -1,19 +1,17 @@
 sudo: required
 dist: trusty
-group: deprecated-2017Q2
 
 language: python
 
 python:
-  - "3.4"
+  - "3.6"
   
 virtualenv:
   system_site_packages: true
 
 before_install:
  - sudo apt-get update -qq
- - sudo apt-get install -yq xvfb python3 python3-pip gir1.2-gtk-3.0 python3-gi-cairo python3-flake8 libproj-dev libgeos-dev python-libhamlib2
- - sudo pip3 install -U -r requirements.txt
+ - sudo apt-get install -yq xvfb python3 python3-pip gir1.2-gtk-3.0 python3-gi-cairo python3-flake8 python3-numpy python3-matplotlib python3-sphinx python-libhamlib2
  - "export DISPLAY=:99.0"
  - "sh -e /etc/init.d/xvfb start"
 
