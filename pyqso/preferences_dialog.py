@@ -67,6 +67,7 @@ class PreferencesDialog:
         self.records = RecordsPage(self.dialog, self.builder)
         self.import_export = ImportExportPage(self.dialog, self.builder)
         self.hamlib = HamlibPage(self.dialog, self.builder)
+        self.world_map = WorldMapPage(self.dialog, self.builder)
 
         self.dialog.show_all()
 
@@ -105,6 +106,11 @@ class PreferencesDialog:
         config.add_section("hamlib")
         for key in list(self.hamlib.data.keys()):
             config.set("hamlib", key.lower(), str(self.hamlib.data[key]))
+
+        # World Map
+        config.add_section("world_map")
+        for key in list(self.world_map.data.keys()):
+            config.set("world_map", key.lower(), str(self.world_map.data[key]))
 
         # Write the preferences to file.
         with open(os.path.expanduser(PREFERENCES_FILE), 'w') as f:
@@ -177,44 +183,6 @@ class GeneralPage:
         else:
             self.sources["KEEP_OPEN"].set_active(False)
 
-        # Pin-point QTH on grey line map.
-        self.sources["SHOW_QTH"] = self.builder.get_object("general_show_qth_checkbutton")
-        (section, option) = ("general", "show_qth")
-        if(have_config and config.has_option(section, option)):
-            self.sources["SHOW_QTH"].set_active(config.getboolean(section, option))
-        else:
-            self.sources["SHOW_QTH"].set_active(False)
-
-        self.sources["QTH_NAME"] = self.builder.get_object("general_qth_name_entry")
-        button = self.builder.get_object("general_qth_lookup")
-        button.connect("clicked", self.lookup_callback)  # Uses geocoding to find the latitude-longitude coordinates.
-
-        self.sources["QTH_LATITUDE"] = self.builder.get_object("general_qth_coordinates_latitude_entry")
-        self.sources["QTH_LONGITUDE"] = self.builder.get_object("general_qth_coordinates_longitude_entry")
-
-        (section, option) = ("general", "show_qth")
-        # Disable the text entry boxes if the SHOW_QTH checkbox is not checked.
-        if(have_config and config.has_option(section, option)):
-            self.sources["QTH_NAME"].set_sensitive(self.sources["SHOW_QTH"].get_active())
-            self.sources["QTH_LATITUDE"].set_sensitive(self.sources["SHOW_QTH"].get_active())
-            self.sources["QTH_LONGITUDE"].set_sensitive(self.sources["SHOW_QTH"].get_active())
-            button.set_sensitive(self.sources["SHOW_QTH"].get_active())
-        else:
-            self.sources["QTH_NAME"].set_sensitive(False)
-            self.sources["QTH_LATITUDE"].set_sensitive(False)
-            self.sources["QTH_LONGITUDE"].set_sensitive(False)
-            button.set_sensitive(False)
-        (section, option) = ("general", "qth_name")
-        if(have_config and config.has_option(section, option)):
-            self.sources["QTH_NAME"].set_text(config.get(section, option))
-        (section, option) = ("general", "qth_latitude")
-        if(have_config and config.has_option(section, option)):
-            self.sources["QTH_LATITUDE"].set_text(config.get(section, option))
-        (section, option) = ("general", "qth_longitude")
-        if(have_config and config.has_option(section, option)):
-            self.sources["QTH_LONGITUDE"].set_text(config.get(section, option))
-        self.sources["SHOW_QTH"].connect("toggled", self.on_show_qth_toggled)
-
         return
 
     @property
@@ -226,10 +194,6 @@ class GeneralPage:
         data["DEFAULT_LOGBOOK"] = self.sources["DEFAULT_LOGBOOK"].get_active()
         data["DEFAULT_LOGBOOK_PATH"] = os.path.expanduser(self.sources["DEFAULT_LOGBOOK_PATH"].get_text())
         data["KEEP_OPEN"] = self.sources["KEEP_OPEN"].get_active()
-        data["SHOW_QTH"] = self.sources["SHOW_QTH"].get_active()
-        data["QTH_NAME"] = self.sources["QTH_NAME"].get_text()
-        data["QTH_LATITUDE"] = self.sources["QTH_LATITUDE"].get_text()
-        data["QTH_LONGITUDE"] = self.sources["QTH_LONGITUDE"].get_text()
         return data
 
     def on_default_logbook_toggled(self, widget, data=None):
@@ -255,40 +219,6 @@ class GeneralPage:
             path = dialog.get_filename()
             self.sources["DEFAULT_LOGBOOK_PATH"].set_text(path)
         dialog.destroy()
-        return
-
-    def on_show_qth_toggled(self, widget, data=None):
-        if(widget.get_active()):
-            self.sources["QTH_NAME"].set_sensitive(True)
-            self.sources["QTH_LATITUDE"].set_sensitive(True)
-            self.sources["QTH_LONGITUDE"].set_sensitive(True)
-            self.builder.get_object("general_qth_lookup").set_sensitive(True)
-        else:
-            self.sources["QTH_NAME"].set_sensitive(False)
-            self.sources["QTH_LATITUDE"].set_sensitive(False)
-            self.sources["QTH_LONGITUDE"].set_sensitive(False)
-            self.builder.get_object("general_qth_lookup").set_sensitive(False)
-        return
-
-    def lookup_callback(self, widget=None):
-        """ Perform geocoding of the QTH location to obtain latitude-longitude coordinates. """
-        if(not have_geocoder):
-            error(parent=self.parent, message="Geocoder module could not be imported. Geocoding aborted.")
-            return
-        logging.debug("Geocoding QTH location...")
-        name = self.sources["QTH_NAME"].get_text()
-        try:
-            g = geocoder.google(name)
-            latitude, longitude = g.latlng
-            self.sources["QTH_LATITUDE"].set_text(str(latitude))
-            self.sources["QTH_LONGITUDE"].set_text(str(longitude))
-            logging.debug("QTH coordinates found: (%s, %s)", str(latitude), str(longitude))
-        except ValueError as e:
-            error(parent=self.parent, message="Unable to lookup QTH coordinates. Is the QTH name correct?")
-            logging.exception(e)
-        except Exception as e:
-            error(parent=self.parent, message="Unable to lookup QTH coordinates. Check connection to the internets? Lookup limit reached?")
-            logging.exception(e)
         return
 
 
@@ -552,3 +482,122 @@ class HamlibPage:
         data["RIG_PATHNAME"] = self.sources["RIG_PATHNAME"].get_text()
         data["RIG_MODEL"] = self.sources["RIG_MODEL"].get_active_text()
         return data
+
+
+class WorldMapPage:
+
+    """ The section of the preferences dialog containing World Map preferences. """
+
+    def __init__(self, parent, builder):
+        """ Set up the World Map page of the Preferences dialog. """
+
+        self.parent = parent
+        self.builder = builder
+        self.sources = {}
+
+        # Remember that the have_config conditional in the PyQSO class may be out-of-date the next time the user opens up the preferences dialog
+        # because a configuration file may have been created after launching the application. Let's check to see if one exists again...
+        config = configparser.ConfigParser()
+        have_config = (config.read(PREFERENCES_FILE) != [])
+
+        # Option to pin-point QTH on grey line map.
+        self.sources["SHOW_QTH"] = self.builder.get_object("world_map_show_qth_checkbutton")
+        (section, option) = ("world_map", "show_qth")
+        if(have_config and config.has_option(section, option)):
+            self.sources["SHOW_QTH"].set_active(config.getboolean(section, option))
+        else:
+            self.sources["SHOW_QTH"].set_active(False)
+
+        self.sources["QTH_NAME"] = self.builder.get_object("world_map_qth_name_entry")
+        button = self.builder.get_object("world_map_qth_lookup")
+        button.connect("clicked", self.lookup_callback)  # Uses geocoding to find the latitude-longitude coordinates.
+
+        self.sources["QTH_LATITUDE"] = self.builder.get_object("world_map_qth_coordinates_latitude_entry")
+        self.sources["QTH_LONGITUDE"] = self.builder.get_object("world_map_qth_coordinates_longitude_entry")
+
+        (section, option) = ("world_map", "show_qth")
+        # Disable the text entry boxes if the SHOW_QTH checkbox is not checked.
+        if(have_config and config.has_option(section, option)):
+            self.sources["QTH_NAME"].set_sensitive(self.sources["SHOW_QTH"].get_active())
+            self.sources["QTH_LATITUDE"].set_sensitive(self.sources["SHOW_QTH"].get_active())
+            self.sources["QTH_LONGITUDE"].set_sensitive(self.sources["SHOW_QTH"].get_active())
+            button.set_sensitive(self.sources["SHOW_QTH"].get_active())
+        else:
+            self.sources["QTH_NAME"].set_sensitive(False)
+            self.sources["QTH_LATITUDE"].set_sensitive(False)
+            self.sources["QTH_LONGITUDE"].set_sensitive(False)
+            button.set_sensitive(False)
+        (section, option) = ("world_map", "qth_name")
+        if(have_config and config.has_option(section, option)):
+            self.sources["QTH_NAME"].set_text(config.get(section, option))
+        (section, option) = ("world_map", "qth_latitude")
+        if(have_config and config.has_option(section, option)):
+            self.sources["QTH_LATITUDE"].set_text(config.get(section, option))
+        (section, option) = ("world_map", "qth_longitude")
+        if(have_config and config.has_option(section, option)):
+            self.sources["QTH_LONGITUDE"].set_text(config.get(section, option))
+        self.sources["SHOW_QTH"].connect("toggled", self.on_show_qth_toggled)
+
+        # Option to show Maidenhead grid squares.
+        self.sources["SHOW_GRID_SQUARES"] = self.builder.get_object("world_map_show_grid_squares_checkbutton")
+        (section, option) = ("world_map", "show_grid_squares")
+        if(have_config and config.has_option(section, option)):
+            self.sources["SHOW_GRID_SQUARES"].set_active(config.getboolean(section, option))
+        else:
+            self.sources["SHOW_GRID_SQUARES"].set_active(False)
+
+        # Option to shade in worked Maidenhead grid squares.
+        self.sources["SHADE_WORKED_GRID_SQUARES"] = self.builder.get_object("world_map_shade_worked_grid_squares_checkbutton")
+        (section, option) = ("world_map", "shade_worked_grid_squares")
+        if(have_config and config.has_option(section, option)):
+            self.sources["SHADE_WORKED_GRID_SQUARES"].set_active(config.getboolean(section, option))
+        else:
+            self.sources["SHADE_WORKED_GRID_SQUARES"].set_active(False)
+
+        return
+
+    @property
+    def data(self):
+        """ User preferences regarding World Map settings. """
+        data = {}
+        data["SHOW_QTH"] = self.sources["SHOW_QTH"].get_active()
+        data["QTH_NAME"] = self.sources["QTH_NAME"].get_text()
+        data["QTH_LATITUDE"] = self.sources["QTH_LATITUDE"].get_text()
+        data["QTH_LONGITUDE"] = self.sources["QTH_LONGITUDE"].get_text()
+        data["SHOW_GRID_SQUARES"] = self.sources["SHOW_GRID_SQUARES"].get_active()
+        data["SHADE_WORKED_GRID_SQUARES"] = self.sources["SHADE_WORKED_GRID_SQUARES"].get_active()
+        return data
+
+    def on_show_qth_toggled(self, widget, data=None):
+        if(widget.get_active()):
+            self.sources["QTH_NAME"].set_sensitive(True)
+            self.sources["QTH_LATITUDE"].set_sensitive(True)
+            self.sources["QTH_LONGITUDE"].set_sensitive(True)
+            self.builder.get_object("world_map_qth_lookup").set_sensitive(True)
+        else:
+            self.sources["QTH_NAME"].set_sensitive(False)
+            self.sources["QTH_LATITUDE"].set_sensitive(False)
+            self.sources["QTH_LONGITUDE"].set_sensitive(False)
+            self.builder.get_object("world_map_qth_lookup").set_sensitive(False)
+        return
+
+    def lookup_callback(self, widget=None):
+        """ Perform geocoding of the QTH location to obtain latitude-longitude coordinates. """
+        if(not have_geocoder):
+            error(parent=self.parent, message="Geocoder module could not be imported. Geocoding aborted.")
+            return
+        logging.debug("Geocoding QTH location...")
+        name = self.sources["QTH_NAME"].get_text()
+        try:
+            g = geocoder.google(name)
+            latitude, longitude = g.latlng
+            self.sources["QTH_LATITUDE"].set_text(str(latitude))
+            self.sources["QTH_LONGITUDE"].set_text(str(longitude))
+            logging.debug("QTH coordinates found: (%s, %s)", str(latitude), str(longitude))
+        except ValueError as e:
+            error(parent=self.parent, message="Unable to lookup QTH coordinates. Is the QTH name correct?")
+            logging.exception(e)
+        except Exception as e:
+            error(parent=self.parent, message="Unable to lookup QTH coordinates. Check connection to the internets? Lookup limit reached?")
+            logging.exception(e)
+        return

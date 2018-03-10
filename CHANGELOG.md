@@ -2,10 +2,13 @@
 
 ## [UNRELEASED]
 ### Added
-- Added support for the SAT_NAME, SAT_MODE, PROP_MODE, and GRIDSQUARE ADIF fields for the purposes of satellite QSO logging.
+- Support for the SAT_NAME, SAT_MODE, PROP_MODE, and GRIDSQUARE ADIF fields for the purposes of satellite QSO logging.
 - Pinpointing of callsigns on the world map by looking up the latitude-longitude coordinates based on the value in the COUNTRY field. A new right-click popup menu has been created for this purpose.
-- Added basic copy/paste functionality for individual records.
-- Added a requirements.txt file for the purpose of installing dependencies.
+- A separate World Map tab in the Preferences dialog.
+- A navigation bar for the World Map tool.
+- The option of showing Maidenhead grid squares on the World Map, and the option of shading in worked grid squares.
+- Basic copy/paste functionality for individual records.
+- A requirements.txt file for the purpose of installing dependencies.
 
 ### Changed
 - Renamed the GreyLine class to WorldMap, since it now does more than just grey line plotting.
