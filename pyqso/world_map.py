@@ -225,7 +225,7 @@ class WorldMap:
         return
 
     def get_worked_grid_squares(self, logbook):
-        """ Updated the array of worked grid squares.
+        """ Get the array of worked grid squares.
 
         :arg logbook: The logbook containing logs which in turn contain QSOs.
         :returns: A two-dimensional array of boolean values showing which grid squares have been worked.
