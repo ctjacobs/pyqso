@@ -19,6 +19,7 @@
 
 from gi.repository import GObject
 import logging
+import sqlite3 as sqlite
 import re
 from os.path import expanduser
 from datetime import datetime
@@ -49,6 +50,8 @@ except ImportError:
 
 
 class NavigationToolbar(NavigationToolbar2GTK3):
+    """ Navigation tools for the World Map. """
+    # Only include a subset of the tools.
     toolitems = [t for t in NavigationToolbar2GTK3.toolitems if t[0] in ("Home", "Zoom", "Save")]
 
 
@@ -148,29 +151,37 @@ class WorldMap:
         if(have_necessary_modules):
             self.fig = matplotlib.figure.Figure()
             self.canvas = FigureCanvas(self.fig)  # For embedding in the Gtk application
-            self.builder.get_object("worldmap").pack_start(self.canvas, True, True, 0)
+            self.builder.get_object("world_map").pack_start(self.canvas, True, True, 0)
             toolbar = NavigationToolbar(self.canvas, self.application.window)
-            self.builder.get_object("worldmap").pack_start(toolbar, False, False, 0)
+            self.builder.get_object("world_map").pack_start(toolbar, False, False, 0)
             self.refresh_event = GObject.timeout_add(1800000, self.draw)  # Re-draw the world map automatically after 30 minutes (if the world map tool is visible).
 
         # Add the QTH coordinates for plotting, if available.
         config = configparser.ConfigParser()
         have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
-        (section, option) = ("general", "show_qth")
+        (section, option) = ("world_map", "show_qth")
         if(have_config and config.has_option(section, option)):
             if(config.getboolean(section, option)):
                 try:
-                    qth_name = config.get("general", "qth_name")
-                    qth_latitude = float(config.get("general", "qth_latitude"))
-                    qth_longitude = float(config.get("general", "qth_longitude"))
+                    qth_name = config.get("world_map", "qth_name")
+                    qth_latitude = float(config.get("world_map", "qth_latitude"))
+                    qth_longitude = float(config.get("world_map", "qth_longitude"))
                     self.add_point(qth_name, qth_latitude, qth_longitude, "ro")
                 except ValueError:
                     logging.warning("Unable to get the QTH name, latitude and/or longitude. The QTH will not be pinpointed on the world map. Check preferences?")
 
+        # Maidenhead grid squares.
         self.maidenhead = Maidenhead()
-        self.grid_square_count = numpy.zeros((len(self.maidenhead.upper), len(self.maidenhead.upper)), dtype=bool)
+        self.show_grid_squares = False
+        self.shade_worked_grid_squares = False
+        (section, option) = ("world_map", "show_grid_squares")
+        if(have_config and config.has_option(section, option)):
+            self.show_grid_squares = config.getboolean(section, option)
+            (section, option) = ("world_map", "shade_worked_grid_squares")
+            if(have_config and config.has_option(section, option)):
+                self.shade_worked_grid_squares = config.getboolean(section, option)
 
-        self.builder.get_object("worldmap").show_all()
+        self.builder.get_object("world_map").show_all()
 
         logging.debug("World map ready!")
 
@@ -213,6 +224,30 @@ class WorldMap:
 
         return
 
+    def get_worked_grid_squares(self, logbook):
+        """ Updated the array of worked grid squares.
+
+        :arg logbook: The logbook containing logs which in turn contain QSOs.
+        :returns: A two-dimensional array of boolean values showing which grid squares have been worked.
+        :rtype: numpy.array
+        """
+
+        worked_grid_squares = numpy.zeros((len(self.maidenhead.upper), len(self.maidenhead.upper)), dtype=bool)
+
+        for log in logbook.logs:
+            try:
+                records = log.records
+                for r in records:
+                    if(r["GRIDSQUARE"]):
+                        grid_square = r["GRIDSQUARE"][0:2].upper()  # Only consider the field value (e.g. IO).
+                        worked_grid_squares[self.maidenhead.upper.index(grid_square[1]), self.maidenhead.upper.index(grid_square[0])] = True
+
+            except sqlite.Error as e:
+                logging.error("Could not update the array of worked grid squares for log '%s' because of a database error." % log.name)
+                logging.exception(e)
+
+        return worked_grid_squares
+
     def draw(self):
         """ Draw the world map and the grey line on top of it.
 
@@ -240,7 +275,7 @@ class WorldMap:
                 gl.xformatter = cartopy.mpl.gridliner.LONGITUDE_FORMATTER
                 gl.yformatter = cartopy.mpl.gridliner.LATITUDE_FORMATTER
                 ax.add_feature(cartopy.feature.LAND, facecolor="green")
-                ax.add_feature(cartopy.feature.OCEAN, color="skyblue")
+                ax.add_feature(cartopy.feature.OCEAN)
                 ax.add_feature(cartopy.feature.COASTLINE)
                 ax.add_feature(cartopy.feature.BORDERS, alpha=0.4)
 
@@ -283,20 +318,23 @@ class WorldMap:
                         ax.plot(p.longitude, p.latitude, p.style, transform=cartopy.crs.PlateCarree())
                         ax.text(p.longitude+0.02*p.longitude, p.latitude+0.02*p.latitude, p.name, color="white", size="small", weight="bold")
 
-                # Draw Maidenhead grid squares.
-                xx = numpy.linspace(-180, 180, len(list(self.maidenhead.upper))+1)
-                yy = numpy.linspace(-90, 90, len(list(self.maidenhead.upper))+1)
-                A = self.grid_square_count.copy()
-                A[10, 10] = True
-                A[12, 12] = True
-                A[10, 5] = True
-                A[9, 5] = True
-                z = numpy.ma.masked_array(A, A == 0)
-                ax.pcolormesh(xx, yy, z, transform=cartopy.crs.PlateCarree(), cmap='Purples', vmin=0, vmax=1, edgecolors="k", linewidth=2, alpha=0.6)
-                for i in range(len(self.maidenhead.upper)):
-                    for j in range(len(self.maidenhead.upper)):
-                        text = self.maidenhead.upper[i]+self.maidenhead.upper[j]
-                        ax.text((xx[i]+xx[i+1])/2.0, (yy[j]+yy[j+1])/2.0, text, ha="center", va="center", size=8, color="w")
+                # Draw Maidenhead grid squares and shade in the worked squares.
+                x = numpy.linspace(-180, 180, len(list(self.maidenhead.upper))+1)
+                y = numpy.linspace(-90, 90, len(list(self.maidenhead.upper))+1)
+                if(self.show_grid_squares):
+                    if(self.shade_worked_grid_squares):
+                        worked_grid_squares = self.get_worked_grid_squares(self.application.logbook)
+                        masked = numpy.ma.masked_array(worked_grid_squares, worked_grid_squares == 0)
+                    else:
+                        z = numpy.zeros((len(self.maidenhead.upper), len(self.maidenhead.upper)), dtype=bool)
+                        masked = numpy.ma.masked_array(z, z == 0)
+                    ax.pcolormesh(x, y, masked, transform=cartopy.crs.PlateCarree(), cmap='Purples', vmin=0, vmax=1, edgecolors="k", linewidth=2, alpha=0.4)
+
+                    # Grid square labels.
+                    for i in range(len(self.maidenhead.upper)):
+                        for j in range(len(self.maidenhead.upper)):
+                            text = self.maidenhead.upper[i]+self.maidenhead.upper[j]
+                            ax.text((x[i]+x[i+1])/2.0, (y[j]+y[j+1])/2.0, text, ha="center", va="center", size=8, color="w")
 
                 return True
         else:
