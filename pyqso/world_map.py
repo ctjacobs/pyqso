@@ -201,17 +201,26 @@ class WorldMap:
         return
 
     def pinpoint(self, r):
-        """ Pinpoint the location of a QSO on the world map based on the COUNTRY field.
+        """ Pinpoint the location of a QSO on the world map.
 
         :arg r: The QSO record containing the location to pinpoint.
         """
 
         if(have_geocoder):
-            country = r["COUNTRY"]
             callsign = r["CALL"]
+            gridsquare = r["GRIDSQUARE"]
+            country = r["COUNTRY"]
 
-            # Get the latitude-longitude coordinates of the country.
-            if(country):
+            # Get the latitude-longitude coordinates. Use any GRIDSQUARE information first since this is likely to be more accurate than the COUNTRY field.
+            if(gridsquare):
+                m = Maidenhead()
+                try:
+                    latitude, longitude = m.gs2ll(gridsquare)
+                    logging.debug("QTH coordinates found: (%s, %s)", str(latitude), str(longitude))
+                    self.add_point(callsign, latitude, longitude)
+                except ValueError:
+                    logging.exception("Unable to lookup QTH coordinates.")
+            elif(country):
                 try:
                     g = geocoder.google(country)
                     latitude, longitude = g.latlng
