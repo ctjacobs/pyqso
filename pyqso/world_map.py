@@ -218,14 +218,17 @@ class WorldMap:
                     latitude, longitude = m.gs2ll(gridsquare)
                     logging.debug("QTH coordinates found: (%s, %s)", str(latitude), str(longitude))
                     self.add_point(callsign, latitude, longitude)
+                    return
                 except ValueError:
                     logging.exception("Unable to lookup QTH coordinates.")
-            elif(country):
+
+            if(country):
                 try:
                     g = geocoder.google(country)
                     latitude, longitude = g.latlng
                     logging.debug("QTH coordinates found: (%s, %s)", str(latitude), str(longitude))
                     self.add_point(callsign, latitude, longitude)
+                    return
                 except ValueError:
                     logging.exception("Unable to lookup QTH coordinates.")
                 except Exception:
