@@ -908,7 +908,7 @@
     <property name="type_hint">dialog</property>
     <property name="transient_for">pyqso</property>
     <property name="program_name">PyQSO</property>
-    <property name="version">1.1.0-dev</property>
+    <property name="version">1.1.0</property>
     <property name="copyright" translatable="yes">Copyright (C) 2012-2018 Christian Thomas Jacobs</property>
     <property name="comments" translatable="yes">A contact logging tool for amateur radio operators.</property>
     <property name="website">http://christianjacobs.uk/pyqso</property>
