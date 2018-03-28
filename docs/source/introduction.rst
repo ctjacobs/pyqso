@@ -24,7 +24,7 @@ include:
 
 -  Progress tracker for the `DXCC <http://www.arrl.org/dxcc/>`_ award.
 
--  World map with grey line.
+-  World map with grey line and Maidenhead grid squares.
 
 -  Filter QSOs based on callsign (e.g. only display contacts with callsigns beginning with "M6").
 

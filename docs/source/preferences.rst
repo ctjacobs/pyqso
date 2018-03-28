@@ -17,8 +17,6 @@ Under the ``General`` tab, the user can choose to:
 
 -  Keep the ``Add Record`` dialog window open after a new QSO is added, in preparation for the next QSO.
 
--  Pin-point the user's QTH on the world map by specifying the latitude-longitude coordinates (or looking them up based on the QTH's name, e.g. city name).
-
    .. _figure:summary:
    .. figure::  images/summary.png
       :align:   center
@@ -60,9 +58,9 @@ PyQSO currently supports the ``NOTES`` field in the ADIF specification, but not 
 Hamlib support
 --------------
 
-PyQSO features rudimentary support for the `Hamlib <http://hamlib.sourceforge.net/>`_ library. The name and
-path of the radio device connected to the user's computer can be
-specified in the ``Hamlib`` tab of the preferences dialog. Upon adding a
-new record to the log, PyQSO will use Hamlib to retrieve the current
-frequency and mode that the radio device is set to and automatically fill in the
-Frequency and Mode fields.
+PyQSO features rudimentary support for the `Hamlib <http://hamlib.sourceforge.net/>`_ library. The name and path of the radio device connected to the user's computer can be specified in the ``Hamlib`` tab of the preferences dialog. Upon adding a new record to the log, PyQSO will use Hamlib to retrieve the current frequency and mode that the radio device is set to and automatically fill in the Frequency and Mode fields.
+
+World Map
+---------
+
+The user can pin-point their QTH on the world map by specifying the latitude-longitude coordinates (or looking them up based on the QTH's name, e.g. city name) in the ``World Map`` tab. Maidenhead grid squares can also be rendered, with worked grid squares shaded, which is particularly useful for satellite operating.
