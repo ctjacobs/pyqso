@@ -48,11 +48,11 @@ except ImportError:
     logging.warning("Could not import the geocoder module!")
     have_geocoder = False
 
-
-class NavigationToolbar(NavigationToolbar2GTK3):
-    """ Navigation tools for the World Map. """
-    # Only include a subset of the tools.
-    toolitems = [t for t in NavigationToolbar2GTK3.toolitems if t[0] in ("Home", "Zoom", "Save")]
+if(have_necessary_modules):
+    class NavigationToolbar(NavigationToolbar2GTK3):
+        """ Navigation tools for the World Map. """
+        # Only include a subset of the tools.
+        toolitems = [t for t in NavigationToolbar2GTK3.toolitems if t[0] in ("Home", "Zoom", "Save")]
 
 
 class Point:
