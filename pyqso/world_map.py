@@ -221,9 +221,8 @@ class WorldMap:
 
             # Get the latitude-longitude coordinates. Use any GRIDSQUARE information first since this is likely to be more accurate than the COUNTRY field.
             if(gridsquare):
-                m = Maidenhead()
                 try:
-                    latitude, longitude = m.gs2ll(gridsquare)
+                    latitude, longitude = self.maidenhead.gs2ll(gridsquare)
                     logging.debug("QTH coordinates found: (%s, %s)", str(latitude), str(longitude))
                     self.add_point(callsign, latitude, longitude)
                     return
