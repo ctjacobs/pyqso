@@ -22,7 +22,7 @@ try:
     import unittest.mock as mock
 except ImportError:
     import mock
-from pyqso.world_map import *
+from pyqso.world_map import Maidenhead, WorldMap
 
 
 class TestMaidenhead(unittest.TestCase):
