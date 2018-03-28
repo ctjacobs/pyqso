@@ -3,7 +3,7 @@
 ## [UNRELEASED]
 ### Added
 - Support for the SAT_NAME, SAT_MODE, PROP_MODE, and GRIDSQUARE ADIF fields for the purposes of satellite QSO logging.
-- Pinpointing of callsigns on the world map by looking up the latitude-longitude coordinates based on the value in the COUNTRY field. A new right-click popup menu has been created for this purpose.
+- Pinpointing of callsigns on the world map by looking up the latitude-longitude coordinates based on the value in the GRIDSQUARE field (or COUNTRY field if the GRIDSQUARE is not specified). A new right-click popup menu has been created for this purpose.
 - A separate World Map tab in the Preferences dialog.
 - A navigation bar for the World Map tool.
 - The option of showing Maidenhead grid squares on the World Map, and the option of shading in worked grid squares.
