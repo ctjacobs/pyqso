@@ -82,12 +82,13 @@ class Maidenhead:
         self.lower = "abcdefghijklmnopqrstuvwx"
         return
 
-    def ll2gs(self, latitude, longitude):
+    def ll2gs(self, latitude, longitude, subsquare=False):
         """ Convert latitude-longitude coordinates to a Maidenhead grid square locator.
         This is based on the code by Walter Underwood, K6WRU (https://ham.stackexchange.com/questions/221/how-can-one-convert-from-lat-long-to-grid-square).
 
         :arg float latitude: The latitude.
         :arg float longitude: The longitude.
+        :arg bool subsquare: Option to include the subsquare (thereby obtaining a 6-character Maidenhead locator).
         :rtype: str
         :returns: The Maidenhead grid square locator.
         """
@@ -99,7 +100,14 @@ class Maidenhead:
         square_latitude = int(adjusted_latitude % 10)
         square_longitude = int((adjusted_longitude/2) % 10)
 
-        return ("%s"*4) % (field_longitude, field_latitude, square_longitude, square_latitude)
+        if(subsquare):
+            adjusted_latitude_remainder = (adjusted_latitude - int(adjusted_latitude)) * 60
+            adjusted_longitude_remainder = ((adjusted_longitude) - int(adjusted_longitude/2)*2) * 60
+            subsquare_latitude = self.lower[int(adjusted_latitude_remainder/2.5)]
+            subsquare_longitude = self.lower[int(adjusted_longitude_remainder/5)]
+            return ("%s"*6) % (field_longitude, field_latitude, square_longitude, square_latitude, subsquare_longitude, subsquare_latitude)
+        else:
+            return ("%s"*4) % (field_longitude, field_latitude, square_longitude, square_latitude)
 
     def gs2ll(self, grid_square):
         """ Convert a Maidenhead grid square locator to latitude-longitude coordinates.
