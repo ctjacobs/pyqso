@@ -42,7 +42,7 @@ The user's QTH can be pin-pointed on the map by specifying the QTH's location (e
    .. figure::  images/world_map.png
       :align:   center
       
-      The world map tool with the user's QTH (e.g. Southampton) pin-pointed.
+      The world map tool with the user's QTH (e.g. Southampton) pin-pointed in red, and several other worked stations pin-pointed in yellow. Worked grid squares are shaded purple.
 
 Awards
 ------
