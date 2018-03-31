@@ -293,7 +293,7 @@ class WorldMap:
                 gl.ylabels_right = False
                 gl.xformatter = cartopy.mpl.gridliner.LONGITUDE_FORMATTER
                 gl.yformatter = cartopy.mpl.gridliner.LATITUDE_FORMATTER
-                ax.add_feature(cartopy.feature.LAND, facecolor="green")
+                ax.add_feature(cartopy.feature.LAND, facecolor="olivedrab")
                 ax.add_feature(cartopy.feature.OCEAN, facecolor="cornflowerblue")
                 ax.add_feature(cartopy.feature.COASTLINE)
                 ax.add_feature(cartopy.feature.BORDERS, alpha=0.4)
@@ -335,7 +335,7 @@ class WorldMap:
                     logging.debug("Plotting QTHs on the map...")
                     for p in self.points:
                         ax.plot(p.longitude, p.latitude, p.style, transform=cartopy.crs.PlateCarree())
-                        ax.text(p.longitude+0.04*p.longitude, p.latitude+0.04*p.latitude, p.name, color="white", size="small")
+                        ax.text(p.longitude+0.08*p.longitude, p.latitude+0.04*p.latitude, p.name, color="orange", size=8)
 
                 # Draw Maidenhead grid squares and shade in the worked squares.
                 x = numpy.linspace(-180, 180, len(list(self.maidenhead.upper))+1)
@@ -347,7 +347,7 @@ class WorldMap:
                     else:
                         z = numpy.zeros((len(self.maidenhead.upper), len(self.maidenhead.upper)), dtype=bool)
                         masked = numpy.ma.masked_array(z, z == 0)
-                    ax.pcolormesh(x, y, masked, transform=cartopy.crs.PlateCarree(), cmap='Reds', vmin=0, vmax=1, edgecolors="k", linewidth=2, alpha=0.5)
+                    ax.pcolormesh(x, y, masked, transform=cartopy.crs.PlateCarree(), cmap='Reds', vmin=0, vmax=1, edgecolors="k", linewidth=1.5, alpha=0.4)
 
                     # Grid square labels.
                     for i in range(len(self.maidenhead.upper)):
