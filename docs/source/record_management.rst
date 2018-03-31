@@ -49,6 +49,17 @@ An existing record can be edited by:
 
 This will bring up the same dialog window as before.
 
+Copying/pasting a record
+------------------------
+
+An existing record can be copied and pasted by:
+
+-  Selecting it and right-clicking to bring up the popup menu.
+
+-  Selecting ``Copy``.
+
+-  Right-clicking again and selecting ``Paste``. This will duplicate the record, with the duplicate becoming the latest record in the selected log.
+
 Deleting a record
 -----------------
 

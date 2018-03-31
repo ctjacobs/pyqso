@@ -38,6 +38,8 @@ The world map tool (see figure:world_map_) can be used to plot the QTH of your s
 
 The user's QTH can be pin-pointed on the map by specifying the QTH's location (e.g. city name) and latitude-longitude coordinates in the preferences. If the `geocoder <https://pypi.python.org/pypi/geocoder>`_ library is installed then these coordinates can be filled in for you by clicking the lookup button after entering the QTH's name, otherwise the coordinates will need to be entered manually.
 
+The location of a worked station may also be plotted by right-clicking on the relevant QSO in the main window and selecting ``Pinpoint`` from the popup menu.
+
    .. _figure:world_map:
    .. figure::  images/world_map.png
       :align:   center
