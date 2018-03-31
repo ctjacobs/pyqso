@@ -63,4 +63,4 @@ PyQSO features rudimentary support for the `Hamlib <http://hamlib.sourceforge.ne
 World Map
 ---------
 
-The user can pin-point their QTH on the world map by specifying the latitude-longitude coordinates (or looking them up based on the QTH's name, e.g. city name) in the ``World Map`` tab. Maidenhead grid squares can also be rendered, with worked grid squares shaded, which is particularly useful for satellite operating.
+The user can pinpoint their QTH on the world map by specifying the latitude-longitude coordinates (or looking them up based on the QTH's name, e.g. city name) in the ``World Map`` tab. Maidenhead grid squares can also be rendered, with worked grid squares shaded, which is particularly useful for satellite operating.

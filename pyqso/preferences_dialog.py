@@ -500,7 +500,7 @@ class WorldMapPage:
         config = configparser.ConfigParser()
         have_config = (config.read(PREFERENCES_FILE) != [])
 
-        # Option to pin-point QTH on grey line map.
+        # Option to pinpoint QTH on grey line map.
         self.sources["SHOW_QTH"] = self.builder.get_object("world_map_show_qth_checkbutton")
         (section, option) = ("world_map", "show_qth")
         if(have_config and config.has_option(section, option)):

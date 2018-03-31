@@ -2746,7 +2746,7 @@ Base64-encoded plain text in the configuration file.</property>
                             <property name="spacing">2</property>
                             <child>
                               <object class="GtkCheckButton" id="world_map_show_qth_checkbutton">
-                                <property name="label" translatable="yes">Pin-point QTH on world map</property>
+                                <property name="label" translatable="yes">Pinpoint QTH on world map</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
