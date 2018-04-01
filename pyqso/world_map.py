@@ -335,8 +335,8 @@ class WorldMap:
                     logging.debug("Plotting QTHs on the map...")
                     for p in self.points:
                         ax.plot(p.longitude, p.latitude, p.style, transform=cartopy.crs.PlateCarree())
-                        at_x, at_y = ax.projection.transform_point(p.longitude, p.latitude, src_crs=cartopy.crs.PlateCarree())
-                        ax.annotate(p.name, xy=(at_x, at_y), xytext=(0, 2.5), textcoords="offset points", color="orange", size="small", weight="bold")
+                        projected_x, projected_y = ax.projection.transform_point(p.longitude, p.latitude, src_crs=cartopy.crs.PlateCarree())
+                        ax.annotate(p.name, xy=(projected_x, projected_y), xytext=(0, 2.5), textcoords="offset points", color="white", size="small", weight="bold")
 
                 # Draw Maidenhead grid squares and shade in the worked squares.
                 x = numpy.linspace(-180, 180, len(list(self.maidenhead.upper))+1)
@@ -348,13 +348,13 @@ class WorldMap:
                     else:
                         z = numpy.zeros((len(self.maidenhead.upper), len(self.maidenhead.upper)), dtype=bool)
                         masked = numpy.ma.masked_array(z, z == 0)
-                    ax.pcolormesh(x, y, masked, transform=cartopy.crs.PlateCarree(), cmap='Reds', vmin=0, vmax=1, edgecolors="k", linewidth=1.5, alpha=0.4)
+                    ax.pcolormesh(x, y, masked, transform=cartopy.crs.PlateCarree(), cmap="Reds", vmin=0, vmax=1, edgecolors="k", linewidth=1.5, alpha=0.4)
 
                     # Grid square labels.
                     for i in range(len(self.maidenhead.upper)):
                         for j in range(len(self.maidenhead.upper)):
                             text = self.maidenhead.upper[i]+self.maidenhead.upper[j]
-                            ax.text((x[i]+x[i+1])/2.0, (y[j]+y[j+1])/2.0, text, ha="center", va="center", size="small", color="w", alpha=0.6)
+                            ax.text((x[i]+x[i+1])/2.0, (y[j]+y[j+1])/2.0, text, ha="center", va="center", size="small", color="w", family="monospace", alpha=0.4)
 
                 return True
         else:
