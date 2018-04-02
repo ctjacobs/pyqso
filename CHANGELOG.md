@@ -1,6 +1,6 @@
 # Change Log
 
-## [UNRELEASED]
+## [1.1.0] - 2018-04-02
 ### Added
 - Support for the SAT_NAME, SAT_MODE, PROP_MODE, and GRIDSQUARE ADIF fields for the purposes of satellite QSO logging.
 - Pinpointing of callsigns on the world map by looking up the latitude-longitude coordinates based on the value in the GRIDSQUARE field (or COUNTRY field if the GRIDSQUARE is not specified). A new right-click popup menu has been created for this purpose.
@@ -112,7 +112,7 @@
 - QSO filtering and sorting.
 - Duplicate record removal.
 
-[UNRELEASED]: https://github.com/ctjacobs/pyqso/compare/v1.0.0...HEAD
+[1.1.0]: https://github.com/ctjacobs/pyqso/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/ctjacobs/pyqso/compare/v0.3...v1.0.0
 [0.3]: https://github.com/ctjacobs/pyqso/compare/v0.2...v0.3
 [0.2]: https://github.com/ctjacobs/pyqso/compare/v0.1...v0.2
