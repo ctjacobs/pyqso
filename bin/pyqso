@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#    Copyright (C) 2012-2017 Christian Thomas Jacobs.
+#    Copyright (C) 2012-2018 Christian Thomas Jacobs.
 
 #    This file is part of PyQSO.
 
