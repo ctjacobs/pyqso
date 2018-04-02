@@ -34,7 +34,7 @@ import pkg_resources
 
 import logging
 logging.basicConfig(level=logging.INFO)
-logging.info("PyQSO version 1.0.0")
+logging.info("PyQSO version 1.1.0")
 
 # This will help Python find the PyQSO modules that need to be imported below.
 pyqso_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), os.pardir)

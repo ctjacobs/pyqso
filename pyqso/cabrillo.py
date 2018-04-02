@@ -49,7 +49,7 @@ class Cabrillo:
 
             # Header
             f.write("""START-OF-LOG: %s\n""" % (CABRILLO_VERSION))
-            f.write("""CREATED-BY: PyQSO v1.0.0\n""")
+            f.write("""CREATED-BY: PyQSO v1.1.0\n""")
             f.write("""CALLSIGN: %s\n""" % (mycall))
             f.write("""CONTEST: %s\n""" % (contest))
 

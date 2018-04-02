@@ -348,7 +348,7 @@ class ADIF:
 
 <adif_ver:%d>%s
 <programid:5>PyQSO
-<programversion:5>1.0.0
+<programversion:5>1.1.0
 <eoh>\n""" % (dt, len(records), len(str(ADIF_VERSION)), ADIF_VERSION))
 
             # Then write each record to the file.

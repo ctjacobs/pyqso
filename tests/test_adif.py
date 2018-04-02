@@ -108,7 +108,7 @@ class TestADIF(unittest.TestCase):
         assert("""
 <adif_ver:5>3.0.4
 <programid:5>PyQSO
-<programversion:5>1.0.0
+<programversion:5>1.1.0
 <eoh>
 <call:7>TEST123
 <qso_date:8>20120402
@@ -150,7 +150,7 @@ class TestADIF(unittest.TestCase):
         assert("""
 <adif_ver:5>3.0.4
 <programid:5>PyQSO
-<programversion:5>1.0.0
+<programversion:5>1.1.0
 <eoh>
 <call:7>TEST123
 <qso_date:8>20120402

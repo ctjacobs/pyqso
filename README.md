@@ -39,7 +39,7 @@ but the complete list is given below:
 * python3-matplotlib (version 1.3.0 or later)
 * python3-numpy
 * libxcb-render0-dev
-* [cartopy](http://scitools.org.uk/cartopy/), for drawing the world map. This package depends on python3-cairocffi, cython, libproj-dev (version 4.9.0 or later), and libgeos-dev (version 3.3.3 or later).
+* [cartopy](http://scitools.org.uk/cartopy/), for drawing the world map. This package depends on python3-scipy, python3-cairocffi, cython, libproj-dev (version 4.9.0 or later), and libgeos-dev (version 3.3.3 or later).
 * [geocoder](https://pypi.python.org/pypi/geocoder), for QTH lookups.
 * python3-sphinx, for building the documentation.
 * python3-hamlib, for Hamlib support.
