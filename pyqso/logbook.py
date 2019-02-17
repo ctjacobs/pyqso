@@ -345,6 +345,7 @@ class Logbook:
             self.sorter.pop(log_index)
             self.filter.pop(log_index)
             # And finally remove the tab in the Logbook.
+            self.notebook.set_current_page(page_index - 1)
             self.notebook.remove_page(page_index)
 
         self.summary.update()
