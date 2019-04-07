@@ -4,3 +4,4 @@ cairocffi
 cartopy>=0.16.0
 sphinx
 geocoder
+bs4
