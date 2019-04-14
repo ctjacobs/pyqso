@@ -167,6 +167,7 @@ class Modes:
             connection.close()
         except sqlite3.Error as e:
             logging.exception(e)
+            modes = self.basic  # Revert to the basic built-in list.
         return modes
 
     def update(self, url):
