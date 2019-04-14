@@ -48,4 +48,3 @@ class UpdateModesDialog:
         :rtype: str
         """
         return self.sources["URL"].get_text()
-

@@ -103,46 +103,46 @@ class Modes:
 
         # A dictionary of all the deprecated MODE values.
         deprecated = {"AMTORFEC": ("",),
-                            "ASCI": ("",),
-                            "CHIP64": ("",),
-                            "CHIP128": ("",),
-                            "DOMINOF": ("",),
-                            "FMHELL": ("",),
-                            "FSK31": ("",),
-                            "GTOR": ("",),
-                            "HELL80": ("",),
-                            "HFSK": ("",),
-                            "JT4A": ("",),
-                            "JT4B": ("",),
-                            "JT4C": ("",),
-                            "JT4D": ("",),
-                            "JT4E": ("",),
-                            "JT4F": ("",),
-                            "JT4G": ("",),
-                            "JT65A": ("",),
-                            "JT65B": ("",),
-                            "JT65C": ("",),
-                            "MFSK8": ("",),
-                            "MFSK16": ("",),
-                            "PAC2": ("",),
-                            "PAC3": ("",),
-                            "PAX2": ("",),
-                            "PCW": ("",),
-                            "PSK10": ("",),
-                            "PSK31": ("",),
-                            "PSK63": ("",),
-                            "PSK63F": ("",),
-                            "PSK125": ("",),
-                            "PSKAM10": ("",),
-                            "PSKAM31": ("",),
-                            "PSKAM50": ("",),
-                            "PSKFEC31": ("",),
-                            "PSKHELL": ("",),
-                            "QPSK31": ("",),
-                            "QPSK63": ("",),
-                            "QPSK125": ("",),
-                            "THRBX": ("",)
-                            }
+                      "ASCI": ("",),
+                      "CHIP64": ("",),
+                      "CHIP128": ("",),
+                      "DOMINOF": ("",),
+                      "FMHELL": ("",),
+                      "FSK31": ("",),
+                      "GTOR": ("",),
+                      "HELL80": ("",),
+                      "HFSK": ("",),
+                      "JT4A": ("",),
+                      "JT4B": ("",),
+                      "JT4C": ("",),
+                      "JT4D": ("",),
+                      "JT4E": ("",),
+                      "JT4F": ("",),
+                      "JT4G": ("",),
+                      "JT65A": ("",),
+                      "JT65B": ("",),
+                      "JT65C": ("",),
+                      "MFSK8": ("",),
+                      "MFSK16": ("",),
+                      "PAC2": ("",),
+                      "PAC3": ("",),
+                      "PAX2": ("",),
+                      "PCW": ("",),
+                      "PSK10": ("",),
+                      "PSK31": ("",),
+                      "PSK63": ("",),
+                      "PSK63F": ("",),
+                      "PSK125": ("",),
+                      "PSKAM10": ("",),
+                      "PSKAM31": ("",),
+                      "PSKAM50": ("",),
+                      "PSKFEC31": ("",),
+                      "PSKHELL": ("",),
+                      "QPSK31": ("",),
+                      "QPSK63": ("",),
+                      "QPSK125": ("",),
+                      "THRBX": ("",)
+                      }
 
         # Include all deprecated modes.
         modes.update(deprecated)
@@ -181,7 +181,6 @@ class Modes:
             connection.close()
         except sqlite3.Error as e:
             logging.exception(e)
-        
         return
 
     def parse(self, url):
@@ -205,4 +204,3 @@ class Modes:
                 modes[mode] = submode
 
         return modes
-

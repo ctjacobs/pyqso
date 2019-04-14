@@ -1123,7 +1123,6 @@ class Logbook:
         umd.dialog.destroy()
         return
 
-
     @property
     def log_count(self):
         """ Return the total number of logs in the logbook.
