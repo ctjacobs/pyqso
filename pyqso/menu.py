@@ -109,6 +109,10 @@ class Menu:
         self.items["RECORD_COUNT"] = self.builder.get_object("mitem_record_count")
         self.items["RECORD_COUNT"].connect("activate", self.application.logbook.record_count_callback)
 
+        # Record count
+        self.items["UPDATE_MODES"] = self.builder.get_object("mitem_update_modes")
+        self.items["UPDATE_MODES"].connect("activate", self.application.logbook.update_modes_callback)
+
         # View toolbox
         self.items["TOOLBOX"] = self.builder.get_object("mitem_toolbox")
         config = configparser.ConfigParser()

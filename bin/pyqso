@@ -85,6 +85,7 @@ class PyQSO:
         # Kills the application if the close button is clicked on the main window itself.
         self.window.connect("delete-event", Gtk.main_quit)
 
+        # Status bar.
         self.statusbar = self.builder.get_object("statusbar")
         context_id = self.statusbar.get_context_id("Status")
         self.statusbar.push(context_id, "No logbook is currently open.")

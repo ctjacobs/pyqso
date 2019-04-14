@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.18.3 -->
+<!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.10"/>
   <object class="GtkImage" id="image1">
@@ -68,6 +68,12 @@
     <property name="stock">gtk-open</property>
     <property name="icon_size">1</property>
   </object>
+  <object class="GtkImage" id="image25">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-refresh</property>
+    <property name="icon_size">1</property>
+  </object>
   <object class="GtkImage" id="image29">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -128,6 +134,9 @@
     <property name="default_width">800</property>
     <property name="default_height">600</property>
     <property name="icon">log_64x64.png</property>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <object class="GtkBox" id="vbox_outer">
         <property name="visible">True</property>
@@ -358,6 +367,28 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Record Count</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="mitem_adif">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">ADIF</property>
+                <child type="submenu">
+                  <object class="GtkMenu" id="subm_adif">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkImageMenuItem" id="mitem_update_modes">
+                        <property name="label" translatable="yes">Update Modes</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="image">image25</property>
+                        <property name="use_stock">False</property>
                       </object>
                     </child>
                   </object>
@@ -927,6 +958,9 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
     <property name="authors">Christian Thomas Jacobs, M0UOS</property>
     <property name="logo">log_64x64.png</property>
     <property name="license_type">custom</property>
+    <child>
+      <placeholder/>
+    </child>
     <child internal-child="vbox">
       <object class="GtkBox" id="about_dialog_vbox">
         <property name="can_focus">False</property>
@@ -956,6 +990,9 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <property name="transient_for">pyqso</property>
+    <child>
+      <placeholder/>
+    </child>
     <child internal-child="vbox">
       <object class="GtkBox" id="cabrillo_export_dialog_vbox">
         <property name="can_focus">False</property>
@@ -1098,6 +1135,9 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <property name="transient_for">pyqso</property>
+    <child>
+      <placeholder/>
+    </child>
     <child internal-child="vbox">
       <object class="GtkBox" id="log_name_dialog_vbox">
         <property name="can_focus">False</property>
@@ -1195,6 +1235,9 @@ along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</pro
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <property name="transient_for">pyqso</property>
+    <child>
+      <placeholder/>
+    </child>
     <child internal-child="vbox">
       <object class="GtkBox" id="preferences_dialog_vbox">
         <property name="can_focus">False</property>
@@ -2505,7 +2548,7 @@ Base64-encoded plain text in the configuration file.</property>
                 <property name="orientation">vertical</property>
                 <property name="spacing">2</property>
                 <child>
-                  <object class="GtkFrame" id="preferences_adif_import">
+                  <object class="GtkFrame" id="preferences_adif">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label_xalign">0</property>
@@ -2522,7 +2565,7 @@ Base64-encoded plain text in the configuration file.</property>
                             <property name="orientation">vertical</property>
                             <property name="spacing">2</property>
                             <child>
-                              <object class="GtkCheckButton" id="adif_import_merge_comment_checkbutton">
+                              <object class="GtkCheckButton" id="adif_merge_comment_checkbutton">
                                 <property name="label" translatable="yes">Merge any text in the COMMENT field with the NOTES field</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
@@ -2541,10 +2584,10 @@ Base64-encoded plain text in the configuration file.</property>
                       </object>
                     </child>
                     <child type="label">
-                      <object class="GtkLabel" id="preferences_adif_import_label">
+                      <object class="GtkLabel" id="preferences_adif_label">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">ADIF Import</property>
+                        <property name="label" translatable="yes">ADIF</property>
                       </object>
                     </child>
                   </object>
@@ -3029,6 +3072,9 @@ Base64-encoded plain text in the configuration file.</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <property name="transient_for">pyqso</property>
+    <child>
+      <placeholder/>
+    </child>
     <child internal-child="vbox">
       <object class="GtkBox" id="record_dialog_vbox">
         <property name="can_focus">False</property>
@@ -4343,6 +4389,9 @@ Base64-encoded plain text in the configuration file.</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <property name="transient_for">record_dialog</property>
+    <child>
+      <placeholder/>
+    </child>
     <child internal-child="vbox">
       <object class="GtkBox" id="calendar_dialog_vbox">
         <property name="can_focus">False</property>
@@ -4415,6 +4464,9 @@ Base64-encoded plain text in the configuration file.</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">dialog</property>
     <property name="transient_for">pyqso</property>
+    <child>
+      <placeholder/>
+    </child>
     <child internal-child="vbox">
       <object class="GtkBox" id="telnet_connection_dialog_vbox">
         <property name="can_focus">False</property>
@@ -4656,6 +4708,106 @@ Base64-encoded plain text in the configuration file.</property>
     <action-widgets>
       <action-widget response="-6">telnet_connection_cancel_button</action-widget>
       <action-widget response="-5">telnet_connection_ok_button</action-widget>
+    </action-widgets>
+  </object>
+  <object class="GtkDialog" id="update_modes_dialog">
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Update ADIF Modes</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="type_hint">dialog</property>
+    <property name="transient_for">pyqso</property>
+    <child>
+      <placeholder/>
+    </child>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="update_modes_cancel_button">
+                <property name="label">gtk-cancel</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+                <property name="always_show_image">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="update_modes_ok_button">
+                <property name="label">gtk-ok</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+                <property name="always_show_image">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox" id="adif_url_hbox">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkLabel" id="adif_url_label">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">URL of ADIF webpage</property>
+                <property name="width_chars">12</property>
+                <property name="xalign">0</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="padding">2</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="adif_url_entry">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="-6">update_modes_cancel_button</action-widget>
+      <action-widget response="-5">update_modes_ok_button</action-widget>
     </action-widgets>
   </object>
   <object class="GtkMenu" id="popup">

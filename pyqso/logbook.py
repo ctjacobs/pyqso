@@ -38,6 +38,7 @@ from pyqso.summary import Summary
 from pyqso.blank import Blank
 from pyqso.printer import Printer
 from pyqso.compare import compare_date_and_time, compare_default
+from pyqso.update_modes_dialog import UpdateModesDialog
 
 
 class Logbook:
@@ -907,7 +908,7 @@ class Logbook:
             return
         log = self.logs[log_index]
 
-        (sort_model, path) = self.treeselection[log_index].get_selected_rows()  # Get the selected row in the log
+        (sort_model, path) = self.treeselection[log_index].get_selected_rows()  # Get the selected row in the log.
         try:
             sort_iter = sort_model.get_iter(path[0])
             filter_iter = self.sorter[log_index].convert_iter_to_child_iter(sort_iter)
@@ -1112,6 +1113,16 @@ class Logbook:
         self.application.clipboard.request_text(self.clipboard_text_received, l)
 
         return
+
+    def update_modes_callback(self, widget=None, path=None):
+        umd = UpdateModesDialog(self.application)
+        response = umd.dialog.run()
+        if(response == Gtk.ResponseType.OK):
+            modes = Modes()
+            modes.update(url=umd.url)
+        umd.dialog.destroy()
+        return
+
 
     @property
     def log_count(self):

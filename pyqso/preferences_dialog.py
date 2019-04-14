@@ -38,7 +38,8 @@ except ImportError:
     logging.warning("Could not import the geocoder module!")
     have_geocoder = False
 
-from pyqso.adif import AVAILABLE_FIELD_NAMES_ORDERED, MODES
+from pyqso.adif import AVAILABLE_FIELD_NAMES_ORDERED
+from pyqso.modes import Modes
 from pyqso.auxiliary_dialogs import error
 
 PREFERENCES_FILE = os.path.expanduser("~/.config/pyqso/preferences.ini")
@@ -289,27 +290,28 @@ class RecordsPage:
         # Default values
 
         # Mode
+        self.modes = Modes()
         self.sources["DEFAULT_MODE"] = self.builder.get_object("default_values_mode_combo")
-        for mode in sorted(MODES.keys()):
+        for mode in sorted(self.modes.all.keys()):
             self.sources["DEFAULT_MODE"].append_text(mode)
         (section, option) = ("records", "default_mode")
         if(have_config and config.has_option(section, option)):
             mode = config.get(section, option)
         else:
             mode = ""
-        self.sources["DEFAULT_MODE"].set_active(sorted(MODES.keys()).index(mode))
+        self.sources["DEFAULT_MODE"].set_active(sorted(self.modes.all.keys()).index(mode))
         self.sources["DEFAULT_MODE"].connect("changed", self.on_mode_changed)
 
         # Submode
         self.sources["DEFAULT_SUBMODE"] = self.builder.get_object("default_values_submode_combo")
-        for submode in MODES[mode]:
+        for submode in self.modes.all[mode]:
             self.sources["DEFAULT_SUBMODE"].append_text(submode)
         (section, option) = ("records", "default_submode")
         if(have_config and config.has_option(section, option)):
             submode = config.get(section, option)
         else:
             submode = ""
-        self.sources["DEFAULT_SUBMODE"].set_active(MODES[mode].index(submode))
+        self.sources["DEFAULT_SUBMODE"].set_active(self.modes.all[mode].index(submode))
 
         # Power
         self.sources["DEFAULT_POWER"] = self.builder.get_object("default_values_tx_power_entry")
@@ -384,9 +386,9 @@ class RecordsPage:
         """ If the MODE field has changed its value, then fill the SUBMODE field with all the available SUBMODE options for that new MODE. """
         self.sources["DEFAULT_SUBMODE"].get_model().clear()
         mode = combo.get_active_text()
-        for submode in MODES[mode]:
+        for submode in self.modes.all[mode]:
             self.sources["DEFAULT_SUBMODE"].append_text(submode)
-        self.sources["DEFAULT_SUBMODE"].set_active(MODES[mode].index(""))
+        self.sources["DEFAULT_SUBMODE"].set_active(self.modes.all[mode].index(""))
         return
 
 
@@ -406,8 +408,8 @@ class ImportExportPage:
         config = configparser.ConfigParser()
         have_config = (config.read(PREFERENCES_FILE) != [])
 
-        # Import
-        self.sources["MERGE_COMMENT"] = self.builder.get_object("adif_import_merge_comment_checkbutton")
+        # ADIF
+        self.sources["MERGE_COMMENT"] = self.builder.get_object("adif_merge_comment_checkbutton")
         (section, option) = ("import_export", "merge_comment")
         if(have_config and config.has_option(section, option)):
             self.sources["MERGE_COMMENT"].set_active(config.getboolean(section, option))
