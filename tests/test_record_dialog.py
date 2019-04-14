@@ -44,7 +44,7 @@ class TestRecordDialog(unittest.TestCase):
             self.record_dialog.sources["BAND"].append_text(band)
 
         self.record_dialog.sources["MODE"] = Gtk.ComboBoxText()
-        for mode in sorted(MODES.keys()):
+        for mode in sorted(self.record_dialog.modes.keys()):
             self.record_dialog.sources["MODE"].append_text(mode)
 
         self.record_dialog.sources["SUBMODE"] = Gtk.ComboBoxText()
