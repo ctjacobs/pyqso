@@ -4,3 +4,6 @@ cairocffi
 cartopy>=0.16.0
 sphinx
 geocoder
+vext
+pygobject
+setuptools
