@@ -86,4 +86,4 @@ which will produce an HTML version of the documentation in `docs/build/html` tha
 
 ## Contact
 
-If you have any comments or questions about PyQSO please send them via email to Christian Jacobs, M0UOS, at <christian@christianjacobs.uk>.
+Please raise any technical issues or feature suggestions about PyQSO on the GitHub issue tracker.
