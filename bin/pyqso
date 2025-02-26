@@ -30,7 +30,7 @@ import os
 import os.path
 import sys
 import signal
-import pkg_resources
+import importlib.resources
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -62,8 +62,9 @@ class PyQSO:
 
         # Get the PyQSO main window defined in the Glade file.
         self.builder = Gtk.Builder()
-        glade_file_path = pkg_resources.resource_filename("pyqso", os.path.join("res", "pyqso.glade"))
-        self.builder.add_from_file(glade_file_path)
+        glade_file_path = importlib.resources.files("pyqso").joinpath("res", "pyqso.glade")
+        with importlib.resources.as_file(glade_file_path) as path:
+            self.builder.add_from_file(path.as_posix())
         self.window = self.builder.get_object("pyqso")
 
         # Check that the directory for holding PyQSO configuration files exists. If it doesn't, create it now.
@@ -132,8 +133,9 @@ class PyQSO:
 
     def show_about(self, widget):
         """ Show the About dialog, which includes license information. """
-        glade_file_path = pkg_resources.resource_filename("pyqso", os.path.join("res", "pyqso.glade"))
-        self.builder.add_objects_from_file(glade_file_path, ("about_dialog",))
+        glade_file_path = importlib.resources.files("pyqso").joinpath("res", "pyqso.glade")
+        with importlib.resources.as_file(glade_file_path) as path:
+            self.builder.add_objects_from_file(path.as_posix(), ("about_dialog",))
         about = self.builder.get_object("about_dialog")
         about.run()
         about.destroy()
