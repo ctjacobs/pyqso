@@ -23,7 +23,7 @@ import logging
 import sqlite3 as sqlite
 import re
 from os.path import expanduser
-from datetime import datetime
+from datetime import datetime, timezone
 try:
     import configparser
 except ImportError:
@@ -301,15 +301,15 @@ class WorldMap:
 
                 # Draw the grey line. This is based on the code from the Cartopy Aurora Forecast example (http://scitools.org.uk/cartopy/docs/latest/gallery/aurora_forecast.html) and used under the Open Government Licence (http://scitools.org.uk/cartopy/docs/v0.15/copyright.html).
                 logging.debug("Drawing the grey line...")
-                dt = datetime.utcnow()
+                dt = datetime.now(timezone.utc)
                 axial_tilt = 23.5
-                reference_solstice = datetime(2016, 6, 21, 22, 22)
+                reference_solstice = datetime(2016, 6, 21, 22, 22, tzinfo=timezone.utc)
                 days_per_year = 365.2425
                 seconds_per_day = 86400.0
 
                 days_since_reference = (dt - reference_solstice).total_seconds()/seconds_per_day
                 latitude = axial_tilt*numpy.cos(2*numpy.pi*days_since_reference/days_per_year)
-                seconds_since_midnight = (dt - datetime(dt.year, dt.month, dt.day)).seconds
+                seconds_since_midnight = (dt - datetime(dt.year, dt.month, dt.day, tzinfo=timezone.utc)).seconds
                 longitude = -(seconds_since_midnight/seconds_per_day - 0.5)*360
 
                 pole_longitude = longitude
