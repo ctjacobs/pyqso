@@ -18,6 +18,7 @@
 #    along with PyQSO.  If not, see <http://www.gnu.org/licenses/>.
 
 from gi.repository import GObject
+from importlib.metadata import version
 import logging
 import sqlite3 as sqlite
 import re
@@ -160,7 +161,10 @@ class WorldMap:
             self.fig = matplotlib.figure.Figure()
             self.canvas = FigureCanvas(self.fig)  # For embedding in the Gtk application
             self.builder.get_object("world_map").pack_start(self.canvas, True, True, 0)
-            toolbar = NavigationToolbar(self.canvas, self.application.window)
+            if version('matplotlib') < '3.6':
+                toolbar = NavigationToolbar(self.canvas, self.application.window)
+            else:
+                toolbar = NavigationToolbar(self.canvas)
             self.builder.get_object("world_map").pack_start(toolbar, False, False, 0)
             self.refresh_event = GObject.timeout_add(1800000, self.draw)  # Re-draw the world map automatically after 30 minutes (if the world map tool is visible).
 
