@@ -7,3 +7,4 @@ geocoder
 vext
 pygobject
 setuptools
+telnetlib3
