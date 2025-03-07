@@ -161,10 +161,7 @@ class WorldMap:
             self.fig = matplotlib.figure.Figure()
             self.canvas = FigureCanvas(self.fig)  # For embedding in the Gtk application
             self.builder.get_object("world_map").pack_start(self.canvas, True, True, 0)
-            if version('matplotlib') < '3.6':
-                toolbar = NavigationToolbar(self.canvas, self.application.window)
-            else:
-                toolbar = NavigationToolbar(self.canvas)
+            toolbar = NavigationToolbar(self.canvas)
             self.builder.get_object("world_map").pack_start(toolbar, False, False, 0)
             self.refresh_event = GObject.timeout_add(1800000, self.draw)  # Re-draw the world map automatically after 30 minutes (if the world map tool is visible).
 
@@ -293,8 +290,8 @@ class WorldMap:
                 ax.set_aspect("auto")
 
                 gl = ax.gridlines(draw_labels=True)
-                gl.xlabels_top = False
-                gl.ylabels_right = False
+                gl.top_labels = False
+                gl.right_labels = False
                 gl.xformatter = cartopy.mpl.gridliner.LONGITUDE_FORMATTER
                 gl.yformatter = cartopy.mpl.gridliner.LATITUDE_FORMATTER
                 ax.add_feature(cartopy.feature.LAND, facecolor="olivedrab")
