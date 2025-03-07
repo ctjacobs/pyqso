@@ -22,10 +22,7 @@ require_version('Gtk', '3.0')
 require_version('PangoCairo', '1.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf
 import argparse
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
+import configparser
 import os
 import os.path
 import sys
