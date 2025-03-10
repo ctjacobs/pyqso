@@ -50,10 +50,7 @@ class LogNameDialog:
             self.entry.set_text(name)
 
         self.dialog.show_all()
-
         logging.debug("Log name dialog built.")
-
-        return
 
     @property
     def name(self):
