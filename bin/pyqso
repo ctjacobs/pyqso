@@ -143,7 +143,7 @@ class PyQSO:
             preferences.commit()
         preferences.dialog.destroy()
 
-if(__name__ == "__main__"):
+if __name__ == "__main__":
     # Get any command line arguments.
     parser = argparse.ArgumentParser(prog="pyqso")
     parser.add_argument("-d", "--debug", action="store_true", default=False, help="Enable debugging. All debugging messages will be written to pyqso.debug.")
