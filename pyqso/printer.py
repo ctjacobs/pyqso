@@ -63,7 +63,7 @@ class Printer(object):
         # Assemble the header and records into one string.
         line_format = "%-5s\t%-15s\t%-8s\t%-6s\t%-15s\t%-12s\t%-8s\t%-8s\n"
         self.text_to_print += line_format % ("Index", "Callsign", "Date", "Time", "Frequency", "Mode", "RST Sent", "RST Rcvd")
-        self.text_to_print += line_format % ("-----", "--------", "----", "----", "---------", "----", "--------", "--------")
+        self.text_to_print += line_format % ("_____", "________", "____", "____", "_________", "____", "________", "________")
         for r in records:
             self.text_to_print += line_format % (str(r["id"]), str(r["CALL"]), str(r["QSO_DATE"]), str(r["TIME_ON"]), str(r["FREQ"]), str(r["MODE"]), str(r["RST_SENT"]), str(r["RST_RCVD"]))
 
@@ -81,7 +81,7 @@ class Printer(object):
         width = context.get_width()  # Measured in pixels.
         height = context.get_height()  # Measured in pixels.
         layout = context.create_pango_layout()
-        layout.set_font_description(Pango.FontDescription("monospace expanded 10"))
+        layout.set_font_description(Pango.FontDescription("monospace 10"))
         layout.set_width(int(width*Pango.SCALE))
         layout.set_text(self.text_to_print, -1)
 
@@ -110,7 +110,7 @@ class Printer(object):
         cr = context.get_cairo_context()
         cr.set_source_rgb(0, 0, 0)
         layout = context.create_pango_layout()
-        layout.set_font_description(Pango.FontDescription("monospace expanded 10"))
+        layout.set_font_description(Pango.FontDescription("monospace 10"))
         layout.set_width(int(context.get_width()*Pango.SCALE))
 
         current_line_number = 1
