@@ -103,30 +103,28 @@ class PyQSO:
         # Show the main window.
         self.window.show_all()
 
-        if(have_config):
-            if(not config.getboolean("general", "show_toolbox")):
+        if have_config:
+            if not config.getboolean("general", "show_toolbox"):
                 self.toolbox.toggle_visible_callback()
         else:
             # Hide the Toolbox by default.
             self.toolbox.toggle_visible_callback()
 
-        if(logbook_path):
+        if logbook_path:
             logging.info("Opening logbook: %s" % logbook_path)
             self.logbook.open(path=logbook_path)
         else:
             # If no logbook path is specified at the command line,
             # then check if the user wants to open a default logbook.
             (section, option) = ("general", "default_logbook")
-            if(have_config and config.has_option(section, option)):
+            if have_config and config.has_option(section, option):
                 open_default_logbook = config.getboolean(section, option)
                 (section, option) = ("general", "default_logbook_path")
-                if(open_default_logbook and config.has_option(section, option)):
+                if open_default_logbook and config.has_option(section, option):
                     logbook_path = config.get(section, option)
-                    if(logbook_path is not None and logbook_path != ""):
+                    if logbook_path:
                         logging.info("Opening the default logbook: %s" % logbook_path)
                         self.logbook.open(path=logbook_path)
-
-        return
 
     def show_about(self, widget):
         """ Show the About dialog, which includes license information. """
@@ -136,16 +134,14 @@ class PyQSO:
         about = self.builder.get_object("about_dialog")
         about.run()
         about.destroy()
-        return
 
     def show_preferences(self, widget):
         """ Show the Preferences dialog. Any changes made by the user after clicking the 'Ok' button are saved in the configuration file. """
         preferences = PreferencesDialog(self)
         response = preferences.dialog.run()
-        if(response == Gtk.ResponseType.OK):
+        if response == Gtk.ResponseType.OK:
             preferences.commit()
         preferences.dialog.destroy()
-        return
 
 if(__name__ == "__main__"):
     # Get any command line arguments.
@@ -155,7 +151,7 @@ if(__name__ == "__main__"):
     args = parser.parse_args()
 
     # Output debugging messages to a file.
-    if(args.debug):
+    if args.debug:
         # Get the root logger.
         logger = logging.getLogger()
         logger.setLevel(logging.DEBUG)
@@ -166,7 +162,7 @@ if(__name__ == "__main__"):
         logger.addHandler(handler)
 
     # Enforce an absolute logbook file path.
-    if(args.logbook):
+    if args.logbook:
         args.logbook = os.path.abspath(args.logbook)
 
     signal.signal(signal.SIGINT, signal.SIG_DFL)  # Exit PyQSO if a SIGINT signal is captured.

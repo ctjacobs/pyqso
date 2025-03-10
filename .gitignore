@@ -2,3 +2,4 @@
 pyqso.debug
 build/
 docs/build
+.DS_Store
