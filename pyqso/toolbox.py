@@ -43,16 +43,12 @@ class Toolbox:
 
         self.tools.connect_after("switch-page", self.on_switch_page)
 
-        return
-
     def toggle_visible_callback(self, widget=None):
         """ Show/hide the toolbox. """
         toolbox_frame = self.builder.get_object("toolbox")
         toolbox_frame.set_visible(not toolbox_frame.get_visible())
-        return
 
     def on_switch_page(self, widget, label, new_page):
         """ Re-draw the WorldMap if the user switches to the World Map tab. """
-        if(widget.get_tab_label(label).get_text() == "World Map"):
+        if widget.get_tab_label(label).get_text() == "World Map":
             self.world_map.draw()
-        return

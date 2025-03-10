@@ -43,7 +43,6 @@ class CallsignLookupQRZ:
         self.parent = parent
         self.connection = None
         self.session_key = None
-        return
 
     def connect(self, username, password):
         """ Initiate a session with the qrz.com server. Hopefully this will provide a session key.
@@ -172,7 +171,6 @@ class CallsignLookupHamQTH:
         self.parent = parent
         self.connection = None
         self.session_id = None
-        return
 
     def connect(self, username, password):
         """ Initiate a session with the hamqth.com server. Hopefully this will provide a session key.

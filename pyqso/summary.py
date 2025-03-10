@@ -66,8 +66,8 @@ class Summary(object):
         config = configparser.ConfigParser()
         have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
         (section, option) = ("general", "show_yearly_statistics")
-        if(have_config and config.has_option(section, option)):
-            if(config.getboolean("general", "show_yearly_statistics") and have_matplotlib):
+        if have_config and config.has_option(section, option):
+            if config.getboolean("general", "show_yearly_statistics") and have_matplotlib:
                 hbox = Gtk.HBox()
                 label = Gtk.Label(label="Display statistics for year: ", halign=Gtk.Align.START)
                 hbox.pack_start(label, False, False, 6)
@@ -97,8 +97,6 @@ class Summary(object):
 
         self.logbook.notebook.insert_page(self.summary_page, tab, 0)  # Append as a new tab
         self.logbook.notebook.show_all()
-
-        return
 
     def on_year_changed(self, combo):
         """ Re-plot the statistics for the year selected by the user. """
@@ -141,8 +139,6 @@ class Summary(object):
         mode_count_plot.set_title("Modes used")
 
         self.items["YEARLY_STATISTICS"].canvas.draw()
-
-        return
 
     def get_year_bounds(self):
         """ Find the years of the oldest and newest QSOs across all logs in the logbook.
@@ -235,4 +231,3 @@ class Summary(object):
             self.items["DATE_MODIFIED"].set_label(str(t))
         except (IOError, OSError) as e:
             logging.exception(e)
-        return

@@ -58,5 +58,3 @@ class Blank(object):
 
         self.application.logbook.notebook.insert_page(page, tab, 1)
         self.application.logbook.notebook.set_current_page(0)
-
-        return

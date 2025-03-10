@@ -66,8 +66,6 @@ class Toolbar:
         self.set_record_buttons_sensitive(False)
         self.filter_source.set_sensitive(False)
 
-        return
-
     def set_logbook_button_sensitive(self, sensitive):
         """ Enable/disable logbook-related toolbar items.
 
@@ -76,7 +74,6 @@ class Toolbar:
         self.buttons["NEW_LOGBOOK"].set_sensitive(sensitive)
         self.buttons["OPEN_LOGBOOK"].set_sensitive(sensitive)
         self.buttons["CLOSE_LOGBOOK"].set_sensitive(not sensitive)
-        return
 
     def set_record_buttons_sensitive(self, sensitive):
         """ Enable/disable record-related toolbar items.
@@ -85,4 +82,3 @@ class Toolbar:
         """
         for button_name in ["ADD_RECORD", "EDIT_RECORD", "DELETE_RECORD"]:
             self.buttons[button_name].set_sensitive(sensitive)
-        return

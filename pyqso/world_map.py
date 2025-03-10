@@ -49,7 +49,7 @@ except ImportError:
     logging.warning("Could not import the geocoder module!")
     have_geocoder = False
 
-if(have_necessary_modules):
+if have_necessary_modules:
     class NavigationToolbar(NavigationToolbar2GTK3):
         """ Navigation tools for the World Map. """
         # Only include a subset of the tools.
@@ -71,7 +71,6 @@ class Point:
         self.latitude = latitude
         self.longitude = longitude
         self.style = style
-        return
 
 
 class Maidenhead:
@@ -81,7 +80,6 @@ class Maidenhead:
     def __init__(self):
         self.upper = "ABCDEFGHIJKLMNOPQR"
         self.lower = "abcdefghijklmnopqrstuvwx"
-        return
 
     def ll2gs(self, latitude, longitude, subsquare=False):
         """ Convert latitude-longitude coordinates to a Maidenhead grid square locator.
@@ -101,7 +99,7 @@ class Maidenhead:
         square_latitude = int(adjusted_latitude % 10)
         square_longitude = int((adjusted_longitude/2) % 10)
 
-        if(subsquare):
+        if subsquare:
             adjusted_latitude_remainder = (adjusted_latitude - int(adjusted_latitude)) * 60
             adjusted_longitude_remainder = ((adjusted_longitude) - int(adjusted_longitude/2)*2) * 60
             subsquare_latitude = self.lower[int(adjusted_latitude_remainder/2.5)]
@@ -120,13 +118,13 @@ class Maidenhead:
         """
 
         m = re.match(r"^[A-X][A-X][0-9][0-9]$", grid_square)
-        if(m):
+        if m:
             gs = m.group(0)
             latitude = self.latitude4(gs)+0.5
             longitude = self.longitude4(gs)+1.0
         else:
             m = re.match(r"^[A-X][A-X][0-9][0-9][a-x][a-x]$", grid_square)
-            if(m):
+            if m:
                 gs = m.group(0)
                 latitude = self.latitude4(gs) + (1.0/60.0)*2.5*(ord(gs[5])-ord("a")+0.5)
                 longitude = self.longitude4(gs) + (1.0/60.0)*5*(ord(gs[4])-ord("a")+0.5)
@@ -157,7 +155,7 @@ class WorldMap:
         self.builder = self.application.builder
         self.points = []
 
-        if(have_necessary_modules):
+        if have_necessary_modules:
             self.fig = matplotlib.figure.Figure()
             self.canvas = FigureCanvas(self.fig)  # For embedding in the Gtk application
             self.builder.get_object("world_map").pack_start(self.canvas, True, True, 0)
@@ -169,8 +167,8 @@ class WorldMap:
         config = configparser.ConfigParser()
         have_config = (config.read(expanduser('~/.config/pyqso/preferences.ini')) != [])
         (section, option) = ("world_map", "show_qth")
-        if(have_config and config.has_option(section, option)):
-            if(config.getboolean(section, option)):
+        if have_config and config.has_option(section, option):
+            if config.getboolean(section, option):
                 try:
                     qth_name = config.get("world_map", "qth_name")
                     qth_latitude = float(config.get("world_map", "qth_latitude"))
@@ -184,17 +182,14 @@ class WorldMap:
         self.show_grid_squares = False
         self.shade_worked_grid_squares = False
         (section, option) = ("world_map", "show_grid_squares")
-        if(have_config and config.has_option(section, option)):
+        if have_config and config.has_option(section, option):
             self.show_grid_squares = config.getboolean(section, option)
             (section, option) = ("world_map", "shade_worked_grid_squares")
-            if(have_config and config.has_option(section, option)):
+            if have_config and config.has_option(section, option):
                 self.shade_worked_grid_squares = config.getboolean(section, option)
 
         self.builder.get_object("world_map").show_all()
-
         logging.debug("World map ready!")
-
-        return
 
     def add_point(self, name, latitude, longitude, style="yo"):
         """ Add a point and re-draw the map.
@@ -207,7 +202,6 @@ class WorldMap:
         p = Point(name, latitude, longitude, style)
         self.points.append(p)
         self.draw()
-        return
 
     def pinpoint(self, r):
         """ Pinpoint the location of a QSO on the world map.
@@ -215,13 +209,13 @@ class WorldMap:
         :arg r: The QSO record containing the location to pinpoint.
         """
 
-        if(have_geocoder):
+        if have_geocoder:
             callsign = r["CALL"]
             gridsquare = r["GRIDSQUARE"]
             country = r["COUNTRY"]
 
             # Get the latitude-longitude coordinates. Use any GRIDSQUARE information first since this is likely to be more accurate than the COUNTRY field.
-            if(gridsquare):
+            if gridsquare:
                 try:
                     latitude, longitude = self.maidenhead.gs2ll(gridsquare)
                     logging.debug("QTH coordinates found: (%s, %s)", str(latitude), str(longitude))
@@ -230,7 +224,7 @@ class WorldMap:
                 except ValueError:
                     logging.exception("Unable to lookup QTH coordinates.")
 
-            if(country):
+            if country:
                 try:
                     g = geocoder.google(country)
                     latitude, longitude = g.latlng
@@ -241,8 +235,6 @@ class WorldMap:
                     logging.exception("Unable to lookup QTH coordinates.")
                 except Exception:
                     logging.exception("Unable to lookup QTH coordinates. Check connection to the internets? Lookup limit reached?")
-
-        return
 
     def get_worked_grid_squares(self, logbook):
         """ Get the array of worked grid squares.
@@ -258,7 +250,7 @@ class WorldMap:
             try:
                 records = log.records
                 for r in records:
-                    if(r["GRIDSQUARE"]):
+                    if r["GRIDSQUARE"]:
                         grid_square = r["GRIDSQUARE"][0:2].upper()  # Only consider the field value (e.g. IO).
                         worked_grid_squares[self.maidenhead.upper.index(grid_square[1]), self.maidenhead.upper.index(grid_square[0])] = True
 
@@ -275,10 +267,10 @@ class WorldMap:
         :rtype: bool
         """
 
-        if(have_necessary_modules):
+        if have_necessary_modules:
             toolbox = self.builder.get_object("toolbox")
             tools = self.builder.get_object("tools")
-            if(tools.get_current_page() != 1 or not toolbox.get_visible()):
+            if tools.get_current_page() != 1 or not toolbox.get_visible():
                 # Don't re-draw if the world map is not visible.
                 return True  # We need to return True in case this is method was called by a timer event.
             else:
@@ -332,7 +324,7 @@ class WorldMap:
                 ax.fill(x, y, transform=rotated_pole, color="black", alpha=0.5)
 
                 # Plot points on the map.
-                if(self.points):
+                if self.points:
                     logging.debug("Plotting QTHs on the map...")
                     for p in self.points:
                         ax.plot(p.longitude, p.latitude, p.style, transform=cartopy.crs.PlateCarree())
@@ -342,8 +334,8 @@ class WorldMap:
                 # Draw Maidenhead grid squares and shade in the worked squares.
                 x = numpy.linspace(-180, 180, len(list(self.maidenhead.upper))+1)
                 y = numpy.linspace(-90, 90, len(list(self.maidenhead.upper))+1)
-                if(self.show_grid_squares):
-                    if(self.shade_worked_grid_squares):
+                if self.show_grid_squares:
+                    if self.shade_worked_grid_squares:
                         worked_grid_squares = self.get_worked_grid_squares(self.application.logbook)
                         masked = numpy.ma.masked_array(worked_grid_squares, worked_grid_squares == 0)
                     else:

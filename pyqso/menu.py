@@ -114,7 +114,7 @@ class Menu:
         config = configparser.ConfigParser()
         have_config = (config.read(os.path.expanduser('~/.config/pyqso/preferences.ini')) != [])
         (section, option) = ("general", "show_toolbox")
-        if(have_config and config.has_option(section, option)):
+        if have_config and config.has_option(section, option):
             self.items["TOOLBOX"].set_active(config.getboolean(section, option))
         else:
             self.items["TOOLBOX"].set_active(False)  # Don't show the toolbox by default
@@ -128,8 +128,6 @@ class Menu:
         self.set_log_items_sensitive(False)
         self.set_record_items_sensitive(False)
 
-        return
-
     def set_logbook_item_sensitive(self, sensitive):
         """ Enable/disable logbook-related menu items.
 
@@ -139,7 +137,6 @@ class Menu:
         self.items["NEW_LOGBOOK"].set_sensitive(sensitive)
         self.items["OPEN_LOGBOOK"].set_sensitive(sensitive)
         self.items["CLOSE_LOGBOOK"].set_sensitive(not sensitive)
-        return
 
     def set_log_items_sensitive(self, sensitive):
         """ Enable/disable log-related menu items.
@@ -149,7 +146,6 @@ class Menu:
 
         for item_name in ["NEW_LOG", "DELETE_LOG", "RENAME_LOG", "IMPORT_LOG", "EXPORT_LOG_ADIF", "EXPORT_LOG_CABRILLO", "PRINT_LOG"]:
             self.items[item_name].set_sensitive(sensitive)
-        return
 
     def set_record_items_sensitive(self, sensitive):
         """ Enable/disable record-related menu items.
@@ -159,4 +155,3 @@ class Menu:
 
         for item_name in ["ADD_RECORD", "EDIT_RECORD", "DELETE_RECORD", "REMOVE_DUPLICATES", "RECORD_COUNT"]:
             self.items[item_name].set_sensitive(sensitive)
-        return

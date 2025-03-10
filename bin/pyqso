@@ -78,7 +78,7 @@ class PyQSO:
 
         # Check that the configuration file actually exists (and is readable)
         # otherwise, we will resort to the defaults.
-        have_config = (config.read(config_directory + "/preferences.ini") != [])
+        have_config = (config.read(os.path.join(config_directory, "preferences.ini")) != [])
 
         # Kills the application if the close button is clicked on the main window itself.
         self.window.connect("delete-event", Gtk.main_quit)

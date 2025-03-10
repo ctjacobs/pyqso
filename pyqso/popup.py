@@ -42,5 +42,3 @@ class Popup:
 
         self.items["PASTE"] = self.builder.get_object("mitem_paste")
         self.items["PASTE"].connect("activate", self.application.logbook.paste_callback)
-
-        return

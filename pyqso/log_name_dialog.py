@@ -40,13 +40,13 @@ class LogNameDialog:
         self.builder.add_objects_from_file(glade_file_path, ("log_name_dialog",))
         self.dialog = self.builder.get_object("log_name_dialog")
 
-        if(title is None):
-            self.dialog.set_title("New Log")
-        else:
+        if title:
             self.dialog.set_title(title)
+        else:
+            self.dialog.set_title("New Log")
 
         self.entry = self.builder.get_object("log_name_entry")
-        if(name is not None):
+        if name:
             self.entry.set_text(name)
 
         self.dialog.show_all()

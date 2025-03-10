@@ -42,8 +42,6 @@ class TelnetConnectionDialog:
 
         self.dialog.show_all()
 
-        return
-
     @property
     def host(self):
         """ Return the Telnet server's host name.

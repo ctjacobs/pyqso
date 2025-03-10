@@ -45,8 +45,6 @@ class Printer(object):
         self.operation.connect("begin_print", self.begin_print)
         self.operation.connect("draw_page", self.draw_page)
 
-        return
-
     def print_records(self, records, title=None):
         """ Perform the print operation.
 
@@ -57,7 +55,7 @@ class Printer(object):
         """
 
         # Add the title, if given.
-        if(title):
+        if title:
             self.text_to_print = title + "\n\n"
         else:
             self.text_to_print = ""
@@ -70,9 +68,8 @@ class Printer(object):
             self.text_to_print += line_format % (str(r["id"]), str(r["CALL"]), str(r["QSO_DATE"]), str(r["TIME_ON"]), str(r["FREQ"]), str(r["MODE"]), str(r["RST_SENT"]), str(r["RST_RCVD"]))
 
         result = self.operation.run(self.action, parent=self.application.window)
-        if(result == Gtk.PrintOperationResult.ERROR):
+        if result == Gtk.PrintOperationResult.ERROR:
             error(parent=self.application.window, message="Unable to print the log.")
-
         return result
 
     def begin_print(self, operation, context):
@@ -95,14 +92,13 @@ class Printer(object):
             ink_rectangle, logical_rectangle = layout_line.get_pixel_extents()
             self.line_height = logical_rectangle.height + 3.0
             page_height += self.line_height
-            if((page_height + 2*self.line_height) >= height):
+            if (page_height + 2*self.line_height) >= height:
                 # Go on to the next page.
                 number_of_pages += 1
                 page_height = 0.0
         operation.set_n_pages(number_of_pages)
         logging.debug("Printing %d pages..." % number_of_pages)
         self.text_to_print = self.text_to_print.split("\n")
-        return
 
     def draw_page(self, operation, context, page_number):
         """ Render the QSO details on the page.
@@ -124,9 +120,7 @@ class Printer(object):
             PangoCairo.update_layout(cr, layout)
             PangoCairo.show_layout(cr, layout)
             current_line_number += 1
-            if((current_line_number+1)*self.line_height >= context.get_height()):
+            if (current_line_number+1)*self.line_height >= context.get_height():
                 for j in range(0, current_line_number-1):
                     self.text_to_print.pop(0)  # Remove what has been printed already before draw_page is called again.
                 break
-
-        return

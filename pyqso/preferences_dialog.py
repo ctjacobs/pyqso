@@ -70,10 +70,7 @@ class PreferencesDialog:
         self.world_map = WorldMapPage(self.dialog, self.builder)
 
         self.dialog.show_all()
-
         logging.debug("Preferences dialog ready!")
-
-        return
 
     def commit(self):
         """ Commit the user preferences to the configuration file. """
@@ -115,8 +112,6 @@ class PreferencesDialog:
         # Write the preferences to file.
         with open(os.path.expanduser(PREFERENCES_FILE), 'w') as f:
             config.write(f)
-
-        return
 
 
 class GeneralPage:
@@ -183,8 +178,6 @@ class GeneralPage:
         else:
             self.sources["KEEP_OPEN"].set_active(False)
 
-        return
-
     @property
     def data(self):
         """ User preferences regarding General settings. """
@@ -203,7 +196,6 @@ class GeneralPage:
         else:
             self.sources["DEFAULT_LOGBOOK_PATH"].set_sensitive(False)
             self.builder.get_object("general_default_logbook_button").set_sensitive(False)
-        return
 
     def on_default_logbook_clicked(self, widget):
         """ Let the user select the default logbook file via a file chooser dialog,
@@ -219,7 +211,6 @@ class GeneralPage:
             path = dialog.get_filename()
             self.sources["DEFAULT_LOGBOOK_PATH"].set_text(path)
         dialog.destroy()
-        return
 
 
 class ViewPage:
@@ -243,8 +234,6 @@ class ViewPage:
                 self.sources[field_name].set_active(config.getboolean("view", field_name.lower()))
             else:
                 self.sources[field_name].set_active(True)
-
-        return
 
     @property
     def data(self):
@@ -360,8 +349,6 @@ class RecordsPage:
         else:
             self.sources["IGNORE_PREFIX_SUFFIX"].set_active(True)
 
-        return
-
     @property
     def data(self):
         """ User preferences regarding Records settings. """
@@ -387,7 +374,6 @@ class RecordsPage:
         for submode in MODES[mode]:
             self.sources["DEFAULT_SUBMODE"].append_text(submode)
         self.sources["DEFAULT_SUBMODE"].set_active(MODES[mode].index(""))
-        return
 
 
 class ImportExportPage:
@@ -413,8 +399,6 @@ class ImportExportPage:
             self.sources["MERGE_COMMENT"].set_active(config.getboolean(section, option))
         else:
             self.sources["MERGE_COMMENT"].set_active(False)
-
-        return
 
     @property
     def data(self):
@@ -471,8 +455,6 @@ class HamlibPage:
         (section, option) = ("hamlib", "rig_pathname")
         if(have_config and config.has_option(section, option)):
             self.sources["RIG_PATHNAME"].set_text(config.get(section, option))
-
-        return
 
     @property
     def data(self):
@@ -554,8 +536,6 @@ class WorldMapPage:
         else:
             self.sources["SHADE_WORKED_GRID_SQUARES"].set_active(False)
 
-        return
-
     @property
     def data(self):
         """ User preferences regarding World Map settings. """
@@ -579,7 +559,6 @@ class WorldMapPage:
             self.sources["QTH_LATITUDE"].set_sensitive(False)
             self.sources["QTH_LONGITUDE"].set_sensitive(False)
             self.builder.get_object("world_map_qth_lookup").set_sensitive(False)
-        return
 
     def lookup_callback(self, widget=None):
         """ Perform geocoding of the QTH location to obtain latitude-longitude coordinates. """

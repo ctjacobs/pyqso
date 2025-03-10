@@ -68,8 +68,6 @@ class Awards:
 
         self.count(self.application.logbook)
 
-        return
-
     def count(self, logbook):
         """ Update the table for progress tracking.
 
@@ -92,13 +90,13 @@ class Awards:
             try:
                 records = log.records
                 for r in records:
-                    if(r["BAND"] is not None and r["MODE"] is not None):
-                        if(r["BAND"].lower() in self.bands and r["MODE"] != ""):
+                    if r["BAND"] is not None and r["MODE"] is not None:
+                        if r["BAND"].lower() in self.bands and r["MODE"] != "":
                             band = self.bands.index(r["BAND"].lower())
                             # Phone modes
-                            if(r["MODE"].upper() in ["FM", "AM", "SSB", "SSTV"]):
+                            if r["MODE"].upper() in ["FM", "AM", "SSB", "SSTV"]:
                                 count[0][band] += 1
-                            elif(r["MODE"].upper() == "CW"):
+                            elif r["MODE"].upper() == "CW":
                                 count[1][band] += 1
                             else:
                                 # FIXME: This assumes that all the other modes in the ADIF list are digital modes. Is this the case?
