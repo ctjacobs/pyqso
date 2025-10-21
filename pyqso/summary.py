@@ -69,7 +69,7 @@ class Summary(object):
         if have_config and config.has_option(section, option):
             if config.getboolean("general", "show_yearly_statistics") and have_matplotlib:
                 hbox = Gtk.HBox()
-                label = Gtk.Label(label="Display statistics for year: ", halign=Gtk.Align.START)
+                label = Gtk.Label(label='Display statistics for year: ', halign=Gtk.Align.START)
                 hbox.pack_start(label, False, False, 6)
                 year_select = Gtk.ComboBoxText()
                 min_year, max_year = self.get_year_bounds()
@@ -89,7 +89,7 @@ class Summary(object):
 
         # Summary tab label and icon.
         tab = Gtk.HBox(homogeneous=False, spacing=0)
-        label = Gtk.Label(label="Summary  ")
+        label = Gtk.Label(label='Summary  ')
         icon = Gtk.Image.new_from_icon_name(Gtk.STOCK_INDEX, Gtk.IconSize.MENU)
         tab.pack_start(label, False, False, 0)
         tab.pack_start(icon, False, False, 0)
@@ -123,7 +123,7 @@ class Summary(object):
         contact_count_plot.xaxis.set_major_formatter(formatter)
         month_locator = MonthLocator()
         contact_count_plot.xaxis.set_major_locator(month_locator)
-        contact_count_plot.set_ylabel("Number of QSOs")
+        contact_count_plot.set_ylabel('Number of QSOs')
 
         # Set x-axis upper limit based on the current month.
         contact_count_plot.xaxis_date()
@@ -136,7 +136,7 @@ class Summary(object):
         for p in patches:
             # Make the patches partially transparent.
             p.set_alpha(0.75)
-        mode_count_plot.set_title("Modes used")
+        mode_count_plot.set_title('Modes used')
 
         self.items["YEARLY_STATISTICS"].canvas.draw()
 
@@ -151,8 +151,7 @@ class Summary(object):
         max_years = []
         min_years = []
         for log in self.logbook.logs:
-            query = "SELECT min(QSO_DATE), max(QSO_DATE) FROM %s" % (log.name)
-            c.execute(query)
+            c.execute(f'SELECT MIN(QSO_DATE), MAX(QSO_DATE) FROM "{log.name}"')
             years = c.fetchone()
             if years[0] and years[1]:
                 min_years.append(int(years[0][:4]))
@@ -176,8 +175,8 @@ class Summary(object):
         c = self.logbook.connection.cursor()
 
         for log in self.logbook.logs:
-            query = "SELECT QSO_DATE, count(QSO_DATE) FROM %s WHERE QSO_DATE >= %d0101 AND QSO_DATE < %d0101 GROUP by QSO_DATE" % (log.name, year, year+1)
-            c.execute(query)
+            query = f'SELECT QSO_DATE, COUNT(QSO_DATE) FROM "{log.name}" WHERE QSO_DATE >= ? AND QSO_DATE < ? GROUP BY QSO_DATE'
+            c.execute(query, [f'{year}0101', f'{year+1}0101'])
             xy = c.fetchall()
 
             for i in range(len(xy)):
@@ -203,15 +202,15 @@ class Summary(object):
         mode_count = {}
 
         for log in self.logbook.logs:
-            query = "SELECT MODE, count(MODE) FROM %s WHERE QSO_DATE >= %d0101 AND QSO_DATE < %d0101 GROUP by MODE" % (log.name, year, year+1)
+            query = f'SELECT MODE, COUNT(MODE) FROM "{log.name}" WHERE QSO_DATE >= ? AND QSO_DATE < ? GROUP BY MODE'
             c = self.logbook.connection.cursor()
-            c.execute(query)
+            c.execute(query, [f'{year}0101', f'{year+1}0101'])
             xy = c.fetchall()
 
             for i in range(len(xy)):
                 mode = xy[i][0]
-                if mode == "":
-                    mode = "Unspecified"
+                if mode == '':
+                    mode = 'Unspecified'
 
                 # Add to running total
                 if mode in mode_count.keys():
@@ -227,7 +226,7 @@ class Summary(object):
         self.items["LOG_COUNT"].set_label(str(self.logbook.log_count))
         self.items["QSO_COUNT"].set_label(str(self.logbook.record_count))
         try:
-            t = datetime.fromtimestamp(getmtime(self.logbook.path)).strftime("%d %B %Y @ %H:%M")
+            t = datetime.fromtimestamp(getmtime(self.logbook.path)).strftime('%d %B %Y @ %H:%M')
             self.items["DATE_MODIFIED"].set_label(str(t))
         except (IOError, OSError) as e:
             logging.exception(e)

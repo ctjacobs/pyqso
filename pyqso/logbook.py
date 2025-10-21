@@ -259,23 +259,22 @@ class Logbook:
     def new_log(self, widget=None):
         """ Create a new log in the logbook. """
 
-        if(self.connection is None):
+        if self.connection is None:
             return
         exists = True
         ln = LogNameDialog(self.application)
-        while(exists):
+        while exists:
             response = ln.dialog.run()
-            if(response == Gtk.ResponseType.OK):
+            if response == Gtk.ResponseType.OK:
                 log_name = ln.name
                 try:
                     with self.connection:
                         c = self.connection.cursor()
                         # NOTE: "id" is simply an alias for the "rowid" column here.
-                        query = "CREATE TABLE %s (id INTEGER PRIMARY KEY AUTOINCREMENT" % log_name
+                        query = f'CREATE TABLE "{log_name}" (id INTEGER PRIMARY KEY AUTOINCREMENT'
                         for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
-                            s = ", %s TEXT" % field_name.lower()
-                            query = query + s
-                        query = query + ")"
+                            query += f', {field_name.lower()} TEXT'
+                        query += ")"
                         c.execute(query)
                         exists = False
                 except sqlite.Error as e:
@@ -305,12 +304,12 @@ class Logbook:
 
         :arg Gtk.Widget page: An optional argument corresponding to the currently-selected page/tab.
         """
-        if(self.connection is None):
+        if self.connection is None:
             return
 
-        if(page is None):
+        if page is None:
             page_index = self.notebook.get_current_page()  # Get the index of the selected tab in the logbook.
-            if(page_index == 0):  # If we are on the Summary page...
+            if page_index == 0:  # If we are on the Summary page...
                 logging.debug("No log currently selected!")
                 return
             else:
@@ -323,19 +322,19 @@ class Logbook:
         # This may not be the same as what get_current_page() returns.
         page_index = self.notebook.page_num(page)
 
-        if(page_index == 0 or page_index == self.notebook.get_n_pages()-1):  # Only the "New Log" tab is present (i.e. no actual logs in the logbook).
-            logging.debug("No logs to delete!")
+        if page_index == 0 or page_index == self.notebook.get_n_pages()-1:  # Only the "New Log" tab is present (i.e. no actual logs in the logbook).
+            logging.debug('No logs to delete!')
             return
 
-        response = question(parent=self.application.window, message="Are you sure you want to delete log %s?" % log.name)
-        if(response == Gtk.ResponseType.YES):
+        response = question(parent=self.application.window, message=f'Are you sure you want to delete log {log.name}?')
+        if response == Gtk.ResponseType.YES:
             try:
                 with self.connection:
                     c = self.connection.cursor()
-                    c.execute("DROP TABLE %s" % log.name)
+                    c.execute(f'DROP TABLE "{log.name}"')
             except sqlite.Error as e:
                 logging.exception(e)
-                error(parent=self.application.window, message="Database error. Could not delete the log.")
+                error(parent=self.application.window, message='Database error. Could not delete the log.')
                 return
 
             self.logs.pop(log_index)
@@ -593,9 +592,9 @@ class Logbook:
 
         # Get the new log's name (or the name of the existing log the user wants to import into).
         ln = LogNameDialog(self.application, title="Import Log")
-        while(True):
+        while True:
             response = ln.dialog.run()
-            if(response == Gtk.ResponseType.OK):
+            if response == Gtk.ResponseType.OK:
                 log_name = ln.name
 
                 # Check if the log name exists.
@@ -608,22 +607,21 @@ class Logbook:
                     ln.dialog.destroy()
                     return
 
-                if(exists):
+                if exists:
                     # Import into existing log.
                     l = self.logs[self.get_log_index(name=log_name)]
                     response = question(parent=ln.dialog, message="Are you sure you want to import into an existing log?")
-                    if(response == Gtk.ResponseType.YES):
+                    if response == Gtk.ResponseType.YES:
                         break
                 else:
                     # Create a new log with the name the user supplies.
                     try:
                         with self.connection:
                             c = self.connection.cursor()
-                            query = "CREATE TABLE %s (id INTEGER PRIMARY KEY AUTOINCREMENT" % log_name
+                            query = f'CREATE TABLE "{log_name}" (id INTEGER PRIMARY KEY AUTOINCREMENT'
                             for field_name in AVAILABLE_FIELD_NAMES_ORDERED:
-                                s = ", %s TEXT" % field_name.lower()
-                                query = query + s
-                            query = query + ")"
+                                query += f', {field_name.lower()} TEXT'
+                            query += ")"
                             c.execute(query)
                             l = Log(self.connection, log_name)
                             break
@@ -641,7 +639,7 @@ class Logbook:
         l.add_record(records)
         l.populate()
 
-        if(not exists):
+        if not exists:
             self.logs.append(l)
             self.render_log(self.log_count-1)
 
@@ -1142,7 +1140,7 @@ class Logbook:
 
         with self.connection:
             c = self.connection.cursor()
-            c.execute("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE name=?)", [table_name])
+            c.execute(f'SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE name="{table_name}")')
             exists = c.fetchone()
         if(exists[0] == 1):
             return True
@@ -1215,7 +1213,7 @@ class Logbook:
         logs = []
         with self.connection:
             c = self.connection.cursor()
-            c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT GLOB 'sqlite_*'")
+            c.execute('SELECT name FROM sqlite_master WHERE type=\'table\' AND name NOT GLOB \'sqlite_*\'')
             for name in c:
                 l = Log(self.connection, name[0])
                 l.populate()
