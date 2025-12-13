@@ -1,3 +1,35 @@
+
+<div align="right">
+  <details>
+    <summary >🌐 Language</summary>
+    <div>
+      <div align="center">
+        <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=en">English</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=zh-CN">简体中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=zh-TW">繁體中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=ja">日本語</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=ko">한국어</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=hi">हिन्दी</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=th">ไทย</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=fr">Français</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=de">Deutsch</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=es">Español</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=it">Italiano</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=ru">Русский</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=pt">Português</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=nl">Nederlands</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=pl">Polski</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=ar">العربية</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=fa">فارسی</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=tr">Türkçe</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=vi">Tiếng Việt</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=id">Bahasa Indonesia</a>
+        | <a href="https://openaitx.github.io/view.html?user=ctjacobs&project=pyqso&lang=as">অসমীয়া</
+      </div>
+    </div>
+  </details>
+</div>
+
     Copyright (C) 2013-2018 Christian Thomas Jacobs.
 
     This file is part of PyQSO.
